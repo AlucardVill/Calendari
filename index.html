@@ -24,7 +24,6 @@
 
     <style>
         :root {
-            /* TEMA OSCURO - Minimalista, profundo y elegante (Estilo Tech Moderno) */
             --bg: #09090b; 
             --bg-gradient: none; 
             --card: #121214; 
@@ -39,7 +38,7 @@
             --input-bg: #09090b;
             
             --past: #52525b; 
-            --today: #10b981; /* DÍA ACTUAL EN VERDE ESMERALDA */
+            --today: #10b981; 
             --future: #e4e4e7; 
             --saturday: #8b5cf6; 
             --sunday: #f43f5e; 
@@ -48,14 +47,13 @@
             --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
             --accent-secondary: #8b5cf6; 
             
-            /* COLORES NEÓN PARA PANELES Y BARRAS */
-            --bi-bar: #ec4899;   --bi-bar-rgb: 236, 72, 153;     /* Rosa */
-            --year-bar: #3b82f6; --year-bar-rgb: 59, 130, 246;   /* Azul */
-            --week-bar: #10b981; --week-bar-rgb: 16, 185, 129;   /* Verde */
-            --work: #f59e0b;     --work-rgb: 245, 158, 11;       /* Naranja */
-            --day-bar: #a855f7;  --day-bar-rgb: 168, 85, 247;    /* Morado */
+            --bi-bar: #ec4899;   --bi-bar-rgb: 236, 72, 153;     
+            --year-bar: #3b82f6; --year-bar-rgb: 59, 130, 246;   
+            --week-bar: #10b981; --week-bar-rgb: 16, 185, 129;   
+            --work: #f59e0b;     --work-rgb: 245, 158, 11;       
+            --day-bar: #a855f7;  --day-bar-rgb: 168, 85, 247;    
             
-            --week-box-active: rgba(16, 185, 129, 0.15); /* RESPLANDOR DE SEMANA EN VERDE */
+            --week-box-active: rgba(16, 185, 129, 0.15); 
             --week-box-concluded: rgba(39, 39, 42, 0.5);
             --block-id: #a1a1aa; 
             --clock-future: #18181b;
@@ -67,14 +65,13 @@
             --badge-meta-bg: #27272a; 
             --badge-meta-txt: #e4e4e7;
             
-            --shadow-raised: 0 4px 20px rgba(0, 0, 0, 0.4); 
+            --shadow-raised: 0 4px 15px rgba(0, 0, 0, 0.4); 
             --shadow-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-            --shadow-today: 0 4px 12px rgba(16, 185, 129, 0.3); /* SOMBRA DEL DÍA EN VERDE */
+            --shadow-today: 0 4px 10px rgba(16, 185, 129, 0.3); 
             --check-color: #121214;
         }
 
         [data-theme="light"] {
-            /* TEMA CLARO - Limpio, corporativo y nítido */
             --bg: #f8fafc; 
             --bg-gradient: none;
             --card: #ffffff; 
@@ -89,7 +86,7 @@
             --input-bg: #ffffff;
             
             --past: #94a3b8; 
-            --today: #059669; /* DÍA ACTUAL EN VERDE */
+            --today: #059669; 
             --future: #0f172a;
             --saturday: #6366f1; 
             --sunday: #e11d48; 
@@ -98,14 +95,13 @@
             --accent-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
             --accent-secondary: #0ea5e9;
             
-            /* COLORES NEÓN PARA PANELES Y BARRAS (Versión Clara) */
             --bi-bar: #db2777;   --bi-bar-rgb: 219, 39, 119;
             --year-bar: #2563eb; --year-bar-rgb: 37, 99, 235;
             --week-bar: #059669; --week-bar-rgb: 5, 150, 105;
             --work: #d97706;     --work-rgb: 217, 119, 6;
             --day-bar: #7c3aed;  --day-bar-rgb: 124, 58, 237;
             
-            --week-box-active: rgba(5, 150, 105, 0.1); /* RESPLANDOR DE SEMANA EN VERDE */
+            --week-box-active: rgba(5, 150, 105, 0.1); 
             --week-box-concluded: rgba(226, 232, 240, 0.6);
             --block-id: #64748b; 
             --clock-future: #f1f5f9;
@@ -117,9 +113,9 @@
             --badge-meta-bg: #e2e8f0; 
             --badge-meta-txt: #0f172a;
             
-            --shadow-raised: 0 4px 20px rgba(0,0,0,0.04);
+            --shadow-raised: 0 4px 15px rgba(0,0,0,0.04);
             --shadow-pressed: inset 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-today: 0 4px 12px rgba(5, 150, 105, 0.2); /* SOMBRA DEL DÍA EN VERDE */
+            --shadow-today: 0 4px 10px rgba(5, 150, 105, 0.2); 
             --check-color: #fff;
         }
 
@@ -130,8 +126,9 @@
             background: var(--bg); 
             color: var(--text); 
             margin: 0; 
-            padding: 20px; 
-            padding-top: calc(20px + env(safe-area-inset-top)); 
+            /* Reducimos el padding general */
+            padding: 15px; 
+            padding-top: calc(15px + env(safe-area-inset-top)); 
             overflow-x: hidden; 
             min-height: 100vh;
         }
@@ -139,10 +136,10 @@
         .m-arrow { display: inline-block; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: var(--accent); }
         .m-arrow.up { transform: rotate(180deg); color: var(--muted); }
 
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
         #current-date { 
-            font-size: 1.1rem; 
+            font-size: 1rem; /* Más pequeño */
             font-weight: 600; 
             color: var(--text); 
             margin: 0; 
@@ -156,91 +153,91 @@
             border: 1px solid var(--border); 
             cursor: pointer; 
             color: var(--text); 
-            border-radius: 14px; 
-            width: 44px; 
-            height: 44px; 
+            border-radius: 12px; 
+            width: 36px; /* Botones superiores más chicos */
+            height: 36px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             box-shadow: var(--shadow-raised); 
             transition: all 0.2s ease;
         }
+        .theme-btn svg { width: 16px; height: 16px; }
         .theme-btn:active { transform: scale(0.95); }
 
         .clocks-container { 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            gap: 35px; 
-            margin-bottom: 25px; 
+            gap: 25px; 
+            margin-bottom: 20px; 
             background: var(--card); 
-            padding: 25px 20px; 
-            border-radius: 28px; 
+            padding: 18px 15px; 
+            border-radius: 20px; 
             border: 1px solid var(--border); 
             box-shadow: var(--shadow-raised);
         }
 
         .digital-clock { 
             font-family: 'JetBrains Mono', monospace;
-            font-size: 2.2rem; 
+            font-size: 1.8rem; /* Reloj digital más sutil */
             font-weight: 600; 
             color: var(--text); 
             letter-spacing: -1px; 
         }
-        .digital-clock span { font-size: 1rem; color: var(--accent); font-weight: 600; margin-left: 4px; }
+        .digital-clock span { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-left: 4px; }
         
         .analog-clock { 
-            width: 100px; 
-            height: 100px; 
+            width: 80px; /* Reloj analógico más pequeño */
+            height: 80px; 
             border-radius: 50%; 
             position: relative; 
-            box-shadow: inset 0 0 15px var(--analog-shadow), 0 0 0 4px var(--item-bg), 0 0 0 5px var(--border); 
+            box-shadow: inset 0 0 10px var(--analog-shadow), 0 0 0 3px var(--item-bg), 0 0 0 4px var(--border); 
             background: var(--clock-future); 
         }
         .num { position: absolute; width: 100%; height: 100%; text-align: center; z-index: 1; }
-        .num span { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--subtext); padding-top: 5px; opacity: 0.7;}
+        .num span { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; color: var(--subtext); padding-top: 4px; opacity: 0.7;}
         .n1 { transform: rotate(30deg); } .n1 span { transform: rotate(-30deg); } .n2 { transform: rotate(60deg); } .n2 span { transform: rotate(-60deg); } .n3 { transform: rotate(90deg); } .n3 span { transform: rotate(-90deg); } .n4 { transform: rotate(120deg); } .n4 span { transform: rotate(-120deg); } .n5 { transform: rotate(150deg); } .n5 span { transform: rotate(-150deg); } .n6 { transform: rotate(180deg); } .n6 span { transform: rotate(-180deg); } .n7 { transform: rotate(210deg); } .n7 span { transform: rotate(-210deg); } .n8 { transform: rotate(240deg); } .n8 span { transform: rotate(-240deg); } .n9 { transform: rotate(270deg); } .n9 span { transform: rotate(-270deg); } .n10 { transform: rotate(300deg); } .n10 span { transform: rotate(-300deg); } .n11 { transform: rotate(330deg); } .n11 span { transform: rotate(-330deg); } .n12 { transform: rotate(360deg); } .n12 span { transform: rotate(-360deg); }
         
-        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 4px; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.3);}
-        .hand.hour { width: 4px; height: 26px; margin-left: -2px; background: var(--text); } 
-        .hand.minute { width: 3px; height: 36px; margin-left: -1.5px; background: var(--subtext); } 
-        .hand.second { width: 2px; height: 40px; margin-left: -1px; background: var(--accent); z-index: 3; }
-        .clock-center { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: var(--item-bg); border: 2px solid var(--accent); border-radius: 50%; transform: translate(-50%, -50%); z-index: 4;}
+        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 4px; z-index: 2; box-shadow: 0 1px 3px rgba(0,0,0,0.3);}
+        .hand.hour { width: 3px; height: 20px; margin-left: -1.5px; background: var(--text); } 
+        .hand.minute { width: 2px; height: 28px; margin-left: -1px; background: var(--subtext); } 
+        .hand.second { width: 1.5px; height: 32px; margin-left: -0.75px; background: var(--accent); z-index: 3; }
+        .clock-center { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: var(--item-bg); border: 1.5px solid var(--accent); border-radius: 50%; transform: translate(-50%, -50%); z-index: 4;}
 
         /* MÓDULO DE MÚLTIPLES TEMPORIZADORES */
         .timers-wrapper { 
-            margin-bottom: 25px; 
+            margin-bottom: 20px; 
             background: var(--card); 
             border: 1px solid var(--border);
-            border-radius: 28px; 
+            border-radius: 20px; 
             box-shadow: var(--shadow-raised);
             overflow: hidden;
         }
-        .timers-header { display: flex; justify-content: space-between; padding: 20px 24px; align-items: center; border-bottom: 1px solid var(--border);}
-        .th-title { font-size: 0.95rem; font-weight: 600; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 8px; flex: 1; user-select: none; letter-spacing: 0.5px;}
-        .timers-list { padding: 0 24px; display: none; background: var(--bg); }
+        .timers-header { display: flex; justify-content: space-between; padding: 15px 18px; align-items: center; border-bottom: 1px solid var(--border);}
+        .th-title { font-size: 0.85rem; font-weight: 600; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 8px; flex: 1; user-select: none; letter-spacing: 0.5px;}
+        .timers-list { padding: 0 18px; display: none; background: var(--bg); }
         .timers-list.active { display: block; animation: slideDown 0.2s ease-out; }
         
-        .timer-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-top: 1px solid var(--border); }
+        .timer-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-top: 1px solid var(--border); }
         .timer-row:first-child { border-top: none; }
-        .tr-info { display: flex; flex-direction: column; flex: 1; gap: 4px; }
-        .tr-name { font-size: 0.9rem; color: var(--text); font-weight: 600; }
-        .tr-pts { font-size: 0.7rem; color: var(--accent-secondary); font-weight: 600; font-family: 'JetBrains Mono', monospace;}
+        .tr-info { display: flex; flex-direction: column; flex: 1; gap: 3px; }
+        .tr-name { font-size: 0.85rem; color: var(--text); font-weight: 600; }
+        .tr-pts { font-size: 0.65rem; color: var(--accent-secondary); font-weight: 600; font-family: 'JetBrains Mono', monospace;}
         
-        .tr-val { font-size: 1.3rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--text); letter-spacing: 0px; }
+        .tr-val { font-size: 1.1rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--text); letter-spacing: 0px; }
         @keyframes pulse-accent { 0% { color: var(--accent-secondary); } 50% { color: var(--text); } 100% { color: var(--accent-secondary); } }
         .tr-val.done { animation: pulse-accent 1s infinite; }
         
-        .tr-actions { display: flex; gap: 10px; margin-left: 15px; align-items: center;}
-        .tr-btn { color: var(--muted); font-size: 1.2rem; cursor: pointer; transition: 0.2s; background: var(--item-bg); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); }
+        .tr-actions { display: flex; gap: 8px; margin-left: 12px; align-items: center;}
+        .tr-btn { color: var(--muted); font-size: 1rem; cursor: pointer; transition: 0.2s; background: var(--item-bg); padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); }
         .tr-btn:active { transform: scale(0.9); }
         .tr-btn:hover { color: var(--text); border-color: var(--accent);}
         .tr-btn.del:hover { color: var(--sunday); border-color: var(--sunday);}
 
         /* CONFIGURACIÓN DOCK Y BOTONES CON RESPLANDOR (GLOW) */
-        .dock { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
+        .dock { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         
-        /* Variables de color de resplandor específicas por botón */
         #btn-block { --c-rgb: var(--bi-bar-rgb); --c-hex: var(--bi-bar); }
         #btn-year  { --c-rgb: var(--year-bar-rgb); --c-hex: var(--year-bar); }
         #btn-week  { --c-rgb: var(--week-bar-rgb); --c-hex: var(--week-bar); }
@@ -248,59 +245,55 @@
         #btn-day   { --c-rgb: var(--day-bar-rgb); --c-hex: var(--day-bar); }
 
         .dock-btn { 
-            width: 52px; 
-            height: 52px; 
-            border-radius: 14px; 
+            width: 44px; /* Botones inferiores más pequeños */
+            height: 44px; 
+            border-radius: 12px; 
             display: flex; align-items: center; justify-content: center; 
             cursor: pointer; 
             transition: all 0.3s ease; 
             font-weight: 600; 
-            font-size: 0.85rem; 
+            font-size: 0.75rem; 
             background: var(--input-bg);
-            /* Borde sutil del color asignado + resplandor suave */
             border: 1px solid rgba(var(--c-rgb), 0.3);
             color: var(--c-hex);
-            box-shadow: 0 0 8px rgba(var(--c-rgb), 0.15);
+            box-shadow: 0 0 6px rgba(var(--c-rgb), 0.15);
         }
         .dock-btn.active { 
-            /* Efecto brillante e intenso al estar activo */
             background: rgba(var(--c-rgb), 0.15);
             border-color: rgba(var(--c-rgb), 0.7);
             color: var(--c-hex) !important;
-            box-shadow: 0 0 16px rgba(var(--c-rgb), 0.35), inset 0 0 8px rgba(var(--c-rgb), 0.15);
+            box-shadow: 0 0 12px rgba(var(--c-rgb), 0.35), inset 0 0 6px rgba(var(--c-rgb), 0.15);
             transform: translateY(-2px);
         }
 
-        .dock-panel { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 24px; margin-bottom: 25px; box-shadow: var(--shadow-raised); }
+        .dock-panel { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px; margin-bottom: 20px; box-shadow: var(--shadow-raised); }
         .dock-panel.active { display: block; animation: slideDown 0.2s ease-out; }
 
-        .label { font-size: 0.85rem; color: var(--subtext); display: flex; justify-content: space-between; align-items: center; font-weight: 600; letter-spacing: 0.5px;}
-        .timer { font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 600; margin: 16px 0; color: var(--text) !important;}
+        .label { font-size: 0.75rem; color: var(--subtext); display: flex; justify-content: space-between; align-items: center; font-weight: 600; letter-spacing: 0.5px;}
+        .timer { font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; font-weight: 600; margin: 12px 0; color: var(--text) !important;}
         
-        .progress-container { margin-top: 20px; margin-bottom: 5px; }
-        .bar-wrapper { position: relative; width: 100%; height: 10px; background: var(--input-bg); border-radius: 5px; overflow: visible;}
+        .progress-container { margin-top: 15px; margin-bottom: 4px; }
+        .bar-wrapper { position: relative; width: 100%; height: 8px; background: var(--input-bg); border-radius: 4px; overflow: visible;}
         
-        /* BARRAS DE PROGRESO - Eliminamos 'overflow: hidden' para que el resplandor se vea */
         .progress-bar { height: 100%; position: absolute; width: 100%; top: 0; left: 0;}
-        .fill { height: 100%; border-radius: 5px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .fill { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Efecto de resplandor para las barras de progreso */
-        #block-fill { box-shadow: 0 0 12px rgba(var(--bi-bar-rgb), 0.4); }
-        #year-fill  { box-shadow: 0 0 12px rgba(var(--year-bar-rgb), 0.4); }
-        #week-fill  { box-shadow: 0 0 12px rgba(var(--week-bar-rgb), 0.4); }
-        #work-fill  { box-shadow: 0 0 12px rgba(var(--work-rgb), 0.4); }
-        #day-fill   { box-shadow: 0 0 12px rgba(var(--day-bar-rgb), 0.4); }
+        #block-fill { box-shadow: 0 0 10px rgba(var(--bi-bar-rgb), 0.4); }
+        #year-fill  { box-shadow: 0 0 10px rgba(var(--year-bar-rgb), 0.4); }
+        #week-fill  { box-shadow: 0 0 10px rgba(var(--week-bar-rgb), 0.4); }
+        #work-fill  { box-shadow: 0 0 10px rgba(var(--work-rgb), 0.4); }
+        #day-fill   { box-shadow: 0 0 10px rgba(var(--day-bar-rgb), 0.4); }
 
-        .ticks { display: flex; justify-content: space-between; padding: 0; margin-top: 14px; }
-        .tick { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); font-weight: 500; text-align: center; width: 25px; }
+        .ticks { display: flex; justify-content: space-between; padding: 0; margin-top: 10px; }
+        .tick { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); font-weight: 500; text-align: center; width: 25px; }
         .tick.day-tick { width: auto; flex: 1; }
 
-        .controls-group { display: flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent);}
-        .icon-btn { background: var(--item-bg); border: 1px solid var(--border); color: var(--text); cursor: pointer; font-size: 0.8rem; padding: 8px 12px; border-radius: 10px; transition: 0.2s; }
+        .controls-group { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent);}
+        .icon-btn { background: var(--item-bg); border: 1px solid var(--border); color: var(--text); cursor: pointer; font-size: 0.75rem; padding: 6px 10px; border-radius: 8px; transition: 0.2s; }
         .icon-btn:active { transform: scale(0.9); }
 
-        .bar-marker { position: absolute; top: -16px; width: 16px; height: 20px; background: var(--m-color); border-radius: 5px; transform: translateX(-50%); cursor: grab; z-index: 10; border: 2px solid var(--card); box-shadow: 0 4px 8px rgba(0,0,0,0.2); touch-action: none; }
-        .bar-marker::after { content: ''; position: absolute; top: 18px; left: 4px; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 6px solid var(--m-color); }
+        .bar-marker { position: absolute; top: -14px; width: 14px; height: 18px; background: var(--m-color); border-radius: 4px; transform: translateX(-50%); cursor: grab; z-index: 10; border: 2px solid var(--card); box-shadow: 0 3px 6px rgba(0,0,0,0.2); touch-action: none; }
+        .bar-marker::after { content: ''; position: absolute; top: 16px; left: 3px; width: 0; height: 0; border-left: 3px solid transparent; border-right: 3px solid transparent; border-top: 5px solid var(--m-color); }
         .bar-marker:active { cursor: grabbing; transform: translateX(-50%) scale(1.1); }
 
         /* Modales estilo UI Avanzada */
@@ -309,125 +302,125 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .modal-card { background: var(--card); border: 1px solid var(--border); border-radius: 32px; padding: 32px; width: 340px; max-width: 90%; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.5); }
-        .modal-card h3 { margin: 0 0 24px; font-size: 1.1rem; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 16px;}
+        .modal-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 24px; width: 300px; max-width: 90%; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5); }
+        .modal-card h3 { margin: 0 0 18px; font-size: 1rem; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 12px;}
         
-        .input-group { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; color: var(--subtext); font-weight: 500;}
-        .input-group input[type="text"], .input-group input[type="number"], .input-group select { background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 12px 16px; border-radius: 12px; text-align: center; font-weight: 600; font-family: 'JetBrains Mono', monospace; width: 120px; outline: none; transition: 0.2s;}
-        .input-group input[type="text"] { width: 160px; font-family: 'Manrope', sans-serif;}
+        .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--subtext); font-weight: 500;}
+        .input-group input[type="text"], .input-group input[type="number"], .input-group select { background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 10px 12px; border-radius: 10px; text-align: center; font-weight: 600; font-family: 'JetBrains Mono', monospace; width: 100px; outline: none; transition: 0.2s;}
+        .input-group input[type="text"] { width: 140px; font-family: 'Manrope', sans-serif;}
         .input-group input:focus { border-color: var(--accent); }
         
-        .modal-actions { display: flex; gap: 14px; margin-top: 35px; }
-        .btn { flex: 1; padding: 14px; border: none; border-radius: 14px; font-weight: 600; cursor: pointer; font-size: 0.95rem; transition: 0.2s; letter-spacing: 0.5px;}
+        .modal-actions { display: flex; gap: 10px; margin-top: 25px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: 0.2s; letter-spacing: 0.5px;}
         .btn:active { transform: scale(0.95); }
         .btn-save { background: var(--accent-gradient); color: var(--btn-text); }
         .btn-cancel { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); }
         .btn-delete { background: rgba(244, 63, 94, 0.1); color: var(--sunday); border: 1px solid rgba(244, 63, 94, 0.3);}
 
-        .q-header { display: flex; justify-content: space-between; align-items: center; margin: 45px 0 25px; border-bottom: 1px solid var(--border); padding-bottom: 16px; cursor: pointer; transition: opacity 0.2s; }
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin: 30px 0 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; cursor: pointer; transition: opacity 0.2s; }
         .q-header:hover { opacity: 0.8; }
-        .q-title { font-size: 1.2rem; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 12px; }
-        .q-content { display: none; margin-bottom: 35px; }
+        .q-title { font-size: 1.05rem; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 12px; }
+        .q-content { display: none; margin-bottom: 25px; }
         .q-content.active { display: block; animation: slideDown 0.2s; }
 
         /* Estilos Calendario y Tareas */
-        .task-mgr { margin-bottom: 30px; }
-        .t-month { background: var(--card); border: 1px solid var(--border); border-radius: 28px; margin-bottom: 20px; box-shadow: var(--shadow-raised); overflow: hidden; transition: all 0.3s;}
+        .task-mgr { margin-bottom: 20px; }
+        .t-month { background: var(--card); border: 1px solid var(--border); border-radius: 20px; margin-bottom: 15px; box-shadow: var(--shadow-raised); overflow: hidden; transition: all 0.3s;}
         
-        .t-month-head { padding: 20px 24px; font-size: 1rem; font-weight: 600; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--card);}
-        .t-month-body { display: none; padding: 0 24px 24px; background: var(--bg); border-top: 1px solid var(--border);}
-        .t-month-body.active { display: block; animation: slideDown 0.2s; padding-top: 24px;}
+        .t-month-head { padding: 15px 20px; font-size: 0.9rem; font-weight: 600; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--card);}
+        .t-month-body { display: none; padding: 0 20px 20px; background: var(--bg); border-top: 1px solid var(--border);}
+        .t-month-body.active { display: block; animation: slideDown 0.2s; padding-top: 20px;}
         
-        .t-week { border-left: 2px solid var(--border); margin-left: 8px; padding-left: 20px; margin-bottom: 28px; position: relative;}
-        .t-week::before { content:''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: 0.3s; }
+        .t-week { border-left: 2px solid var(--border); margin-left: 6px; padding-left: 15px; margin-bottom: 20px; position: relative;}
+        .t-week::before { content:''; position: absolute; left: -5px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: 0.3s; }
         .t-week:focus-within { border-color: var(--accent); }
-        .t-week:focus-within::before { background: var(--accent); box-shadow: 0 0 12px var(--week-box-active); }
+        .t-week:focus-within::before { background: var(--accent); box-shadow: 0 0 10px var(--week-box-active); }
 
-        .t-week-title { font-size: 0.9rem; color: var(--text); font-weight: 600; margin-bottom: 16px; cursor: pointer; display: flex; justify-content: space-between; }
+        .t-week-title { font-size: 0.85rem; color: var(--text); font-weight: 600; margin-bottom: 12px; cursor: pointer; display: flex; justify-content: space-between; }
         .t-week-body { display: none; }
         .t-week-body.active { display: block; }
         
-        .t-item { display: flex; align-items: flex-start; gap: 16px; font-size: 0.95rem; margin-bottom: 14px; color: var(--subtext); font-weight: 500;}
-        .custom-check { appearance: none; background: var(--input-bg); margin: 0; width: 22px; height: 22px; border: 1px solid var(--border-input); border-radius: 6px; display: grid; place-content: center; cursor: pointer; flex-shrink: 0; margin-top: 1px; transition: 0.2s;}
-        .custom-check::before { content: ""; width: 10px; height: 10px; transform: scale(0); transition: 0.2s; box-shadow: inset 1em 1em var(--bg); clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+        .t-item { display: flex; align-items: flex-start; gap: 12px; font-size: 0.85rem; margin-bottom: 12px; color: var(--subtext); font-weight: 500;}
+        .custom-check { appearance: none; background: var(--input-bg); margin: 0; width: 18px; height: 18px; border: 1px solid var(--border-input); border-radius: 4px; display: grid; place-content: center; cursor: pointer; flex-shrink: 0; margin-top: 1px; transition: 0.2s;}
+        .custom-check::before { content: ""; width: 8px; height: 8px; transform: scale(0); transition: 0.2s; box-shadow: inset 1em 1em var(--bg); clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
         .custom-check:checked { background: var(--accent); border-color: var(--accent);}
         .custom-check:checked::before { transform: scale(1); }
         .t-item.done span.text { text-decoration: line-through; color: var(--muted);}
 
-        .t-add { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px;}
-        .t-type-select { background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); border-radius: 10px; padding: 10px 14px; font-size: 0.85rem; font-weight: 600; outline: none;}
-        .t-add input { flex: 1; min-width: 140px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 12px 16px; border-radius: 10px; font-size: 0.9rem; outline: none; transition: 0.2s;}
+        .t-add { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;}
+        .t-type-select { background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); border-radius: 8px; padding: 8px 10px; font-size: 0.75rem; font-weight: 600; outline: none;}
+        .t-add input { flex: 1; min-width: 120px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; outline: none; transition: 0.2s;}
         .t-add input:focus { border-color: var(--accent); }
-        .t-add button { background: var(--item-bg); color: var(--accent); border: 1px solid var(--border); padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s;}
+        .t-add button { background: var(--item-bg); color: var(--accent); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;}
         .t-add button:active { transform: scale(0.95); background: var(--week-box-active); border-color: var(--accent);}
 
-        .t-badge { font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; font-weight: 600; flex-shrink: 0; margin-top: 2px; font-family: 'JetBrains Mono', monospace;}
+        .t-badge { font-size: 0.65rem; padding: 4px 8px; border-radius: 6px; font-weight: 600; flex-shrink: 0; margin-top: 2px; font-family: 'JetBrains Mono', monospace;}
         .badge-meta { background: var(--badge-meta-bg); color: var(--badge-meta-txt); border: 1px solid var(--border);}
 
         /* CONTENEDOR DE MESES Y CALENDARIO (ESTÉTICA SOFT) */
-        .months-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; align-items: start; }
+        .months-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; align-items: start; }
         
-        .month { background: var(--card); border-radius: 32px; border: 1px solid var(--border); box-shadow: var(--shadow-raised); overflow: hidden; transition: padding 0.3s ease; padding: 28px; }
+        .month { background: var(--card); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-raised); overflow: hidden; transition: padding 0.3s ease; padding: 20px; }
         
-        .month.collapsed { padding: 20px 28px; }
+        .month.collapsed { padding: 15px 20px; }
         .month.collapsed .days-grid { display: none; }
         .month.collapsed .month-name { margin-bottom: 0; color: var(--muted); }
 
-        .month-name { font-size: 1.05rem; font-weight: 600; margin-bottom: 24px; color: var(--text); display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.5px; cursor: pointer; transition: 0.3s;}
+        .month-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 15px; color: var(--text); display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.5px; cursor: pointer; transition: 0.3s;}
         
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
-        .week-day { font-size: 0.75rem; color: var(--muted); font-weight: 600; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace;}
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .week-day { font-size: 0.65rem; color: var(--muted); font-weight: 600; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace;}
         
-        .day { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: 500; border-radius: 10px; background: transparent; border: 1px solid transparent; cursor: pointer; transition: 0.2s; position: relative;}
+        .day { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: 500; border-radius: 8px; background: transparent; border: 1px solid transparent; cursor: pointer; transition: 0.2s; position: relative;}
         .day:hover { background: var(--item-bg); }
         
         .day.future { color: var(--text); } 
         .day.past { color: var(--muted); } 
         .day.today { background: var(--today) !important; color: var(--today-text); box-shadow: var(--shadow-today); border: none; font-weight: 700; transform: scale(1.05); z-index: 5; } 
-        .day.has-points::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--accent); border-radius: 50%; }
+        .day.has-points::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; background: var(--accent); border-radius: 50%; }
         .day.today.has-points::after { background: var(--today-text); }
         
         .day.sat-future { color: var(--saturday); } 
         .day.sun-future { color: var(--sunday); }
 
-        .block-label { position: absolute; top: -14px; left: 0; font-size: 0.6rem; color: var(--block-id); font-weight: 600; z-index: 10; letter-spacing: 0.05em;}
+        .block-label { position: absolute; top: -12px; left: 0; font-size: 0.55rem; color: var(--block-id); font-weight: 600; z-index: 10; letter-spacing: 0.05em;}
         
         @keyframes pulse-bg { 0% { background: transparent; } 50% { background: var(--week-box-active); } 100% { background: transparent; } }
-        .current-week-glow .day { animation: pulse-bg 3s infinite; z-index: 1; border-radius: 10px;}
+        .current-week-glow .day { animation: pulse-bg 3s infinite; z-index: 1; border-radius: 8px;}
         
         .highlight-week-active .day { border-top: 1px solid var(--week-box-active); border-bottom: 1px solid var(--week-box-active); border-radius: 0; background: var(--week-box-active);} 
-        .highlight-week-active .block-start { border-left: 1px solid var(--week-box-active); border-top-left-radius: 10px; border-bottom-left-radius: 10px; } 
-        .highlight-week-active .block-end { border-right: 1px solid var(--week-box-active); border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        .highlight-week-active .block-start { border-left: 1px solid var(--week-box-active); border-top-left-radius: 8px; border-bottom-left-radius: 8px; } 
+        .highlight-week-active .block-end { border-right: 1px solid var(--week-box-active); border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
         
         .highlight-week-concluded .day { border-top: 1px solid var(--week-box-concluded); border-bottom: 1px solid var(--week-box-concluded); border-radius: 0; } 
-        .highlight-week-concluded .block-start { border-left: 1px solid var(--week-box-concluded); border-top-left-radius: 10px; border-bottom-left-radius: 10px; } 
-        .highlight-week-concluded .block-end { border-right: 1px solid var(--week-box-concluded); border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        .highlight-week-concluded .block-start { border-left: 1px solid var(--week-box-concluded); border-top-left-radius: 8px; border-bottom-left-radius: 8px; } 
+        .highlight-week-concluded .block-end { border-right: 1px solid var(--week-box-concluded); border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
 
         /* Estilos Historial Diario Modal */
-        .daily-log-list { max-height: 250px; overflow-y: auto; margin-top: 20px; padding-right: 5px;}
-        .log-item { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; font-size: 0.9rem;}
-        .log-item-head { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 8px; color: var(--text);}
-        .log-item-time { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted);}
+        .daily-log-list { max-height: 200px; overflow-y: auto; margin-top: 15px; padding-right: 5px;}
+        .log-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 0.85rem;}
+        .log-item-head { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 6px; color: var(--text);}
+        .log-item-time { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted);}
 
         /* Métricas */
-        .metrics-wrapper { margin-top: 30px; background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 28px; box-shadow: var(--shadow-raised);}
-        .metrics-header { display: flex; justify-content: space-between; margin-bottom: 24px; align-items: center; }
-        .metrics-title { font-size: 0.9rem; color: var(--text); font-weight: 600; letter-spacing: 0.5px; }
-        .m-bar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
-        .m-label { width: 45px; font-size: 0.85rem; font-weight: 600; color: var(--subtext); text-align: left; }
-        .m-pct { width: 55px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 600; text-align: right; }
-        .m-progress { flex: 1; background: var(--input-bg); height: 8px; border-radius: 4px; overflow: hidden; }
-        .m-fill { height: 100%; background: var(--accent-gradient); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 4px; }
+        .metrics-wrapper { margin-top: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: var(--shadow-raised);}
+        .metrics-header { display: flex; justify-content: space-between; margin-bottom: 18px; align-items: center; }
+        .metrics-title { font-size: 0.85rem; color: var(--text); font-weight: 600; letter-spacing: 0.5px; }
+        .m-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .m-label { width: 40px; font-size: 0.75rem; font-weight: 600; color: var(--subtext); text-align: left; }
+        .m-pct { width: 45px; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 600; text-align: right; }
+        .m-progress { flex: 1; background: var(--input-bg); height: 6px; border-radius: 3px; overflow: hidden; }
+        .m-fill { height: 100%; background: var(--accent-gradient); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 3px; }
     </style>
 </head>
 <body>
     <div class="header-top">
         <button class="theme-btn" onclick="exportData()" title="Backup">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
         </button>
         <h2 id="current-date">CARGANDO...</h2>
         <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Tema">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
         </button>
     </div>
 
@@ -441,7 +434,7 @@
 
     <div class="timers-wrapper" id="timers-wrapper">
         <div class="timers-header">
-            <div class="th-title" onclick="toggleTimersSection()">Operations <span id="timers-arrow" class="m-arrow" style="font-size:0.75rem; margin-left:8px">▼</span></div>
+            <div class="th-title" onclick="toggleTimersSection()">Operations <span id="timers-arrow" class="m-arrow" style="font-size:0.65rem; margin-left:8px">▼</span></div>
             <button class="icon-btn" onclick="openAddTimerModal()" style="border:none; color: var(--bg); background: var(--accent); font-weight:600;">+ NEW</button>
         </div>
         <div class="timers-list" id="timers-list">
@@ -518,14 +511,14 @@
             
             <div id="modal-content-marker" style="display:none;">
                 <h3>MARKER</h3>
-                <div class="input-group"><label>Color:</label><input type="color" id="inp-marker-color" style="padding:0; width:60px; height:36px; border:none; background:none;"></div>
+                <div class="input-group"><label>Color:</label><input type="color" id="inp-marker-color" style="padding:0; width:50px; height:30px; border:none; background:none;"></div>
                 <div class="modal-actions" style="flex-wrap: wrap;"><button class="btn btn-delete" onclick="deleteActiveMarker()" style="flex-basis: 100%; margin-bottom: 8px;">DELETE</button><button class="btn btn-cancel" onclick="closeModal()">CANCEL</button><button class="btn btn-save" onclick="saveMarkerSettings()">SAVE</button></div>
             </div>
 
             <div id="modal-content-daily-log" style="display:none;">
                 <h3 id="daily-log-title">LOG: DD/MM/YYYY</h3>
-                <div style="font-size: 0.95rem; color: var(--subtext); margin-bottom: 15px; font-weight: 600;">
-                    POINTS EARNED: <span id="daily-log-pts" style="color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight:600; margin-left: 6px;">0</span>
+                <div style="font-size: 0.85rem; color: var(--subtext); margin-bottom: 12px; font-weight: 600;">
+                    POINTS EARNED: <span id="daily-log-pts" style="color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight:600; margin-left: 6px;">0</span>
                 </div>
                 <div class="daily-log-list" id="daily-log-list"></div>
                 <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()" style="flex:1">CLOSE</button></div>
@@ -737,7 +730,7 @@
             document.getElementById('daily-log-pts').innerText = logs.length;
             
             const list = document.getElementById('daily-log-list');
-            if(logs.length === 0) { list.innerHTML = `<div style="color:var(--muted); font-size:0.9rem;">No activity recorded.</div>`; } 
+            if(logs.length === 0) { list.innerHTML = `<div style="color:var(--muted); font-size:0.85rem;">No activity recorded.</div>`; } 
             else {
                 list.innerHTML = logs.map(l => {
                     let aTime = new Date(l.activatedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -904,7 +897,7 @@
             updateAllMetrics(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); ['block', 'year', 'week', 'work', 'day'].forEach(renderMarkers);
         }
             
-        document.getElementById('theme-btn').innerHTML = document.documentElement.getAttribute('data-theme') === 'light' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+        document.getElementById('theme-btn').innerHTML = document.documentElement.getAttribute('data-theme') === 'light' ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
         initTimers(); drawCalendar(); setInterval(update, 1000); update();
     </script>
 </body>

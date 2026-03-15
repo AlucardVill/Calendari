@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Control Personal</title>
+    <title>Control Personal Avanzado</title>
     
-    <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,219 +12,423 @@
     <meta name="theme-color" id="theme-color-meta" content="#09090b">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2370/2370264.png">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <script>
         const savedTheme = localStorage.getItem('wkTheme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
-        if(savedTheme === 'light') document.getElementById('theme-color-meta').setAttribute('content', '#f4f4f5');
+        if(savedTheme === 'light') document.getElementById('theme-color-meta').setAttribute('content', '#f8fafc');
     </script>
 
     <style>
         :root {
-            /* TEMA OSCURO */
-            --bg: #09090b; --card: #18181b; --text: #fafafa;
-            --border: #27272a; --border-input: #3f3f46;
-            --muted: #71717a; --subtext: #a1a1aa;
-            --item-bg: #121214; --input-bg: #09090b;
+            /* TEMA OSCURO - Minimalista, profundo y elegante (Estilo Tech Moderno) */
+            --bg: #09090b; 
+            --bg-gradient: none; 
+            --card: #121214; 
+            --card-gradient: none;
+            --text: #fafafa; 
+            --border: #27272a; 
+            --border-highlight: transparent;
+            --border-input: #3f3f46;
+            --muted: #a1a1aa; 
+            --subtext: #71717a;
+            --item-bg: #18181b; 
+            --input-bg: #09090b;
             
-            --past: #27272a; --today: #ffffff; --future: #22c55e;
-            --saturday: #38bdf8; --sunday: #fb7185; --accent: #10b981;
-            --work: #f59e0b; --day-bar: #a855f7; --year-bar: #3b82f6;
-            --week-bar: #10b981; --bi-bar: #ec4899;
-            --week-box-active: #00ff7f; --week-box-concluded: #3f3f46;
-            --block-id: #fde047; --clock-future: #064e3b; 
+            --past: #52525b; 
+            --today: #10b981; /* DÍA ACTUAL EN VERDE ESMERALDA */
+            --future: #e4e4e7; 
+            --saturday: #8b5cf6; 
+            --sunday: #f43f5e; 
             
-            --modal-bg: rgba(0,0,0,0.8); --analog-shadow: rgba(0,0,0,0.6);
-            --btn-text: #000; --today-text: #000;
-            --badge-meta-bg: #3f3f46; --badge-meta-txt: #d4d4d8;
-            --badge-dia-bg: #27272a; --badge-dia-border: #52525b; --badge-dia-txt: #a1a1aa;
-            --shadow-today: 0 0 12px #ffffff; --check-color: #000;
+            --accent: #3b82f6; 
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            --accent-secondary: #8b5cf6; 
+            
+            /* COLORES NEÓN PARA PANELES Y BARRAS */
+            --bi-bar: #ec4899;   --bi-bar-rgb: 236, 72, 153;     /* Rosa */
+            --year-bar: #3b82f6; --year-bar-rgb: 59, 130, 246;   /* Azul */
+            --week-bar: #10b981; --week-bar-rgb: 16, 185, 129;   /* Verde */
+            --work: #f59e0b;     --work-rgb: 245, 158, 11;       /* Naranja */
+            --day-bar: #a855f7;  --day-bar-rgb: 168, 85, 247;    /* Morado */
+            
+            --week-box-active: rgba(16, 185, 129, 0.15); /* RESPLANDOR DE SEMANA EN VERDE */
+            --week-box-concluded: rgba(39, 39, 42, 0.5);
+            --block-id: #a1a1aa; 
+            --clock-future: #18181b;
+            
+            --modal-bg: rgba(9, 9, 11, 0.85); 
+            --analog-shadow: rgba(0, 0, 0, 0.5);
+            --btn-text: #ffffff; 
+            --today-text: #ffffff;
+            --badge-meta-bg: #27272a; 
+            --badge-meta-txt: #e4e4e7;
+            
+            --shadow-raised: 0 4px 20px rgba(0, 0, 0, 0.4); 
+            --shadow-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+            --shadow-today: 0 4px 12px rgba(16, 185, 129, 0.3); /* SOMBRA DEL DÍA EN VERDE */
+            --check-color: #121214;
         }
 
         [data-theme="light"] {
-            /* TEMA CLARO */
-            --bg: #f4f4f5; --card: #ffffff; --text: #18181b;
-            --border: #e4e4e7; --border-input: #d4d4d8;
-            --muted: #a1a1aa; --subtext: #52525b;
-            --item-bg: #fafafa; --input-bg: #ffffff;
+            /* TEMA CLARO - Limpio, corporativo y nítido */
+            --bg: #f8fafc; 
+            --bg-gradient: none;
+            --card: #ffffff; 
+            --card-gradient: none;
+            --text: #0f172a; 
+            --border: #e2e8f0; 
+            --border-highlight: transparent;
+            --border-input: #cbd5e1;
+            --muted: #64748b; 
+            --subtext: #94a3b8;
+            --item-bg: #f1f5f9; 
+            --input-bg: #ffffff;
             
-            --past: #e4e4e7; --today: #000000; --future: #16a34a;
-            --saturday: #0284c7; --sunday: #e11d48; --accent: #059669;
-            --work: #d97706; --day-bar: #9333ea; --year-bar: #2563eb;
-            --week-bar: #059669; --bi-bar: #db2777;
-            --week-box-active: #10b981; --week-box-concluded: #d4d4d8;
-            --block-id: #ca8a04; --clock-future: #d1fae5;
+            --past: #94a3b8; 
+            --today: #059669; /* DÍA ACTUAL EN VERDE */
+            --future: #0f172a;
+            --saturday: #6366f1; 
+            --sunday: #e11d48; 
             
-            --modal-bg: rgba(255,255,255,0.85); --analog-shadow: rgba(0,0,0,0.05);
-            --btn-text: #ffffff; --today-text: #ffffff;
-            --badge-meta-bg: #e4e4e7; --badge-meta-txt: #18181b;
-            --badge-dia-bg: #f4f4f5; --badge-dia-border: #d4d4d8; --badge-dia-txt: #52525b;
-            --shadow-today: 0 4px 10px rgba(0,0,0,0.3); --check-color: #fff;
+            --accent: #2563eb;
+            --accent-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            --accent-secondary: #0ea5e9;
+            
+            /* COLORES NEÓN PARA PANELES Y BARRAS (Versión Clara) */
+            --bi-bar: #db2777;   --bi-bar-rgb: 219, 39, 119;
+            --year-bar: #2563eb; --year-bar-rgb: 37, 99, 235;
+            --week-bar: #059669; --week-bar-rgb: 5, 150, 105;
+            --work: #d97706;     --work-rgb: 217, 119, 6;
+            --day-bar: #7c3aed;  --day-bar-rgb: 124, 58, 237;
+            
+            --week-box-active: rgba(5, 150, 105, 0.1); /* RESPLANDOR DE SEMANA EN VERDE */
+            --week-box-concluded: rgba(226, 232, 240, 0.6);
+            --block-id: #64748b; 
+            --clock-future: #f1f5f9;
+            
+            --modal-bg: rgba(248, 250, 252, 0.85); 
+            --analog-shadow: rgba(0,0,0,0.03);
+            --btn-text: #ffffff; 
+            --today-text: #ffffff;
+            --badge-meta-bg: #e2e8f0; 
+            --badge-meta-txt: #0f172a;
+            
+            --shadow-raised: 0 4px 20px rgba(0,0,0,0.04);
+            --shadow-pressed: inset 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-today: 0 4px 12px rgba(5, 150, 105, 0.2); /* SOMBRA DEL DÍA EN VERDE */
+            --check-color: #fff;
         }
 
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(15px + env(safe-area-inset-top)); overflow-x: hidden; transition: background 0.3s, color 0.3s; }
-        
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 15px; }
-        #current-date { font-size: 1.1rem; font-weight: 300; color: var(--subtext); margin: 0; text-align: center; flex: 1; }
-        .theme-btn { background: var(--card); border: 1px solid var(--border); cursor: pointer; font-size: 1.2rem; color: var(--text); padding: 5px; border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .theme-btn:active { transform: scale(0.9); }
+        * { box-sizing: border-box; }
 
-        .clocks-container { display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 25px; background: var(--card); padding: 20px; border-radius: 14px; border: 1px solid var(--border); transition: background 0.3s, border-color 0.3s; }
-        .digital-clock { font-size: 2.2rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: 1px; }
-        .digital-clock span { font-size: 1rem; color: var(--muted); font-weight: 500; }
-        .analog-clock { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--border-input); position: relative; box-shadow: inset 0 0 12px var(--analog-shadow); background: var(--clock-future); }
+        body { 
+            font-family: 'Manrope', system-ui, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+            padding-top: calc(20px + env(safe-area-inset-top)); 
+            overflow-x: hidden; 
+            min-height: 100vh;
+        }
+        
+        .m-arrow { display: inline-block; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: var(--accent); }
+        .m-arrow.up { transform: rotate(180deg); color: var(--muted); }
+
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        
+        #current-date { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            color: var(--text); 
+            margin: 0; 
+            text-align: center; 
+            flex: 1; 
+            letter-spacing: 0.5px;
+        }
+
+        .theme-btn { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            cursor: pointer; 
+            color: var(--text); 
+            border-radius: 14px; 
+            width: 44px; 
+            height: 44px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: var(--shadow-raised); 
+            transition: all 0.2s ease;
+        }
+        .theme-btn:active { transform: scale(0.95); }
+
+        .clocks-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 35px; 
+            margin-bottom: 25px; 
+            background: var(--card); 
+            padding: 25px 20px; 
+            border-radius: 28px; 
+            border: 1px solid var(--border); 
+            box-shadow: var(--shadow-raised);
+        }
+
+        .digital-clock { 
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem; 
+            font-weight: 600; 
+            color: var(--text); 
+            letter-spacing: -1px; 
+        }
+        .digital-clock span { font-size: 1rem; color: var(--accent); font-weight: 600; margin-left: 4px; }
+        
+        .analog-clock { 
+            width: 100px; 
+            height: 100px; 
+            border-radius: 50%; 
+            position: relative; 
+            box-shadow: inset 0 0 15px var(--analog-shadow), 0 0 0 4px var(--item-bg), 0 0 0 5px var(--border); 
+            background: var(--clock-future); 
+        }
         .num { position: absolute; width: 100%; height: 100%; text-align: center; z-index: 1; }
-        .num span { display: inline-block; font-size: 10px; font-weight: 700; color: var(--subtext); padding-top: 5px; }
+        .num span { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--subtext); padding-top: 5px; opacity: 0.7;}
         .n1 { transform: rotate(30deg); } .n1 span { transform: rotate(-30deg); } .n2 { transform: rotate(60deg); } .n2 span { transform: rotate(-60deg); } .n3 { transform: rotate(90deg); } .n3 span { transform: rotate(-90deg); } .n4 { transform: rotate(120deg); } .n4 span { transform: rotate(-120deg); } .n5 { transform: rotate(150deg); } .n5 span { transform: rotate(-150deg); } .n6 { transform: rotate(180deg); } .n6 span { transform: rotate(-180deg); } .n7 { transform: rotate(210deg); } .n7 span { transform: rotate(-210deg); } .n8 { transform: rotate(240deg); } .n8 span { transform: rotate(-240deg); } .n9 { transform: rotate(270deg); } .n9 span { transform: rotate(-270deg); } .n10 { transform: rotate(300deg); } .n10 span { transform: rotate(-300deg); } .n11 { transform: rotate(330deg); } .n11 span { transform: rotate(-330deg); } .n12 { transform: rotate(360deg); } .n12 span { transform: rotate(-360deg); }
-        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 4px; z-index: 2; }
-        .hand.hour { width: 4px; height: 28px; margin-left: -2px; background: var(--text); } .hand.minute { width: 3px; height: 38px; margin-left: -1.5px; background: var(--subtext); } .hand.second { width: 2px; height: 42px; margin-left: -1px; background: var(--sunday); z-index: 3; }
-        .clock-center { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: var(--text); border-radius: 50%; transform: translate(-50%, -50%); z-index: 4; }
-
-        .dock { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .dock-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--card); transition: all 0.2s; font-weight: 800; font-size: 0.7rem; }
-        .dock-btn.active { border-color: var(--today); transform: scale(1.1); background: var(--border); }
-
-        .dock-panel { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 15px; margin-bottom: 15px; animation: slideIn 0.25s ease-out; }
-        .dock-panel.active { display: block; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-
-        .label { font-size: 0.7rem; color: var(--subtext); display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
-        .timer { font-size: 1.2rem; font-weight: bold; margin: 4px 0; font-variant-numeric: tabular-nums; }
         
-        .progress-container { margin-top: 15px; margin-bottom: 10px; }
-        .bar-wrapper { position: relative; width: 100%; height: 8px; }
-        .progress-bar { background: var(--border); height: 100%; border-radius: 4px; overflow: hidden; position: absolute; width: 100%; top: 0; left: 0;}
-        .fill { height: 100%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        .ticks { display: flex; justify-content: space-between; padding: 0 2px; margin-top: 8px; }
-        .tick { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; width: 20px; }
-        .tick.year-tick { width: 35px; } 
-        .tick.day-tick { font-size: 0.45rem; width: auto; letter-spacing: -0.5px; flex: 1; } 
-
-        .controls-group { display: flex; align-items: center; gap: 8px; }
-        .icon-btn { background: var(--border); border: none; color: var(--text); cursor: pointer; font-size: 0.65rem; font-weight: bold; padding: 3px 6px; border-radius: 6px; transition: 0.2s; border: 1px solid var(--border-input); }
-        .icon-btn:active { background: var(--border-input); transform: scale(0.95); }
-
-        .bar-marker { position: absolute; top: -10px; width: 12px; height: 12px; background: var(--m-color); border-radius: 50%; transform: translateX(-50%); cursor: grab; z-index: 10; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.5); touch-action: none; }
-        .bar-marker::after { content: ''; position: absolute; top: 10px; left: 3px; width: 2px; height: 8px; background: var(--m-color); }
-        .bar-marker:active { cursor: grabbing; transform: translateX(-50%) scale(1.2); }
+        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 4px; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.3);}
+        .hand.hour { width: 4px; height: 26px; margin-left: -2px; background: var(--text); } 
+        .hand.minute { width: 3px; height: 36px; margin-left: -1.5px; background: var(--subtext); } 
+        .hand.second { width: 2px; height: 40px; margin-left: -1px; background: var(--accent); z-index: 3; }
+        .clock-center { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: var(--item-bg); border: 2px solid var(--accent); border-radius: 50%; transform: translate(-50%, -50%); z-index: 4;}
 
         /* MÓDULO DE MÚLTIPLES TEMPORIZADORES */
-        .timers-wrapper { margin-bottom: 25px; background: var(--item-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-        .timers-header { display: flex; justify-content: space-between; padding: 12px 15px; align-items: center; background: var(--card); }
-        .th-title { font-size: 0.85rem; font-weight: bold; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 8px; flex: 1; user-select: none; }
-        .timers-list { padding: 0 15px; display: none; }
-        .timers-list.active { display: block; animation: slideIn 0.2s; }
-        .timer-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
+        .timers-wrapper { 
+            margin-bottom: 25px; 
+            background: var(--card); 
+            border: 1px solid var(--border);
+            border-radius: 28px; 
+            box-shadow: var(--shadow-raised);
+            overflow: hidden;
+        }
+        .timers-header { display: flex; justify-content: space-between; padding: 20px 24px; align-items: center; border-bottom: 1px solid var(--border);}
+        .th-title { font-size: 0.95rem; font-weight: 600; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 8px; flex: 1; user-select: none; letter-spacing: 0.5px;}
+        .timers-list { padding: 0 24px; display: none; background: var(--bg); }
+        .timers-list.active { display: block; animation: slideDown 0.2s ease-out; }
+        
+        .timer-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-top: 1px solid var(--border); }
         .timer-row:first-child { border-top: none; }
-        .tr-name { font-size: 0.8rem; color: var(--subtext); font-weight: 600; flex: 1; }
-        .tr-val { font-size: 1.1rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); letter-spacing: 0.5px; }
+        .tr-info { display: flex; flex-direction: column; flex: 1; gap: 4px; }
+        .tr-name { font-size: 0.9rem; color: var(--text); font-weight: 600; }
+        .tr-pts { font-size: 0.7rem; color: var(--accent-secondary); font-weight: 600; font-family: 'JetBrains Mono', monospace;}
         
-        @keyframes pulse-red { 0% { color: var(--sunday); } 50% { color: var(--text); } 100% { color: var(--sunday); } }
-        .tr-val.done { animation: pulse-red 1s infinite; }
+        .tr-val { font-size: 1.3rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--text); letter-spacing: 0px; }
+        @keyframes pulse-accent { 0% { color: var(--accent-secondary); } 50% { color: var(--text); } 100% { color: var(--accent-secondary); } }
+        .tr-val.done { animation: pulse-accent 1s infinite; }
         
-        .tr-del { color: var(--muted); font-size: 1.2rem; cursor: pointer; padding-left: 15px; transition: color 0.2s; }
-        .tr-del:hover { color: var(--sunday); }
+        .tr-actions { display: flex; gap: 10px; margin-left: 15px; align-items: center;}
+        .tr-btn { color: var(--muted); font-size: 1.2rem; cursor: pointer; transition: 0.2s; background: var(--item-bg); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); }
+        .tr-btn:active { transform: scale(0.9); }
+        .tr-btn:hover { color: var(--text); border-color: var(--accent);}
+        .tr-btn.del:hover { color: var(--sunday); border-color: var(--sunday);}
 
-        .modal-overlay { display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        /* CONFIGURACIÓN DOCK Y BOTONES CON RESPLANDOR (GLOW) */
+        .dock { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
+        
+        /* Variables de color de resplandor específicas por botón */
+        #btn-block { --c-rgb: var(--bi-bar-rgb); --c-hex: var(--bi-bar); }
+        #btn-year  { --c-rgb: var(--year-bar-rgb); --c-hex: var(--year-bar); }
+        #btn-week  { --c-rgb: var(--week-bar-rgb); --c-hex: var(--week-bar); }
+        #btn-work  { --c-rgb: var(--work-rgb); --c-hex: var(--work); }
+        #btn-day   { --c-rgb: var(--day-bar-rgb); --c-hex: var(--day-bar); }
+
+        .dock-btn { 
+            width: 52px; 
+            height: 52px; 
+            border-radius: 14px; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            font-weight: 600; 
+            font-size: 0.85rem; 
+            background: var(--input-bg);
+            /* Borde sutil del color asignado + resplandor suave */
+            border: 1px solid rgba(var(--c-rgb), 0.3);
+            color: var(--c-hex);
+            box-shadow: 0 0 8px rgba(var(--c-rgb), 0.15);
+        }
+        .dock-btn.active { 
+            /* Efecto brillante e intenso al estar activo */
+            background: rgba(var(--c-rgb), 0.15);
+            border-color: rgba(var(--c-rgb), 0.7);
+            color: var(--c-hex) !important;
+            box-shadow: 0 0 16px rgba(var(--c-rgb), 0.35), inset 0 0 8px rgba(var(--c-rgb), 0.15);
+            transform: translateY(-2px);
+        }
+
+        .dock-panel { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 24px; margin-bottom: 25px; box-shadow: var(--shadow-raised); }
+        .dock-panel.active { display: block; animation: slideDown 0.2s ease-out; }
+
+        .label { font-size: 0.85rem; color: var(--subtext); display: flex; justify-content: space-between; align-items: center; font-weight: 600; letter-spacing: 0.5px;}
+        .timer { font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 600; margin: 16px 0; color: var(--text) !important;}
+        
+        .progress-container { margin-top: 20px; margin-bottom: 5px; }
+        .bar-wrapper { position: relative; width: 100%; height: 10px; background: var(--input-bg); border-radius: 5px; overflow: visible;}
+        
+        /* BARRAS DE PROGRESO - Eliminamos 'overflow: hidden' para que el resplandor se vea */
+        .progress-bar { height: 100%; position: absolute; width: 100%; top: 0; left: 0;}
+        .fill { height: 100%; border-radius: 5px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Efecto de resplandor para las barras de progreso */
+        #block-fill { box-shadow: 0 0 12px rgba(var(--bi-bar-rgb), 0.4); }
+        #year-fill  { box-shadow: 0 0 12px rgba(var(--year-bar-rgb), 0.4); }
+        #week-fill  { box-shadow: 0 0 12px rgba(var(--week-bar-rgb), 0.4); }
+        #work-fill  { box-shadow: 0 0 12px rgba(var(--work-rgb), 0.4); }
+        #day-fill   { box-shadow: 0 0 12px rgba(var(--day-bar-rgb), 0.4); }
+
+        .ticks { display: flex; justify-content: space-between; padding: 0; margin-top: 14px; }
+        .tick { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); font-weight: 500; text-align: center; width: 25px; }
+        .tick.day-tick { width: auto; flex: 1; }
+
+        .controls-group { display: flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent);}
+        .icon-btn { background: var(--item-bg); border: 1px solid var(--border); color: var(--text); cursor: pointer; font-size: 0.8rem; padding: 8px 12px; border-radius: 10px; transition: 0.2s; }
+        .icon-btn:active { transform: scale(0.9); }
+
+        .bar-marker { position: absolute; top: -16px; width: 16px; height: 20px; background: var(--m-color); border-radius: 5px; transform: translateX(-50%); cursor: grab; z-index: 10; border: 2px solid var(--card); box-shadow: 0 4px 8px rgba(0,0,0,0.2); touch-action: none; }
+        .bar-marker::after { content: ''; position: absolute; top: 18px; left: 4px; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 6px solid var(--m-color); }
+        .bar-marker:active { cursor: grabbing; transform: translateX(-50%) scale(1.1); }
+
+        /* Modales estilo UI Avanzada */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; width: 280px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .modal-card h3 { margin: 0 0 15px; font-size: 1rem; color: var(--text); }
-        .input-group { margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--subtext); font-weight: 500;}
-        .input-group input[type="text"], .input-group input[type="number"], .input-group select { width: auto; min-width: 60px; max-width: 140px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 6px; border-radius: 6px; text-align: center; font-weight: bold; font-family: inherit;}
-        .input-group input[type="color"] { background: none; border: none; padding: 0; width: 35px; height: 35px; cursor: pointer; border-radius: 6px; }
-        .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
-        .btn { flex: 1; padding: 8px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s;}
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal-card { background: var(--card); border: 1px solid var(--border); border-radius: 32px; padding: 32px; width: 340px; max-width: 90%; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.5); }
+        .modal-card h3 { margin: 0 0 24px; font-size: 1.1rem; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 16px;}
+        
+        .input-group { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; color: var(--subtext); font-weight: 500;}
+        .input-group input[type="text"], .input-group input[type="number"], .input-group select { background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 12px 16px; border-radius: 12px; text-align: center; font-weight: 600; font-family: 'JetBrains Mono', monospace; width: 120px; outline: none; transition: 0.2s;}
+        .input-group input[type="text"] { width: 160px; font-family: 'Manrope', sans-serif;}
+        .input-group input:focus { border-color: var(--accent); }
+        
+        .modal-actions { display: flex; gap: 14px; margin-top: 35px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 14px; font-weight: 600; cursor: pointer; font-size: 0.95rem; transition: 0.2s; letter-spacing: 0.5px;}
         .btn:active { transform: scale(0.95); }
-        .btn-save { background: var(--accent); color: var(--btn-text); }
-        .btn-cancel { background: var(--border); color: var(--text); }
-        .btn-delete { background: var(--sunday); color: var(--btn-text); }
+        .btn-save { background: var(--accent-gradient); color: var(--btn-text); }
+        .btn-cancel { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); }
+        .btn-delete { background: rgba(244, 63, 94, 0.1); color: var(--sunday); border: 1px solid rgba(244, 63, 94, 0.3);}
 
-        .q-header { display: flex; justify-content: space-between; align-items: center; margin: 30px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; cursor: pointer; transition: opacity 0.2s; }
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin: 45px 0 25px; border-bottom: 1px solid var(--border); padding-bottom: 16px; cursor: pointer; transition: opacity 0.2s; }
         .q-header:hover { opacity: 0.8; }
-        .q-title { font-size: 1rem; font-weight: bold; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-        .q-arrow { font-size: 0.6rem; transition: transform 0.3s; color: var(--muted); }
-        .q-content { display: none; margin-bottom: 25px; }
-        .q-content.active { display: block; animation: slideIn 0.2s; }
-        .q-header.open .q-arrow { transform: rotate(180deg); }
+        .q-title { font-size: 1.2rem; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 12px; }
+        .q-content { display: none; margin-bottom: 35px; }
+        .q-content.active { display: block; animation: slideDown 0.2s; }
 
-        .task-mgr { margin-bottom: 20px; }
-        .t-month { background: var(--item-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
-        .t-month-head { padding: 12px 15px; font-size: 0.9rem; font-weight: bold; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; background: var(--card); transition: background 0.2s;}
-        .t-month-head:hover { background: var(--item-bg); }
-        .t-month-body { display: none; padding: 15px; border-top: 1px solid var(--border); }
-        .t-month-body.active { display: block; animation: slideIn 0.2s; }
+        /* Estilos Calendario y Tareas */
+        .task-mgr { margin-bottom: 30px; }
+        .t-month { background: var(--card); border: 1px solid var(--border); border-radius: 28px; margin-bottom: 20px; box-shadow: var(--shadow-raised); overflow: hidden; transition: all 0.3s;}
         
-        .t-week { border-left: 2px solid var(--block-id); margin-left: 5px; padding-left: 12px; margin-bottom: 15px; }
-        .t-week:last-child { margin-bottom: 0; }
-        .t-week-title { font-size: 0.85rem; color: var(--block-id); font-weight: 800; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 4px 0;}
+        .t-month-head { padding: 20px 24px; font-size: 1rem; font-weight: 600; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--card);}
+        .t-month-body { display: none; padding: 0 24px 24px; background: var(--bg); border-top: 1px solid var(--border);}
+        .t-month-body.active { display: block; animation: slideDown 0.2s; padding-top: 24px;}
+        
+        .t-week { border-left: 2px solid var(--border); margin-left: 8px; padding-left: 20px; margin-bottom: 28px; position: relative;}
+        .t-week::before { content:''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: 0.3s; }
+        .t-week:focus-within { border-color: var(--accent); }
+        .t-week:focus-within::before { background: var(--accent); box-shadow: 0 0 12px var(--week-box-active); }
+
+        .t-week-title { font-size: 0.9rem; color: var(--text); font-weight: 600; margin-bottom: 16px; cursor: pointer; display: flex; justify-content: space-between; }
         .t-week-body { display: none; }
-        .t-week-body.active { display: block; animation: fadeIn 0.3s ease-out; }
+        .t-week-body.active { display: block; }
         
-        .t-list { list-style: none; padding: 0; margin: 0 0 10px 0; }
-        .t-item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.85rem; margin-bottom: 8px; color: var(--text); line-height: 1.3; transition: opacity 0.2s; padding: 2px 0;}
-        
-        .custom-check { appearance: none; background-color: var(--input-bg); margin: 0; width: 16px; height: 16px; border: 2px solid var(--border-input); border-radius: 4px; display: grid; place-content: center; transition: 0.2s ease-in-out; margin-top: 2px; flex-shrink: 0; cursor: pointer; }
-        .custom-check::before { content: ""; width: 8px; height: 8px; transform: scale(0); transition: 0.2s ease-in-out; box-shadow: inset 1em 1em var(--check-color); transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
-        .custom-check:checked { background-color: var(--accent); border-color: var(--accent); }
+        .t-item { display: flex; align-items: flex-start; gap: 16px; font-size: 0.95rem; margin-bottom: 14px; color: var(--subtext); font-weight: 500;}
+        .custom-check { appearance: none; background: var(--input-bg); margin: 0; width: 22px; height: 22px; border: 1px solid var(--border-input); border-radius: 6px; display: grid; place-content: center; cursor: pointer; flex-shrink: 0; margin-top: 1px; transition: 0.2s;}
+        .custom-check::before { content: ""; width: 10px; height: 10px; transform: scale(0); transition: 0.2s; box-shadow: inset 1em 1em var(--bg); clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+        .custom-check:checked { background: var(--accent); border-color: var(--accent);}
         .custom-check:checked::before { transform: scale(1); }
+        .t-item.done span.text { text-decoration: line-through; color: var(--muted);}
 
-        .t-item.done span.text { text-decoration: line-through; color: var(--muted); }
-        .delete-btn { color: var(--muted); font-size: 1.1rem; padding: 0 5px; cursor: pointer; transition: 0.2s; opacity: 0.5; }
-        .t-item:hover .delete-btn { opacity: 1; color: var(--sunday); }
-        .empty-tasks { color: var(--muted); font-size: 0.75rem; font-style: italic; padding: 5px 0 10px; }
-
-        .t-add { display: flex; gap: 6px; flex-wrap: wrap; }
-        .t-type-select { background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); border-radius: 6px; padding: 6px; font-size: 0.75rem; outline: none; }
-        .t-add input { flex: 1; min-width: 120px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; outline: none; transition: border-color 0.2s;}
+        .t-add { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px;}
+        .t-type-select { background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); border-radius: 10px; padding: 10px 14px; font-size: 0.85rem; font-weight: 600; outline: none;}
+        .t-add input { flex: 1; min-width: 140px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 12px 16px; border-radius: 10px; font-size: 0.9rem; outline: none; transition: 0.2s;}
         .t-add input:focus { border-color: var(--accent); }
-        .t-add button { background: var(--accent); color: var(--btn-text); border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: opacity 0.2s;}
-        .t-add button:active { opacity: 0.8; }
+        .t-add button { background: var(--item-bg); color: var(--accent); border: 1px solid var(--border); padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s;}
+        .t-add button:active { transform: scale(0.95); background: var(--week-box-active); border-color: var(--accent);}
 
-        .t-badge { font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; flex-shrink: 0;}
-        .badge-meta { background: var(--badge-meta-bg); color: var(--badge-meta-txt); }
-        .badge-diario { background: #3b82f630; color: #3b82f6; border: 1px solid #3b82f650; }
-        .badge-dia { background: var(--badge-dia-bg); color: var(--badge-dia-txt); border: 1px solid var(--badge-dia-border); }
+        .t-badge { font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; font-weight: 600; flex-shrink: 0; margin-top: 2px; font-family: 'JetBrains Mono', monospace;}
+        .badge-meta { background: var(--badge-meta-bg); color: var(--badge-meta-txt); border: 1px solid var(--border);}
 
-        .metrics-wrapper { margin-top: 20px; background: var(--item-bg); border: 1px solid var(--border); border-radius: 10px; padding: 15px; }
-        .metrics-header { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
-        .metrics-title { font-size: 0.75rem; color: var(--subtext); font-weight: bold; letter-spacing: 0.5px; }
-        .toggle-view { font-size: 0.65rem; background: var(--border); padding: 5px 10px; border-radius: 12px; cursor: pointer; color: var(--text); font-weight: bold; border: 1px solid var(--border-input); }
-        .metrics-view { display: none; }
-        .metrics-view.active { display: block; animation: slideIn 0.2s ease-out; }
-        .m-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .m-bar-row:last-child { margin-bottom: 0; }
-        .m-label { width: 75px; font-size: 0.75rem; color: var(--subtext); text-align: right; }
-        .m-pct { width: 40px; font-size: 0.75rem; color: var(--text); font-weight: bold; text-align: left; }
-        .m-progress { flex: 1; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; position: relative; }
-        .m-fill { height: 100%; background: var(--accent); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; }
-
-        .months-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; align-items: start; }
-        .month { background: var(--card); padding: 12px; border-radius: 10px; border: 1px solid var(--border); transition: padding 0.2s, border-color 0.3s; }
-        .month-name { font-size: 0.85rem; font-weight: bold; margin-bottom: 12px; color: var(--subtext); text-align: center; position: relative; cursor: pointer; user-select: none; }
-        .month-toggle { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: var(--muted); font-weight: normal; }
-        .month.collapsed { padding: 10px 12px; }
+        /* CONTENEDOR DE MESES Y CALENDARIO (ESTÉTICA SOFT) */
+        .months-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; align-items: start; }
+        
+        .month { background: var(--card); border-radius: 32px; border: 1px solid var(--border); box-shadow: var(--shadow-raised); overflow: hidden; transition: padding 0.3s ease; padding: 28px; }
+        
+        .month.collapsed { padding: 20px 28px; }
         .month.collapsed .days-grid { display: none; }
-        .month.collapsed .month-name { margin-bottom: 0; }
+        .month.collapsed .month-name { margin-bottom: 0; color: var(--muted); }
 
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; text-align: center; }
-        .week-day { font-size: 0.6rem; color: var(--muted); margin-bottom: 8px; }
-        .day { font-size: 0.75rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: 500; border: 1.5px solid transparent; box-sizing: border-box; margin-top: 10px; position: relative; }
-        .block-label { position: absolute; top: -11px; left: 0; font-size: 0.5rem; color: var(--block-id); font-weight: 800; z-index: 10; }
+        .month-name { font-size: 1.05rem; font-weight: 600; margin-bottom: 24px; color: var(--text); display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.5px; cursor: pointer; transition: 0.3s;}
+        
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+        .week-day { font-size: 0.75rem; color: var(--muted); font-weight: 600; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace;}
+        
+        .day { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: 500; border-radius: 10px; background: transparent; border: 1px solid transparent; cursor: pointer; transition: 0.2s; position: relative;}
+        .day:hover { background: var(--item-bg); }
+        
+        .day.future { color: var(--text); } 
+        .day.past { color: var(--muted); } 
+        .day.today { background: var(--today) !important; color: var(--today-text); box-shadow: var(--shadow-today); border: none; font-weight: 700; transform: scale(1.05); z-index: 5; } 
+        .day.has-points::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--accent); border-radius: 50%; }
+        .day.today.has-points::after { background: var(--today-text); }
+        
+        .day.sat-future { color: var(--saturday); } 
+        .day.sun-future { color: var(--sunday); }
 
-        @keyframes pulse-border { 0% { box-shadow: 0 0 0px var(--week-box-active); } 50% { box-shadow: 0 0 8px var(--week-box-active); } 100% { box-shadow: 0 0 0px var(--week-box-active); } }
-        .current-week-glow .day { animation: pulse-border 2s infinite; z-index: 1; }
-        .day.future { color: var(--future); } .day.past { color: var(--subtext); background: var(--past) !important; border-radius: 2px; } 
-        .day.today { background: var(--today) !important; color: var(--today-text); font-weight: 900; box-shadow: var(--shadow-today); border-radius: 2px; transform: scale(1.1); z-index: 5; } 
-        .day.sat-future { color: var(--saturday); } .day.sun-future { color: var(--sunday); }
-        .highlight-week-active .day { border-top-color: var(--week-box-active); border-bottom-color: var(--week-box-active); } .highlight-week-active .block-start { border-left-color: var(--week-box-active); border-top-left-radius: 6px; border-bottom-left-radius: 6px; } .highlight-week-active .block-end { border-right-color: var(--week-box-active); border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        .block-label { position: absolute; top: -14px; left: 0; font-size: 0.6rem; color: var(--block-id); font-weight: 600; z-index: 10; letter-spacing: 0.05em;}
+        
+        @keyframes pulse-bg { 0% { background: transparent; } 50% { background: var(--week-box-active); } 100% { background: transparent; } }
+        .current-week-glow .day { animation: pulse-bg 3s infinite; z-index: 1; border-radius: 10px;}
+        
+        .highlight-week-active .day { border-top: 1px solid var(--week-box-active); border-bottom: 1px solid var(--week-box-active); border-radius: 0; background: var(--week-box-active);} 
+        .highlight-week-active .block-start { border-left: 1px solid var(--week-box-active); border-top-left-radius: 10px; border-bottom-left-radius: 10px; } 
+        .highlight-week-active .block-end { border-right: 1px solid var(--week-box-active); border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        
+        .highlight-week-concluded .day { border-top: 1px solid var(--week-box-concluded); border-bottom: 1px solid var(--week-box-concluded); border-radius: 0; } 
+        .highlight-week-concluded .block-start { border-left: 1px solid var(--week-box-concluded); border-top-left-radius: 10px; border-bottom-left-radius: 10px; } 
+        .highlight-week-concluded .block-end { border-right: 1px solid var(--week-box-concluded); border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+
+        /* Estilos Historial Diario Modal */
+        .daily-log-list { max-height: 250px; overflow-y: auto; margin-top: 20px; padding-right: 5px;}
+        .log-item { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; font-size: 0.9rem;}
+        .log-item-head { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 8px; color: var(--text);}
+        .log-item-time { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted);}
+
+        /* Métricas */
+        .metrics-wrapper { margin-top: 30px; background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 28px; box-shadow: var(--shadow-raised);}
+        .metrics-header { display: flex; justify-content: space-between; margin-bottom: 24px; align-items: center; }
+        .metrics-title { font-size: 0.9rem; color: var(--text); font-weight: 600; letter-spacing: 0.5px; }
+        .m-bar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+        .m-label { width: 45px; font-size: 0.85rem; font-weight: 600; color: var(--subtext); text-align: left; }
+        .m-pct { width: 55px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 600; text-align: right; }
+        .m-progress { flex: 1; background: var(--input-bg); height: 8px; border-radius: 4px; overflow: hidden; }
+        .m-fill { height: 100%; background: var(--accent-gradient); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 4px; }
     </style>
 </head>
 <body>
     <div class="header-top">
-        <!-- BOTÓN DE EXPORTACIÓN (Copia de Seguridad) -->
-        <button class="theme-btn" onclick="exportData()" title="Exportar Tareas y Configuración">💾</button>
-        <h2 id="current-date">Cargando...</h2>
-        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Alternar Tema">🌙</button>
+        <button class="theme-btn" onclick="exportData()" title="Backup">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        </button>
+        <h2 id="current-date">CARGANDO...</h2>
+        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Tema">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
     </div>
 
     <div class="clocks-container">
@@ -236,593 +439,473 @@
         <div class="digital-clock" id="digital-clock">--:--:--</div>
     </div>
 
-    <!-- Módulo de Múltiples Temporizadores (AHORA ARRIBA) -->
     <div class="timers-wrapper" id="timers-wrapper">
         <div class="timers-header">
-            <div class="th-title" onclick="toggleTimersSection()">⏱️ Temporizadores <span id="timers-arrow" style="font-size:0.6rem; color:var(--muted); transition:0.3s">▼</span></div>
-            <button class="icon-btn" onclick="openAddTimerModal()">+ Añadir</button>
+            <div class="th-title" onclick="toggleTimersSection()">Operations <span id="timers-arrow" class="m-arrow" style="font-size:0.75rem; margin-left:8px">▼</span></div>
+            <button class="icon-btn" onclick="openAddTimerModal()" style="border:none; color: var(--bg); background: var(--accent); font-weight:600;">+ NEW</button>
         </div>
         <div class="timers-list" id="timers-list">
-            <!-- Renderizado dinámico -->
-        </div>
+            </div>
     </div>
 
     <div class="dock">
-        <div class="dock-btn" id="btn-block" style="color: var(--bi-bar);" onclick="togglePanel('block')">2Y</div>
-        <div class="dock-btn" id="btn-year" style="color: var(--year-bar);" onclick="togglePanel('year')">1Y</div>
-        <div class="dock-btn" id="btn-week" style="color: var(--week-bar);" onclick="togglePanel('week')">7D</div>
-        <div class="dock-btn" id="btn-work" style="color: var(--work);" onclick="togglePanel('work')">W</div>
-        <div class="dock-btn" id="btn-day" style="color: var(--day-bar);" onclick="togglePanel('day')">D</div>
+        <div class="dock-btn" id="btn-block" onclick="togglePanel('block')">2Y</div>
+        <div class="dock-btn" id="btn-year" onclick="togglePanel('year')">1Y</div>
+        <div class="dock-btn" id="btn-week" onclick="togglePanel('week')">7D</div>
+        <div class="dock-btn" id="btn-work" onclick="togglePanel('work')">WRK</div>
+        <div class="dock-btn" id="btn-day" onclick="togglePanel('day')">DAY</div>
     </div>
 
-    <!-- Paneles Dock -->
     <div id="panel-block" class="dock-panel">
-        <div class="label"><span style="color: var(--bi-bar); font-weight: bold;" id="label-block">Bloque Años</span> <div class="controls-group"><span id="block-pct" style="margin-right:5px">0.00%</span><button class="icon-btn" onclick="openBlockModal()">⚙️</button><button class="icon-btn" onclick="addMarker('block')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--bi-bar);" id="label-block">BLOCK</span> <div class="controls-group"><span id="block-pct">0.00%</span><button class="icon-btn" onclick="openBlockModal()">⚙️</button><button class="icon-btn" onclick="addMarker('block')">+📍</button></div></div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-block"><div class="progress-bar"><div id="block-fill" class="fill" style="background: var(--bi-bar);"></div></div></div><div class="ticks" id="block-ticks"></div></div>
     </div>
 
     <div id="panel-year" class="dock-panel">
-        <div class="label"><span style="color: var(--year-bar); font-weight: bold;" id="label-year">Año Actual</span> <div class="controls-group"><span id="year-pct" style="margin-right:5px">0.00%</span><button class="icon-btn" onclick="addMarker('year')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--year-bar);" id="label-year">YEAR</span> <div class="controls-group"><span id="year-pct">0.00%</span><button class="icon-btn" onclick="addMarker('year')">+📍</button></div></div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-year"><div class="progress-bar"><div id="year-fill" class="fill" style="background: var(--year-bar);"></div></div></div><div class="ticks"><span class="tick">E</span><span class="tick">F</span><span class="tick">M</span><span class="tick">A</span><span class="tick">M</span><span class="tick">J</span><span class="tick">J</span><span class="tick">A</span><span class="tick">S</span><span class="tick">O</span><span class="tick">N</span><span class="tick">D</span></div></div>
     </div>
 
     <div id="panel-week" class="dock-panel">
-        <div class="label"><span style="color: var(--week-bar); font-weight: bold;">Semana Actual</span> <div class="controls-group"><span id="week-pct" style="margin-right:5px">0.00%</span><button class="icon-btn" onclick="addMarker('week')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--week-bar);">WEEK</span> <div class="controls-group"><span id="week-pct">0.00%</span><button class="icon-btn" onclick="addMarker('week')">+📍</button></div></div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-week"><div class="progress-bar"><div id="week-fill" class="fill" style="background: var(--week-bar);"></div></div></div><div class="ticks"><span class="tick">L</span><span class="tick">M</span><span class="tick">M</span><span class="tick">J</span><span class="tick">V</span><span class="tick">S</span><span class="tick">D</span></div></div>
     </div>
 
     <div id="panel-work" class="dock-panel">
-        <div class="label"><span id="label-work">Jornada</span> <div class="controls-group"><span id="work-pct" style="margin-right:5px">0.00%</span><button class="icon-btn" onclick="openWorkModal()">⚙️</button><button class="icon-btn" onclick="addMarker('work')">+📍</button></div></div>
+        <div class="label"><span id="label-work" style="color: var(--work);">WORK SHIFT</span> <div class="controls-group"><span id="work-pct">0.00%</span><button class="icon-btn" onclick="openWorkModal()">⚙️</button><button class="icon-btn" onclick="addMarker('work')">+📍</button></div></div>
         <div id="work-timer" class="timer" style="color: var(--work);">--:--:--</div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-work"><div class="progress-bar"><div id="work-fill" class="fill" style="background: var(--work)"></div></div></div><div class="ticks" id="work-ticks"></div></div>
     </div>
 
     <div id="panel-day" class="dock-panel">
-        <div class="label"><span>Día Actual (24h)</span> <div class="controls-group"><span id="day-pct" style="margin-right:5px">0.00%</span><button class="icon-btn" onclick="openDayModal()">⚙️</button><button class="icon-btn" onclick="addMarker('day')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--day-bar);">CURRENT DAY</span> <div class="controls-group"><span id="day-pct">0.00%</span><button class="icon-btn" onclick="openDayModal()">⚙️</button><button class="icon-btn" onclick="addMarker('day')">+📍</button></div></div>
         <div id="day-timer" class="timer" style="color: var(--day-bar);">--:--:--</div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-day"><div class="progress-bar"><div id="day-fill" class="fill" style="background: var(--day-bar)"></div></div></div><div class="ticks" id="day-ticks"></div></div>
     </div>
 
     <div id="calendar-container"></div>
 
-    <!-- Modales -->
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             
             <div id="modal-content-timer" style="display:none;">
-                <h3>Añadir Temporizador</h3>
-                <div class="input-group"><label>Nombre:</label><input type="text" id="inp-t-name" placeholder="Ej. Lavadora" style="width: 120px;"></div>
-                <div class="input-group"><label>Horas:</label><input type="number" id="inp-t-hours" min="0" max="999" value="0"></div>
-                <div class="input-group"><label>Minutos:</label><input type="number" id="inp-t-mins" min="0" max="59" value="15"></div>
-                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveCustomTimer()">Iniciar</button></div>
+                <h3>NEW TIMER</h3>
+                <div class="input-group"><label>Label:</label><input type="text" id="inp-t-name" placeholder="Focus 1"></div>
+                <div class="input-group"><label>Hours:</label><input type="number" id="inp-t-hours" min="0" max="999" value="0"></div>
+                <div class="input-group"><label>Mins:</label><input type="number" id="inp-t-mins" min="0" max="59" value="25"></div>
+                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">CANCEL</button><button class="btn btn-save" onclick="saveCustomTimer()">START</button></div>
             </div>
 
             <div id="modal-content-block" style="display:none;">
-                <h3>Configurar Bloque Años</h3>
-                <div class="input-group"><label>Año de inicio:</label><input type="number" id="inp-block-start" min="2000" max="2100"></div>
-                <div class="input-group"><label>Duración (Años):</label><select id="inp-block-years"><option value="2">2 Años</option><option value="3">3 Años</option><option value="4">4 Años</option><option value="5">5 Años</option></select></div>
-                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveBlockSettings()">Guardar</button></div>
+                <h3>BLOCK CONFIG</h3>
+                <div class="input-group"><label>Start Year:</label><input type="number" id="inp-block-start"></div>
+                <div class="input-group"><label>Duration:</label><select id="inp-block-years"><option value="2">2 Years</option><option value="3">3 Years</option><option value="4">4 Years</option></select></div>
+                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">CANCEL</button><button class="btn btn-save" onclick="saveBlockSettings()">SAVE</button></div>
             </div>
-
+            
             <div id="modal-content-work" style="display:none;">
-                <h3>Configurar Jornada</h3>
-                <div class="input-group"><label>Hora Inicio (0-23):</label><input type="number" id="inp-work-start" min="0" max="23"></div>
-                <div class="input-group"><label>Hora Fin (0-23):</label><input type="number" id="inp-work-end" min="0" max="23"></div>
-                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveWorkSettings()">Guardar</button></div>
+                <h3>SHIFT CONFIG</h3>
+                <div class="input-group"><label>Start (0-23):</label><input type="number" id="inp-work-start"></div>
+                <div class="input-group"><label>End (0-23):</label><input type="number" id="inp-work-end"></div>
+                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">CANCEL</button><button class="btn btn-save" onclick="saveWorkSettings()">SAVE</button></div>
             </div>
-
+            
             <div id="modal-content-day" style="display:none;">
-                <h3>Configurar Barra del Día</h3>
-                <div class="input-group"><label>Formato:</label><select id="inp-day-format"><option value="24h">24 Horas</option><option value="12h">AM / PM</option></select></div>
-                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveDaySettings()">Guardar</button></div>
+                <h3>DAY CONFIG</h3>
+                <div class="input-group"><label>Format:</label><select id="inp-day-format"><option value="24h">24H</option><option value="12h">AM/PM</option></select></div>
+                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">CANCEL</button><button class="btn btn-save" onclick="saveDaySettings()">SAVE</button></div>
+            </div>
+            
+            <div id="modal-content-marker" style="display:none;">
+                <h3>MARKER</h3>
+                <div class="input-group"><label>Color:</label><input type="color" id="inp-marker-color" style="padding:0; width:60px; height:36px; border:none; background:none;"></div>
+                <div class="modal-actions" style="flex-wrap: wrap;"><button class="btn btn-delete" onclick="deleteActiveMarker()" style="flex-basis: 100%; margin-bottom: 8px;">DELETE</button><button class="btn btn-cancel" onclick="closeModal()">CANCEL</button><button class="btn btn-save" onclick="saveMarkerSettings()">SAVE</button></div>
             </div>
 
-            <div id="modal-content-marker" style="display:none;">
-                <h3>Editar Marcador</h3>
-                <div class="input-group"><label>Color:</label><input type="color" id="inp-marker-color"></div>
-                <div class="modal-actions" style="flex-wrap: wrap;"><button class="btn btn-delete" onclick="deleteActiveMarker()" style="flex-basis: 100%; margin-bottom: 5px;">Eliminar Marcador</button><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveMarkerSettings()">Guardar</button></div>
+            <div id="modal-content-daily-log" style="display:none;">
+                <h3 id="daily-log-title">LOG: DD/MM/YYYY</h3>
+                <div style="font-size: 0.95rem; color: var(--subtext); margin-bottom: 15px; font-weight: 600;">
+                    POINTS EARNED: <span id="daily-log-pts" style="color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight:600; margin-left: 6px;">0</span>
+                </div>
+                <div class="daily-log-list" id="daily-log-list"></div>
+                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()" style="flex:1">CLOSE</button></div>
             </div>
         </div>
     </div>
 
-    <!-- PWA Service Worker Registration -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
-            });
-        }
-    </script>
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 
-    <script>
-        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        const diasL = ["L", "M", "M", "J", "V", "S", "D"];
+        const meses = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const mesesCortos = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        const diasL = ["M", "T", "W", "T", "F", "S", "S"];
         const currentYear = new Date().getFullYear();
         
         let rawTasks = JSON.parse(localStorage.getItem('wkTasks')) || {};
         let tasksData = {};
-        let migrated = false;
-        for (let key in rawTasks) {
-            if (!key.includes('-')) { tasksData[`${currentYear}-${key}`] = rawTasks[key]; migrated = true; } 
-            else { tasksData[key] = rawTasks[key]; }
-        }
-        if (migrated) localStorage.setItem('wkTasks', JSON.stringify(tasksData));
+        for (let key in rawTasks) { if (!key.includes('-')) tasksData[`${currentYear}-${key}`] = rawTasks[key]; else tasksData[key] = rawTasks[key]; }
+        localStorage.setItem('wkTasks', JSON.stringify(tasksData));
 
         let workConfig = JSON.parse(localStorage.getItem('wkWorkCfg')) || { start: 7, end: 17 };
         let blockConfig = JSON.parse(localStorage.getItem('wkBlockCfg')) || { years: 2, startYear: currentYear };
         let dayConfig = JSON.parse(localStorage.getItem('wkDayCfg')) || { format: '24h' };
         
+        let dailyLogs = JSON.parse(localStorage.getItem('wkDailyLogs')) || {};
+        
         let customTimers = JSON.parse(localStorage.getItem('wkCustomTimers')) || [];
-        customTimers.forEach(t => { if(t.target - Date.now() <= 0) t.alarmPlayed = true; }); 
+        customTimers.forEach(t => { if(t.target - Date.now() <= 0 && !t.logged) { t.alarmPlayed = true; } }); 
         
         let timersCollapsed = localStorage.getItem('wkTimersCollapsed') === 'true';
         let markersData = JSON.parse(localStorage.getItem('wkMarkers')) || { block:[], year:[], week:[], work:[], day:[] };
         let collapsedMonths = JSON.parse(localStorage.getItem('wkCollapsedMonths')) || {};
+        if(!blockConfig.startYear) blockConfig.startYear = currentYear;
 
-        if(markersData.bi) { markersData.block = markersData.bi; delete markersData.bi; localStorage.setItem('wkMarkers', JSON.stringify(markersData)); }
-        if(!blockConfig.startYear) { blockConfig.startYear = currentYear; localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); }
-
-        // --- SISTEMA DE EXPORTACIÓN ---
         function exportData() {
-            let content = "=== COPIA DE SEGURIDAD - CONTROL PERSONAL ===\n";
-            content += "Fecha de exportación: " + new Date().toLocaleString() + "\n\n";
-            
-            content += "--- TAREAS GUARDADAS ---\n";
-            let hasTasks = false;
-            for(let key in tasksData) {
-                if(tasksData[key].length > 0) {
-                    hasTasks = true;
-                    content += `\n[ AÑO / SEMANA: ${key} ]\n`;
-                    tasksData[key].forEach(t => {
-                        let status = t.done ? "[x]" : "[ ]";
-                        content += `${status} (${t.type}) ${t.text}\n`;
-                    });
-                }
-            }
-            if(!hasTasks) content += "No hay tareas guardadas.\n";
-
-            content += "\n\n--- DATOS DE SISTEMA (No modificar) ---\n";
-            let backup = {
-                tasks: tasksData, timers: customTimers, work: workConfig,
-                block: blockConfig, day: dayConfig, markers: markersData,
-                collapsed: collapsedMonths
-            };
-            content += JSON.stringify(backup);
-
-            const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `Control_Personal_Backup_${new Date().toISOString().slice(0,10)}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            let content = "=== DB BACKUP ===\n" + new Date().toLocaleString() + "\n\n" + JSON.stringify({ tasks: tasksData, timers: customTimers, logs: dailyLogs, config: {work: workConfig, block: blockConfig, day: dayConfig, markers: markersData} });
+            const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([content])); a.download = `Backup_${new Date().toISOString().slice(0,10)}.txt`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
-        // --- SISTEMA DE AUDIO (ALARMA) ---
         function playAlarmSound() {
             try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const ctx = new AudioContext();
-                function beep(startTime) {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(800, startTime);
-                    gain.gain.setValueAtTime(1, startTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
-                    osc.start(startTime);
-                    osc.stop(startTime + 0.3);
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                function beep(st) {
+                    const osc = ctx.createOscillator(), gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(880, st);
+                    gain.gain.setValueAtTime(0.5, st); gain.gain.exponentialRampToValueAtTime(0.001, st + 0.3);
+                    osc.start(st); osc.stop(st + 0.3);
                 }
-                beep(ctx.currentTime);
-                beep(ctx.currentTime + 0.4);
-            } catch(e) {
-                console.log("Audio no soportado en este navegador.");
-            }
+                beep(ctx.currentTime); beep(ctx.currentTime + 0.4); beep(ctx.currentTime + 0.8);
+            } catch(e){}
         }
 
-        // --- SISTEMA DE TEMA CLARO/OSCURO ---
-        function setInitialThemeIcon() {
-            const theme = document.documentElement.getAttribute('data-theme');
-            document.getElementById('theme-btn').innerText = theme === 'light' ? '☀️' : '🌙';
-        }
         function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', currentTheme);
-            localStorage.setItem('wkTheme', currentTheme);
-            document.getElementById('theme-color-meta').setAttribute('content', currentTheme === 'light' ? '#f4f4f5' : '#09090b');
-            document.getElementById('theme-btn').innerText = currentTheme === 'light' ? '☀️' : '🌙';
+            const t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t); localStorage.setItem('wkTheme', t);
+            document.getElementById('theme-color-meta').setAttribute('content', t === 'light' ? '#f8fafc' : '#09090b');
             update();
         }
 
-        // --- MÚLTIPLES TEMPORIZADORES ---
         function initTimers() {
-            const list = document.getElementById('timers-list');
-            const arrow = document.getElementById('timers-arrow');
-            if(!timersCollapsed) { list.classList.add('active'); arrow.style.transform = 'rotate(180deg)'; }
+            const list = document.getElementById('timers-list'), arrow = document.getElementById('timers-arrow');
+            if(!timersCollapsed) { list.classList.add('active'); arrow.classList.add('up'); }
             renderTimersList();
         }
 
         function toggleTimersSection() {
-            timersCollapsed = !timersCollapsed;
-            localStorage.setItem('wkTimersCollapsed', timersCollapsed);
-            const list = document.getElementById('timers-list');
-            const arrow = document.getElementById('timers-arrow');
-            if(!timersCollapsed) { list.classList.add('active'); arrow.style.transform = 'rotate(180deg)'; } 
-            else { list.classList.remove('active'); arrow.style.transform = 'rotate(0deg)'; }
+            timersCollapsed = !timersCollapsed; localStorage.setItem('wkTimersCollapsed', timersCollapsed);
+            const list = document.getElementById('timers-list'), arrow = document.getElementById('timers-arrow');
+            if(!timersCollapsed) { list.classList.add('active'); arrow.classList.add('up'); } else { list.classList.remove('active'); arrow.classList.remove('up'); }
         }
 
-        function openAddTimerModal() {
-            document.getElementById('modal-content-timer').style.display = 'block';
-            document.getElementById('inp-t-name').value = "";
-            document.getElementById('inp-t-hours').value = "0";
-            document.getElementById('inp-t-mins').value = "15";
-            openModal();
-        }
+        function openAddTimerModal() { document.getElementById('modal-content-timer').style.display = 'block'; document.getElementById('inp-t-name').value = ""; document.getElementById('inp-t-hours').value = "0"; document.getElementById('inp-t-mins').value = "25"; openModal(); }
 
         function saveCustomTimer() {
-            const name = document.getElementById('inp-t-name').value.trim() || "Temporizador";
-            const h = parseInt(document.getElementById('inp-t-hours').value) || 0;
-            const m = parseInt(document.getElementById('inp-t-mins').value) || 0;
-            
-            if(h === 0 && m === 0) { alert("Añade al menos 1 minuto."); return; }
-            
-            try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); ctx.resume(); } catch(e){}
+            const name = document.getElementById('inp-t-name').value.trim() || "SYS_TIMER", h = parseInt(document.getElementById('inp-t-hours').value) || 0, m = parseInt(document.getElementById('inp-t-mins').value) || 0;
+            if(h === 0 && m === 0) return alert("Min 1 minute.");
+            try { new (window.AudioContext || window.webkitAudioContext)().resume(); } catch(e){}
 
-            const targetMs = Date.now() + (h * 3600000) + (m * 60000);
-            customTimers.push({ id: Date.now(), name: name, target: targetMs, alarmPlayed: false });
+            const durationMs = (h * 3600000) + (m * 60000);
+            customTimers.push({ id: Date.now(), name: name, target: Date.now() + durationMs, durationMs: durationMs, activatedAt: Date.now(), alarmPlayed: false, logged: false });
             localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers));
-            
             if(timersCollapsed) toggleTimersSection();
             renderTimersList(); update(); closeModal();
         }
 
-        function deleteCustomTimer(id) {
-            customTimers = customTimers.filter(t => t.id !== id);
-            localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers));
-            renderTimersList();
+        function deleteCustomTimer(id) { customTimers = customTimers.filter(t => t.id !== id); localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers)); renderTimersList(); }
+
+        function repeatTimer(id) {
+            let t = customTimers.find(x => x.id === id);
+            if(t) { t.target = Date.now() + t.durationMs; t.activatedAt = Date.now(); t.alarmPlayed = false; t.logged = false; localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers)); renderTimersList(); update(); }
         }
 
         function renderTimersList() {
             const list = document.getElementById('timers-list');
-            if(customTimers.length === 0) {
-                list.innerHTML = `<div class="empty-tasks" style="padding: 15px 0;">No hay temporizadores activos.</div>`;
-                return;
-            }
-            list.innerHTML = customTimers.map(t => `
+            if(customTimers.length === 0) return list.innerHTML = `<div style="color:var(--muted); font-size:0.85rem; padding: 20px 0;">No active operations.</div>`;
+            
+            list.innerHTML = customTimers.map(t => {
+                let isDone = (t.target - Date.now() <= 0);
+                return `
                 <div class="timer-row">
-                    <span class="tr-name">${t.name}</span>
-                    <span class="tr-val" id="t-val-${t.id}">--:--:--</span>
-                    <span class="tr-del" onclick="deleteCustomTimer(${t.id})" title="Borrar">×</span>
-                </div>
-            `).join('');
+                    <div class="tr-info">
+                        <span class="tr-name">${t.name}</span>
+                        ${isDone ? `<span class="tr-pts">+1 POINT EARNED</span>` : ``}
+                    </div>
+                    <span class="tr-val ${isDone ? 'done' : ''}" id="t-val-${t.id}">--:--:--</span>
+                    <div class="tr-actions">
+                        ${isDone ? `<span class="tr-btn" onclick="repeatTimer(${t.id})" title="Repeat">🔁</span>` : ''}
+                        <span class="tr-btn del" onclick="deleteCustomTimer(${t.id})" title="Delete">✕</span>
+                    </div>
+                </div>`
+            }).join('');
         }
 
-        // --- FUNCIONES DE NAVEGACIÓN ---
+        function getTodayKeyStr() { let n = new Date(); return `${n.getFullYear()}-${n.getMonth()}-${n.getDate()}`; }
+
         function togglePanel(id) {
             const p = document.getElementById('panel-' + id), b = document.getElementById('btn-' + id);
             p.classList.toggle('active'); b.classList.toggle('active');
             localStorage.setItem('panel-open-' + id, p.classList.contains('active'));
         }
-        function toggleQ(index) { document.getElementById(`q-content-${index}`).classList.toggle('active'); document.getElementById(`q-header-${index}`).classList.toggle('open'); }
-        function toggleWeek(wNum) {
-            const body = document.getElementById(`t-week-body-${wNum}`); const arrow = document.getElementById(`w-arrow-${wNum}`);
-            body.classList.toggle('active'); arrow.style.transform = body.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+        function toggleQ(index) { 
+            document.getElementById(`q-content-${index}`).classList.toggle('active'); 
+            const arr = document.getElementById(`q-arrow-${index}`);
+            if(arr) arr.classList.toggle('up');
         }
-        function toggleMonth(mI) {
-            const yKey = `${currentYear}-${mI}`; collapsedMonths[yKey] = !collapsedMonths[yKey];
-            localStorage.setItem('wkCollapsedMonths', JSON.stringify(collapsedMonths));
-            const wrap = document.getElementById(`month-wrap-${mI}`);
-            if(collapsedMonths[yKey]) { wrap.classList.add('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '+'; } 
-            else { wrap.classList.remove('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '−'; }
+        
+        function toggleMonthUI(mI, el) {
+            const yKey = `${currentYear}-${mI}`; 
+            collapsedMonths[yKey] = !collapsedMonths[yKey];
+            localStorage.setItem('wkCollapsedMonths', JSON.stringify(collapsedMonths)); 
+            
+            const monthCard = el.parentElement;
+            const arrow = el.querySelector('.m-arrow');
+            
+            if(collapsedMonths[yKey]) {
+                monthCard.classList.add('collapsed');
+                arrow.classList.remove('up');
+            } else {
+                monthCard.classList.remove('collapsed');
+                arrow.classList.add('up');
+            }
         }
 
-        // --- MODALES DE CONFIGURACIÓN BÁSICOS ---
         function openModal() { document.getElementById('modal-overlay').classList.add('active'); }
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
             document.getElementById('modal-overlay').classList.remove('active');
-            document.getElementById('modal-content-work').style.display = 'none';
-            document.getElementById('modal-content-marker').style.display = 'none';
-            document.getElementById('modal-content-block').style.display = 'none';
-            document.getElementById('modal-content-day').style.display = 'none';
-            document.getElementById('modal-content-timer').style.display = 'none';
+            ['work','marker','block','day','timer','daily-log'].forEach(id => document.getElementById('modal-content-'+id).style.display = 'none');
         }
 
         function openBlockModal() { document.getElementById('modal-content-block').style.display = 'block'; document.getElementById('inp-block-start').value = blockConfig.startYear; document.getElementById('inp-block-years').value = blockConfig.years; openModal(); }
         function saveBlockSettings() { blockConfig.years = parseInt(document.getElementById('inp-block-years').value); blockConfig.startYear = parseInt(document.getElementById('inp-block-start').value); localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); renderBlockTicks(); update(); closeModal(); }
         function renderBlockTicks() {
-            const container = document.getElementById('block-ticks'); document.getElementById('label-block').innerText = `Bloque ${blockConfig.years} Años`; document.getElementById('btn-block').innerText = `${blockConfig.years}Y`;
-            let html = '';
-            for(let i = 0; i <= blockConfig.years; i++) {
-                let align = i === 0 ? 'left' : (i === blockConfig.years ? 'right' : 'center');
-                html += `<span class="tick year-tick" style="text-align: ${align};">${blockConfig.startYear + i}</span>`;
-            }
-            container.innerHTML = html;
+            const c = document.getElementById('block-ticks'); document.getElementById('label-block').innerText = `BLOCK ${blockConfig.years}Y`; document.getElementById('btn-block').innerText = `${blockConfig.years}Y`;
+            let h = ''; for(let i = 0; i <= blockConfig.years; i++) h += `<span class="tick">${blockConfig.startYear + i}</span>`; c.innerHTML = h;
         }
 
         function openWorkModal() { document.getElementById('modal-content-work').style.display = 'block'; document.getElementById('inp-work-start').value = workConfig.start; document.getElementById('inp-work-end').value = workConfig.end; openModal(); }
         function saveWorkSettings() {
-            let s = parseInt(document.getElementById('inp-work-start').value); let e = parseInt(document.getElementById('inp-work-end').value);
-            if(isNaN(s) || isNaN(e) || s >= e) { alert("Horario inválido. Inicio debe ser menor a Fin."); return; }
+            let s = parseInt(document.getElementById('inp-work-start').value), e = parseInt(document.getElementById('inp-work-end').value);
+            if(isNaN(s) || isNaN(e) || s >= e) return alert("Invalid hours.");
             workConfig = { start: s, end: e }; localStorage.setItem('wkWorkCfg', JSON.stringify(workConfig)); renderWorkTicks(); update(); closeModal();
         }
         function renderWorkTicks() {
-            const container = document.getElementById('work-ticks'); document.getElementById('label-work').innerText = `Jornada (${workConfig.start}h - ${workConfig.end}h)`;
-            let html = '';
-            for(let i = workConfig.start; i <= workConfig.end; i++) {
-                let num = i > 12 ? i - 12 : (i === 0 ? 12 : i); let align = i === workConfig.start ? 'left' : (i === workConfig.end ? 'right' : 'center');
-                html += `<span class="tick" style="text-align: ${align};">${num}h</span>`;
-            }
-            container.innerHTML = html;
+            const c = document.getElementById('work-ticks'); document.getElementById('label-work').innerText = `SHIFT (${workConfig.start}H-${workConfig.end}H)`;
+            let h = ''; for(let i = workConfig.start; i <= workConfig.end; i++) h += `<span class="tick">${i}</span>`; c.innerHTML = h;
         }
 
         function openDayModal() { document.getElementById('modal-content-day').style.display = 'block'; document.getElementById('inp-day-format').value = dayConfig.format; openModal(); }
         function saveDaySettings() { dayConfig.format = document.getElementById('inp-day-format').value; localStorage.setItem('wkDayCfg', JSON.stringify(dayConfig)); renderDayTicks(); closeModal(); }
         function renderDayTicks() {
-            const container = document.getElementById('day-ticks'); let html = '';
-            for(let i = 0; i <= 24; i++) {
-                let label = '';
-                if (dayConfig.format === '12h') {
-                    if (i === 0 || i === 24) label = '12a'; else if (i < 12) label = i + 'a'; else if (i === 12) label = '12p'; else label = (i - 12) + 'p';
-                } else { label = i; }
-                let align = (i === 0) ? 'left' : (i === 24 ? 'right' : 'center');
-                html += `<span class="tick day-tick" style="text-align: ${align};">${label}</span>`;
-            }
-            container.innerHTML = html;
+            const c = document.getElementById('day-ticks'); let h = '';
+            for(let i = 0; i <= 24; i++) { let l = dayConfig.format === '12h' ? (i===0||i===24?'12a':i<12?i+'a':i===12?'12p':(i-12)+'p') : i; h += `<span class="tick day-tick">${l}</span>`; }
+            c.innerHTML = h;
         }
 
-        // --- SISTEMA DE MARCADORES ---
-        let activeMarker = null; let dragState = null;
-        function addMarker(barId) {
-            if(!markersData[barId]) markersData[barId] = [];
-            let newId = Date.now(); markersData[barId].push({ id: newId, pct: 50, color: '#10b981' }); saveMarkers(); renderMarkers(barId);
-        }
+        let activeMarker = null, dragState = null;
+        function addMarker(bId) { if(!markersData[bId]) markersData[bId] = []; markersData[bId].push({ id: Date.now(), pct: 50, color: '#3b82f6' }); saveMarkers(); renderMarkers(bId); }
         function saveMarkers() { localStorage.setItem('wkMarkers', JSON.stringify(markersData)); }
-        function renderAllMarkers() { ['block', 'year', 'week', 'work', 'day'].forEach(renderMarkers); }
-
-        function renderMarkers(barId) {
-            const container = document.getElementById(`bar-${barId}`); if(!container) return;
-            container.querySelectorAll('.bar-marker').forEach(e => e.remove());
-            (markersData[barId] || []).forEach(m => {
-                let el = document.createElement('div'); el.className = 'bar-marker'; el.id = `m-${barId}-${m.id}`; el.style.left = `${m.pct}%`; el.style.setProperty('--m-color', m.color);
-                el.onmousedown = (e) => startDrag(e, barId, m); el.ontouchstart = (e) => startDrag(e, barId, m);
-                container.appendChild(el);
+        function renderMarkers(bId) {
+            const c = document.getElementById(`bar-${bId}`); if(!c) return;
+            c.querySelectorAll('.bar-marker').forEach(e => e.remove());
+            (markersData[bId] || []).forEach(m => {
+                let el = document.createElement('div'); el.className = 'bar-marker'; el.id = `m-${bId}-${m.id}`; el.style.left = `${m.pct}%`; el.style.setProperty('--m-color', m.color);
+                el.onmousedown = (e) => startDrag(e, bId, m); el.ontouchstart = (e) => startDrag(e, bId, m); c.appendChild(el);
             });
         }
-        function startDrag(e, barId, markerObj) {
-            e.preventDefault(); e.stopPropagation();
-            const el = document.getElementById(`m-${barId}-${markerObj.id}`); const barWrapper = document.getElementById(`bar-${barId}`);
-            dragState = { barId, obj: markerObj, el, wrapper: barWrapper, moved: false, startX: e.touches ? e.touches[0].clientX : e.clientX };
-        }
+        function startDrag(e, bId, m) { e.preventDefault(); e.stopPropagation(); dragState = { bId, obj: m, el: document.getElementById(`m-${bId}-${m.id}`), wrap: document.getElementById(`bar-${bId}`), moved: false, sX: e.touches ? e.touches[0].clientX : e.clientX }; }
         window.addEventListener('mousemove', dragMarker); window.addEventListener('touchmove', dragMarker, {passive: false});
         window.addEventListener('mouseup', endDrag); window.addEventListener('touchend', endDrag);
-
         function dragMarker(e) {
-            if(!dragState) return;
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            if(Math.abs(clientX - dragState.startX) > 3) dragState.moved = true;
-            if(!dragState.moved) return;
-            let rect = dragState.wrapper.getBoundingClientRect();
-            let pct = ((clientX - rect.left) / rect.width) * 100; pct = Math.max(0, Math.min(100, pct));
-            dragState.el.style.left = `${pct}%`; dragState.obj.pct = pct;
+            if(!dragState) return; let cX = e.touches ? e.touches[0].clientX : e.clientX;
+            if(Math.abs(cX - dragState.sX) > 3) dragState.moved = true; if(!dragState.moved) return;
+            let r = dragState.wrap.getBoundingClientRect(), p = ((cX - r.left) / r.width) * 100; p = Math.max(0, Math.min(100, p));
+            dragState.el.style.left = `${p}%`; dragState.obj.pct = p;
         }
-        function endDrag(e) {
-            if(!dragState) return;
-            if(!dragState.moved) openMarkerModal(dragState.barId, dragState.obj); else saveMarkers();
-            dragState = null;
-        }
-        function openMarkerModal(barId, markerObj) {
-            activeMarker = { barId, obj: markerObj }; document.getElementById('modal-content-marker').style.display = 'block';
-            document.getElementById('inp-marker-color').value = markerObj.color; openModal();
-        }
-        function saveMarkerSettings() {
-            if(!activeMarker) return; activeMarker.obj.color = document.getElementById('inp-marker-color').value;
-            saveMarkers(); renderMarkers(activeMarker.barId); closeModal();
-        }
-        function deleteActiveMarker() {
-            if(!activeMarker) return; markersData[activeMarker.barId] = markersData[activeMarker.barId].filter(m => m.id !== activeMarker.obj.id);
-            saveMarkers(); renderMarkers(activeMarker.barId); closeModal();
+        function endDrag() { if(!dragState) return; if(!dragState.moved) openMarkerModal(dragState.bId, dragState.obj); else saveMarkers(); dragState = null; }
+        function openMarkerModal(bId, m) { activeMarker = { bId, obj: m }; document.getElementById('modal-content-marker').style.display = 'block'; document.getElementById('inp-marker-color').value = m.color; openModal(); }
+        function saveMarkerSettings() { if(activeMarker) { activeMarker.obj.color = document.getElementById('inp-marker-color').value; saveMarkers(); renderMarkers(activeMarker.bId); closeModal(); } }
+        function deleteActiveMarker() { if(activeMarker) { markersData[activeMarker.bId] = markersData[activeMarker.bId].filter(m => m.id !== activeMarker.obj.id); saveMarkers(); renderMarkers(activeMarker.bId); closeModal(); } }
+
+        function openDailyLog(y, mI, d) {
+            const dateStr = `${y}-${mI}-${d}`, logs = dailyLogs[dateStr] || [], fDate = new Date(y, mI, d);
+            const titleStr = `${fDate.getDate().toString().padStart(2,'0')}/${(fDate.getMonth()+1).toString().padStart(2,'0')}/${fDate.getFullYear()}`;
+            
+            document.getElementById('daily-log-title').innerText = `ACTIVITY: ${titleStr}`;
+            document.getElementById('daily-log-pts').innerText = logs.length;
+            
+            const list = document.getElementById('daily-log-list');
+            if(logs.length === 0) { list.innerHTML = `<div style="color:var(--muted); font-size:0.9rem;">No activity recorded.</div>`; } 
+            else {
+                list.innerHTML = logs.map(l => {
+                    let aTime = new Date(l.activatedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    let cTime = new Date(l.completedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    return `<div class="log-item"><div class="log-item-head"><span>${l.name}</span> <span style="color:var(--accent-secondary)">+1</span></div><div class="log-item-time">${aTime} - ${cTime}</div></div>`;
+                }).join('');
+            }
+            document.getElementById('modal-content-daily-log').style.display = 'block'; openModal();
         }
 
-        // --- SISTEMA DE TAREAS Y METRICAS ---
         function getTKey(wNum) { return `${currentYear}-${wNum}`; }
-
         function renderTasks(wNum) {
             const list = document.getElementById(`t-list-${wNum}`); if(!list) return;
-            const tKey = getTKey(wNum); const tasks = tasksData[tKey] || [];
-            
-            if(tasks.length === 0) { list.innerHTML = `<li class="empty-tasks">Sin tareas añadidas...</li>`; return; }
-            list.innerHTML = tasks.map(t => {
-                const type = t.type || 'Meta'; let badgeClass = 'badge-dia';
-                if(type === 'Meta') badgeClass = 'badge-meta'; if(type === 'Diario') badgeClass = 'badge-diario';
-                return `<li class="t-item ${t.done ? 'done' : ''}"><input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleTask(${wNum}, ${t.id})"><span class="t-badge ${badgeClass}">${type}</span><span class="text" style="flex:1;">${t.text}</span><span class="delete-btn" onclick="deleteTask(${wNum}, ${t.id})" title="Eliminar tarea">×</span></li>`
-            }).join('');
+            const tasks = tasksData[getTKey(wNum)] || [];
+            if(tasks.length === 0) return list.innerHTML = ``;
+            list.innerHTML = tasks.map(t => `<div class="t-item ${t.done ? 'done' : ''}"><input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleTask(${wNum}, ${t.id})"><span class="t-badge badge-meta">${t.type||'GOAL'}</span><span class="text" style="flex:1;">${t.text}</span><span class="tr-btn del" onclick="deleteTask(${wNum}, ${t.id})" style="padding:6px 10px; font-size:0.85rem">✕</span></div>`).join('');
         }
-
         function addTask(wNum) {
-            const input = document.getElementById(`t-input-${wNum}`); const select = document.getElementById(`t-type-${wNum}`);
-            if(!input.value.trim()) return; 
-            const tKey = getTKey(wNum); if(!tasksData[tKey]) tasksData[tKey] = [];
-            tasksData[tKey].push({ id: Date.now(), text: input.value.trim(), done: false, type: select.value });
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); input.value = ''; renderTasks(wNum); updateAllMetrics();
+            const i = document.getElementById(`t-input-${wNum}`), s = document.getElementById(`t-type-${wNum}`);
+            if(!i.value.trim()) return; 
+            const k = getTKey(wNum); if(!tasksData[k]) tasksData[k] = [];
+            tasksData[k].push({ id: Date.now(), text: i.value.trim(), done: false, type: s.value });
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); i.value = ''; renderTasks(wNum); updateAllMetrics();
         }
-        function toggleTask(wNum, taskId) {
-            const tKey = getTKey(wNum); const t = tasksData[tKey].find(x => x.id === taskId); if(t) t.done = !t.done;
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wNum); updateAllMetrics();
-        }
-        function deleteTask(wNum, taskId) {
-            const tKey = getTKey(wNum); tasksData[tKey] = tasksData[tKey].filter(x => x.id !== taskId);
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wNum); updateAllMetrics();
-        }
-
-        function toggleMetricsView(q) {
-            const mBlock = document.getElementById(`metrics-m-${q}`), qBlock = document.getElementById(`metrics-q-${q}`), btnText = document.getElementById(`m-toggle-btn-${q}`);
-            if(mBlock.classList.contains('active')) { mBlock.classList.remove('active'); qBlock.classList.add('active'); btnText.innerText = 'Ver por Mes'; } 
-            else { qBlock.classList.remove('active'); mBlock.classList.add('active'); btnText.innerText = 'Ver Trimestre'; }
-        }
+        function toggleTask(wN, tId) { let t = tasksData[getTKey(wN)].find(x => x.id === tId); if(t) t.done = !t.done; localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wN); updateAllMetrics(); }
+        function deleteTask(wN, tId) { tasksData[getTKey(wN)] = tasksData[getTKey(wN)].filter(x => x.id !== tId); localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wN); updateAllMetrics(); }
 
         function updateAllMetrics() {
             for(let q=0; q<4; q++) {
-                let qTotal = 0, qDone = 0;
+                let qT = 0, qD = 0;
                 for(let m=0; m<3; m++) {
-                    let mI = q*3 + m, mTotal = 0, mDone = 0;
-                    for(let w=1; w<=4; w++) { 
-                        let tKey = getTKey(mI * 4 + w); let tasks = tasksData[tKey] || []; 
-                        mTotal += tasks.length; mDone += tasks.filter(t => t.done).length; 
-                    }
-                    let mPct = mTotal === 0 ? 0 : (mDone / mTotal) * 100;
-                    let mFill = document.getElementById(`fill-m-${mI}`), mPctTxt = document.getElementById(`pct-m-${mI}`);
-                    if(mFill) mFill.style.width = mPct + '%'; if(mPctTxt) mPctTxt.innerText = Math.round(mPct) + '%';
-                    qTotal += mTotal; qDone += mDone;
+                    let mI = q*3 + m, mT = 0, mD = 0;
+                    for(let w=1; w<=4; w++) { let ts = tasksData[getTKey(mI*4+w)] || []; mT += ts.length; mD += ts.filter(t=>t.done).length; }
+                    let mP = mT === 0 ? 0 : (mD/mT)*100;
+                    let f = document.getElementById(`fill-m-${mI}`), p = document.getElementById(`pct-m-${mI}`);
+                    if(f) f.style.width = mP + '%'; if(p) p.innerText = Math.round(mP) + '%';
+                    qT += mT; qD += mD;
                 }
-                let qPct = qTotal === 0 ? 0 : (qDone / qTotal) * 100;
-                let qFill = document.getElementById(`fill-q-${q}`), qPctTxt = document.getElementById(`pct-q-${q}`);
-                if(qFill) qFill.style.width = qPct + '%'; if(qPctTxt) qPctTxt.innerText = Math.round(qPct) + '%';
             }
         }
 
-        // --- RELOJ Y BARRAS PRINCIPALES ---
         function update() {
-            const now = new Date(); const year = now.getFullYear();
-            const h = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
+            const now = new Date(), y = now.getFullYear(), hh = now.getHours(), mm = now.getMinutes(), ss = now.getSeconds(), h = hh + mm/60 + ss/3600;
             
-            document.getElementById('current-date').innerText = `${now.getDate()} de ${meses[now.getMonth()]}, ${year}`;
-            const hh = now.getHours(), mm = now.getMinutes(), ss = now.getSeconds();
-            const ampm = hh >= 12 ? 'PM' : 'AM', displayHour = hh % 12 || 12; 
-            document.getElementById('digital-clock').innerHTML = `${String(displayHour).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')} <span>${ampm}</span>`;
+            document.getElementById('current-date').innerText = `${now.getDate()} ${meses[now.getMonth()]} ${y}`;
+            const ampm = hh >= 12 ? 'PM' : 'AM', dH = hh % 12 || 12; 
+            document.getElementById('digital-clock').innerHTML = `${String(dH).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')} <span>${ampm}</span>`;
             
-            const hDeg = (hh % 12) * 30 + mm * 0.5, mDeg = mm * 6 + ss * 0.1, sDeg = ss * 6;
-            const pastColor = getComputedStyle(document.documentElement).getPropertyValue('--past').trim();
-            const clockFutureColor = getComputedStyle(document.documentElement).getPropertyValue('--clock-future').trim();
-            document.getElementById('hour-hand').style.transform = `rotate(${hDeg}deg)`; document.getElementById('minute-hand').style.transform = `rotate(${mDeg}deg)`; document.getElementById('second-hand').style.transform = `rotate(${sDeg}deg)`;
-            document.getElementById('analog-clock').style.background = `conic-gradient(${pastColor} ${hDeg}deg, ${clockFutureColor} ${hDeg}deg)`;
+            const hD = (hh%12)*30 + mm*0.5, mD = mm*6 + ss*0.1, sD = ss*6;
+            const pst = getComputedStyle(document.documentElement).getPropertyValue('--past').trim(), fut = getComputedStyle(document.documentElement).getPropertyValue('--clock-future').trim();
+            document.getElementById('hour-hand').style.transform = `rotate(${hD}deg)`; document.getElementById('minute-hand').style.transform = `rotate(${mD}deg)`; document.getElementById('second-hand').style.transform = `rotate(${sD}deg)`;
+            document.getElementById('analog-clock').style.background = `conic-gradient(${pst} ${hD}deg, ${fut} ${hD}deg)`;
 
-            const startBlock = blockConfig.startYear; const endBlock = startBlock + blockConfig.years;
-            const blockTotalMs = new Date(endBlock, 0, 1) - new Date(startBlock, 0, 1); const blockElapsedMs = now - new Date(startBlock, 0, 1);
-            let blockPct = (blockElapsedMs / blockTotalMs * 100);
-            if(blockPct < 0) blockPct = 0; else if(blockPct > 100) blockPct = 100;
-            document.getElementById('block-fill').style.width = blockPct.toFixed(4) + '%';
-            document.getElementById('block-pct').innerText = blockPct.toFixed(2) + '%';
+            const bS = blockConfig.startYear, bE = bS + blockConfig.years;
+            let bP = ((now - new Date(bS,0,1)) / (new Date(bE,0,1) - new Date(bS,0,1))) * 100; bP = Math.max(0, Math.min(100, bP));
+            document.getElementById('block-fill').style.width = bP.toFixed(4) + '%'; document.getElementById('block-pct').innerText = bP.toFixed(2) + '%';
 
-            document.getElementById('year-fill').style.width = ((now - new Date(year,0,1)) / (new Date(year+1,0,1) - new Date(year,0,1)) * 100).toFixed(4) + '%';
-            document.getElementById('year-pct').innerText = ((now - new Date(year,0,1)) / (new Date(year+1,0,1) - new Date(year,0,1)) * 100).toFixed(2) + '%';
+            document.getElementById('year-fill').style.width = ((now - new Date(y,0,1)) / (new Date(y+1,0,1) - new Date(y,0,1)) * 100).toFixed(4) + '%';
+            document.getElementById('year-pct').innerText = ((now - new Date(y,0,1)) / (new Date(y+1,0,1) - new Date(y,0,1)) * 100).toFixed(2) + '%';
 
             let dW = now.getDay(), adj = dW === 0 ? 6 : dW - 1, sW = new Date(now); sW.setDate(now.getDate() - adj); sW.setHours(0,0,0,0);
-            const wkP = ((now - sW) / (7 * 24 * 60 * 60 * 1000)) * 100;
-            document.getElementById('week-fill').style.width = wkP.toFixed(4) + '%'; document.getElementById('week-pct').innerText = wkP.toFixed(2) + '%';
+            const wP = ((now - sW) / (7*24*3600000)) * 100;
+            document.getElementById('week-fill').style.width = wP.toFixed(4) + '%'; document.getElementById('week-pct').innerText = wP.toFixed(2) + '%';
 
-            let wP = 0, wT = "Libre";
-            if (h >= workConfig.start && h < workConfig.end) { 
-                wP = ((h - workConfig.start) / (workConfig.end - workConfig.start)) * 100; wT = new Date((workConfig.end - h) * 3600 * 1000).toISOString().substr(11, 8); 
-            } else if (h >= workConfig.end) { wP = 100; wT = "¡Finalizado!"; }
-            document.getElementById('work-fill').style.width = wP.toFixed(4) + '%'; document.getElementById('work-timer').innerText = wT; document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
+            let wPct = 0, wT = "OFFLINE";
+            if(h >= workConfig.start && h < workConfig.end) { wPct = ((h - workConfig.start)/(workConfig.end - workConfig.start))*100; wT = new Date((workConfig.end - h)*3600000).toISOString().substr(11,8); }
+            else if(h >= workConfig.end) { wPct = 100; wT = "DONE"; }
+            document.getElementById('work-fill').style.width = wPct.toFixed(4) + '%'; document.getElementById('work-timer').innerText = wT; document.getElementById('work-pct').innerText = wPct.toFixed(2) + '%';
 
-            const dP = (h / 24) * 100;
-            document.getElementById('day-fill').style.width = dP.toFixed(4) + '%'; document.getElementById('day-timer').innerText = new Date((24 - h) * 3600 * 1000).toISOString().substr(11, 8); document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
+            const dPct = (h/24)*100;
+            document.getElementById('day-fill').style.width = dPct.toFixed(4) + '%'; document.getElementById('day-timer').innerText = new Date((24 - h)*3600000).toISOString().substr(11,8); document.getElementById('day-pct').innerText = dPct.toFixed(2) + '%';
 
-            // Actualizar Múltiples Temporizadores
-            let timersChanged = false;
+            let tc = false, rc = false;
             customTimers.forEach(t => {
-                const el = document.getElementById(`t-val-${t.id}`);
-                if(!el) return;
+                const el = document.getElementById(`t-val-${t.id}`); if(!el) return;
                 const diff = t.target - now.getTime();
                 if(diff > 0) {
-                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const hr = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                    const mn = Math.floor((diff / 1000 / 60) % 60);
-                    const sc = Math.floor((diff / 1000) % 60);
-                    let timeStr = "";
-                    if(d > 0) timeStr += `${d}d `;
-                    timeStr += `${String(hr).padStart(2,'0')}:${String(mn).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;
-                    el.innerText = timeStr;
+                    const d = Math.floor(diff/(1000*3600*24)), hr = Math.floor((diff/(1000*3600))%24), mn = Math.floor((diff/60000)%60), sc = Math.floor((diff/1000)%60);
+                    el.innerText = (d>0?`${d}d `:"") + `${String(hr).padStart(2,'0')}:${String(mn).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;
                     el.classList.remove('done');
                 } else {
-                    el.innerText = "¡Completado!";
-                    el.classList.add('done');
-                    if(!t.alarmPlayed) {
-                        playAlarmSound();
-                        t.alarmPlayed = true;
-                        timersChanged = true;
+                    el.innerText = "00:00:00"; el.classList.add('done');
+                    if(!t.logged) {
+                        let todayStr = getTodayKeyStr(); if(!dailyLogs[todayStr]) dailyLogs[todayStr] = [];
+                        dailyLogs[todayStr].push({ name: t.name, activatedAt: t.activatedAt, completedAt: Date.now() });
+                        localStorage.setItem('wkDailyLogs', JSON.stringify(dailyLogs)); t.logged = true; tc = true; rc = true; 
                     }
+                    if(!t.alarmPlayed) { playAlarmSound(); t.alarmPlayed = true; tc = true; }
                 }
             });
-            if(timersChanged) localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers));
+            if(tc) { localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers)); renderTimersList(); }
+            if(rc) drawCalendar(); 
         }
 
-        // --- RENDERIZADO CALENDARIO ---
         function drawCalendar() {
-            const now = new Date(); now.setHours(0,0,0,0); const year = currentYear; 
-            let html = ""; let tBC = 0;
-            
-            ['block', 'year', 'week', 'work', 'day'].forEach(id => {
-                if(localStorage.getItem('panel-open-' + id) === 'true') {
-                    document.getElementById('panel-'+id).classList.add('active'); document.getElementById('btn-'+id).classList.add('active');
-                }
-            });
+            const now = new Date(); now.setHours(0,0,0,0); const year = currentYear; let html = ""; let tBC = 0;
+            ['block', 'year', 'week', 'work', 'day'].forEach(id => { if(localStorage.getItem('panel-open-'+id) === 'true') { document.getElementById('panel-'+id).classList.add('active'); document.getElementById('btn-'+id).classList.add('active'); }});
 
             for(let q=0; q<4; q++) {
-                html += `<div class="q-header" id="q-header-${q}" onclick="toggleQ(${q})"><div class="q-title">T${q+1} <span class="q-arrow">▼</span></div><div style="font-size: 0.6rem; color: var(--muted);">OBJETIVOS</div></div><div class="q-content" id="q-content-${q}"><div class="task-mgr">`;
-                
+                html += `<div class="q-header" onclick="toggleQ(${q})"><div class="q-title">QUARTER ${q+1}</div><span class="m-arrow up" id="q-arrow-${q}" style="font-size: 0.85rem">▼</span></div><div class="q-content active" id="q-content-${q}"><div class="task-mgr">`;
                 for(let m=0; m<3; m++) {
                     let mI = q*3 + m;
-                    html += `<div class="t-month"><div class="t-month-head" onclick="this.nextElementSibling.classList.toggle('active')">${meses[mI]} <span style="font-size: 0.6rem; color: var(--muted);">▼</span></div><div class="t-month-body">`;
+                    html += `<div class="t-month"><div class="t-month-head" onclick="this.nextElementSibling.classList.toggle('active'); this.querySelector('.m-arrow').classList.toggle('up')">${meses[mI].toUpperCase()} TASKS <span class="m-arrow">▼</span></div><div class="t-month-body">`;
                     for(let w=1; w<=4; w++) {
-                        let wNum = mI * 4 + w; 
-                        html += `<div class="t-week"><div class="t-week-title" onclick="toggleWeek(${wNum})">W${wNum} <span id="w-arrow-${wNum}" style="font-size: 0.5rem; transition: transform 0.2s; color:var(--muted)">▼</span></div><div class="t-week-body" id="t-week-body-${wNum}"><ul class="t-list" id="t-list-${wNum}"></ul><div class="t-add"><select id="t-type-${wNum}" class="t-type-select"><option value="Meta">Meta</option><option value="Diario">Diario</option><option value="Lun">Lun</option><option value="Mar">Mar</option><option value="Mié">Mié</option><option value="Jue">Jue</option><option value="Vie">Vie</option><option value="Sáb">Sáb</option><option value="Dom">Dom</option></select><input type="text" id="t-input-${wNum}" placeholder="Añadir tarea..." onkeypress="if(event.key==='Enter') addTask(${wNum})"><button onclick="addTask(${wNum})">+</button></div></div></div>`;
+                        let wN = mI*4 + w; 
+                        html += `<div class="t-week"><div class="t-week-title" onclick="document.getElementById('t-week-body-${wN}').classList.toggle('active'); this.querySelector('.m-arrow').classList.toggle('up')">WEEK ${wN} <span class="m-arrow">▼</span></div><div class="t-week-body" id="t-week-body-${wN}"><div id="t-list-${wN}"></div><div class="t-add"><select id="t-type-${wN}" class="t-type-select"><option>GOAL</option><option>HABIT</option><option>MON</option><option>TUE</option><option>WED</option><option>THU</option><option>FRI</option><option>SAT</option><option>SUN</option></select><input type="text" id="t-input-${wN}" placeholder="New task..." onkeypress="if(event.key==='Enter') addTask(${wN})"><button onclick="addTask(${wN})">+</button></div></div></div>`;
                     }
                     html += `</div></div>`;
                 }
                 html += `</div><div class="months-container">`;
                 
                 for(let m=0; m<3; m++) {
-                    let mI = q*3 + m, fD = new Date(year, mI, 1).getDay(), off = fD === 0 ? 6 : fD - 1, dM = new Date(year, mI + 1, 0).getDate();
-                    
-                    let yKey = `${year}-${mI}`;
-                    let isCol = collapsedMonths[yKey];
+                    let mI = q*3 + m, fD = new Date(year, mI, 1).getDay(), off = fD === 0 ? 6 : fD - 1, dM = new Date(year, mI+1, 0).getDate();
+                    let isCol = collapsedMonths[`${year}-${mI}`];
                     let colClass = isCol ? " collapsed" : "";
-                    let tChar = isCol ? '+' : '−';
-
-                    html += `<div class="month${colClass}" id="month-wrap-${mI}">
-                        <div class="month-name" onclick="toggleMonth(${mI})">${meses[mI]} <span id="toggle-m-${mI}" class="month-toggle">${tChar}</span></div>
-                        <div class="days-grid" id="grid-m-${mI}">`;
+                    let arrowRot = isCol ? "" : "up";
                     
+                    html += `<div class="month${colClass}">
+                                <div class="month-name" onclick="toggleMonthUI(${mI}, this)">${meses[mI]} <span class="m-arrow ${arrowRot}">▼</span></div>
+                                <div class="days-grid">`;
                     diasL.forEach(d => html += `<div class="week-day">${d}</div>`);
-                    let slots = []; for(let i=0;i<off;i++) slots.push(null); for(let d=1;d<=dM;d++) slots.push(d); while(slots.length%7!==0) slots.push(null);
-                    let weeks = []; for(let i=0;i<slots.length;i+=7) { let dws = slots.slice(i, i+7); weeks.push({dws, c: dws.filter(d=>d!==null).length}); }
+                    
+                    let s = []; for(let i=0;i<off;i++) s.push(null); for(let d=1;d<=dM;d++) s.push(d); while(s.length%7!==0) s.push(null);
+                    let weeks = []; for(let i=0;i<s.length;i+=7) { let dws = s.slice(i, i+7); weeks.push({dws, c: dws.filter(d=>d!==null).length}); }
                     let sI = weeks.map((w,i)=>({i,c:w.c})).sort((a,b)=>b.c-a.c).slice(0,4).map(x=>x.i);
+                    
                     weeks.forEach((w, i) => {
                         let h = sI.includes(i), wCl = "", fR = -1, lR = -1;
                         for(let k=0;k<7;k++){ if(w.dws[k]!==null){ if(fR===-1)fR=k; lR=k; }}
-                        if(h){ tBC++; let endD = new Date(year, mI, w.dws[lR]); wCl = (endD >= now) ? "highlight-week-active" : "highlight-week-concluded"; if(now >= new Date(year,mI,w.dws[fR]) && now <= endD) wCl += " current-week-glow"; }
+                        
+                        if(h) { 
+                            tBC++; let endD = new Date(year, mI, w.dws[lR]); 
+                            wCl = (endD >= now) ? "highlight-week-active" : "highlight-week-concluded"; 
+                            if(now >= new Date(year,mI,w.dws[fR]) && now <= endD) wCl += " current-week-glow"; 
+                        }
+                        
                         html += `<div class="week-wrapper ${wCl}" style="display: contents;">`;
                         w.dws.forEach((d, dI) => {
-                            if(d===null) html += `<div style="border:1.5px solid transparent; margin-top:10px;"></div>`;
+                            if(!d) html += `<div></div>`;
                             else {
-                                let dt = new Date(year, mI, d), cl = "day";
-                                if(dt < now) cl += " past"; else if(dt.getTime()===now.getTime()) cl += " today"; else cl += (dt.getDay()===6)?" sat-future":(dt.getDay()===0)?" sun-future":" future";
-                                if(h && dI===fR) html += `<div class="${cl} block-start"><span class="block-label">W${tBC}</span>${d}</div>`; else if(h && dI===lR) html += `<div class="${cl} block-end">${d}</div>`; else html += `<div class="${cl}">${d}</div>`;
+                                let dt = new Date(year, mI, d), c = "day", hasPts = dailyLogs[`${year}-${mI}-${d}`] && dailyLogs[`${year}-${mI}-${d}`].length > 0;
+                                if(dt < now) c += " past"; else if(dt.getTime()===now.getTime()) c += " today"; else c += (dt.getDay()===6) ? " sat-future" : (dt.getDay()===0) ? " sun-future" : " future";
+                                if(hasPts) c += " has-points";
+                                
+                                let inner = d;
+                                if(h && dI===fR) { c += " block-start"; inner = `<span class="block-label">W${tBC}</span>${d}`; }
+                                else if(h && dI===lR) c += " block-end";
+                                
+                                html += `<div class="${c}" onclick="openDailyLog(${year}, ${mI}, ${d})">${inner}</div>`;
                             }
-                        }); html += `</div>`;
-                    }); html += `</div></div>`;
+                        });
+                        html += `</div>`;
+                    });
+                    
+                    html += `</div></div>`;
                 } 
                 
-                html += `</div><div class="metrics-wrapper"><div class="metrics-header"><span class="metrics-title">CUMPLIMIENTO DE TAREAS</span><div class="toggle-view" id="m-toggle-btn-${q}" onclick="toggleMetricsView(${q})">Ver Trimestre</div></div><div id="metrics-m-${q}" class="metrics-view active">`;
-                for(let m=0; m<3; m++) { let mI = q*3 + m; html += `<div class="m-bar-row"><div class="m-label">${meses[mI]}</div><div class="m-progress"><div id="fill-m-${mI}" class="m-fill"></div></div><div id="pct-m-${mI}" class="m-pct">0%</div></div>`; }
-                html += `</div><div id="metrics-q-${q}" class="metrics-view"><div class="m-bar-row"><div class="m-label">T${q+1} Total</div><div class="m-progress"><div id="fill-q-${q}" class="m-fill" style="background: var(--year-bar)"></div></div><div id="pct-q-${q}" class="m-pct">0%</div></div></div></div></div>`;
+                html += `</div><div class="metrics-wrapper"><div class="metrics-header"><span class="metrics-title">Q${q+1} OVERVIEW</span></div><div class="metrics-view active">`;
+                for(let m=0; m<3; m++) { let mI = q*3 + m; html += `<div class="m-bar-row"><div class="m-label">${mesesCortos[mI]}</div><div class="m-progress"><div id="fill-m-${mI}" class="m-fill"></div></div><div id="pct-m-${mI}" class="m-pct">0%</div></div>`; }
+                html += `</div></div></div>`;
             }
             document.getElementById('calendar-container').innerHTML = html;
-
             for(let w=1; w<=48; w++) renderTasks(w);
-            updateAllMetrics(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();
+            updateAllMetrics(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); ['block', 'year', 'week', 'work', 'day'].forEach(renderMarkers);
         }
             
-        setInitialThemeIcon();
-        initTimers();
-        drawCalendar(); setInterval(update, 1000); update();
+        document.getElementById('theme-btn').innerHTML = document.documentElement.getAttribute('data-theme') === 'light' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+        initTimers(); drawCalendar(); setInterval(update, 1000); update();
     </script>
 </body>
 </html>

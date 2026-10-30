@@ -410,19 +410,37 @@
             padding: 10px 8px; box-shadow: var(--card-shadow); display: flex; flex-direction: column;
             height: 250px; overflow: hidden; min-width: 0; margin-top: 10px;
         }
-        .qt-title { font-size: 0.7rem; font-weight: 800; color: var(--text); margin-bottom: 6px; text-align: center; padding-bottom: 6px; border-bottom: 1px solid var(--border); letter-spacing: -0.01em; }
         
-        /* NUEVOS ESTILOS PARA LOS TABS DEL PANEL */
-        .qt-tabs { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 6px; }
-        .qt-tab { font-size: 0.65rem; font-weight: 800; color: var(--muted); cursor: pointer; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; transition: 0.2s;}
-        .qt-tab.active { color: var(--text); background: var(--item-bg); }
-        .qt-tab:hover { color: var(--text); }
+        /* SISTEMA DE BOTONES PARA LA LISTA GENERAL (MESES Y SEMANAS) */
+        .list-tabs { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding: 0 4px; }
+        .tab-row { display: flex; gap: 8px; justify-content: center; }
+        .tab-btn { 
+            flex: 1; 
+            background: var(--item-bg); 
+            color: var(--text); 
+            border: 1px solid var(--border-input); 
+            padding: 8px 4px; 
+            font-size: 0.65rem; 
+            font-weight: 800; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            letter-spacing: 0.03em;
+        }
+        .tab-btn.active { 
+            background: var(--accent); 
+            color: var(--btn-text); 
+            border-color: var(--accent); 
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); 
+            transform: translateY(-2px); 
+        }
+        .tab-btn:hover:not(.active) {
+            border-color: var(--muted);
+            transform: translateY(-1px);
+        }
+        .tab-btn:active { transform: scale(0.95); }
         
-        .qt-week-tabs { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
-        .qt-week-tab { font-size: 0.6rem; font-weight: 700; color: var(--muted); cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: 0.2s;}
-        .qt-week-tab.active { color: var(--accent); background: rgba(16, 185, 129, 0.15); }
-        .qt-week-tab:hover { color: var(--text); }
-
         .qt-list { flex: 1; overflow-y: auto; padding-right: 3px; min-height: 0; }
         .qt-list::-webkit-scrollbar { width: 4px; }
         .qt-list::-webkit-scrollbar-track { background: transparent; }
@@ -533,7 +551,6 @@
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             
-            <!-- MODAL GENERAL / OPCIONES -->
             <div id="modal-content-general" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 20px;">Configuración</h3>
                 <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -543,7 +560,6 @@
                 <div class="modal-actions" style="margin-top: 25px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div>
             </div>
 
-            <!-- MODAL CREADOR DUAL: TAREAS / ENTORNOS -->
             <div id="modal-content-taskcreate" style="display:none;">
                 <div class="modal-header-flex">
                     <h3 id="tc-main-title">Nueva Acción</h3>
@@ -741,9 +757,8 @@
         let quarterBarMode = parseInt(localStorage.getItem('wkQBarMode')) || 0;
         let tcMode = 'tarea'; 
 
-        // ESTADO GLOBAL DE FILTROS DEL PANEL DE TAREAS
-        let qtFilterMonth = -1;
-        let qtFilterWeek = -1;
+        let activeTabM = 0;
+        let activeTabW = 1;
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
@@ -882,31 +897,44 @@
         }
 
         function openTaskCreateModal() {
-            tcMode = 'entorno'; toggleTcMode(); // fuerza tarea
-            const q = selectedQuarter; const nowMonth = new Date().getMonth();
-            let defaultM = q * 3; if (Math.floor(nowMonth / 3) === q) defaultM = nowMonth;
+            tcMode = 'entorno'; 
+            toggleTcMode();
+
+            const q = selectedQuarter;
+            const nowMonth = new Date().getMonth();
+            let defaultM = q * 3;
+            if (Math.floor(nowMonth / 3) === q) defaultM = nowMonth;
             
-            const monthSel = document.getElementById('inp-tc-month'); let mHtml = '';
+            const monthSel = document.getElementById('inp-tc-month');
+            let mHtml = '';
             for (let i = 0; i < 3; i++) {
-                const mI = q * 3 + i; mHtml += `<option value="${mI}" ${mI === defaultM ? 'selected' : ''}>${meses[mI]}</option>`;
+                const mI = q * 3 + i;
+                mHtml += `<option value="${mI}" ${mI === defaultM ? 'selected' : ''}>${meses[mI]}</option>`;
             }
-            monthSel.innerHTML = mHtml; updateWeekDropdown();
+            monthSel.innerHTML = mHtml;
+            updateWeekDropdown();
             
-            const chkMonths = document.getElementById('chk-months'); chkMonths.innerHTML = '';
+            const chkMonths = document.getElementById('chk-months');
+            chkMonths.innerHTML = '';
             for(let i=0; i<3; i++) {
-                const mI = q * 3 + i; chkMonths.innerHTML += `<div class="chk-btn" onclick="this.classList.toggle('active')" data-val="${i}">${meses[mI].slice(0,3)}</div>`;
+                const mI = q * 3 + i;
+                chkMonths.innerHTML += `<div class="chk-btn" onclick="this.classList.toggle('active')" data-val="${i}">${meses[mI].slice(0,3)}</div>`;
             }
             document.querySelectorAll('.chk-btn').forEach(btn => btn.classList.remove('active'));
 
-            document.getElementById('inp-tc-title').value = ''; document.getElementById('inp-tc-day').value = '';
-            document.getElementById('inp-tc-hour').value = ''; document.getElementById('inp-tc-hourEnd').value = '';
+            document.getElementById('inp-tc-title').value = '';
+            document.getElementById('inp-tc-day').value = '';
+            document.getElementById('inp-tc-hour').value = '';
+            document.getElementById('inp-tc-hourEnd').value = '';
             document.getElementById('inp-tc-color').value = '#3b82f6';
             
-            document.getElementById('modal-content-taskcreate').style.display = 'block'; openModal();
+            document.getElementById('modal-content-taskcreate').style.display = 'block';
+            openModal();
         }
 
         function updateWeekDropdown() {
-            const mI = parseInt(document.getElementById('inp-tc-month').value); const weeks = getWeeksForMonth(selectedYear, mI);
+            const mI = parseInt(document.getElementById('inp-tc-month').value);
+            const weeks = getWeeksForMonth(selectedYear, mI);
             const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
             const weekSel = document.getElementById('inp-tc-week'); const prevVal = weekSel.value;
             let wHtml = (weeks.length > sI.length) ? `<option value="0">W0</option>` : '';
@@ -915,16 +943,24 @@
             if (prevVal && Array.from(weekSel.options).some(o => o.value === prevVal)) weekSel.value = prevVal;
         }
 
-        function saveTcRecord() { if (tcMode === 'tarea') saveNewManagedTask(); else saveNewEntorno(); }
+        function saveTcRecord() {
+            if (tcMode === 'tarea') saveNewManagedTask();
+            else saveNewEntorno();
+        }
 
         function saveNewManagedTask() {
-            const title = document.getElementById('inp-tc-title').value.trim(); const mI = parseInt(document.getElementById('inp-tc-month').value);
-            const localW = parseInt(document.getElementById('inp-tc-week').value); const dayVal = document.getElementById('inp-tc-day').value;
-            const hour = document.getElementById('inp-tc-hour').value; const hourEnd = document.getElementById('inp-tc-hourEnd').value;
+            const title = document.getElementById('inp-tc-title').value.trim();
+            const mI = parseInt(document.getElementById('inp-tc-month').value);
+            const localW = parseInt(document.getElementById('inp-tc-week').value);
+            const dayVal = document.getElementById('inp-tc-day').value;
+            const hour = document.getElementById('inp-tc-hour').value;
+            const hourEnd = document.getElementById('inp-tc-hourEnd').value;
             const color = document.getElementById('inp-tc-color').value;
+            
             if (!title) { alert("Escribe una descripción"); return; }
             
-            const wNum = mI * 5 + localW; const tKey = `${selectedYear}-${wNum}`;
+            const wNum = mI * 5 + localW;
+            const tKey = `${selectedYear}-${wNum}`;
             if (!tasksData[tKey]) tasksData[tKey] = [];
             tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: dayVal === '' ? null : parseInt(dayVal), hour: hour || null, hourEnd: hourEnd || null, color: color });
             localStorage.setItem('wkTasks', JSON.stringify(tasksData));
@@ -932,70 +968,88 @@
         }
 
         function saveNewEntorno() {
-            const title = document.getElementById('inp-tc-title').value.trim(); const hour = document.getElementById('inp-tc-hour').value;
-            const hourEnd = document.getElementById('inp-tc-hourEnd').value; const color = document.getElementById('inp-tc-color').value;
+            const title = document.getElementById('inp-tc-title').value.trim();
+            const hour = document.getElementById('inp-tc-hour').value;
+            const hourEnd = document.getElementById('inp-tc-hourEnd').value;
+            const color = document.getElementById('inp-tc-color').value;
+
             if (!title) { alert("Escribe una descripción para el entorno"); return; }
+
             const selMonths = Array.from(document.getElementById('chk-months').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
             const selWeeks = Array.from(document.getElementById('chk-weeks').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
             const selDays = Array.from(document.getElementById('chk-days').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
-            if (selMonths.length === 0 || selWeeks.length === 0 || selDays.length === 0) { alert("Debes seleccionar al menos un mes, una semana y un día."); return; }
 
-            entornosData.push({ id: Date.now(), text: title, color: color, hour: hour || null, hourEnd: hourEnd || null, year: selectedYear, q: selectedQuarter, months: selMonths, weeks: selWeeks, days: selDays });
-            localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); closeModal(); renderQuarterDetailBody(); renderDayTaskMarks();
+            if (selMonths.length === 0 || selWeeks.length === 0 || selDays.length === 0) {
+                alert("Debes seleccionar al menos un mes, una semana y un día."); return;
+            }
+
+            entornosData.push({
+                id: Date.now(), text: title, color: color, hour: hour || null, hourEnd: hourEnd || null,
+                year: selectedYear, q: selectedQuarter, months: selMonths, weeks: selWeeks, days: selDays
+            });
+            localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
+            closeModal(); renderQuarterDetailBody(); renderDayTaskMarks();
         }
 
         function toggleManagedTask(week, taskId) {
             const tKey = `${selectedYear}-${week}`; const t = (tasksData[tKey] || []).find(x => x.id === taskId);
-            if (t) t.done = !t.done; localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderQuarterTasksPanel(); renderDayTaskMarks();
+            if (t) t.done = !t.done; localStorage.setItem('wkTasks', JSON.stringify(tasksData)); updateMasterTaskList(); renderDayTaskMarks();
         }
         function deleteManagedTask(week, taskId) {
             const tKey = `${selectedYear}-${week}`; tasksData[tKey] = (tasksData[tKey] || []).filter(x => x.id !== taskId);
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderQuarterTasksPanel(); renderDayTaskMarks();
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); updateMasterTaskList(); renderDayTaskMarks();
         }
         function deleteEntorno(id) {
             entornosData = entornosData.filter(e => e.id !== id);
-            localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); renderQuarterTasksPanel(); renderDayTaskMarks();
+            localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); updateMasterTaskList(); renderDayTaskMarks();
         }
 
-        // CONTROL DE TABS
-        function setQtMonth(mI) { qtFilterMonth = mI; renderQuarterTasksPanel(); }
-        function setQtWeek(w) { qtFilterWeek = w; renderQuarterTasksPanel(); }
+        function setActiveTabM(m) {
+            activeTabM = m;
+            const activeMonthAbs = selectedQuarter * 3 + m;
+            const weeks = getWeeksForMonth(selectedYear, activeMonthAbs);
+            const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
+            const hasW0 = weeks.length > sI.length;
+            if(activeTabW === 0 && !hasW0) activeTabW = 1;
+            updateMasterTaskList();
+        }
 
-        function renderQuarterTasksPanel() {
-            const container = document.getElementById('qt-tasks-panel-inner');
-            if(!container) return;
+        function setActiveTabW(w) {
+            activeTabW = w;
+            updateMasterTaskList();
+        }
 
-            const q = selectedQuarter;
+        function updateMasterTaskList() {
+            const q = selectedQuarter; const year = selectedYear;
             
-            let mHtml = '<div class="qt-tabs">';
-            for(let i=0; i<3; i++) {
-                const mI = q * 3 + i;
-                const mName = meses[mI].substring(0,3).toUpperCase();
-                const active = (mI === qtFilterMonth) ? 'active' : '';
-                mHtml += `<div class="qt-tab ${active}" onclick="setQtMonth(${mI})">${mName}</div>`;
-                if(i < 2) mHtml += `<div style="color:var(--border); font-size:0.6rem; align-self:center;">|</div>`;
+            let tabsHtml = '<div class="list-tabs"><div class="tab-row">';
+            for(let i = 0; i < 3; i++) {
+                const mName = meses[q * 3 + i].slice(0,3).toUpperCase();
+                tabsHtml += `<button class="tab-btn ${activeTabM === i ? 'active' : ''}" onclick="setActiveTabM(${i})">${mName}</button>`;
             }
-            mHtml += '</div>';
-
-            let wHtml = '<div class="qt-week-tabs">';
-            for(let w=0; w<=4; w++) {
-                const active = (w === qtFilterWeek) ? 'active' : '';
-                wHtml += `<div class="qt-week-tab ${active}" onclick="setQtWeek(${w})">W${w}</div>`;
-            }
-            wHtml += '</div>';
-
-            let listHtml = '';
+            tabsHtml += '</div><div class="tab-row">';
             
-            let qEntornos = entornosData.filter(e => 
-                e.year === selectedYear && e.q === q && 
-                e.months.includes(qtFilterMonth % 3) && e.weeks.includes(qtFilterWeek)
-            );
+            const activeMonthAbs = q * 3 + activeTabM;
+            const weeks = getWeeksForMonth(year, activeMonthAbs);
+            const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
+            const hasW0 = weeks.length > sI.length;
 
-            if(qEntornos.length > 0) {
-                listHtml += `<div style="padding: 0 0 6px;">`;
+            if (hasW0) tabsHtml += `<button class="tab-btn ${activeTabW === 0 ? 'active' : ''}" onclick="setActiveTabW(0)">W0</button>`;
+            for (let i = 1; i <= 4; i++) {
+                tabsHtml += `<button class="tab-btn ${activeTabW === i ? 'active' : ''}" onclick="setActiveTabW(${i})">W${i}</button>`;
+            }
+            tabsHtml += '</div></div>';
+            
+            document.getElementById('qt-tabs-container').innerHTML = tabsHtml;
+
+            let tasksHtml = '';
+            
+            let qEntornos = entornosData.filter(e => e.year === year && e.q === q && e.months.includes(activeTabM) && e.weeks.includes(activeTabW));
+            if (qEntornos.length > 0) {
+                tasksHtml += `<div style="padding: 0 0 8px;">`;
                 qEntornos.forEach(e => {
                     const timeDisp = e.hour ? (e.hourEnd ? `${e.hour}-${e.hourEnd}` : e.hour) : 'Todo el día';
-                    listHtml += `
+                    tasksHtml += `
                     <div class="qt-item">
                         <div class="qt-info">
                             <div class="qt-text"><span class="entorno-tag" style="background:${e.color}20; color:${e.color};">ENTORNO</span> ${e.text}</div>
@@ -1004,33 +1058,35 @@
                         <span class="qt-delete" onclick="deleteEntorno(${e.id})">×</span>
                     </div>`;
                 });
-                listHtml += `</div><div style="border-bottom: 1px dashed var(--border); margin: 4px 0 6px;"></div>`;
+                tasksHtml += `</div><div style="border-bottom: 1px dashed var(--border); margin: 0 0 5px;"></div>`;
             }
 
-            const wNum = qtFilterMonth * 5 + qtFilterWeek;
-            const weekTasks = tasksData[`${selectedYear}-${wNum}`] || [];
+            const wNum = activeMonthAbs * 5 + activeTabW;
+            const weekTasks = tasksData[`${year}-${wNum}`] || [];
             
             if (weekTasks.length === 0 && qEntornos.length === 0) {
-                listHtml += `<div class="qt-empty">Sin registros en W${qtFilterWeek}.</div>`;
+                tasksHtml += `<div class="qt-empty">Sin registros en esta semana.</div>`;
             } else {
-                listHtml += weekTasks.map(t => {
+                tasksHtml += weekTasks.map(t => {
                     const tDay = getTaskDay(t);
                     let metaParts = [];
                     if (tDay !== null) metaParts.push(diasFull[tDay].slice(0,3));
                     if (t.hour) metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
+                    const metaStr = metaParts.length > 0 ? `<div class="qt-meta">${metaParts.join(' · ')}</div>` : '';
+                    
                     return `
                         <div class="qt-item ${t.done ? 'done' : ''}">
                             <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${wNum}, ${t.id})">
                             <div class="qt-info">
                                 <div class="qt-text">${t.text}</div>
-                                <div class="qt-meta">${metaParts.join(' · ')}</div>
+                                ${metaStr}
                             </div>
                             <span class="qt-delete" onclick="deleteManagedTask(${wNum}, ${t.id})">×</span>
                         </div>`;
                 }).join('');
             }
-
-            container.innerHTML = mHtml + wHtml + `<div class="qt-list">${listHtml}</div>`;
+            
+            document.getElementById('qt-list-container').innerHTML = tasksHtml;
         }
 
         function getQuarterStats(year, q) {
@@ -1089,26 +1145,21 @@
 
         function openQuarterDetail(q) {
             selectedQuarter = q; localStorage.setItem('wkSelQtr', q);
+            document.getElementById('calendar-detail-title').innerText = `T${q + 1} · ${selectedYear}`;
             
-            // CONFIGURAR FILTROS POR DEFECTO DEL PANEL DE TAREAS
             const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonth = now.getMonth();
-            if (selectedYear === currentYear && Math.floor(currentMonth / 3) === q) {
-                qtFilterMonth = currentMonth;
-                const weekInfo = getWeekForDay(currentYear, currentMonth, now.getDate());
-                qtFilterWeek = weekInfo ? weekInfo.localW : 1;
+            const currentM = now.getMonth();
+            if (selectedYear === now.getFullYear() && Math.floor(currentM / 3) === q) {
+                activeTabM = currentM % 3;
+                const wInfo = getWeekForDay(now.getFullYear(), currentM, now.getDate());
+                activeTabW = wInfo ? wInfo.localW : 1;
             } else {
-                qtFilterMonth = q * 3;
-                qtFilterWeek = 1; 
+                activeTabM = 0; activeTabW = 1;
             }
 
-            document.getElementById('calendar-detail-title').innerText = `T${q + 1} · ${selectedYear}`;
-            renderQuarterDetailBody(); 
-            document.getElementById('calendar-overlay').classList.add('active'); 
-            document.body.style.overflow = 'hidden';
+            renderQuarterDetailBody(); document.getElementById('calendar-overlay').classList.add('active'); document.body.style.overflow = 'hidden';
         }
-
+        
         function closeQuarterDetail(e) {
             if (e && e.target.id !== 'calendar-overlay') return;
             document.getElementById('calendar-overlay').classList.remove('active'); document.body.style.overflow = '';
@@ -1181,10 +1232,10 @@
                 });
                 html += `</div></div>`;
             }
-            html += `<div class="quarter-tasks-panel"><div class="qt-title">📋 Registros</div><div id="qt-tasks-panel-inner" style="display:flex; flex-direction:column; flex:1; min-height:0;"></div></div></div>`;
+            html += `</div><div class="quarter-tasks-panel"><div id="qt-tabs-container"></div><div class="qt-list" id="qt-list-container"></div></div>`;
             document.getElementById('calendar-detail-body').innerHTML = html; 
             updateQuarterBar();
-            renderQuarterTasksPanel();
+            updateMasterTaskList();
         }
 
         function openModal() { document.getElementById('modal-overlay').classList.add('active'); }
@@ -1303,13 +1354,15 @@
             let itemsToRender = [];
 
             if (weekInfo) {
-                const localM = mI % 3; const localW = weekInfo.localW;
+                const localM = mI % 3;
+                const localW = weekInfo.localW;
                 const todayEntornos = entornosData.filter(e => 
                     e.year === year && e.q === Math.floor(mI/3) &&
                     e.months.includes(localM) && e.weeks.includes(localW) && e.days.includes(weekInfo.dayIdx)
                 ).map(e => ({...e, isEntorno: true}));
                 
-                const wNum = mI * 5 + weekInfo.localW; const weekTasks = tasksData[`${year}-${wNum}`] || [];
+                const wNum = mI * 5 + weekInfo.localW;
+                const weekTasks = tasksData[`${year}-${wNum}`] || [];
                 const todayTasks = weekTasks.filter(t => getTaskDay(t) === weekInfo.dayIdx && t.hour && t.color);
                 
                 itemsToRender = [...todayEntornos, ...todayTasks];
@@ -1337,13 +1390,21 @@
                     endPct = Math.min(100, startPct + (100 / 24));
                 }
 
-                const mark = document.createElement('div'); mark.className = 'day-task-mark';
-                mark.style.left = startPct + '%'; mark.style.width = (endPct - startPct) + '%'; mark.style.background = t.color;
+                const mark = document.createElement('div');
+                mark.className = 'day-task-mark';
+                mark.style.left = startPct + '%';
+                mark.style.width = (endPct - startPct) + '%';
+                mark.style.background = t.color;
                 
-                if (t.isEntorno) { mark.style.opacity = '0.35'; mark.style.mixBlendMode = 'screen'; } 
-                else { mark.style.opacity = t.done ? '0.9' : '0.6'; }
+                if (t.isEntorno) {
+                    mark.style.opacity = '0.35';
+                    mark.style.mixBlendMode = 'screen';
+                } else {
+                    mark.style.opacity = t.done ? '0.9' : '0.6';
+                }
                 
-                mark.title = `${t.text} · ${t.hour}${t.hourEnd ? ' - '+t.hourEnd : ''}`; container.appendChild(mark);
+                mark.title = `${t.text} · ${t.hour}${t.hourEnd ? ' - '+t.hourEnd : ''}`;
+                container.appendChild(mark);
             });
         }
 

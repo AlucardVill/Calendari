@@ -405,29 +405,29 @@
         .highlight-week-active .block-start { border-left-color: var(--week-box-active); border-top-left-radius: 4px; border-bottom-left-radius: 4px; } 
         .highlight-week-active .block-end { border-right-color: var(--week-box-active); border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
 
-        /* ALTURA REDUCIDA PARA EL PANEL DE TAREAS */
+        /* PANEL DE TAREAS INTEGRADO EN EL GRID */
         .quarter-tasks-panel {
             background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-            padding: 10px 8px; box-shadow: var(--card-shadow); display: flex; flex-direction: column;
-            height: 175px; overflow: hidden; min-width: 0; margin-top: 10px;
+            padding: 8px; box-shadow: var(--card-shadow); display: flex; flex-direction: column;
+            min-width: 0; position: relative;
         }
         
         /* SISTEMA DE BOTONES PARA LA LISTA GENERAL (MESES Y SEMANAS) */
-        .list-tabs { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding: 0 4px; }
-        .tab-row { display: flex; gap: 8px; justify-content: center; }
+        .list-tabs { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+        .tab-row { display: flex; gap: 4px; justify-content: center; }
         .tab-btn { 
             flex: 1; 
             background: var(--item-bg); 
             color: var(--text); 
             border: 1px solid var(--border-input); 
-            padding: 8px 4px; 
-            font-size: 0.65rem; 
+            padding: 6px 2px; 
+            font-size: 0.55rem; 
             font-weight: 800; 
-            border-radius: 8px; 
+            border-radius: 6px; 
             cursor: pointer; 
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-            letter-spacing: 0.03em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 0.02em;
         }
         .tab-btn.active { 
             background: var(--accent); 
@@ -442,20 +442,20 @@
         }
         .tab-btn:active { transform: scale(0.95); }
         
-        .qt-list { flex: 1; overflow-y: auto; padding-right: 3px; min-height: 0; }
+        .qt-list { flex: 1; overflow-y: auto; padding-right: 2px; min-height: 0; }
         .qt-list::-webkit-scrollbar { width: 4px; }
         .qt-list::-webkit-scrollbar-track { background: transparent; }
         .qt-list::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 2px; }
-        .qt-item { display: flex; align-items: flex-start; gap: 6px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.72rem; }
+        .qt-item { display: flex; align-items: flex-start; gap: 6px; padding: 4px 0; border-bottom: 1px solid var(--border); font-size: 0.65rem; }
         .qt-item:last-child { border-bottom: none; }
         .qt-item.done .qt-text { text-decoration: line-through; color: var(--muted); opacity: 0.65; }
         .qt-info { flex: 1; min-width: 0; }
-        .qt-text { color: var(--text); font-weight: 500; line-height: 1.25; word-break: break-word; font-size: 0.72rem; }
-        .qt-meta { font-size: 0.55rem; color: var(--muted); margin-top: 2px; font-weight: 600; letter-spacing: 0.02em; }
-        .qt-empty { color: var(--muted); font-size: 0.68rem; font-style: italic; text-align: center; padding: 20px 6px; }
+        .qt-text { color: var(--text); font-weight: 500; line-height: 1.25; word-break: break-word; font-size: 0.65rem; }
+        .qt-meta { font-size: 0.5rem; color: var(--muted); margin-top: 2px; font-weight: 600; letter-spacing: 0.02em; }
+        .qt-empty { color: var(--muted); font-size: 0.6rem; font-style: italic; text-align: center; padding: 10px 2px; }
         .qt-delete { color: var(--muted); font-size: 0.95rem; cursor: pointer; opacity: 0.5; font-weight: bold; padding: 0 2px; flex-shrink: 0; line-height: 1; transition: 0.2s; }
         .qt-delete:hover { opacity: 1; color: var(--sunday); }
-        .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.5rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
+        .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.45rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
 
         @media (max-width: 380px) {
             .progress-btn { padding: 12px 2px; font-size: 0.75rem; }
@@ -463,8 +463,6 @@
             .week-day { font-size: 0.42rem; }
             .month-name { font-size: 0.65rem; }
             .block-label { font-size: 0.38rem; top: -8px; }
-            .qt-text { font-size: 0.65rem; }
-            .qt-meta { font-size: 0.5rem; }
         }
     </style>
 </head>
@@ -1233,7 +1231,7 @@
                 });
                 html += `</div></div>`;
             }
-            html += `</div><div class="quarter-tasks-panel"><div id="qt-tabs-container"></div><div class="qt-list" id="qt-list-container"></div></div>`;
+            html += `<div class="quarter-tasks-panel"><div id="qt-tabs-container"></div><div class="qt-list" id="qt-list-container"></div></div></div>`;
             document.getElementById('calendar-detail-body').innerHTML = html; 
             updateQuarterBar();
             updateMasterTaskList();

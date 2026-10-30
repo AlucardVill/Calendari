@@ -31,8 +31,8 @@
             --work: #f59e0b; --day-bar: #8b5cf6; --year-bar: #3b82f6;
             --week-bar: #10b981; --bi-bar: #ec4899;
             --week-box-active: #10b981; --week-box-concluded: #3f3f46;
-            --block-id: #fde047; --clock-future: #064e3b; 
-            --modal-bg: rgba(0,0,0,0.75); --analog-shadow: rgba(0,0,0,0.8);
+            --block-id: #fde047;
+            --modal-bg: rgba(0,0,0,0.75); 
             --btn-text: #000; --today-text: #000;
             --badge-meta-bg: #262626; --badge-meta-txt: #e5e5e5;
             --badge-dia-bg: #1c1c1e; --badge-dia-border: #3f3f46; --badge-dia-txt: #a1a1aa;
@@ -50,8 +50,8 @@
             --work: #d97706; --day-bar: #7c3aed; --year-bar: #2563eb;
             --week-bar: #059669; --bi-bar: #db2777;
             --week-box-active: #10b981; --week-box-concluded: #d1d5db;
-            --block-id: #ca8a04; --clock-future: #d1fae5; 
-            --modal-bg: rgba(255,255,255,0.75); --analog-shadow: rgba(0,0,0,0.03);
+            --block-id: #ca8a04;
+            --modal-bg: rgba(255,255,255,0.75);
             --btn-text: #ffffff; --today-text: #ffffff;
             --badge-meta-bg: #e5e7eb; --badge-meta-txt: #1f2937;
             --badge-dia-bg: #f9fafb; --badge-dia-border: #d1d5db; --badge-dia-txt: #4b5563;
@@ -127,7 +127,6 @@
 
         .controls-group { display: flex; align-items: center; gap: 8px; }
 
-        /* Estilos específicos para la barra ancha del día */
         .tall-bar { height: 32px !important; border-radius: 10px !important; }
         .bar-text-overlay {
             position: absolute; inset: 0;
@@ -157,9 +156,23 @@
             color: var(--accent); background: rgba(16, 185, 129, 0.15);
             padding: 3px 6px; border-radius: 5px;
         }
+        .delete-year-btn {
+            position: absolute; top: 8px; left: 8px;
+            width: 22px; height: 22px; border-radius: 6px;
+            background: var(--item-bg); color: var(--muted);
+            font-size: 0.9rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; z-index: 10;
+        }
+        .delete-year-btn:hover { color: var(--sunday); background: rgba(251, 113, 133, 0.15); }
         .year-progress { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 8px 0 6px; }
         .year-progress .fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--year-bar); }
         .year-pct { font-size: 0.85rem; font-weight: 800; color: var(--text); }
+        .year-box.add-year {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 2px dashed var(--border); background: transparent; color: var(--muted);
+        }
+        .year-box.add-year:hover { border-color: var(--accent); color: var(--accent); }
 
         .quarters-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 0 2px; }
         .quarters-header .back-btn {
@@ -193,18 +206,15 @@
             display: none; position: fixed; inset: 0;
             background: var(--modal-bg); z-index: 900;
             align-items: center; justify-content: center;
-            backdrop-filter: blur(8px);
-            padding: 16px;
+            backdrop-filter: blur(8px); padding: 16px;
         }
         .calendar-overlay.active { display: flex; animation: fadeIn 0.2s; }
         .calendar-detail {
             background: var(--bg); border-radius: 20px;
             width: 100%; max-width: 700px; max-height: 90vh;
-            display: flex; flex-direction: column;
-            border: 1px solid var(--border);
+            display: flex; flex-direction: column; border: 1px solid var(--border);
             animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
         @keyframes modalIn {
             from { transform: scale(0.95); opacity: 0; }
@@ -212,8 +222,7 @@
         }
         .calendar-detail-header {
             padding: 14px 16px; display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center; gap: 8px;
+            grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px;
             border-bottom: 1px solid var(--border); flex-shrink: 0;
             background: var(--card);
         }
@@ -238,77 +247,39 @@
         .metrics-btn {
             background: var(--item-bg); border: 1px solid var(--border-input); color: var(--accent);
             width: 32px; height: 32px; border-radius: 8px; font-size: 0.95rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
-            padding: 0;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0;
         }
         .metrics-btn:hover { border-color: var(--accent); transform: scale(1.08); }
 
-        .calendar-detail-body {
-            padding: 12px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;
-        }
+        .calendar-detail-body { padding: 12px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
         .calendar-detail-body::-webkit-scrollbar { width: 6px; }
         .calendar-detail-body::-webkit-scrollbar-track { background: var(--bg); }
         .calendar-detail-body::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 3px; }
 
         .qbar-widget {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            padding: 7px 10px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            box-shadow: var(--card-shadow);
+            display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+            padding: 7px 10px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 10px; cursor: pointer; transition: all 0.2s;
+            user-select: none; -webkit-tap-highlight-color: transparent; box-shadow: var(--card-shadow);
         }
         .qbar-widget:hover { border-color: var(--border-input); }
         .qbar-widget:active { transform: scale(0.99); }
-
         .qbar-badge {
-            font-size: 0.58rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 3px 8px;
-            border-radius: 5px;
-            flex-shrink: 0;
-            transition: all 0.3s;
-            min-width: 68px;
-            text-align: center;
-            line-height: 1;
+            font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+            padding: 3px 8px; border-radius: 5px; flex-shrink: 0; transition: all 0.3s;
+            min-width: 68px; text-align: center; line-height: 1;
         }
         .qbar-widget[data-mode="q"] .qbar-badge { color: var(--accent); background: rgba(16, 185, 129, 0.15); }
         .qbar-widget[data-mode="y"] .qbar-badge { color: var(--year-bar); background: rgba(59, 130, 246, 0.15); }
         .qbar-widget[data-mode="b"] .qbar-badge { color: var(--bi-bar); background: rgba(236, 72, 153, 0.15); }
-
-        .qbar-track {
-            flex: 1;
-            height: 5px;
-            background: var(--border);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .qbar-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
-        }
+        .qbar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+        .qbar-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s; }
         .qbar-widget[data-mode="q"] .qbar-fill { background: var(--accent); }
         .qbar-widget[data-mode="y"] .qbar-fill { background: var(--year-bar); }
         .qbar-widget[data-mode="b"] .qbar-fill { background: var(--bi-bar); }
-
         .qbar-pct {
-            font-size: 0.7rem;
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
-            min-width: 38px;
-            text-align: right;
-            flex-shrink: 0;
-            transition: color 0.3s;
+            font-size: 0.7rem; font-weight: 800; font-variant-numeric: tabular-nums;
+            min-width: 38px; text-align: right; flex-shrink: 0; transition: color 0.3s;
         }
         .qbar-widget[data-mode="q"] .qbar-pct { color: var(--accent); }
         .qbar-widget[data-mode="y"] .qbar-pct { color: var(--year-bar); }
@@ -361,7 +332,7 @@
         }
         .tc-field input[type="time"] { color-scheme: dark; }
         [data-theme="light"] .tc-field input[type="time"] { color-scheme: light; }
-        .tc-field input[type="color"] { padding: 2px; height: 32px; width: 48px; cursor: pointer; border-radius: 8px; }
+        .tc-field input[type="color"] { padding: 2px; height: 32px; width: 100%; cursor: pointer; border-radius: 8px; }
 
         .day-task-mark {
             position: absolute; top: 0; height: 100%; border-radius: 2px;
@@ -549,27 +520,33 @@
                         <select id="inp-tc-week"></select>
                     </div>
                 </div>
-                <div class="tc-row" style="grid-template-columns: 1fr 1fr auto;">
+                <div class="tc-row">
                     <div class="tc-field">
                         <label>Día</label>
                         <select id="inp-tc-day">
                             <option value="">—</option>
-                            <option value="0">Lun</option>
-                            <option value="1">Mar</option>
-                            <option value="2">Mié</option>
-                            <option value="3">Jue</option>
-                            <option value="4">Vie</option>
-                            <option value="5">Sáb</option>
-                            <option value="6">Dom</option>
+                            <option value="0">Lunes</option>
+                            <option value="1">Martes</option>
+                            <option value="2">Miércoles</option>
+                            <option value="3">Jueves</option>
+                            <option value="4">Viernes</option>
+                            <option value="5">Sábado</option>
+                            <option value="6">Domingo</option>
                         </select>
                     </div>
                     <div class="tc-field">
-                        <label>Hora</label>
+                        <label>Color Tarea</label>
+                        <input type="color" id="inp-tc-color" value="#3b82f6">
+                    </div>
+                </div>
+                <div class="tc-row">
+                    <div class="tc-field">
+                        <label>Hora Inicio (Opcional)</label>
                         <input type="time" id="inp-tc-hour">
                     </div>
                     <div class="tc-field">
-                        <label>Color</label>
-                        <input type="color" id="inp-tc-color" value="#3b82f6">
+                        <label>Hora Fin (Opcional)</label>
+                        <input type="time" id="inp-tc-hourEnd">
                     </div>
                 </div>
                 <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveNewManagedTask()">Guardar</button></div>
@@ -661,6 +638,64 @@
             localStorage.setItem(MIGRATION_KEY, 'true');
         }
 
+        // --- SISTEMA DE AÑOS TRACKEADOS ---
+        let trackedYears = JSON.parse(localStorage.getItem('wkYears'));
+        if (!trackedYears || !Array.isArray(trackedYears)) {
+            let yearsSet = new Set();
+            for (let y = currentYear - 1; y <= currentYear + 2; y++) yearsSet.add(y);
+            for (let key in tasksData) {
+                if (tasksData[key].length > 0) {
+                    let y = parseInt(key.split('-')[0]);
+                    if (!isNaN(y) && y > 2000 && y < 2100) yearsSet.add(y);
+                }
+            }
+            trackedYears = Array.from(yearsSet).sort((a, b) => a - b);
+            localStorage.setItem('wkYears', JSON.stringify(trackedYears));
+        }
+
+        function getAvailableYears() {
+            return trackedYears.sort((a, b) => a - b);
+        }
+
+        function promptAddYear() {
+            let y = prompt("Ingresa el año que deseas crear (ej. 2027):");
+            if (y) {
+                y = parseInt(y);
+                if (!isNaN(y) && y > 2000 && y < 2100) {
+                    if (!trackedYears.includes(y)) {
+                        trackedYears.push(y);
+                        localStorage.setItem('wkYears', JSON.stringify(trackedYears));
+                        drawCalendar();
+                    } else {
+                        alert("Ese año ya existe.");
+                    }
+                } else {
+                    alert("Por favor, ingresa un año válido.");
+                }
+            }
+        }
+
+        function deleteYear(e, y) {
+            e.stopPropagation();
+            if (confirm(`¿Estás seguro de eliminar el año ${y} y TODAS sus tareas guardadas?`)) {
+                trackedYears = trackedYears.filter(yr => yr !== y);
+                localStorage.setItem('wkYears', JSON.stringify(trackedYears));
+                
+                for(let key in tasksData) {
+                    if (key.startsWith(y + '-')) {
+                        delete tasksData[key];
+                    }
+                }
+                localStorage.setItem('wkTasks', JSON.stringify(tasksData));
+                
+                if (selectedYear === y) {
+                    calendarView = 'years';
+                }
+                drawCalendar();
+            }
+        }
+        // ----------------------------------
+
         let workConfig = JSON.parse(localStorage.getItem('wkWorkCfg')) || { start: 7, end: 17 };
         let blockConfig = JSON.parse(localStorage.getItem('wkBlockCfg')) || { years: 2, startYear: currentYear };
         let dayConfig = JSON.parse(localStorage.getItem('wkDayCfg')) || { format: '24h' };
@@ -727,7 +762,8 @@
                     content += `\n[ AÑO / SLOT: ${key} ]\n`;
                     tasksData[key].forEach(t => {
                         let status = t.done ? "[x]" : "[ ]";
-                        let dayInfo = getTaskDay(t) !== null ? ` [${diasFull[getTaskDay(t)]}${t.hour ? ' ' + t.hour : ''}]` : '';
+                        let timeInfo = t.hour ? (t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour) : '';
+                        let dayInfo = getTaskDay(t) !== null ? ` [${diasFull[getTaskDay(t)]}${timeInfo ? ' ' + timeInfo : ''}]` : '';
                         content += `${status}${dayInfo} ${t.text}\n`;
                     });
                 }
@@ -737,7 +773,7 @@
             let backup = {
                 tasks: tasksData, work: workConfig,
                 block: blockConfig, day: dayConfig, markers: markersData,
-                collapsed: collapsedMonths
+                collapsed: collapsedMonths, trackedYears: trackedYears
             };
             content += JSON.stringify(backup);
 
@@ -776,10 +812,10 @@
             
             if (tasks.length > 0) {
                 tasksList.innerHTML = tasks.map(t => {
-                    const hour = t.hour ? ` · ${t.hour}` : '';
+                    const timeDisp = t.hour ? (t.hourEnd ? `${t.hour} - ${t.hourEnd}` : t.hour) : '';
                     return `<div style="font-size:0.85rem; padding:8px 0; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:8px;">
                         <span style="color:${t.done ? 'var(--muted)' : 'var(--accent)'}; font-weight:bold; flex-shrink:0;">${t.done ? '✓' : '○'}</span>
-                        <span style="${t.done ? 'text-decoration: line-through; color: var(--muted);' : 'color: var(--text);'}">${t.text}${hour ? `<span style="color:var(--muted); font-size:0.72rem;">${hour}</span>` : ''}</span>
+                        <span style="${t.done ? 'text-decoration: line-through; color: var(--muted);' : 'color: var(--text);'}">${t.text}${timeDisp ? `<span style="color:var(--muted); font-size:0.72rem; display:block;">${timeDisp}</span>` : ''}</span>
                     </div>`;
                 }).join('');
             } else {
@@ -896,6 +932,7 @@
             document.getElementById('inp-tc-title').value = '';
             document.getElementById('inp-tc-day').value = '';
             document.getElementById('inp-tc-hour').value = '';
+            document.getElementById('inp-tc-hourEnd').value = '';
             document.getElementById('inp-tc-color').value = '#3b82f6';
             
             document.getElementById('modal-content-taskcreate').style.display = 'block';
@@ -927,13 +964,14 @@
             const localW = parseInt(document.getElementById('inp-tc-week').value);
             const dayVal = document.getElementById('inp-tc-day').value;
             const hour = document.getElementById('inp-tc-hour').value;
+            const hourEnd = document.getElementById('inp-tc-hourEnd').value;
             const color = document.getElementById('inp-tc-color').value;
             if (!title) { alert("Escribe una descripción"); return; }
             const day = dayVal === '' ? null : parseInt(dayVal);
             const wNum = mI * 5 + localW;
             const tKey = `${selectedYear}-${wNum}`;
             if (!tasksData[tKey]) tasksData[tKey] = [];
-            tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: day, hour: hour || null, color: color });
+            tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: day, hour: hour || null, hourEnd: hourEnd || null, color: color });
             localStorage.setItem('wkTasks', JSON.stringify(tasksData));
             closeModal();
             renderQuarterDetailBody();
@@ -976,7 +1014,9 @@
                 const tDay = getTaskDay(t);
                 let metaParts = [`${meses[t.month].slice(0,3)} · W${t.localW}`];
                 if (tDay !== null) metaParts.push(diasFull[tDay].slice(0,3));
-                if (t.hour) metaParts.push(t.hour);
+                if (t.hour) {
+                    metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
+                }
                 return `
                     <div class="qt-item ${t.done ? 'done' : ''}">
                         <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${t.week}, ${t.id})">
@@ -988,20 +1028,6 @@
                     </div>
                 `;
             }).join('');
-        }
-
-        function getAvailableYears() {
-            const now = new Date();
-            const currentY = now.getFullYear();
-            let years = new Set();
-            for (let y = currentY - 1; y <= currentY + 2; y++) years.add(y);
-            for (let key in tasksData) {
-                if (tasksData[key].length > 0) {
-                    let y = parseInt(key.split('-')[0]);
-                    if (!isNaN(y) && y > 2000 && y < 2100) years.add(y);
-                }
-            }
-            return Array.from(years).sort((a, b) => a - b);
         }
 
         function getQuarterStats(year, q) {
@@ -1058,13 +1084,20 @@
                 html += `
                     <div class="year-box ${isCurrent ? 'current' : ''}" onclick="selectYear(${year})">
                         ${isCurrent ? '<div class="year-badge">Actual</div>' : ''}
+                        <span class="delete-year-btn" title="Eliminar año" onclick="deleteYear(event, ${year})">×</span>
                         <div class="year-num">${year}</div>
                         <div class="year-progress"><div class="fill" style="width:${stats.pct}%;"></div></div>
                         <div class="year-pct">${stats.pct.toFixed(0)}%</div>
                     </div>
                 `;
             });
-            html += '</div>';
+            html += `
+                    <div class="year-box add-year" onclick="promptAddYear()">
+                        <div class="year-num" style="font-size:2rem; margin:0;">+</div>
+                        <div class="year-pct" style="margin-top:5px;">Añadir Año</div>
+                    </div>
+                </div>
+            `;
             return html;
         }
 
@@ -1356,7 +1389,7 @@
                 todayTasks = weekTasks.filter(t =>
                     getTaskDay(t) === weekInfo.dayIdx && t.hour && t.color
                 );
-                sig += todayTasks.map(t => `${t.id}:${t.hour}:${t.color}:${t.done}`).join('|');
+                sig += todayTasks.map(t => `${t.id}:${t.hour}:${t.hourEnd||''}:${t.color}:${t.done}`).join('|');
             }
 
             if (sig === lastDayMarksSig) return;
@@ -1370,7 +1403,17 @@
                 const minute = parseInt(mStr) || 0;
 
                 const startPct = ((hour * 60 + minute) / (24 * 60)) * 100;
-                const endPct = Math.min(100, startPct + (100 / 24));
+                let endPct;
+                
+                if (t.hourEnd) {
+                    const [ehStr, emStr] = t.hourEnd.split(':');
+                    const eHour = parseInt(ehStr);
+                    const eMinute = parseInt(emStr) || 0;
+                    endPct = ((eHour * 60 + eMinute) / (24 * 60)) * 100;
+                    if (endPct <= startPct) endPct = startPct + (100 / 24); 
+                } else {
+                    endPct = Math.min(100, startPct + (100 / 24));
+                }
 
                 const mark = document.createElement('div');
                 mark.className = 'day-task-mark';
@@ -1378,7 +1421,7 @@
                 mark.style.width = (endPct - startPct) + '%';
                 mark.style.background = t.color;
                 mark.style.opacity = t.done ? '1' : '0.7';
-                mark.title = `${t.text} · ${t.hour}`;
+                mark.title = `${t.text} · ${t.hour}${t.hourEnd ? ' - '+t.hourEnd : ''}`;
                 container.appendChild(mark);
             });
         }
@@ -1389,7 +1432,6 @@
             const hh = now.getHours(), mm = now.getMinutes();
             const ampm = hh >= 12 ? 'PM' : 'AM', displayHour = hh % 12 || 12; 
 
-            // Textos sobre la barra del Día Actual
             const overlayDate = document.getElementById('overlay-date');
             const overlayTime = document.getElementById('overlay-time');
             if (overlayDate) overlayDate.innerText = `${now.getDate()} de ${meses[now.getMonth()]}, ${year}`;

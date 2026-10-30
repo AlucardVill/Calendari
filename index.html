@@ -405,11 +405,17 @@
         .highlight-week-active .block-start { border-left-color: var(--week-box-active); border-top-left-radius: 4px; border-bottom-left-radius: 4px; } 
         .highlight-week-active .block-end { border-right-color: var(--week-box-active); border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
 
-        /* PANEL DE TAREAS INTEGRADO EN EL GRID */
+        /* CONTENEDOR RELATIVO PARA BLOQUEAR LA EXPANSIÓN DEL GRID */
+        .quarter-tasks-wrapper {
+            position: relative;
+            height: 100%;
+        }
+
+        /* PANEL DE TAREAS EN POSICIÓN ABSOLUTA PARA ADAPTARSE SIN ESTIRAR */
         .quarter-tasks-panel {
             background: var(--card); border: 1px solid var(--border); border-radius: 12px;
             padding: 8px; box-shadow: var(--card-shadow); display: flex; flex-direction: column;
-            min-width: 0; position: relative;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
         }
         
         /* SISTEMA DE BOTONES PARA LA LISTA GENERAL (MESES Y SEMANAS) */
@@ -1231,7 +1237,7 @@
                 });
                 html += `</div></div>`;
             }
-            html += `<div class="quarter-tasks-panel"><div id="qt-tabs-container"></div><div class="qt-list" id="qt-list-container"></div></div></div>`;
+            html += `<div class="quarter-tasks-wrapper"><div class="quarter-tasks-panel"><div id="qt-tabs-container"></div><div class="qt-list" id="qt-list-container"></div></div></div></div>`;
             document.getElementById('calendar-detail-body').innerHTML = html; 
             updateQuarterBar();
             updateMasterTaskList();

@@ -384,19 +384,16 @@
             border-radius: 8px;
         }
 
-        /* Marcas de tareas sobre la barra del día */
+        /* Marcas de tareas sobre la barra del día: segmentos de 1 hora */
         .day-task-mark {
             position: absolute;
             top: 0;
             height: 100%;
-            width: 2%;
-            min-width: 4px;
-            max-width: 8px;
-            transform: translateX(-50%);
             border-radius: 2px;
             pointer-events: none;
             z-index: 5;
-            box-shadow: 0 0 2px rgba(0,0,0,0.25);
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
+            transition: opacity 0.3s;
         }
 
         .custom-check { appearance: none; background-color: var(--input-bg); margin: 0; width: 16px; height: 16px; border: 2px solid var(--border-input); border-radius: 4px; display: grid; place-content: center; transition: all 0.2s ease-in-out; margin-top: 2px; flex-shrink: 0; cursor: pointer; }
@@ -764,7 +761,6 @@
             return weeks;
         }
 
-        // NUEVO: localizar la semana (slot) y el índice de día de una fecha concreta
         function getWeekForDay(year, mI, dayNum) {
             const weeks = getWeeksForMonth(year, mI);
             const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
@@ -1398,7 +1394,7 @@
             saveMarkers(); renderMarkers(activeMarker.barId); closeModal();
         }
 
-        // NUEVO: pintar las marcas de tareas sobre la barra del día según su hora y color
+        // NUEVO: pintar segmentos de 1 hora sobre la barra del día con el color de cada tarea
         let lastDayMarksSig = '';
         function renderDayTaskMarks() {
             const container = document.getElementById('bar-day');
@@ -1429,15 +1425,21 @@
 
             todayTasks.forEach(t => {
                 const [hStr, mStr] = t.hour.split(':');
-                const hourPos = parseInt(hStr) + (parseInt(mStr) || 0) / 60;
-                const pctPos = (hourPos / 24) * 100;
+                const hour = parseInt(hStr);
+                const minute = parseInt(mStr) || 0;
+
+                // Posición de inicio (en % del día de 24h)
+                const startPct = ((hour * 60 + minute) / (24 * 60)) * 100;
+                // Duración de 1 hora → 100/24 ≈ 4.1667% del ancho total
+                const endPct = Math.min(100, startPct + (100 / 24));
 
                 const mark = document.createElement('div');
                 mark.className = 'day-task-mark';
-                mark.style.left = Math.max(1, Math.min(99, pctPos)) + '%';
+                mark.style.left = startPct + '%';
+                mark.style.width = (endPct - startPct) + '%';
                 mark.style.background = t.color;
-                mark.style.opacity = t.done ? '1' : '0.5';
-                mark.title = t.text;
+                mark.style.opacity = t.done ? '1' : '0.7';
+                mark.title = `${t.text} · ${t.hour}`;
                 container.appendChild(mark);
             });
         }

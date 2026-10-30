@@ -464,19 +464,27 @@
         
         .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.45rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
         
-        /* NUEVA ETIQUETA DE DÍA PARA TAREAS (BADGE INLINE) */
+        /* NUEVA ETIQUETA DE DÍA PARA TAREAS (DESPUÉS DEL TEXTO) */
         .task-day-tag {
-            background: var(--input-bg);
-            border: 1px solid var(--border-input);
-            color: var(--subtext);
-            padding: 1px 4px;
+            background: rgba(139, 92, 246, 0.15); /* Color morado suave */
+            color: var(--day-bar);
+            border: none;
+            padding: 2px 5px;
             border-radius: 4px;
-            font-size: 0.42rem;
+            font-size: 0.45rem;
             font-weight: 800;
             display: inline-block;
-            margin-right: 4px;
+            margin-left: 6px; /* Separación al ponerla después del texto */
+            vertical-align: middle;
             position: relative;
             top: -1px;
+            letter-spacing: 0.05em;
+        }
+        /* ESTILO ESPECÍFICO PARA "HOY" */
+        .task-day-tag.today {
+            background: var(--accent);
+            color: var(--btn-text);
+            box-shadow: 0 2px 5px rgba(16, 185, 129, 0.3);
         }
 
         @media (max-width: 380px) {
@@ -1085,26 +1093,40 @@
             const wNum = activeMonthAbs * 5 + activeTabW;
             const weekTasks = tasksData[`${year}-${wNum}`] || [];
             
+            // Logic to determine "HOY"
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth();
+            const todayWeekInfo = getWeekForDay(currentYear, currentMonth, today.getDate());
+
             if (weekTasks.length === 0 && qEntornos.length === 0) {
                 tasksHtml += `<div class="qt-empty">Sin registros en esta semana.</div>`;
             } else {
                 tasksHtml += weekTasks.map(t => {
                     const tDay = getTaskDay(t);
                     let metaParts = [];
-                    // Ya no incluimos el día en metaParts porque va junto al título
                     if (t.hour) metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
                     const metaStr = metaParts.length > 0 ? `<div class="qt-meta">${metaParts.join(' · ')}</div>` : '';
                     
                     let dayTagHtml = '';
                     if (tDay !== null) {
-                        dayTagHtml = `<span class="task-day-tag">${diasFull[tDay].slice(0,3).toUpperCase()}</span>`;
+                        let isHoy = false;
+                        if (year === currentYear && activeMonthAbs === currentMonth && todayWeekInfo && todayWeekInfo.localW === activeTabW && tDay === todayWeekInfo.dayIdx) {
+                            isHoy = true;
+                        }
+
+                        if (isHoy) {
+                            dayTagHtml = `<span class="task-day-tag today">HOY</span>`;
+                        } else {
+                            dayTagHtml = `<span class="task-day-tag">${diasFull[tDay].slice(0,3).toUpperCase()}</span>`;
+                        }
                     }
                     
                     return `
                         <div class="qt-item ${t.done ? 'done' : ''}">
                             <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${wNum}, ${t.id})">
                             <div class="qt-info">
-                                <div class="qt-text">${dayTagHtml}${t.text}</div>
+                                <div class="qt-text">${t.text}${dayTagHtml}</div>
                                 ${metaStr}
                             </div>
                             <span class="qt-delete" onclick="deleteManagedTask(${wNum}, ${t.id})">×</span>

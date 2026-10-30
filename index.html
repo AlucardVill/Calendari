@@ -677,6 +677,10 @@
 
         function deleteYear(e, y) {
             e.stopPropagation();
+            if (y === new Date().getFullYear()) {
+                alert("No puedes eliminar el año actual.");
+                return;
+            }
             if (confirm(`¿Estás seguro de eliminar el año ${y} y TODAS sus tareas guardadas?`)) {
                 trackedYears = trackedYears.filter(yr => yr !== y);
                 localStorage.setItem('wkYears', JSON.stringify(trackedYears));
@@ -1084,7 +1088,7 @@
                 html += `
                     <div class="year-box ${isCurrent ? 'current' : ''}" onclick="selectYear(${year})">
                         ${isCurrent ? '<div class="year-badge">Actual</div>' : ''}
-                        <span class="delete-year-btn" title="Eliminar año" onclick="deleteYear(event, ${year})">×</span>
+                        ${!isCurrent ? `<span class="delete-year-btn" title="Eliminar año" onclick="deleteYear(event, ${year})">×</span>` : ''}
                         <div class="year-num">${year}</div>
                         <div class="year-progress"><div class="fill" style="width:${stats.pct}%;"></div></div>
                         <div class="year-pct">${stats.pct.toFixed(0)}%</div>

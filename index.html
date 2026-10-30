@@ -67,7 +67,6 @@
             transition: background 0.3s ease, color 0.3s ease; 
         }
         
-        /* ===== HEADER ===== */
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 20px; }
         #current-date { font-size: 1.1rem; font-weight: 600; color: var(--subtext); margin: 0; text-align: center; flex: 1; letter-spacing: -0.02em; }
         
@@ -81,10 +80,9 @@
         .theme-btn:active { transform: scale(0.92); }
         .theme-btn:hover { border-color: var(--accent); }
 
-        /* ===== SECTION LABEL ===== */
         .section-label {
             display: flex; align-items: center; gap: 8px;
-            margin: 28px 0 12px 4px;
+            margin: 26px 0 12px 4px;
             font-size: 0.7rem; font-weight: 800;
             text-transform: uppercase; letter-spacing: 0.12em;
             color: var(--muted);
@@ -114,7 +112,7 @@
         .clock-center { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; background: var(--text); border-radius: 50%; transform: translate(-50%, -50%); z-index: 4; border: 2px solid var(--card); }
 
         /* ===== TIMERS ===== */
-        .timers-wrapper { margin-bottom: 0; background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--card-shadow); }
+        .timers-wrapper { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--card-shadow); }
         .timers-header { display: flex; justify-content: space-between; padding: 15px 20px; align-items: center; border-bottom: 1px solid transparent; transition: border-color 0.3s; }
         .timers-wrapper:has(.timers-list.active) .timers-header { border-bottom-color: var(--border); }
         .th-title { font-size: 0.9rem; font-weight: 700; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 10px; flex: 1; user-select: none; }
@@ -139,52 +137,23 @@
         .icon-btn:hover { background: var(--border-input); }
         .icon-btn:active { transform: scale(0.95); }
 
-        /* ===== PROGRESS TABS ===== */
-        .progress-tabs {
-            display: flex; gap: 4px;
-            background: var(--card);
-            padding: 6px;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            margin-bottom: 12px;
-            box-shadow: var(--card-shadow);
-        }
-        .progress-tab {
-            flex: 1;
-            padding: 12px 6px;
-            border-radius: 10px;
-            border: none;
-            background: transparent;
-            font-family: inherit;
-            font-size: 0.8rem;
-            font-weight: 800;
-            letter-spacing: 0.02em;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0.5;
-            filter: saturate(0.4);
-        }
-        .progress-tab:hover { opacity: 0.85; filter: saturate(0.8); }
-        .progress-tab.active {
-            opacity: 1;
-            filter: saturate(1);
-            background: var(--item-bg);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        /* ===== PROGRESS STACK (all panels visible) ===== */
+        .progress-stack {
+            display: flex; flex-direction: column; gap: 10px;
         }
 
-        /* ===== PROGRESS PANELS ===== */
         .dock-panel { 
-            display: none; background: var(--card); border: 1px solid var(--border); 
-            border-radius: 16px; padding: 20px; margin-bottom: 0; 
-            box-shadow: var(--card-shadow); animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+            display: block;
+            background: var(--card); border: 1px solid var(--border); 
+            border-radius: 14px; padding: 14px 16px; 
+            box-shadow: var(--card-shadow); 
         }
-        .dock-panel.active { display: block; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         .label { font-size: 0.75rem; color: var(--subtext); display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-        .timer { font-size: 1.4rem; font-weight: 800; margin: 8px 0; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+        .timer { font-size: 1.3rem; font-weight: 800; margin: 6px 0; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
         
-        .progress-container { margin-top: 15px; margin-bottom: 5px; }
+        .progress-container { margin-top: 12px; margin-bottom: 3px; }
         .bar-wrapper { position: relative; width: 100%; height: 10px; border-radius: 5px; background: var(--border); }
         .progress-bar { height: 100%; border-radius: 5px; overflow: hidden; position: absolute; width: 100%; top: 0; left: 0;}
         .fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -198,6 +167,194 @@
         .bar-marker { position: absolute; top: -12px; width: 14px; height: 14px; background: var(--m-color); border-radius: 50%; transform: translateX(-50%); cursor: grab; z-index: 10; border: 2px solid var(--card); box-shadow: 0 2px 6px rgba(0,0,0,0.4); touch-action: none; transition: transform 0.1s; }
         .bar-marker::after { content: ''; position: absolute; top: 12px; left: 4px; width: 2px; height: 10px; background: var(--m-color); border-radius: 1px;}
         .bar-marker:active { cursor: grabbing; transform: translateX(-50%) scale(1.15); }
+
+        /* ===== CALENDAR — YEARS VIEW ===== */
+        .years-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+        }
+        .year-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 16px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--card-shadow);
+            position: relative;
+            text-align: center;
+        }
+        .year-box:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .year-box.current {
+            border-color: var(--accent);
+            border-width: 2px;
+        }
+        .year-num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+        .year-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            background: rgba(16, 185, 129, 0.15);
+            padding: 3px 7px;
+            border-radius: 5px;
+        }
+        .year-progress {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0 8px;
+        }
+        .year-progress .fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--year-bar);
+        }
+        .year-pct {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .year-count {
+            font-size: 0.65rem;
+            color: var(--muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ===== CALENDAR — QUARTERS VIEW ===== */
+        .quarters-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .quarter-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--card-shadow);
+            position: relative;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .quarter-box:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .quarter-box.current {
+            border-color: var(--accent);
+            border-width: 2px;
+        }
+        .q-num {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+        .q-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            background: rgba(16, 185, 129, 0.15);
+            padding: 3px 6px;
+            border-radius: 5px;
+        }
+        .q-months {
+            font-size: 0.7rem;
+            color: var(--subtext);
+            font-weight: 600;
+            margin: 4px 0 10px;
+            letter-spacing: 0.01em;
+        }
+        .q-progress {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        .q-progress .fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--accent);
+        }
+        .q-pct {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .q-count {
+            font-size: 0.6rem;
+            color: var(--muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ===== BACK BAR ===== */
+        .back-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding: 0 2px;
+            gap: 8px;
+        }
+        .back-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--card-shadow);
+            flex-shrink: 0;
+        }
+        .back-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateX(-2px);
+        }
+        .back-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            text-align: center;
+            flex: 1;
+        }
 
         /* ===== MODALS ===== */
         .modal-overlay { display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
@@ -216,24 +373,6 @@
         .btn-save { background: var(--accent); color: var(--btn-text); }
         .btn-cancel { background: var(--item-bg); color: var(--text); border: 1px solid var(--border-input); }
         .btn-delete { background: var(--sunday); color: var(--btn-text); }
-
-        /* ===== QUARTER HEADERS ===== */
-        .q-header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin: 16px 0 10px; padding: 14px 18px;
-            background: var(--card); border: 1px solid var(--border); 
-            border-radius: 14px; cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--card-shadow);
-        }
-        .q-header:hover { border-color: var(--border-input); transform: translateY(-1px); }
-        .q-header.open { border-color: var(--accent); }
-        .q-title { font-size: 0.95rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; letter-spacing: -0.02em; }
-        .q-header.open .q-title { color: var(--accent); }
-        .q-arrow { font-size: 0.65rem; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: var(--muted); }
-        .q-header.open .q-arrow { transform: rotate(180deg); }
-        .q-content { display: none; margin-bottom: 20px; }
-        .q-content.active { display: block; animation: slideIn 0.3s; }
 
         /* ===== TASKS ===== */
         .task-mgr { margin-bottom: 25px; }
@@ -275,7 +414,7 @@
         .badge-dia { background: var(--badge-dia-bg); color: var(--badge-dia-txt); border: 1px solid var(--badge-dia-border); }
 
         /* ===== METRICS ===== */
-        .metrics-wrapper { margin-top: 25px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); }
+        .metrics-wrapper { margin-top: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); }
         .metrics-header { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; }
         .metrics-title { font-size: 0.75rem; color: var(--subtext); font-weight: 800; letter-spacing: 0.08em; }
         .toggle-view { font-size: 0.7rem; background: var(--item-bg); padding: 6px 12px; border-radius: 12px; cursor: pointer; color: var(--text); font-weight: 700; border: 1px solid var(--border-input); transition: all 0.2s; }
@@ -321,7 +460,6 @@
         #ds-list::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
         #ds-list::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 4px; }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 380px) {
             .digital-clock { font-size: 1.9rem; }
             .clocks-container { gap: 20px; padding: 20px 15px; }
@@ -331,9 +469,9 @@
 </head>
 <body>
     <div class="header-top">
-        <button class="theme-btn" onclick="exportData()" title="Exportar Tareas y Configuración">💾</button>
+        <button class="theme-btn" onclick="exportData()" title="Exportar">💾</button>
         <h2 id="current-date">Cargando...</h2>
-        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Alternar Tema">🌙</button>
+        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Tema">🌙</button>
     </div>
 
     <div class="clocks-container">
@@ -349,45 +487,38 @@
             <div class="th-title" onclick="toggleTimersSection()">⏱️ Temporizadores <span id="timers-arrow" style="font-size:0.7rem; color:var(--muted); transition:transform 0.3s">▼</span></div>
             <button class="icon-btn" onclick="openAddTimerModal()">+ Añadir</button>
         </div>
-        <div class="timers-list" id="timers-list">
-            </div>
+        <div class="timers-list" id="timers-list"></div>
     </div>
 
     <div class="section-label">📊 Progreso</div>
 
-    <div class="progress-tabs">
-        <button class="progress-tab" id="btn-block" style="color: var(--bi-bar);" onclick="togglePanel('block')">2Y</button>
-        <button class="progress-tab" id="btn-year" style="color: var(--year-bar);" onclick="togglePanel('year')">1Y</button>
-        <button class="progress-tab" id="btn-week" style="color: var(--week-bar);" onclick="togglePanel('week')">7D</button>
-        <button class="progress-tab" id="btn-work" style="color: var(--work);" onclick="togglePanel('work')">W</button>
-        <button class="progress-tab" id="btn-day" style="color: var(--day-bar);" onclick="togglePanel('day')">D</button>
-    </div>
+    <div class="progress-stack">
+        <div id="panel-block" class="dock-panel">
+            <div class="label"><span style="color: var(--bi-bar); font-weight: 800;" id="label-block">Bloque Años</span> <div class="controls-group"><span id="block-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openBlockModal()">⚙️</button><button class="icon-btn" onclick="addMarker('block')">+📍</button></div></div>
+            <div class="progress-container"><div class="bar-wrapper" id="bar-block"><div class="progress-bar"><div id="block-fill" class="fill" style="background: var(--bi-bar);"></div></div></div><div class="ticks" id="block-ticks"></div></div>
+        </div>
 
-    <div id="panel-block" class="dock-panel">
-        <div class="label"><span style="color: var(--bi-bar); font-weight: 800;" id="label-block">Bloque Años</span> <div class="controls-group"><span id="block-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openBlockModal()">⚙️</button><button class="icon-btn" onclick="addMarker('block')">+📍</button></div></div>
-        <div class="progress-container"><div class="bar-wrapper" id="bar-block"><div class="progress-bar"><div id="block-fill" class="fill" style="background: var(--bi-bar);"></div></div></div><div class="ticks" id="block-ticks"></div></div>
-    </div>
+        <div id="panel-year" class="dock-panel">
+            <div class="label"><span style="color: var(--year-bar); font-weight: 800;" id="label-year">Año Actual</span> <div class="controls-group"><span id="year-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="addMarker('year')">+📍</button></div></div>
+            <div class="progress-container"><div class="bar-wrapper" id="bar-year"><div class="progress-bar"><div id="year-fill" class="fill" style="background: var(--year-bar);"></div></div></div><div class="ticks"><span class="tick">E</span><span class="tick">F</span><span class="tick">M</span><span class="tick">A</span><span class="tick">M</span><span class="tick">J</span><span class="tick">J</span><span class="tick">A</span><span class="tick">S</span><span class="tick">O</span><span class="tick">N</span><span class="tick">D</span></div></div>
+        </div>
 
-    <div id="panel-year" class="dock-panel">
-        <div class="label"><span style="color: var(--year-bar); font-weight: 800;" id="label-year">Año Actual</span> <div class="controls-group"><span id="year-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="addMarker('year')">+📍</button></div></div>
-        <div class="progress-container"><div class="bar-wrapper" id="bar-year"><div class="progress-bar"><div id="year-fill" class="fill" style="background: var(--year-bar);"></div></div></div><div class="ticks"><span class="tick">E</span><span class="tick">F</span><span class="tick">M</span><span class="tick">A</span><span class="tick">M</span><span class="tick">J</span><span class="tick">J</span><span class="tick">A</span><span class="tick">S</span><span class="tick">O</span><span class="tick">N</span><span class="tick">D</span></div></div>
-    </div>
+        <div id="panel-week" class="dock-panel">
+            <div class="label"><span style="color: var(--week-bar); font-weight: 800;">Semana Actual</span> <div class="controls-group"><span id="week-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="addMarker('week')">+📍</button></div></div>
+            <div class="progress-container"><div class="bar-wrapper" id="bar-week"><div class="progress-bar"><div id="week-fill" class="fill" style="background: var(--week-bar);"></div></div></div><div class="ticks"><span class="tick">L</span><span class="tick">M</span><span class="tick">M</span><span class="tick">J</span><span class="tick">V</span><span class="tick">S</span><span class="tick">D</span></div></div>
+        </div>
 
-    <div id="panel-week" class="dock-panel">
-        <div class="label"><span style="color: var(--week-bar); font-weight: 800;">Semana Actual</span> <div class="controls-group"><span id="week-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="addMarker('week')">+📍</button></div></div>
-        <div class="progress-container"><div class="bar-wrapper" id="bar-week"><div class="progress-bar"><div id="week-fill" class="fill" style="background: var(--week-bar);"></div></div></div><div class="ticks"><span class="tick">L</span><span class="tick">M</span><span class="tick">M</span><span class="tick">J</span><span class="tick">V</span><span class="tick">S</span><span class="tick">D</span></div></div>
-    </div>
+        <div id="panel-work" class="dock-panel">
+            <div class="label"><span id="label-work" style="font-weight: 800;">Jornada</span> <div class="controls-group"><span id="work-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openWorkModal()">⚙️</button><button class="icon-btn" onclick="addMarker('work')">+📍</button></div></div>
+            <div id="work-timer" class="timer" style="color: var(--work);">--:--:--</div>
+            <div class="progress-container"><div class="bar-wrapper" id="bar-work"><div class="progress-bar"><div id="work-fill" class="fill" style="background: var(--work)"></div></div></div><div class="ticks" id="work-ticks"></div></div>
+        </div>
 
-    <div id="panel-work" class="dock-panel">
-        <div class="label"><span id="label-work" style="font-weight: 800;">Jornada</span> <div class="controls-group"><span id="work-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openWorkModal()">⚙️</button><button class="icon-btn" onclick="addMarker('work')">+📍</button></div></div>
-        <div id="work-timer" class="timer" style="color: var(--work);">--:--:--</div>
-        <div class="progress-container"><div class="bar-wrapper" id="bar-work"><div class="progress-bar"><div id="work-fill" class="fill" style="background: var(--work)"></div></div></div><div class="ticks" id="work-ticks"></div></div>
-    </div>
-
-    <div id="panel-day" class="dock-panel">
-        <div class="label"><span style="font-weight: 800;">Día Actual (24h)</span> <div class="controls-group"><span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openDayModal()">⚙️</button><button class="icon-btn" onclick="addMarker('day')">+📍</button></div></div>
-        <div id="day-timer" class="timer" style="color: var(--day-bar);">--:--:--</div>
-        <div class="progress-container"><div class="bar-wrapper" id="bar-day"><div class="progress-bar"><div id="day-fill" class="fill" style="background: var(--day-bar)"></div></div></div><div class="ticks" id="day-ticks"></div></div>
+        <div id="panel-day" class="dock-panel">
+            <div class="label"><span style="font-weight: 800;">Día Actual (24h)</span> <div class="controls-group"><span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openDayModal()">⚙️</button><button class="icon-btn" onclick="addMarker('day')">+📍</button></div></div>
+            <div id="day-timer" class="timer" style="color: var(--day-bar);">--:--:--</div>
+            <div class="progress-container"><div class="bar-wrapper" id="bar-day"><div class="progress-bar"><div id="day-fill" class="fill" style="background: var(--day-bar)"></div></div></div><div class="ticks" id="day-ticks"></div></div>
+        </div>
     </div>
 
     <div class="section-label">📋 Calendario</div>
@@ -396,7 +527,6 @@
 
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
-            
             <div id="modal-content-timer" style="display:none;">
                 <h3>Añadir Temporizador</h3>
                 <div class="input-group"><label>Nombre:</label><input type="text" id="inp-t-name" placeholder="Ej. Lavadora" style="width: 130px;"></div>
@@ -481,6 +611,14 @@
         if(markersData.bi) { markersData.block = markersData.bi; delete markersData.bi; localStorage.setItem('wkMarkers', JSON.stringify(markersData)); }
         if(!blockConfig.startYear) { blockConfig.startYear = currentYear; localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); }
 
+        // ===== ESTADO DE NAVEGACIÓN DEL CALENDARIO =====
+        let calendarView = localStorage.getItem('wkCalView') || 'years';
+        let selectedYear = parseInt(localStorage.getItem('wkSelYear')) || currentYear;
+        let selectedQuarter = parseInt(localStorage.getItem('wkSelQtr')) || 0;
+        if (isNaN(selectedYear) || selectedYear < 2000 || selectedYear > 2100) selectedYear = currentYear;
+        if (isNaN(selectedQuarter) || selectedQuarter < 0 || selectedQuarter > 3) selectedQuarter = 0;
+        if (!['years', 'quarters', 'detail'].includes(calendarView)) calendarView = 'years';
+
         function exportData() {
             let content = "=== COPIA DE SEGURIDAD - CONTROL PERSONAL ===\n";
             content += "Fecha de exportación: " + new Date().toLocaleString() + "\n\n";
@@ -554,7 +692,6 @@
             
             let logs = JSON.parse(localStorage.getItem('wkDayLogs')) || {};
             if(!logs[dateStr]) logs[dateStr] = { points: 0, timers: [] };
-            
             logs[dateStr].points += pts;
             logs[dateStr].timers.push({ name, time: timeStr, points: pts, duration: Math.round(durationMs / 60000) });
             localStorage.setItem('wkDayLogs', JSON.stringify(logs));
@@ -574,9 +711,7 @@
                     <span style="color:var(--accent); font-weight:bold;">+${t.points} pts</span>
                 </div>`
             ).reverse().join('');
-
             if(!tHtml) tHtml = '<div style="font-size:0.85rem; color:var(--muted); padding:10px 0;">No hay temporizadores registrados este día.</div>';
-            
             document.getElementById('ds-list').innerHTML = tHtml;
             openModal();
         }
@@ -610,16 +745,11 @@
             const h = parseInt(document.getElementById('inp-t-hours').value) || 0;
             const m = parseInt(document.getElementById('inp-t-mins').value) || 0;
             if(h === 0 && m === 0) { alert("Añade al menos 1 minuto."); return; }
-            
             try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); ctx.resume(); } catch(e){}
-
             const durationMs = (h * 3600000) + (m * 60000);
-            const targetMs = Date.now() + durationMs;
-            customTimers.push({ id: Date.now(), name: name, target: targetMs, durationMs: durationMs, alarmPlayed: false });
+            customTimers.push({ id: Date.now(), name: name, target: Date.now() + durationMs, durationMs: durationMs, alarmPlayed: false });
             localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers));
-            
             logTimerToDay(name, durationMs);
-
             if(timersCollapsed) toggleTimersSection();
             renderTimersList(); update(); closeModal();
         }
@@ -631,8 +761,7 @@
                 t.alarmPlayed = false;
                 localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers));
                 logTimerToDay(t.name, t.durationMs);
-                renderTimersList();
-                update();
+                renderTimersList(); update();
             }
         }
 
@@ -653,46 +782,311 @@
                     <span class="tr-name">${t.name}</span>
                     <div style="display:flex; align-items:center; gap:12px;">
                         <span class="tr-val" id="t-val-${t.id}">--:--:--</span>
-                        <button id="t-rep-${t.id}" class="icon-btn" onclick="repeatCustomTimer(${t.id})" style="display:none; padding:4px 8px;" title="Repetir temporizador">↻</button>
+                        <button id="t-rep-${t.id}" class="icon-btn" onclick="repeatCustomTimer(${t.id})" style="display:none; padding:4px 8px;" title="Repetir">↻</button>
                         <span class="tr-del" onclick="deleteCustomTimer(${t.id})" title="Borrar">×</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        // ===== TABS (EXCLUSIVE) =====
-        function togglePanel(id) {
-            const ids = ['block','year','week','work','day'];
-            const wasActive = document.getElementById('panel-' + id).classList.contains('active');
-            ids.forEach(pid => {
-                document.getElementById('panel-' + pid).classList.remove('active');
-                document.getElementById('btn-' + pid).classList.remove('active');
-            });
-            if(!wasActive) {
-                document.getElementById('panel-' + id).classList.add('active');
-                document.getElementById('btn-' + id).classList.add('active');
-                localStorage.setItem('activeProgressPanel', id);
-            } else {
-                localStorage.removeItem('activeProgressPanel');
-            }
+        // ===== TAREAS =====
+        function getTKey(wNum) { return `${selectedYear}-${wNum}`; }
+
+        function renderTasks(wNum) {
+            const list = document.getElementById(`t-list-${wNum}`); if(!list) return;
+            const tKey = getTKey(wNum); const tasks = tasksData[tKey] || [];
+            if(tasks.length === 0) { list.innerHTML = `<li class="empty-tasks">Sin tareas añadidas...</li>`; return; }
+            list.innerHTML = tasks.map(t => {
+                const type = t.type || 'Meta'; let badgeClass = 'badge-dia';
+                if(type === 'Meta') badgeClass = 'badge-meta'; if(type === 'Diario') badgeClass = 'badge-diario';
+                return `<li class="t-item ${t.done ? 'done' : ''}"><input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleTask(${wNum}, ${t.id})"><span class="t-badge ${badgeClass}">${type}</span><span class="text" style="flex:1;">${t.text}</span><span class="delete-btn" onclick="deleteTask(${wNum}, ${t.id})" title="Eliminar">×</span></li>`
+            }).join('');
         }
 
-        function toggleQ(index) { 
-            document.getElementById(`q-content-${index}`).classList.toggle('active'); 
-            document.getElementById(`q-header-${index}`).classList.toggle('open'); 
+        function addTask(wNum) {
+            const input = document.getElementById(`t-input-${wNum}`); const select = document.getElementById(`t-type-${wNum}`);
+            if(!input.value.trim()) return; 
+            const tKey = getTKey(wNum); if(!tasksData[tKey]) tasksData[tKey] = [];
+            tasksData[tKey].push({ id: Date.now(), text: input.value.trim(), done: false, type: select.value });
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); input.value = ''; renderTasks(wNum); updateAllMetrics();
         }
+        function toggleTask(wNum, taskId) {
+            const tKey = getTKey(wNum); const t = tasksData[tKey].find(x => x.id === taskId); if(t) t.done = !t.done;
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wNum); updateAllMetrics();
+        }
+        function deleteTask(wNum, taskId) {
+            const tKey = getTKey(wNum); tasksData[tKey] = tasksData[tKey].filter(x => x.id !== taskId);
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wNum); updateAllMetrics();
+        }
+
+        // ===== NAVEGACIÓN DEL CALENDARIO =====
+        function getAvailableYears() {
+            const now = new Date();
+            const currentY = now.getFullYear();
+            let years = new Set();
+            for (let y = currentY - 1; y <= currentY + 2; y++) years.add(y);
+            for (let key in tasksData) {
+                if (tasksData[key].length > 0) {
+                    let y = parseInt(key.split('-')[0]);
+                    if (!isNaN(y) && y > 2000 && y < 2100) years.add(y);
+                }
+            }
+            return Array.from(years).sort((a, b) => a - b);
+        }
+
+        function getQuarterStats(year, q) {
+            let total = 0, done = 0;
+            for (let m = 0; m < 3; m++) {
+                const mI = q * 3 + m;
+                for (let w = 1; w <= 4; w++) {
+                    const tKey = `${year}-${mI * 4 + w}`;
+                    const tasks = tasksData[tKey] || [];
+                    total += tasks.length;
+                    done += tasks.filter(t => t.done).length;
+                }
+            }
+            return { total, done, pct: total === 0 ? 0 : (done / total) * 100 };
+        }
+
+        function getYearStats(year) {
+            let total = 0, done = 0;
+            for (let q = 0; q < 4; q++) {
+                const s = getQuarterStats(year, q);
+                total += s.total; done += s.done;
+            }
+            return { total, done, pct: total === 0 ? 0 : (done / total) * 100 };
+        }
+
+        function selectYear(year) {
+            selectedYear = year;
+            localStorage.setItem('wkSelYear', year);
+            calendarView = 'quarters';
+            localStorage.setItem('wkCalView', calendarView);
+            drawCalendar();
+        }
+
+        function selectQuarter(q) {
+            selectedQuarter = q;
+            localStorage.setItem('wkSelQtr', q);
+            calendarView = 'detail';
+            localStorage.setItem('wkCalView', calendarView);
+            drawCalendar();
+        }
+
+        function goBack() {
+            if (calendarView === 'detail') calendarView = 'quarters';
+            else if (calendarView === 'quarters') calendarView = 'years';
+            localStorage.setItem('wkCalView', calendarView);
+            drawCalendar();
+        }
+
         function toggleWeek(wNum) {
             const body = document.getElementById(`t-week-body-${wNum}`); const arrow = document.getElementById(`w-arrow-${wNum}`);
             body.classList.toggle('active'); arrow.style.transform = body.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
         }
         function toggleMonth(mI) {
-            const yKey = `${currentYear}-${mI}`; collapsedMonths[yKey] = !collapsedMonths[yKey];
+            const yKey = `${selectedYear}-${mI}`; collapsedMonths[yKey] = !collapsedMonths[yKey];
             localStorage.setItem('wkCollapsedMonths', JSON.stringify(collapsedMonths));
             const wrap = document.getElementById(`month-wrap-${mI}`);
             if(collapsedMonths[yKey]) { wrap.classList.add('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '+'; } 
             else { wrap.classList.remove('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '−'; }
         }
 
+        function toggleMetricsView(q) {
+            const mBlock = document.getElementById(`metrics-m-${q}`), qBlock = document.getElementById(`metrics-q-${q}`), btnText = document.getElementById(`m-toggle-btn-${q}`);
+            if(mBlock.classList.contains('active')) { mBlock.classList.remove('active'); qBlock.classList.add('active'); btnText.innerText = 'Ver por Mes'; } 
+            else { qBlock.classList.remove('active'); mBlock.classList.add('active'); btnText.innerText = 'Ver Trimestre'; }
+        }
+
+        function updateAllMetrics() {
+            const q = selectedQuarter;
+            let qTotal = 0, qDone = 0;
+            for (let m = 0; m < 3; m++) {
+                const mI = q * 3 + m;
+                let mTotal = 0, mDone = 0;
+                for (let w = 1; w <= 4; w++) {
+                    const tKey = getTKey(mI * 4 + w);
+                    const tasks = tasksData[tKey] || [];
+                    mTotal += tasks.length;
+                    mDone += tasks.filter(t => t.done).length;
+                }
+                const mPct = mTotal === 0 ? 0 : (mDone / mTotal) * 100;
+                const mFill = document.getElementById(`fill-m-${mI}`);
+                const mPctTxt = document.getElementById(`pct-m-${mI}`);
+                if (mFill) mFill.style.width = mPct + '%';
+                if (mPctTxt) mPctTxt.innerText = Math.round(mPct) + '%';
+                qTotal += mTotal; qDone += mDone;
+            }
+            const qPct = qTotal === 0 ? 0 : (qDone / qTotal) * 100;
+            const qFill = document.getElementById(`fill-q-${q}`);
+            const qPctTxt = document.getElementById(`pct-q-${q}`);
+            if (qFill) qFill.style.width = qPct + '%';
+            if (qPctTxt) qPctTxt.innerText = Math.round(qPct) + '%';
+        }
+
+        // ===== VISTAS DEL CALENDARIO =====
+        function renderYearsView() {
+            const now = new Date();
+            const currentY = now.getFullYear();
+            const years = getAvailableYears();
+            let html = '<div class="years-view">';
+            years.forEach(year => {
+                const stats = getYearStats(year);
+                const isCurrent = year === currentY;
+                html += `
+                    <div class="year-box ${isCurrent ? 'current' : ''}" onclick="selectYear(${year})">
+                        ${isCurrent ? '<div class="year-badge">Actual</div>' : ''}
+                        <div class="year-num">${year}</div>
+                        <div class="year-progress"><div class="fill" style="width:${stats.pct}%;"></div></div>
+                        <div class="year-pct">${stats.pct.toFixed(0)}%</div>
+                        <div class="year-count">${stats.done}/${stats.total} tareas</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function renderQuartersView() {
+            const now = new Date();
+            const currentY = now.getFullYear();
+            const currentQ = Math.floor(now.getMonth() / 3);
+            const isCurrentYear = selectedYear === currentY;
+            
+            let html = `
+                <div class="back-bar">
+                    <button class="back-btn" onclick="goBack()">← Años</button>
+                    <div class="back-title">${selectedYear}</div>
+                    <div style="width:76px"></div>
+                </div>
+                <div class="quarters-view">
+            `;
+            for (let q = 0; q < 4; q++) {
+                const stats = getQuarterStats(selectedYear, q);
+                const isCurrentQ = isCurrentYear && q === currentQ;
+                const qMonths = [0, 1, 2].map(m => meses[q * 3 + m].slice(0, 3)).join(' · ');
+                html += `
+                    <div class="quarter-box ${isCurrentQ ? 'current' : ''}" onclick="selectQuarter(${q})">
+                        ${isCurrentQ ? '<div class="q-badge">Actual</div>' : ''}
+                        <div class="q-num">T${q + 1}</div>
+                        <div class="q-months">${qMonths}</div>
+                        <div class="q-progress"><div class="fill" style="width:${stats.pct}%;"></div></div>
+                        <div class="q-pct">${stats.pct.toFixed(0)}%</div>
+                        <div class="q-count">${stats.done}/${stats.total} tareas</div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function renderDetailView() {
+            const now = new Date(); now.setHours(0, 0, 0, 0);
+            const year = selectedYear;
+            const q = selectedQuarter;
+            let tBC = q * 12;
+            
+            let html = `
+                <div class="back-bar">
+                    <button class="back-btn" onclick="goBack()">← T${q + 1}</button>
+                    <div class="back-title">T${q + 1} · ${year}</div>
+                    <div style="width:76px"></div>
+                </div>
+                <div class="task-mgr">
+            `;
+            
+            for (let m = 0; m < 3; m++) {
+                const mI = q * 3 + m;
+                html += `<div class="t-month"><div class="t-month-head" onclick="this.nextElementSibling.classList.toggle('active')">${meses[mI]} <span style="font-size: 0.6rem; color: var(--muted);">▼</span></div><div class="t-month-body">`;
+                for (let w = 1; w <= 4; w++) {
+                    const wNum = mI * 4 + w;
+                    html += `<div class="t-week"><div class="t-week-title" onclick="toggleWeek(${wNum})">W${wNum} <span id="w-arrow-${wNum}" style="font-size: 0.5rem; transition: transform 0.2s; color:var(--muted)">▼</span></div><div class="t-week-body" id="t-week-body-${wNum}"><ul class="t-list" id="t-list-${wNum}"></ul><div class="t-add"><select id="t-type-${wNum}" class="t-type-select"><option value="Meta">Meta</option><option value="Diario">Diario</option><option value="Lun">Lun</option><option value="Mar">Mar</option><option value="Mié">Mié</option><option value="Jue">Jue</option><option value="Vie">Vie</option><option value="Sáb">Sáb</option><option value="Dom">Dom</option></select><input type="text" id="t-input-${wNum}" placeholder="Añadir tarea..." onkeypress="if(event.key==='Enter') addTask(${wNum})"><button onclick="addTask(${wNum})">+</button></div></div></div>`;
+                }
+                html += `</div></div>`;
+            }
+            html += `</div><div class="months-container">`;
+            
+            for (let m = 0; m < 3; m++) {
+                const mI = q * 3 + m;
+                const fD = new Date(year, mI, 1).getDay();
+                const off = fD === 0 ? 6 : fD - 1;
+                const dM = new Date(year, mI + 1, 0).getDate();
+                
+                const yKey = `${year}-${mI}`;
+                const isCol = collapsedMonths[yKey];
+                const colClass = isCol ? " collapsed" : "";
+                const tChar = isCol ? '+' : '−';
+
+                html += `<div class="month${colClass}" id="month-wrap-${mI}">
+                    <div class="month-name" onclick="toggleMonth(${mI})">${meses[mI]} <span id="toggle-m-${mI}" class="month-toggle">${tChar}</span></div>
+                    <div class="days-grid" id="grid-m-${mI}">`;
+                
+                diasL.forEach(d => html += `<div class="week-day">${d}</div>`);
+                let slots = [];
+                for (let i = 0; i < off; i++) slots.push(null);
+                for (let d = 1; d <= dM; d++) slots.push(d);
+                while (slots.length % 7 !== 0) slots.push(null);
+                let weeks = [];
+                for (let i = 0; i < slots.length; i += 7) { let dws = slots.slice(i, i + 7); weeks.push({ dws, c: dws.filter(d => d !== null).length }); }
+                let sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
+                weeks.forEach((w, i) => {
+                    let h = sI.includes(i), wCl = "", fR = -1, lR = -1;
+                    for (let k = 0; k < 7; k++) { if (w.dws[k] !== null) { if (fR === -1) fR = k; lR = k; } }
+                    if (h) {
+                        tBC++;
+                        let endD = new Date(year, mI, w.dws[lR]);
+                        wCl = (endD >= now) ? "highlight-week-active" : "highlight-week-concluded";
+                        if (now >= new Date(year, mI, w.dws[fR]) && now <= endD) wCl += " current-week-glow";
+                    }
+                    html += `<div class="week-wrapper ${wCl}" style="display: contents;">`;
+                    w.dws.forEach((d, dI) => {
+                        if (d === null) html += `<div style="border:1.5px solid transparent; margin-top:6px;"></div>`;
+                        else {
+                            let dt = new Date(year, mI, d), cl = "day";
+                            let dtStr = `${year}-${String(mI + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                            if (dt < now) cl += " past";
+                            else if (dt.getTime() === now.getTime()) cl += " today";
+                            else cl += (dt.getDay() === 6) ? " sat-future" : (dt.getDay() === 0) ? " sun-future" : " future";
+                            if (h && dI === fR) html += `<div class="${cl} block-start" onclick="showDayStats('${dtStr}')"><span class="block-label">W${tBC}</span>${d}</div>`;
+                            else if (h && dI === lR) html += `<div class="${cl} block-end" onclick="showDayStats('${dtStr}')">${d}</div>`;
+                            else html += `<div class="${cl}" onclick="showDayStats('${dtStr}')">${d}</div>`;
+                        }
+                    });
+                    html += `</div>`;
+                });
+                html += `</div></div>`;
+            }
+            
+            html += `</div><div class="metrics-wrapper"><div class="metrics-header"><span class="metrics-title">CUMPLIMIENTO T${q + 1}</span><div class="toggle-view" id="m-toggle-btn-${q}" onclick="toggleMetricsView(${q})">Ver Trimestre</div></div><div id="metrics-m-${q}" class="metrics-view active">`;
+            for (let m = 0; m < 3; m++) {
+                const mI = q * 3 + m;
+                html += `<div class="m-bar-row"><div class="m-label">${meses[mI]}</div><div class="m-progress"><div id="fill-m-${mI}" class="m-fill"></div></div><div id="pct-m-${mI}" class="m-pct">0%</div></div>`;
+            }
+            html += `</div><div id="metrics-q-${q}" class="metrics-view"><div class="m-bar-row"><div class="m-label">T${q + 1} Total</div><div class="m-progress"><div id="fill-q-${q}" class="m-fill" style="background: var(--year-bar)"></div></div><div id="pct-q-${q}" class="m-pct">0%</div></div></div></div>`;
+            
+            return html;
+        }
+
+        function drawCalendar() {
+            const container = document.getElementById('calendar-container');
+            if (calendarView === 'years') {
+                container.innerHTML = renderYearsView();
+            } else if (calendarView === 'quarters') {
+                container.innerHTML = renderQuartersView();
+            } else {
+                container.innerHTML = renderDetailView();
+                const q = selectedQuarter;
+                for (let m = 0; m < 3; m++) {
+                    const mI = q * 3 + m;
+                    for (let w = 1; w <= 4; w++) {
+                        renderTasks(mI * 4 + w);
+                    }
+                }
+                updateAllMetrics();
+            }
+        }
+
+        // ===== MODALES =====
         function openModal() { document.getElementById('modal-overlay').classList.add('active'); }
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
@@ -708,7 +1102,7 @@
         function openBlockModal() { document.getElementById('modal-content-block').style.display = 'block'; document.getElementById('inp-block-start').value = blockConfig.startYear; document.getElementById('inp-block-years').value = blockConfig.years; openModal(); }
         function saveBlockSettings() { blockConfig.years = parseInt(document.getElementById('inp-block-years').value); blockConfig.startYear = parseInt(document.getElementById('inp-block-start').value); localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); renderBlockTicks(); update(); closeModal(); }
         function renderBlockTicks() {
-            const container = document.getElementById('block-ticks'); document.getElementById('label-block').innerText = `Bloque ${blockConfig.years} Años`; document.getElementById('btn-block').innerText = `${blockConfig.years}Y`;
+            const container = document.getElementById('block-ticks'); document.getElementById('label-block').innerText = `Bloque ${blockConfig.years} Años`;
             let html = '';
             for(let i = 0; i <= blockConfig.years; i++) {
                 let align = i === 0 ? 'left' : (i === blockConfig.years ? 'right' : 'center');
@@ -751,7 +1145,7 @@
         let activeMarker = null; let dragState = null;
         function addMarker(barId) {
             if(!markersData[barId]) markersData[barId] = [];
-            let newId = Date.now(); markersData[barId].push({ id: newId, pct: 50, color: '#10b981' }); saveMarkers(); renderMarkers(barId);
+            markersData[barId].push({ id: Date.now(), pct: 50, color: '#10b981' }); saveMarkers(); renderMarkers(barId);
         }
         function saveMarkers() { localStorage.setItem('wkMarkers', JSON.stringify(markersData)); }
         function renderAllMarkers() { ['block', 'year', 'week', 'work', 'day'].forEach(renderMarkers); }
@@ -800,62 +1194,7 @@
             saveMarkers(); renderMarkers(activeMarker.barId); closeModal();
         }
 
-        function getTKey(wNum) { return `${currentYear}-${wNum}`; }
-
-        function renderTasks(wNum) {
-            const list = document.getElementById(`t-list-${wNum}`); if(!list) return;
-            const tKey = getTKey(wNum); const tasks = tasksData[tKey] || [];
-            
-            if(tasks.length === 0) { list.innerHTML = `<li class="empty-tasks">Sin tareas añadidas...</li>`; return; }
-            list.innerHTML = tasks.map(t => {
-                const type = t.type || 'Meta'; let badgeClass = 'badge-dia';
-                if(type === 'Meta') badgeClass = 'badge-meta'; if(type === 'Diario') badgeClass = 'badge-diario';
-                return `<li class="t-item ${t.done ? 'done' : ''}"><input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleTask(${wNum}, ${t.id})"><span class="t-badge ${badgeClass}">${type}</span><span class="text" style="flex:1;">${t.text}</span><span class="delete-btn" onclick="deleteTask(${wNum}, ${t.id})" title="Eliminar tarea">×</span></li>`
-            }).join('');
-        }
-
-        function addTask(wNum) {
-            const input = document.getElementById(`t-input-${wNum}`); const select = document.getElementById(`t-type-${wNum}`);
-            if(!input.value.trim()) return; 
-            const tKey = getTKey(wNum); if(!tasksData[tKey]) tasksData[tKey] = [];
-            tasksData[tKey].push({ id: Date.now(), text: input.value.trim(), done: false, type: select.value });
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); input.value = ''; renderTasks(wNum); updateAllMetrics();
-        }
-        function toggleTask(wNum, taskId) {
-            const tKey = getTKey(wNum); const t = tasksData[tKey].find(x => x.id === taskId); if(t) t.done = !t.done;
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wNum); updateAllMetrics();
-        }
-        function deleteTask(wNum, taskId) {
-            const tKey = getTKey(wNum); tasksData[tKey] = tasksData[tKey].filter(x => x.id !== taskId);
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wNum); updateAllMetrics();
-        }
-
-        function toggleMetricsView(q) {
-            const mBlock = document.getElementById(`metrics-m-${q}`), qBlock = document.getElementById(`metrics-q-${q}`), btnText = document.getElementById(`m-toggle-btn-${q}`);
-            if(mBlock.classList.contains('active')) { mBlock.classList.remove('active'); qBlock.classList.add('active'); btnText.innerText = 'Ver por Mes'; } 
-            else { qBlock.classList.remove('active'); mBlock.classList.add('active'); btnText.innerText = 'Ver Trimestre'; }
-        }
-
-        function updateAllMetrics() {
-            for(let q=0; q<4; q++) {
-                let qTotal = 0, qDone = 0;
-                for(let m=0; m<3; m++) {
-                    let mI = q*3 + m, mTotal = 0, mDone = 0;
-                    for(let w=1; w<=4; w++) { 
-                        let tKey = getTKey(mI * 4 + w); let tasks = tasksData[tKey] || []; 
-                        mTotal += tasks.length; mDone += tasks.filter(t => t.done).length; 
-                    }
-                    let mPct = mTotal === 0 ? 0 : (mDone / mTotal) * 100;
-                    let mFill = document.getElementById(`fill-m-${mI}`), mPctTxt = document.getElementById(`pct-m-${mI}`);
-                    if(mFill) mFill.style.width = mPct + '%'; if(mPctTxt) mPctTxt.innerText = Math.round(mPct) + '%';
-                    qTotal += mTotal; qDone += mDone;
-                }
-                let qPct = qTotal === 0 ? 0 : (qDone / qTotal) * 100;
-                let qFill = document.getElementById(`fill-q-${q}`), qPctTxt = document.getElementById(`pct-q-${q}`);
-                if(qFill) qFill.style.width = qPct + '%'; if(qPctTxt) qPctTxt.innerText = Math.round(qPct) + '%';
-            }
-        }
-
+        // ===== LOOP PRINCIPAL =====
         function update() {
             const now = new Date(); const year = now.getFullYear();
             const h = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
@@ -868,31 +1207,41 @@
             const hDeg = (hh % 12) * 30 + mm * 0.5, mDeg = mm * 6 + ss * 0.1, sDeg = ss * 6;
             const pastColor = getComputedStyle(document.documentElement).getPropertyValue('--past').trim();
             const clockFutureColor = getComputedStyle(document.documentElement).getPropertyValue('--clock-future').trim();
-            document.getElementById('hour-hand').style.transform = `rotate(${hDeg}deg)`; document.getElementById('minute-hand').style.transform = `rotate(${mDeg}deg)`; document.getElementById('second-hand').style.transform = `rotate(${sDeg}deg)`;
+            document.getElementById('hour-hand').style.transform = `rotate(${hDeg}deg)`;
+            document.getElementById('minute-hand').style.transform = `rotate(${mDeg}deg)`;
+            document.getElementById('second-hand').style.transform = `rotate(${sDeg}deg)`;
             document.getElementById('analog-clock').style.background = `conic-gradient(${pastColor} ${hDeg}deg, ${clockFutureColor} ${hDeg}deg)`;
 
             const startBlock = blockConfig.startYear; const endBlock = startBlock + blockConfig.years;
-            const blockTotalMs = new Date(endBlock, 0, 1) - new Date(startBlock, 0, 1); const blockElapsedMs = now - new Date(startBlock, 0, 1);
+            const blockTotalMs = new Date(endBlock, 0, 1) - new Date(startBlock, 0, 1);
+            const blockElapsedMs = now - new Date(startBlock, 0, 1);
             let blockPct = (blockElapsedMs / blockTotalMs * 100);
             if(blockPct < 0) blockPct = 0; else if(blockPct > 100) blockPct = 100;
             document.getElementById('block-fill').style.width = blockPct.toFixed(4) + '%';
             document.getElementById('block-pct').innerText = blockPct.toFixed(2) + '%';
 
-            document.getElementById('year-fill').style.width = ((now - new Date(year,0,1)) / (new Date(year+1,0,1) - new Date(year,0,1)) * 100).toFixed(4) + '%';
-            document.getElementById('year-pct').innerText = ((now - new Date(year,0,1)) / (new Date(year+1,0,1) - new Date(year,0,1)) * 100).toFixed(2) + '%';
+            const yearPct = ((now - new Date(year,0,1)) / (new Date(year+1,0,1) - new Date(year,0,1)) * 100);
+            document.getElementById('year-fill').style.width = yearPct.toFixed(4) + '%';
+            document.getElementById('year-pct').innerText = yearPct.toFixed(2) + '%';
 
             let dW = now.getDay(), adj = dW === 0 ? 6 : dW - 1, sW = new Date(now); sW.setDate(now.getDate() - adj); sW.setHours(0,0,0,0);
             const wkP = ((now - sW) / (7 * 24 * 60 * 60 * 1000)) * 100;
-            document.getElementById('week-fill').style.width = wkP.toFixed(4) + '%'; document.getElementById('week-pct').innerText = wkP.toFixed(2) + '%';
+            document.getElementById('week-fill').style.width = wkP.toFixed(4) + '%';
+            document.getElementById('week-pct').innerText = wkP.toFixed(2) + '%';
 
             let wP = 0, wT = "Libre";
             if (h >= workConfig.start && h < workConfig.end) { 
-                wP = ((h - workConfig.start) / (workConfig.end - workConfig.start)) * 100; wT = new Date((workConfig.end - h) * 3600 * 1000).toISOString().substr(11, 8); 
+                wP = ((h - workConfig.start) / (workConfig.end - workConfig.start)) * 100;
+                wT = new Date((workConfig.end - h) * 3600 * 1000).toISOString().substr(11, 8); 
             } else if (h >= workConfig.end) { wP = 100; wT = "¡Finalizado!"; }
-            document.getElementById('work-fill').style.width = wP.toFixed(4) + '%'; document.getElementById('work-timer').innerText = wT; document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
+            document.getElementById('work-fill').style.width = wP.toFixed(4) + '%';
+            document.getElementById('work-timer').innerText = wT;
+            document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
 
             const dP = (h / 24) * 100;
-            document.getElementById('day-fill').style.width = dP.toFixed(4) + '%'; document.getElementById('day-timer').innerText = new Date((24 - h) * 3600 * 1000).toISOString().substr(11, 8); document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
+            document.getElementById('day-fill').style.width = dP.toFixed(4) + '%';
+            document.getElementById('day-timer').innerText = new Date((24 - h) * 3600 * 1000).toISOString().substr(11, 8);
+            document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
 
             let timersChanged = false;
             customTimers.forEach(t => {
@@ -925,80 +1274,12 @@
             if(timersChanged) localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers));
         }
 
-        function drawCalendar() {
-            const now = new Date(); now.setHours(0,0,0,0); const year = currentYear; 
-            let html = ""; let tBC = 0;
-            
-            // Restore single active progress panel
-            const activePanel = localStorage.getItem('activeProgressPanel');
-            if(activePanel && document.getElementById('panel-' + activePanel)) {
-                document.getElementById('panel-' + activePanel).classList.add('active');
-                document.getElementById('btn-' + activePanel).classList.add('active');
-            }
-
-            const currentQuarter = Math.floor(now.getMonth() / 3);
-
-            for(let q=0; q<4; q++) {
-                const isCurrentQ = q === currentQuarter;
-                html += `<div class="q-header ${isCurrentQ ? 'open' : ''}" id="q-header-${q}" onclick="toggleQ(${q})"><div class="q-title">T${q+1} <span class="q-arrow">▼</span></div><div style="font-size: 0.6rem; color: var(--muted); font-weight:700; letter-spacing: 0.08em; opacity: 0.6;">OBJETIVOS</div></div><div class="q-content ${isCurrentQ ? 'active' : ''}" id="q-content-${q}"><div class="task-mgr">`;
-                
-                for(let m=0; m<3; m++) {
-                    let mI = q*3 + m;
-                    html += `<div class="t-month"><div class="t-month-head" onclick="this.nextElementSibling.classList.toggle('active')">${meses[mI]} <span style="font-size: 0.6rem; color: var(--muted);">▼</span></div><div class="t-month-body">`;
-                    for(let w=1; w<=4; w++) {
-                        let wNum = mI * 4 + w; 
-                        html += `<div class="t-week"><div class="t-week-title" onclick="toggleWeek(${wNum})">W${wNum} <span id="w-arrow-${wNum}" style="font-size: 0.5rem; transition: transform 0.2s; color:var(--muted)">▼</span></div><div class="t-week-body" id="t-week-body-${wNum}"><ul class="t-list" id="t-list-${wNum}"></ul><div class="t-add"><select id="t-type-${wNum}" class="t-type-select"><option value="Meta">Meta</option><option value="Diario">Diario</option><option value="Lun">Lun</option><option value="Mar">Mar</option><option value="Mié">Mié</option><option value="Jue">Jue</option><option value="Vie">Vie</option><option value="Sáb">Sáb</option><option value="Dom">Dom</option></select><input type="text" id="t-input-${wNum}" placeholder="Añadir tarea..." onkeypress="if(event.key==='Enter') addTask(${wNum})"><button onclick="addTask(${wNum})">+</button></div></div></div>`;
-                    }
-                    html += `</div></div>`;
-                }
-                html += `</div><div class="months-container">`;
-                
-                for(let m=0; m<3; m++) {
-                    let mI = q*3 + m, fD = new Date(year, mI, 1).getDay(), off = fD === 0 ? 6 : fD - 1, dM = new Date(year, mI + 1, 0).getDate();
-                    
-                    let yKey = `${year}-${mI}`;
-                    let isCol = collapsedMonths[yKey];
-                    let colClass = isCol ? " collapsed" : "";
-                    let tChar = isCol ? '+' : '−';
-
-                    html += `<div class="month${colClass}" id="month-wrap-${mI}">
-                        <div class="month-name" onclick="toggleMonth(${mI})">${meses[mI]} <span id="toggle-m-${mI}" class="month-toggle">${tChar}</span></div>
-                        <div class="days-grid" id="grid-m-${mI}">`;
-                    
-                    diasL.forEach(d => html += `<div class="week-day">${d}</div>`);
-                    let slots = []; for(let i=0;i<off;i++) slots.push(null); for(let d=1;d<=dM;d++) slots.push(d); while(slots.length%7!==0) slots.push(null);
-                    let weeks = []; for(let i=0;i<slots.length;i+=7) { let dws = slots.slice(i, i+7); weeks.push({dws, c: dws.filter(d=>d!==null).length}); }
-                    let sI = weeks.map((w,i)=>({i,c:w.c})).sort((a,b)=>b.c-a.c).slice(0,4).map(x=>x.i);
-                    weeks.forEach((w, i) => {
-                        let h = sI.includes(i), wCl = "", fR = -1, lR = -1;
-                        for(let k=0;k<7;k++){ if(w.dws[k]!==null){ if(fR===-1)fR=k; lR=k; }}
-                        if(h){ tBC++; let endD = new Date(year, mI, w.dws[lR]); wCl = (endD >= now) ? "highlight-week-active" : "highlight-week-concluded"; if(now >= new Date(year,mI,w.dws[fR]) && now <= endD) wCl += " current-week-glow"; }
-                        html += `<div class="week-wrapper ${wCl}" style="display: contents;">`;
-                        w.dws.forEach((d, dI) => {
-                            if(d===null) html += `<div style="border:1.5px solid transparent; margin-top:6px;"></div>`;
-                            else {
-                                let dt = new Date(year, mI, d), cl = "day";
-                                let dtStr = `${year}-${String(mI+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                                if(dt < now) cl += " past"; else if(dt.getTime()===now.getTime()) cl += " today"; else cl += (dt.getDay()===6)?" sat-future":(dt.getDay()===0)?" sun-future":" future";
-                                if(h && dI===fR) html += `<div class="${cl} block-start" onclick="showDayStats('${dtStr}')"><span class="block-label">W${tBC}</span>${d}</div>`; else if(h && dI===lR) html += `<div class="${cl} block-end" onclick="showDayStats('${dtStr}')">${d}</div>`; else html += `<div class="${cl}" onclick="showDayStats('${dtStr}')">${d}</div>`;
-                            }
-                        }); html += `</div>`;
-                    }); html += `</div></div>`;
-                } 
-                
-                html += `</div><div class="metrics-wrapper"><div class="metrics-header"><span class="metrics-title">CUMPLIMIENTO DE TAREAS</span><div class="toggle-view" id="m-toggle-btn-${q}" onclick="toggleMetricsView(${q})">Ver Trimestre</div></div><div id="metrics-m-${q}" class="metrics-view active">`;
-                for(let m=0; m<3; m++) { let mI = q*3 + m; html += `<div class="m-bar-row"><div class="m-label">${meses[mI]}</div><div class="m-progress"><div id="fill-m-${mI}" class="m-fill"></div></div><div id="pct-m-${mI}" class="m-pct">0%</div></div>`; }
-                html += `</div><div id="metrics-q-${q}" class="metrics-view"><div class="m-bar-row"><div class="m-label">T${q+1} Total</div><div class="m-progress"><div id="fill-q-${q}" class="m-fill" style="background: var(--year-bar)"></div></div><div id="pct-q-${q}" class="m-pct">0%</div></div></div></div></div>`;
-            }
-            document.getElementById('calendar-container').innerHTML = html;
-
-            for(let w=1; w<=48; w++) renderTasks(w);
-            updateAllMetrics(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();
-        }
-            
         setInitialThemeIcon();
         initTimers();
-        drawCalendar(); setInterval(update, 1000); update();
+        drawCalendar();
+        renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();
+        setInterval(update, 1000);
+        update();
     </script>
 </body>
 </html>

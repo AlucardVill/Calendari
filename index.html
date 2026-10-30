@@ -375,6 +375,30 @@
         .tc-field input[type="time"] { color-scheme: dark; }
         [data-theme="light"] .tc-field input[type="time"] { color-scheme: light; }
 
+        /* Input de color en modal de tarea */
+        .tc-field input[type="color"] {
+            padding: 2px;
+            height: 32px;
+            width: 48px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        /* Marcas de tareas sobre la barra del día */
+        .day-task-mark {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 2%;
+            min-width: 4px;
+            max-width: 8px;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            pointer-events: none;
+            z-index: 5;
+            box-shadow: 0 0 2px rgba(0,0,0,0.25);
+        }
+
         .custom-check { appearance: none; background-color: var(--input-bg); margin: 0; width: 16px; height: 16px; border: 2px solid var(--border-input); border-radius: 4px; display: grid; place-content: center; transition: all 0.2s ease-in-out; margin-top: 2px; flex-shrink: 0; cursor: pointer; }
         .custom-check::before { content: ""; width: 8px; height: 8px; transform: scale(0); transition: 0.2s ease-in-out; box-shadow: inset 1em 1em var(--check-color); transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
         .custom-check:checked { background-color: var(--accent); border-color: var(--accent); }
@@ -586,7 +610,7 @@
                         <select id="inp-tc-week"></select>
                     </div>
                 </div>
-                <div class="tc-row">
+                <div class="tc-row" style="grid-template-columns: 1fr 1fr auto;">
                     <div class="tc-field">
                         <label>Día</label>
                         <select id="inp-tc-day">
@@ -603,6 +627,10 @@
                     <div class="tc-field">
                         <label>Hora</label>
                         <input type="time" id="inp-tc-hour">
+                    </div>
+                    <div class="tc-field">
+                        <label>Color</label>
+                        <input type="color" id="inp-tc-color" value="#3b82f6">
                     </div>
                 </div>
                 <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveNewManagedTask()">Guardar</button></div>
@@ -736,6 +764,20 @@
             return weeks;
         }
 
+        // NUEVO: localizar la semana (slot) y el índice de día de una fecha concreta
+        function getWeekForDay(year, mI, dayNum) {
+            const weeks = getWeeksForMonth(year, mI);
+            const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
+            for (let i = 0; i < weeks.length; i++) {
+                const dayIdx = weeks[i].dws.indexOf(dayNum);
+                if (dayIdx !== -1) {
+                    const localW = sI.includes(i) ? sI.indexOf(i) + 1 : 0;
+                    return { localW, weekIdx: i, dayIdx };
+                }
+            }
+            return null;
+        }
+
         function exportData() {
             let content = "=== COPIA DE SEGURIDAD - CONTROL PERSONAL ===\n";
             content += "Fecha de exportación: " + new Date().toLocaleString() + "\n\n";
@@ -867,10 +909,6 @@
             const qStart = new Date(year, q * 3, 1);
             const qEnd = new Date(year, q * 3 + 3, 1);
             
-            // Punto de referencia según estado del trimestre:
-            //  - Trimestre pasado   → hasta su fin
-            //  - Trimestre futuro   → hasta su inicio
-            //  - Trimestre en curso → hasta hoy
             let refDate;
             if (now >= qEnd) refDate = qEnd;
             else if (now <= qStart) refDate = qStart;
@@ -878,21 +916,16 @@
             
             let pct;
             if (mode === 'q') {
-                // % del trimestre transcurrido (avance interno del trimestre)
                 const total = qEnd - qStart;
                 const elapsed = Math.max(0, refDate - qStart);
                 pct = (elapsed / total) * 100;
             } else if (mode === 'y') {
-                // % del año transcurrido hasta el punto del trimestre
-                // (contando desde enero del año del trimestre)
                 const yearStart = new Date(year, 0, 1);
                 const yearEnd = new Date(year + 1, 0, 1);
                 const total = yearEnd - yearStart;
                 const elapsed = Math.max(0, refDate - yearStart);
                 pct = (elapsed / total) * 100;
             } else {
-                // % del bloque transcurrido hasta el punto del trimestre
-                // (contando desde el inicio del bloque)
                 const blockStart = new Date(blockConfig.startYear, 0, 1);
                 const blockEnd = new Date(blockConfig.startYear + blockConfig.years, 0, 1);
                 const total = blockEnd - blockStart;
@@ -925,6 +958,7 @@
             document.getElementById('inp-tc-title').value = '';
             document.getElementById('inp-tc-day').value = '';
             document.getElementById('inp-tc-hour').value = '';
+            document.getElementById('inp-tc-color').value = '#3b82f6';
             
             document.getElementById('modal-content-taskcreate').style.display = 'block';
             openModal();
@@ -955,15 +989,17 @@
             const localW = parseInt(document.getElementById('inp-tc-week').value);
             const dayVal = document.getElementById('inp-tc-day').value;
             const hour = document.getElementById('inp-tc-hour').value;
+            const color = document.getElementById('inp-tc-color').value;
             if (!title) { alert("Escribe una descripción"); return; }
             const day = dayVal === '' ? null : parseInt(dayVal);
             const wNum = mI * 5 + localW;
             const tKey = `${selectedYear}-${wNum}`;
             if (!tasksData[tKey]) tasksData[tKey] = [];
-            tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: day, hour: hour || null });
+            tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: day, hour: hour || null, color: color });
             localStorage.setItem('wkTasks', JSON.stringify(tasksData));
             closeModal();
             renderQuarterDetailBody();
+            renderDayTaskMarks();
         }
 
         function toggleManagedTask(week, taskId) {
@@ -972,6 +1008,7 @@
             if (t) t.done = !t.done;
             localStorage.setItem('wkTasks', JSON.stringify(tasksData));
             renderQuarterDetailBody();
+            renderDayTaskMarks();
         }
 
         function deleteManagedTask(week, taskId) {
@@ -979,6 +1016,7 @@
             tasksData[tKey] = (tasksData[tKey] || []).filter(x => x.id !== taskId);
             localStorage.setItem('wkTasks', JSON.stringify(tasksData));
             renderQuarterDetailBody();
+            renderDayTaskMarks();
         }
 
         function renderMasterTaskList() {
@@ -1360,6 +1398,50 @@
             saveMarkers(); renderMarkers(activeMarker.barId); closeModal();
         }
 
+        // NUEVO: pintar las marcas de tareas sobre la barra del día según su hora y color
+        let lastDayMarksSig = '';
+        function renderDayTaskMarks() {
+            const container = document.getElementById('bar-day');
+            if (!container) return;
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const mI = now.getMonth();
+            const dayNum = now.getDate();
+
+            const weekInfo = getWeekForDay(year, mI, dayNum);
+            let sig = `${year}-${mI}-${dayNum}|`;
+            let todayTasks = [];
+
+            if (weekInfo) {
+                const wNum = mI * 5 + weekInfo.localW;
+                const weekTasks = tasksData[`${year}-${wNum}`] || [];
+                todayTasks = weekTasks.filter(t =>
+                    getTaskDay(t) === weekInfo.dayIdx && t.hour && t.color
+                );
+                sig += todayTasks.map(t => `${t.id}:${t.hour}:${t.color}:${t.done}`).join('|');
+            }
+
+            if (sig === lastDayMarksSig) return;
+            lastDayMarksSig = sig;
+
+            container.querySelectorAll('.day-task-mark').forEach(e => e.remove());
+
+            todayTasks.forEach(t => {
+                const [hStr, mStr] = t.hour.split(':');
+                const hourPos = parseInt(hStr) + (parseInt(mStr) || 0) / 60;
+                const pctPos = (hourPos / 24) * 100;
+
+                const mark = document.createElement('div');
+                mark.className = 'day-task-mark';
+                mark.style.left = Math.max(1, Math.min(99, pctPos)) + '%';
+                mark.style.background = t.color;
+                mark.style.opacity = t.done ? '1' : '0.5';
+                mark.title = t.text;
+                container.appendChild(mark);
+            });
+        }
+
         function update() {
             const now = new Date(); const year = now.getFullYear();
             const h = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
@@ -1407,6 +1489,8 @@
             document.getElementById('day-fill').style.width = dP.toFixed(4) + '%';
             document.getElementById('day-timer').innerText = new Date((24 - h) * 3600 * 1000).toISOString().substr(11, 8);
             document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
+
+            renderDayTaskMarks();
 
             if (document.getElementById('qbar-fill')) {
                 updateQuarterBar();

@@ -202,7 +202,6 @@
         .qc-bar .fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--accent); }
         .qc-pct { font-size: 0.85rem; font-weight: 800; color: var(--text); }
 
-        /* ===== FLOATING CALENDAR (CENTERED) ===== */
         .calendar-overlay {
             display: none; position: fixed; inset: 0;
             background: var(--modal-bg); z-index: 900;
@@ -264,7 +263,6 @@
         .calendar-detail-body::-webkit-scrollbar-track { background: var(--bg); }
         .calendar-detail-body::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 3px; }
 
-        /* ===== QUARTER BAR WIDGET ===== */
         .qbar-widget {
             display: flex;
             align-items: center;
@@ -329,7 +327,6 @@
         .qbar-widget[data-mode="y"] .qbar-pct { color: var(--year-bar); }
         .qbar-widget[data-mode="b"] .qbar-pct { color: var(--bi-bar); }
 
-        /* ===== MODALS ===== */
         .modal-overlay { display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 16px; }
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -714,7 +711,6 @@
         if (isNaN(selectedYear) || selectedYear < 2000 || selectedYear > 2100) selectedYear = currentYear;
         if (isNaN(selectedQuarter) || selectedQuarter < 0 || selectedQuarter > 3) selectedQuarter = 0;
 
-        // Estado del widget de barra del trimestre (0=trimestre, 1=año, 2=bloque)
         let quarterBarMode = parseInt(localStorage.getItem('wkQBarMode')) || 0;
         if (isNaN(quarterBarMode) || quarterBarMode < 0 || quarterBarMode > 2) quarterBarMode = 0;
 
@@ -871,20 +867,36 @@
             const qStart = new Date(year, q * 3, 1);
             const qEnd = new Date(year, q * 3 + 3, 1);
             
-            let elapsed;
-            if (now < qStart) elapsed = 0;
-            else if (now >= qEnd) elapsed = qEnd - qStart;
-            else elapsed = now - qStart;
+            // Punto de referencia según estado del trimestre:
+            //  - Trimestre pasado   → hasta su fin
+            //  - Trimestre futuro   → hasta su inicio
+            //  - Trimestre en curso → hasta hoy
+            let refDate;
+            if (now >= qEnd) refDate = qEnd;
+            else if (now <= qStart) refDate = qStart;
+            else refDate = now;
             
             let pct;
             if (mode === 'q') {
+                // % del trimestre transcurrido (avance interno del trimestre)
                 const total = qEnd - qStart;
+                const elapsed = Math.max(0, refDate - qStart);
                 pct = (elapsed / total) * 100;
             } else if (mode === 'y') {
-                const total = new Date(year + 1, 0, 1) - new Date(year, 0, 1);
+                // % del año transcurrido hasta el punto del trimestre
+                // (contando desde enero del año del trimestre)
+                const yearStart = new Date(year, 0, 1);
+                const yearEnd = new Date(year + 1, 0, 1);
+                const total = yearEnd - yearStart;
+                const elapsed = Math.max(0, refDate - yearStart);
                 pct = (elapsed / total) * 100;
             } else {
-                const total = new Date(blockConfig.startYear + blockConfig.years, 0, 1) - new Date(blockConfig.startYear, 0, 1);
+                // % del bloque transcurrido hasta el punto del trimestre
+                // (contando desde el inicio del bloque)
+                const blockStart = new Date(blockConfig.startYear, 0, 1);
+                const blockEnd = new Date(blockConfig.startYear + blockConfig.years, 0, 1);
+                const total = blockEnd - blockStart;
+                const elapsed = Math.max(0, refDate - blockStart);
                 pct = (elapsed / total) * 100;
             }
             
@@ -1396,7 +1408,6 @@
             document.getElementById('day-timer').innerText = new Date((24 - h) * 3600 * 1000).toISOString().substr(11, 8);
             document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
 
-            // Actualizar widget del trimestre si está visible
             if (document.getElementById('qbar-fill')) {
                 updateQuarterBar();
             }

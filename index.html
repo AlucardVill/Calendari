@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Control Personal</title>
+    <title>Tiempo</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Control">
+    <meta name="apple-mobile-web-app-title" content="Tiempo">
     <meta name="theme-color" id="theme-color-meta" content="#0a0a0a">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2370/2370264.png">
 
@@ -342,7 +342,6 @@
         [data-theme="light"] .tc-field input[type="time"] { color-scheme: light; }
         .tc-field input[type="color"] { padding: 2px; height: 32px; width: 100%; cursor: pointer; border-radius: 8px; }
 
-        /* CHECKBOX GROUPS PARA ENTORNOS */
         .checkbox-group { display: flex; gap: 4px; flex-wrap: wrap; }
         .chk-btn {
             background: var(--input-bg); border: 1px solid var(--border-input);
@@ -411,7 +410,14 @@
             padding: 10px 8px; box-shadow: var(--card-shadow); display: flex; flex-direction: column;
             height: 250px; overflow: hidden; min-width: 0; margin-top: 10px;
         }
-        .qt-title { font-size: 0.7rem; font-weight: 800; color: var(--text); margin-bottom: 6px; text-align: center; padding-bottom: 6px; border-bottom: 1px solid var(--border); letter-spacing: -0.01em; }
+        
+        /* SISTEMA DE PESTAÑAS COMPACTAS PARA LA LISTA GENERAL */
+        .list-tabs { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; padding: 0 4px; }
+        .tab-row { display: flex; gap: 6px; justify-content: center; }
+        .tab-btn { flex: 1; background: var(--input-bg); color: var(--subtext); border: 1px solid var(--border-input); padding: 4px; font-size: 0.65rem; font-weight: 700; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: var(--accent); color: var(--btn-text); border-color: var(--accent); }
+        .tab-btn:active { transform: scale(0.95); }
+        
         .qt-list { flex: 1; overflow-y: auto; padding-right: 3px; min-height: 0; }
         .qt-list::-webkit-scrollbar { width: 4px; }
         .qt-list::-webkit-scrollbar-track { background: transparent; }
@@ -440,7 +446,7 @@
 </head>
 <body>
     <div class="header-top">
-        <h2 class="header-title">Control Personal</h2>
+        <h2 class="header-title">Tiempo</h2>
         <button class="header-menu-btn" onclick="openGeneralModal()" title="Menú">⋮</button>
     </div>
 
@@ -522,7 +528,6 @@
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             
-            <!-- MODAL GENERAL / OPCIONES -->
             <div id="modal-content-general" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 20px;">Configuración</h3>
                 <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -532,7 +537,6 @@
                 <div class="modal-actions" style="margin-top: 25px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div>
             </div>
 
-            <!-- MODAL CREADOR DUAL: TAREAS / ENTORNOS -->
             <div id="modal-content-taskcreate" style="display:none;">
                 <div class="modal-header-flex">
                     <h3 id="tc-main-title">Nueva Acción</h3>
@@ -550,7 +554,6 @@
                     </div>
                 </div>
 
-                <!-- CAMPOS EXCLUSIVOS DE "ACCIÓN" (TAREA) -->
                 <div id="tc-tarea-fields">
                     <div class="tc-row">
                         <div class="tc-field"><label>Mes</label><select id="inp-tc-month" onchange="updateWeekDropdown()"></select></div>
@@ -567,7 +570,6 @@
                     </div>
                 </div>
 
-                <!-- CAMPOS EXCLUSIVOS DE "ENTORNO" (RUTINA) -->
                 <div id="tc-entorno-fields" style="display:none;">
                     <div class="tc-field" style="margin-bottom: 12px;">
                         <label>Meses del Trimestre</label>
@@ -671,10 +673,8 @@
         }
         localStorage.setItem('wkTasks', JSON.stringify(tasksData));
 
-        // NUEVO: Almacenamiento de Entornos
         let entornosData = JSON.parse(localStorage.getItem('wkEntornos')) || [];
 
-        // --- SISTEMA DE AÑOS TRACKEADOS ---
         let trackedYears = JSON.parse(localStorage.getItem('wkYears'));
         if (!trackedYears || !Array.isArray(trackedYears)) {
             let yearsSet = new Set();
@@ -732,8 +732,11 @@
         if (isNaN(selectedQuarter) || selectedQuarter < 0 || selectedQuarter > 3) selectedQuarter = 0;
 
         let quarterBarMode = parseInt(localStorage.getItem('wkQBarMode')) || 0;
-        
-        let tcMode = 'tarea'; // 'tarea' o 'entorno'
+        let tcMode = 'tarea'; 
+
+        // ESTADO DE LAS PESTAÑAS (TABS)
+        let activeTabM = 0; // 0, 1 o 2 (Relativo al trimestre)
+        let activeTabW = 1; // 0 a 4
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
@@ -765,7 +768,7 @@
             let backup = { tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, day: dayConfig, markers: markersData, collapsed: collapsedMonths, trackedYears: trackedYears };
             const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
             const url = URL.createObjectURL(blob); const a = document.createElement("a");
-            a.href = url; a.download = `Control_Backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.href = url; a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
@@ -784,12 +787,10 @@
             const tasksList = document.getElementById('ds-tasks-list');
             let tasks = []; let dayEntornos = [];
             
-            // Obtener tareas del día
             if (wNum !== null && wNum !== undefined && dI !== null && dI !== undefined) {
                 const weekTasks = tasksData[`${selectedYear}-${wNum}`] || [];
                 tasks = weekTasks.filter(t => getTaskDay(t) === dI);
                 
-                // Obtener entornos que aplican a este día
                 const localW = wNum % 5;
                 const localM = mI % 3;
                 dayEntornos = entornosData.filter(e => 
@@ -864,7 +865,6 @@
             pct = Math.max(0, Math.min(100, pct)); fill.style.width = pct.toFixed(2) + '%'; pctEl.textContent = pct.toFixed(1) + '%';
         }
 
-        // ===== SISTEMA DUAL: CREADOR =====
         function toggleTcMode() {
             tcMode = tcMode === 'tarea' ? 'entorno' : 'tarea';
             document.getElementById('tc-main-title').innerText = tcMode === 'tarea' ? 'Nueva Acción' : 'Nuevo Entorno';
@@ -875,7 +875,7 @@
         }
 
         function openTaskCreateModal() {
-            tcMode = 'entorno'; // forzamos toggle para que quede en tarea por defecto
+            tcMode = 'entorno'; 
             toggleTcMode();
 
             const q = selectedQuarter;
@@ -883,7 +883,6 @@
             let defaultM = q * 3;
             if (Math.floor(nowMonth / 3) === q) defaultM = nowMonth;
             
-            // Llenar selects de tarea
             const monthSel = document.getElementById('inp-tc-month');
             let mHtml = '';
             for (let i = 0; i < 3; i++) {
@@ -893,7 +892,6 @@
             monthSel.innerHTML = mHtml;
             updateWeekDropdown();
             
-            // Llenar checkboxes de meses para entornos
             const chkMonths = document.getElementById('chk-months');
             chkMonths.innerHTML = '';
             for(let i=0; i<3; i++) {
@@ -973,66 +971,105 @@
 
         function toggleManagedTask(week, taskId) {
             const tKey = `${selectedYear}-${week}`; const t = (tasksData[tKey] || []).find(x => x.id === taskId);
-            if (t) t.done = !t.done; localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderQuarterDetailBody(); renderDayTaskMarks();
+            if (t) t.done = !t.done; localStorage.setItem('wkTasks', JSON.stringify(tasksData)); updateMasterTaskList(); renderDayTaskMarks();
         }
         function deleteManagedTask(week, taskId) {
             const tKey = `${selectedYear}-${week}`; tasksData[tKey] = (tasksData[tKey] || []).filter(x => x.id !== taskId);
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderQuarterDetailBody(); renderDayTaskMarks();
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); updateMasterTaskList(); renderDayTaskMarks();
         }
         function deleteEntorno(id) {
             entornosData = entornosData.filter(e => e.id !== id);
-            localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); renderQuarterDetailBody(); renderDayTaskMarks();
+            localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); updateMasterTaskList(); renderDayTaskMarks();
         }
 
-        function renderMasterTaskList() {
+        // --- SISTEMA DE PESTAÑAS Y LISTA GENERAL ---
+        function setActiveTabM(m) {
+            activeTabM = m;
+            const activeMonthAbs = selectedQuarter * 3 + m;
+            const weeks = getWeeksForMonth(selectedYear, activeMonthAbs);
+            const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
+            const hasW0 = weeks.length > sI.length;
+            if(activeTabW === 0 && !hasW0) activeTabW = 1;
+            updateMasterTaskList();
+        }
+
+        function setActiveTabW(w) {
+            activeTabW = w;
+            updateMasterTaskList();
+        }
+
+        function updateMasterTaskList() {
             const q = selectedQuarter; const year = selectedYear;
-            let html = '';
             
-            // Sección Entornos
-            let qEntornos = entornosData.filter(e => e.year === year && e.q === q);
-            if(qEntornos.length > 0) {
-                html += `<div style="padding: 4px 0 8px;">`;
+            // Construir HTML de las Pestañas (Tabs)
+            let tabsHtml = '<div class="list-tabs"><div class="tab-row">';
+            for(let i = 0; i < 3; i++) {
+                const mName = meses[q * 3 + i].slice(0,3).toUpperCase();
+                tabsHtml += `<button class="tab-btn ${activeTabM === i ? 'active' : ''}" onclick="setActiveTabM(${i})">${mName}</button>`;
+            }
+            tabsHtml += '</div><div class="tab-row">';
+            
+            const activeMonthAbs = q * 3 + activeTabM;
+            const weeks = getWeeksForMonth(year, activeMonthAbs);
+            const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
+            const hasW0 = weeks.length > sI.length;
+
+            if (hasW0) tabsHtml += `<button class="tab-btn ${activeTabW === 0 ? 'active' : ''}" onclick="setActiveTabW(0)">W0</button>`;
+            for (let i = 1; i <= 4; i++) {
+                tabsHtml += `<button class="tab-btn ${activeTabW === i ? 'active' : ''}" onclick="setActiveTabW(${i})">W${i}</button>`;
+            }
+            tabsHtml += '</div></div>';
+            
+            document.getElementById('qt-tabs-container').innerHTML = tabsHtml;
+
+            // Construir HTML de la Lista
+            let tasksHtml = '';
+            
+            // 1. Entornos filtrados
+            let qEntornos = entornosData.filter(e => e.year === year && e.q === q && e.months.includes(activeTabM) && e.weeks.includes(activeTabW));
+            if (qEntornos.length > 0) {
+                tasksHtml += `<div style="padding: 0 0 8px;">`;
                 qEntornos.forEach(e => {
                     const timeDisp = e.hour ? (e.hourEnd ? `${e.hour}-${e.hourEnd}` : e.hour) : 'Todo el día';
-                    html += `
+                    tasksHtml += `
                     <div class="qt-item">
                         <div class="qt-info">
                             <div class="qt-text"><span class="entorno-tag" style="background:${e.color}20; color:${e.color};">ENTORNO</span> ${e.text}</div>
-                            <div class="qt-meta">Meses: ${e.months.map(m=>m+1).join(',')} | Sem: ${e.weeks.map(w=>'W'+w).join(',')} | Días: ${e.days.map(d=>diasL[d]).join(',')} · ${timeDisp}</div>
+                            <div class="qt-meta">Días: ${e.days.map(d=>diasL[d]).join(',')} · ${timeDisp}</div>
                         </div>
                         <span class="qt-delete" onclick="deleteEntorno(${e.id})">×</span>
                     </div>`;
                 });
-                html += `</div><div style="border-bottom: 1px dashed var(--border); margin: 5px 0;"></div>`;
+                tasksHtml += `</div><div style="border-bottom: 1px dashed var(--border); margin: 0 0 5px;"></div>`;
             }
 
-            // Sección Acciones (Tareas)
-            let allTasks = [];
-            for (let m = 0; m < 3; m++) {
-                const mI = q * 3 + m;
-                for (let w = 0; w <= 4; w++) {
-                    const wNum = mI * 5 + w;
-                    (tasksData[`${year}-${wNum}`] || []).forEach(t => allTasks.push({ ...t, week: wNum, month: mI, localW: w }));
-                }
-            }
-            if (allTasks.length === 0 && qEntornos.length === 0) return `<div class="qt-empty">Sin registros este trimestre.<br>Toca ＋ arriba.</div>`;
+            // 2. Acciones filtradas
+            const wNum = activeMonthAbs * 5 + activeTabW;
+            const weekTasks = tasksData[`${year}-${wNum}`] || [];
             
-            html += allTasks.map(t => {
-                const tDay = getTaskDay(t);
-                let metaParts = [`${meses[t.month].slice(0,3)} · W${t.localW}`];
-                if (tDay !== null) metaParts.push(diasFull[tDay].slice(0,3));
-                if (t.hour) metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
-                return `
-                    <div class="qt-item ${t.done ? 'done' : ''}">
-                        <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${t.week}, ${t.id})">
-                        <div class="qt-info">
-                            <div class="qt-text">${t.text}</div>
-                            <div class="qt-meta">${metaParts.join(' · ')}</div>
-                        </div>
-                        <span class="qt-delete" onclick="deleteManagedTask(${t.week}, ${t.id})">×</span>
-                    </div>`;
-            }).join('');
-            return html;
+            if (weekTasks.length === 0 && qEntornos.length === 0) {
+                tasksHtml += `<div class="qt-empty">Sin registros en esta semana.</div>`;
+            } else {
+                tasksHtml += weekTasks.map(t => {
+                    const tDay = getTaskDay(t);
+                    let metaParts = [];
+                    if (tDay !== null) metaParts.push(diasFull[tDay].slice(0,3));
+                    if (t.hour) metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
+                    const metaStr = metaParts.length > 0 ? `<div class="qt-meta">${metaParts.join(' · ')}</div>` : '';
+                    
+                    return `
+                        <div class="qt-item ${t.done ? 'done' : ''}">
+                            <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${wNum}, ${t.id})">
+                            <div class="qt-info">
+                                <div class="qt-text">${t.text}</div>
+                                ${metaStr}
+                            </div>
+                            <span class="qt-delete" onclick="deleteManagedTask(${wNum}, ${t.id})">×</span>
+                        </div>`;
+                }).join('');
+            }
+            
+            document.getElementById('qt-list-container').innerHTML = tasksHtml;
         }
 
         function getQuarterStats(year, q) {
@@ -1092,8 +1129,21 @@
         function openQuarterDetail(q) {
             selectedQuarter = q; localStorage.setItem('wkSelQtr', q);
             document.getElementById('calendar-detail-title').innerText = `T${q + 1} · ${selectedYear}`;
+            
+            // Asignar default tabs
+            const now = new Date();
+            const currentM = now.getMonth();
+            if (selectedYear === now.getFullYear() && Math.floor(currentM / 3) === q) {
+                activeTabM = currentM % 3;
+                const wInfo = getWeekForDay(now.getFullYear(), currentM, now.getDate());
+                activeTabW = wInfo ? wInfo.localW : 1;
+            } else {
+                activeTabM = 0; activeTabW = 1;
+            }
+
             renderQuarterDetailBody(); document.getElementById('calendar-overlay').classList.add('active'); document.body.style.overflow = 'hidden';
         }
+        
         function closeQuarterDetail(e) {
             if (e && e.target.id !== 'calendar-overlay') return;
             document.getElementById('calendar-overlay').classList.remove('active'); document.body.style.overflow = '';
@@ -1152,7 +1202,6 @@
                             if (dt < now) cl += " past"; else if (dt.getTime() === now.getTime()) cl += " today";
                             else cl += (dt.getDay() === 6) ? " sat-future" : (dt.getDay() === 0) ? " sun-future" : " future";
                             
-                            // Evaluar si hay entornos que caen aquí
                             const hasEntornos = entornosData.some(e => e.year === year && e.q === Math.floor(mI/3) && e.months.includes(mI % 3) && e.weeks.includes(localW) && e.days.includes(dI));
                             const hasTasks = weekTasks.some(t => getTaskDay(t) === dI);
                             const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
@@ -1167,8 +1216,10 @@
                 });
                 html += `</div></div>`;
             }
-            html += `<div class="quarter-tasks-panel"><div class="qt-title">📋 Lista General</div><div class="qt-list">${renderMasterTaskList()}</div></div></div>`;
-            document.getElementById('calendar-detail-body').innerHTML = html; updateQuarterBar();
+            html += `</div><div class="quarter-tasks-panel"><div id="qt-tabs-container"></div><div class="qt-list" id="qt-list-container"></div></div>`;
+            document.getElementById('calendar-detail-body').innerHTML = html; 
+            updateQuarterBar();
+            updateMasterTaskList();
         }
 
         function openModal() { document.getElementById('modal-overlay').classList.add('active'); }
@@ -1287,7 +1338,6 @@
             let itemsToRender = [];
 
             if (weekInfo) {
-                // Entornos
                 const localM = mI % 3;
                 const localW = weekInfo.localW;
                 const todayEntornos = entornosData.filter(e => 
@@ -1295,7 +1345,6 @@
                     e.months.includes(localM) && e.weeks.includes(localW) && e.days.includes(weekInfo.dayIdx)
                 ).map(e => ({...e, isEntorno: true}));
                 
-                // Tareas
                 const wNum = mI * 5 + weekInfo.localW;
                 const weekTasks = tasksData[`${year}-${wNum}`] || [];
                 const todayTasks = weekTasks.filter(t => getTaskDay(t) === weekInfo.dayIdx && t.hour && t.color);
@@ -1331,10 +1380,9 @@
                 mark.style.width = (endPct - startPct) + '%';
                 mark.style.background = t.color;
                 
-                // Si es entorno lo hacemos más transparente y lo enviamos más al fondo visualmente
                 if (t.isEntorno) {
                     mark.style.opacity = '0.35';
-                    mark.style.mixBlendMode = 'screen'; // Efecto luminoso sutil
+                    mark.style.mixBlendMode = 'screen';
                 } else {
                     mark.style.opacity = t.done ? '0.9' : '0.6';
                 }

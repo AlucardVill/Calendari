@@ -22,19 +22,16 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
         :root {
-            /* TEMA OSCURO MODERNIZADO */
             --bg: #0a0a0a; --card: #141414; --text: #f3f4f6;
             --border: #262626; --border-input: #333333;
             --muted: #737373; --subtext: #a3a3a3;
             --item-bg: #1a1a1a; --input-bg: #0a0a0a;
-            
             --past: #1f1f22; --today: #ffffff; --future: #10b981;
             --saturday: #38bdf8; --sunday: #fb7185; --accent: #10b981;
             --work: #f59e0b; --day-bar: #8b5cf6; --year-bar: #3b82f6;
             --week-bar: #10b981; --bi-bar: #ec4899;
             --week-box-active: #10b981; --week-box-concluded: #3f3f46;
             --block-id: #fde047; --clock-future: #064e3b; 
-            
             --modal-bg: rgba(0,0,0,0.75); --analog-shadow: rgba(0,0,0,0.8);
             --btn-text: #000; --today-text: #000;
             --badge-meta-bg: #262626; --badge-meta-txt: #e5e5e5;
@@ -44,19 +41,16 @@
         }
 
         [data-theme="light"] {
-            /* TEMA CLARO MODERNIZADO */
             --bg: #f9fafb; --card: #ffffff; --text: #111827;
             --border: #e5e7eb; --border-input: #d1d5db;
             --muted: #9ca3af; --subtext: #4b5563;
             --item-bg: #f3f4f6; --input-bg: #ffffff;
-            
             --past: #f3f4f6; --today: #111827; --future: #059669;
             --saturday: #0284c7; --sunday: #e11d48; --accent: #059669;
             --work: #d97706; --day-bar: #7c3aed; --year-bar: #2563eb;
             --week-bar: #059669; --bi-bar: #db2777;
             --week-box-active: #10b981; --week-box-concluded: #d1d5db;
-            --block-id: #ca8a04; --clock-future: #d1fae5;
-            
+            --block-id: #ca8a04; --clock-future: #d1fae5; 
             --modal-bg: rgba(255,255,255,0.75); --analog-shadow: rgba(0,0,0,0.03);
             --btn-text: #ffffff; --today-text: #ffffff;
             --badge-meta-bg: #e5e7eb; --badge-meta-txt: #1f2937;
@@ -67,21 +61,19 @@
 
         body { 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 15px; 
+            background: var(--bg); color: var(--text); margin: 0; padding: 15px; 
             padding-top: calc(15px + env(safe-area-inset-top)); 
             overflow-x: hidden; 
             transition: background 0.3s ease, color 0.3s ease; 
         }
         
+        /* ===== HEADER ===== */
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 20px; }
-        #current-date { font-size: 1.15rem; font-weight: 500; color: var(--subtext); margin: 0; text-align: center; flex: 1; letter-spacing: -0.02em; }
+        #current-date { font-size: 1.1rem; font-weight: 600; color: var(--subtext); margin: 0; text-align: center; flex: 1; letter-spacing: -0.02em; }
         
         .theme-btn { 
             background: var(--card); border: 1px solid var(--border); cursor: pointer; 
-            font-size: 1.2rem; color: var(--text); padding: 5px; border-radius: 12px; 
+            font-size: 1.15rem; color: var(--text); padding: 0; border-radius: 12px; 
             width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; 
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
             box-shadow: var(--card-shadow); 
@@ -89,36 +81,101 @@
         .theme-btn:active { transform: scale(0.92); }
         .theme-btn:hover { border-color: var(--accent); }
 
+        /* ===== SECTION LABEL ===== */
+        .section-label {
+            display: flex; align-items: center; gap: 8px;
+            margin: 28px 0 12px 4px;
+            font-size: 0.7rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.12em;
+            color: var(--muted);
+        }
+        .section-label::after {
+            content: ''; flex: 1; height: 1px;
+            background: var(--border); margin-left: 4px;
+        }
+
+        /* ===== CLOCKS ===== */
         .clocks-container { 
             display: flex; align-items: center; justify-content: center; gap: 35px; 
-            margin-bottom: 25px; background: var(--card); padding: 25px 20px; 
+            margin-bottom: 10px; background: var(--card); padding: 25px 20px; 
             border-radius: 20px; border: 1px solid var(--border); 
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s ease; 
+            box-shadow: var(--card-shadow); transition: all 0.3s ease; 
         }
         .digital-clock { font-size: 2.4rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
         .digital-clock span { font-size: 1.1rem; color: var(--muted); font-weight: 600; margin-left: 4px; }
-        .analog-clock { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--border-input); position: relative; box-shadow: inset 0 0 16px var(--analog-shadow); background: var(--clock-future); }
+        .analog-clock { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--border-input); position: relative; background: var(--clock-future); }
         .num { position: absolute; width: 100%; height: 100%; text-align: center; z-index: 1; }
         .num span { display: inline-block; font-size: 10px; font-weight: 700; color: var(--subtext); padding-top: 5px; opacity: 0.8; }
         .n1 { transform: rotate(30deg); } .n1 span { transform: rotate(-30deg); } .n2 { transform: rotate(60deg); } .n2 span { transform: rotate(-60deg); } .n3 { transform: rotate(90deg); } .n3 span { transform: rotate(-90deg); } .n4 { transform: rotate(120deg); } .n4 span { transform: rotate(-120deg); } .n5 { transform: rotate(150deg); } .n5 span { transform: rotate(-150deg); } .n6 { transform: rotate(180deg); } .n6 span { transform: rotate(-180deg); } .n7 { transform: rotate(210deg); } .n7 span { transform: rotate(-210deg); } .n8 { transform: rotate(240deg); } .n8 span { transform: rotate(-240deg); } .n9 { transform: rotate(270deg); } .n9 span { transform: rotate(-270deg); } .n10 { transform: rotate(300deg); } .n10 span { transform: rotate(-300deg); } .n11 { transform: rotate(330deg); } .n11 span { transform: rotate(-330deg); } .n12 { transform: rotate(360deg); } .n12 span { transform: rotate(-360deg); }
         .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 4px; z-index: 2; }
-        .hand.hour { width: 4px; height: 28px; margin-left: -2px; background: var(--text); } .hand.minute { width: 3px; height: 38px; margin-left: -1.5px; background: var(--subtext); } .hand.second { width: 2px; height: 42px; margin-left: -1px; background: var(--sunday); z-index: 3; }
+        .hand.hour { width: 4px; height: 28px; margin-left: -2px; background: var(--text); } 
+        .hand.minute { width: 3px; height: 38px; margin-left: -1.5px; background: var(--subtext); } 
+        .hand.second { width: 2px; height: 42px; margin-left: -1px; background: var(--sunday); z-index: 3; }
         .clock-center { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; background: var(--text); border-radius: 50%; transform: translate(-50%, -50%); z-index: 4; border: 2px solid var(--card); }
 
-        .dock { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
-        .dock-btn { 
-            width: 48px; height: 48px; border-radius: 14px; border: 1px solid var(--border); 
-            display: flex; align-items: center; justify-content: center; cursor: pointer; 
-            background: var(--card); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
-            font-weight: 800; font-size: 0.75rem; box-shadow: var(--card-shadow);
-        }
-        .dock-btn:hover { border-color: currentColor; transform: translateY(-2px); }
-        .dock-btn.active { border-color: currentColor; transform: scale(1.08); background: var(--item-bg); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        /* ===== TIMERS ===== */
+        .timers-wrapper { margin-bottom: 0; background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--card-shadow); }
+        .timers-header { display: flex; justify-content: space-between; padding: 15px 20px; align-items: center; border-bottom: 1px solid transparent; transition: border-color 0.3s; }
+        .timers-wrapper:has(.timers-list.active) .timers-header { border-bottom-color: var(--border); }
+        .th-title { font-size: 0.9rem; font-weight: 700; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 10px; flex: 1; user-select: none; }
+        .timers-list { padding: 5px 20px 15px; display: none; background: var(--item-bg); }
+        .timers-list.active { display: block; animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+        .timer-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
+        .timer-row:first-child { border-top: none; }
+        .tr-name { font-size: 0.85rem; color: var(--text); font-weight: 600; flex: 1; }
+        .tr-val { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); letter-spacing: 0.02em; }
+        
+        @keyframes pulse-red { 0% { color: var(--sunday); opacity: 1; } 50% { color: var(--text); opacity: 0.7; } 100% { color: var(--sunday); opacity: 1; } }
+        .tr-val.done { animation: pulse-red 1.5s infinite; }
+        
+        .tr-del { color: var(--muted); font-size: 1.3rem; cursor: pointer; padding-left: 10px; transition: color 0.2s; }
+        .tr-del:hover { color: var(--sunday); }
 
+        .icon-btn { 
+            background: var(--item-bg); color: var(--text); cursor: pointer; 
+            font-size: 0.7rem; font-weight: 600; padding: 5px 10px; border-radius: 8px; 
+            transition: all 0.2s; border: 1px solid var(--border-input); 
+        }
+        .icon-btn:hover { background: var(--border-input); }
+        .icon-btn:active { transform: scale(0.95); }
+
+        /* ===== PROGRESS TABS ===== */
+        .progress-tabs {
+            display: flex; gap: 4px;
+            background: var(--card);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+            box-shadow: var(--card-shadow);
+        }
+        .progress-tab {
+            flex: 1;
+            padding: 12px 6px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.5;
+            filter: saturate(0.4);
+        }
+        .progress-tab:hover { opacity: 0.85; filter: saturate(0.8); }
+        .progress-tab.active {
+            opacity: 1;
+            filter: saturate(1);
+            background: var(--item-bg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        /* ===== PROGRESS PANELS ===== */
         .dock-panel { 
             display: none; background: var(--card); border: 1px solid var(--border); 
-            border-radius: 16px; padding: 20px; margin-bottom: 20px; 
+            border-radius: 16px; padding: 20px; margin-bottom: 0; 
             box-shadow: var(--card-shadow); animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
         }
         .dock-panel.active { display: block; }
@@ -137,36 +194,12 @@
         .tick.day-tick { font-size: 0.55rem; width: auto; letter-spacing: -0.02em; flex: 1; } 
 
         .controls-group { display: flex; align-items: center; gap: 8px; }
-        .icon-btn { 
-            background: var(--item-bg); color: var(--text); cursor: pointer; 
-            font-size: 0.7rem; font-weight: 600; padding: 4px 8px; border-radius: 8px; 
-            transition: all 0.2s; border: 1px solid var(--border-input); 
-        }
-        .icon-btn:hover { background: var(--border-input); }
-        .icon-btn:active { transform: scale(0.95); }
 
         .bar-marker { position: absolute; top: -12px; width: 14px; height: 14px; background: var(--m-color); border-radius: 50%; transform: translateX(-50%); cursor: grab; z-index: 10; border: 2px solid var(--card); box-shadow: 0 2px 6px rgba(0,0,0,0.4); touch-action: none; transition: transform 0.1s; }
         .bar-marker::after { content: ''; position: absolute; top: 12px; left: 4px; width: 2px; height: 10px; background: var(--m-color); border-radius: 1px;}
         .bar-marker:active { cursor: grabbing; transform: translateX(-50%) scale(1.15); }
 
-        /* MÓDULO DE MÚLTIPLES TEMPORIZADORES */
-        .timers-wrapper { margin-bottom: 30px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--card-shadow); }
-        .timers-header { display: flex; justify-content: space-between; padding: 15px 20px; align-items: center; border-bottom: 1px solid transparent; transition: border-color 0.3s; }
-        .timers-wrapper:has(.timers-list.active) .timers-header { border-bottom-color: var(--border); }
-        .th-title { font-size: 0.9rem; font-weight: 700; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 10px; flex: 1; user-select: none; }
-        .timers-list { padding: 5px 20px 15px; display: none; background: var(--item-bg); }
-        .timers-list.active { display: block; animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-        .timer-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
-        .timer-row:first-child { border-top: none; }
-        .tr-name { font-size: 0.85rem; color: var(--text); font-weight: 600; flex: 1; }
-        .tr-val { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); letter-spacing: 0.02em; }
-        
-        @keyframes pulse-red { 0% { color: var(--sunday); opacity: 1; } 50% { color: var(--text); opacity: 0.7; } 100% { color: var(--sunday); opacity: 1; } }
-        .tr-val.done { animation: pulse-red 1.5s infinite; }
-        
-        .tr-del { color: var(--muted); font-size: 1.3rem; cursor: pointer; padding-left: 10px; transition: color 0.2s; }
-        .tr-del:hover { color: var(--sunday); }
-
+        /* ===== MODALS ===== */
         .modal-overlay { display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -184,24 +217,35 @@
         .btn-cancel { background: var(--item-bg); color: var(--text); border: 1px solid var(--border-input); }
         .btn-delete { background: var(--sunday); color: var(--btn-text); }
 
-        .q-header { display: flex; justify-content: space-between; align-items: center; margin: 35px 0 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; cursor: pointer; transition: opacity 0.2s; }
-        .q-header:hover { opacity: 0.8; }
-        .q-title { font-size: 1.1rem; font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 8px; letter-spacing: -0.02em; }
-        .q-arrow { font-size: 0.7rem; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: var(--muted); }
-        .q-content { display: none; margin-bottom: 30px; }
-        .q-content.active { display: block; animation: slideIn 0.3s; }
+        /* ===== QUARTER HEADERS ===== */
+        .q-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin: 16px 0 10px; padding: 14px 18px;
+            background: var(--card); border: 1px solid var(--border); 
+            border-radius: 14px; cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--card-shadow);
+        }
+        .q-header:hover { border-color: var(--border-input); transform: translateY(-1px); }
+        .q-header.open { border-color: var(--accent); }
+        .q-title { font-size: 0.95rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; letter-spacing: -0.02em; }
+        .q-header.open .q-title { color: var(--accent); }
+        .q-arrow { font-size: 0.65rem; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: var(--muted); }
         .q-header.open .q-arrow { transform: rotate(180deg); }
+        .q-content { display: none; margin-bottom: 20px; }
+        .q-content.active { display: block; animation: slideIn 0.3s; }
 
+        /* ===== TASKS ===== */
         .task-mgr { margin-bottom: 25px; }
-        .t-month { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; box-shadow: var(--card-shadow); }
-        .t-month-head { padding: 15px 20px; font-size: 0.95rem; font-weight: 700; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; transition: background 0.2s;}
+        .t-month { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; box-shadow: var(--card-shadow); }
+        .t-month-head { padding: 13px 18px; font-size: 0.9rem; font-weight: 700; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; transition: background 0.2s;}
         .t-month-head:hover { background: var(--item-bg); }
-        .t-month-body { display: none; padding: 15px 20px; border-top: 1px solid var(--border); background: var(--bg); }
+        .t-month-body { display: none; padding: 15px 18px; border-top: 1px solid var(--border); background: var(--bg); }
         .t-month-body.active { display: block; animation: slideIn 0.2s; }
         
-        .t-week { border-left: 3px solid var(--block-id); margin-left: 5px; padding-left: 15px; margin-bottom: 20px; }
+        .t-week { border-left: 3px solid var(--block-id); margin-left: 5px; padding-left: 15px; margin-bottom: 18px; }
         .t-week:last-child { margin-bottom: 0; }
-        .t-week-title { font-size: 0.85rem; color: var(--block-id); font-weight: 800; margin-bottom: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 4px 0;}
+        .t-week-title { font-size: 0.85rem; color: var(--block-id); font-weight: 800; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 4px 0;}
         .t-week-body { display: none; }
         .t-week-body.active { display: block; animation: fadeIn 0.3s ease-out; }
         
@@ -230,9 +274,10 @@
         .badge-diario { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
         .badge-dia { background: var(--badge-dia-bg); color: var(--badge-dia-txt); border: 1px solid var(--badge-dia-border); }
 
+        /* ===== METRICS ===== */
         .metrics-wrapper { margin-top: 25px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); }
         .metrics-header { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; }
-        .metrics-title { font-size: 0.8rem; color: var(--subtext); font-weight: 800; letter-spacing: 0.05em; }
+        .metrics-title { font-size: 0.75rem; color: var(--subtext); font-weight: 800; letter-spacing: 0.08em; }
         .toggle-view { font-size: 0.7rem; background: var(--item-bg); padding: 6px 12px; border-radius: 12px; cursor: pointer; color: var(--text); font-weight: 700; border: 1px solid var(--border-input); transition: all 0.2s; }
         .toggle-view:hover { border-color: var(--accent); }
         .metrics-view { display: none; }
@@ -244,6 +289,7 @@
         .m-progress { flex: 1; background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; position: relative; }
         .m-fill { height: 100%; background: var(--accent); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; border-radius: 5px;}
 
+        /* ===== CALENDAR MONTHS ===== */
         .months-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; align-items: start; }
         .month { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); transition: all 0.3s ease; box-shadow: var(--card-shadow); }
         .month-name { font-size: 0.95rem; font-weight: 800; margin-bottom: 15px; color: var(--text); text-align: center; position: relative; cursor: pointer; user-select: none; letter-spacing: -0.01em; }
@@ -271,10 +317,16 @@
         .highlight-week-active .block-start { border-left-color: var(--week-box-active); border-top-left-radius: 8px; border-bottom-left-radius: 8px; } 
         .highlight-week-active .block-end { border-right-color: var(--week-box-active); border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
         
-        /* Stats Scrollbar */
         #ds-list::-webkit-scrollbar { width: 6px; }
         #ds-list::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
         #ds-list::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 4px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 380px) {
+            .digital-clock { font-size: 1.9rem; }
+            .clocks-container { gap: 20px; padding: 20px 15px; }
+            .analog-clock { width: 85px; height: 85px; }
+        }
     </style>
 </head>
 <body>
@@ -301,12 +353,14 @@
             </div>
     </div>
 
-    <div class="dock">
-        <div class="dock-btn" id="btn-block" style="color: var(--bi-bar);" onclick="togglePanel('block')">2Y</div>
-        <div class="dock-btn" id="btn-year" style="color: var(--year-bar);" onclick="togglePanel('year')">1Y</div>
-        <div class="dock-btn" id="btn-week" style="color: var(--week-bar);" onclick="togglePanel('week')">7D</div>
-        <div class="dock-btn" id="btn-work" style="color: var(--work);" onclick="togglePanel('work')">W</div>
-        <div class="dock-btn" id="btn-day" style="color: var(--day-bar);" onclick="togglePanel('day')">D</div>
+    <div class="section-label">📊 Progreso</div>
+
+    <div class="progress-tabs">
+        <button class="progress-tab" id="btn-block" style="color: var(--bi-bar);" onclick="togglePanel('block')">2Y</button>
+        <button class="progress-tab" id="btn-year" style="color: var(--year-bar);" onclick="togglePanel('year')">1Y</button>
+        <button class="progress-tab" id="btn-week" style="color: var(--week-bar);" onclick="togglePanel('week')">7D</button>
+        <button class="progress-tab" id="btn-work" style="color: var(--work);" onclick="togglePanel('work')">W</button>
+        <button class="progress-tab" id="btn-day" style="color: var(--day-bar);" onclick="togglePanel('day')">D</button>
     </div>
 
     <div id="panel-block" class="dock-panel">
@@ -335,6 +389,8 @@
         <div id="day-timer" class="timer" style="color: var(--day-bar);">--:--:--</div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-day"><div class="progress-bar"><div id="day-fill" class="fill" style="background: var(--day-bar)"></div></div></div><div class="ticks" id="day-ticks"></div></div>
     </div>
+
+    <div class="section-label">📋 Calendario</div>
 
     <div id="calendar-container"></div>
 
@@ -414,7 +470,6 @@
         
         let customTimers = JSON.parse(localStorage.getItem('wkCustomTimers')) || [];
         customTimers.forEach(t => { 
-            // Fix backwards compatibility
             if(!t.durationMs) t.durationMs = t.target - t.id;
             if(t.target - Date.now() <= 0) t.alarmPlayed = true; 
         }); 
@@ -426,7 +481,6 @@
         if(markersData.bi) { markersData.block = markersData.bi; delete markersData.bi; localStorage.setItem('wkMarkers', JSON.stringify(markersData)); }
         if(!blockConfig.startYear) { blockConfig.startYear = currentYear; localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); }
 
-        // --- EXPORTACIÓN ---
         function exportData() {
             let content = "=== COPIA DE SEGURIDAD - CONTROL PERSONAL ===\n";
             content += "Fecha de exportación: " + new Date().toLocaleString() + "\n\n";
@@ -492,9 +546,7 @@
             update();
         }
 
-        // --- SISTEMA DE PUNTOS Y LOGS DIARIOS ---
         function logTimerToDay(name, durationMs) {
-            // 1 Punto por cada 5 minutos
             let pts = Math.floor((durationMs / 60000) / 5);
             let today = new Date();
             let dateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
@@ -521,7 +573,7 @@
                     <span><strong style="color:var(--text)">${t.time}</strong> - ${t.name} <span style="color:var(--muted); font-size:0.75rem">(${t.duration}m)</span></span>
                     <span style="color:var(--accent); font-weight:bold;">+${t.points} pts</span>
                 </div>`
-            ).reverse().join(''); // Inverso para ver el último arriba
+            ).reverse().join('');
 
             if(!tHtml) tHtml = '<div style="font-size:0.85rem; color:var(--muted); padding:10px 0;">No hay temporizadores registrados este día.</div>';
             
@@ -529,7 +581,6 @@
             openModal();
         }
 
-        // --- MÚLTIPLES TEMPORIZADORES ---
         function initTimers() {
             const list = document.getElementById('timers-list');
             const arrow = document.getElementById('timers-arrow');
@@ -567,7 +618,7 @@
             customTimers.push({ id: Date.now(), name: name, target: targetMs, durationMs: durationMs, alarmPlayed: false });
             localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers));
             
-            logTimerToDay(name, durationMs); // Registrar puntos
+            logTimerToDay(name, durationMs);
 
             if(timersCollapsed) toggleTimersSection();
             renderTimersList(); update(); closeModal();
@@ -579,7 +630,7 @@
                 t.target = Date.now() + t.durationMs;
                 t.alarmPlayed = false;
                 localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers));
-                logTimerToDay(t.name, t.durationMs); // Vuelve a registrar puntos
+                logTimerToDay(t.name, t.durationMs);
                 renderTimersList();
                 update();
             }
@@ -609,13 +660,27 @@
             `).join('');
         }
 
-        // --- NAVEGACIÓN ---
+        // ===== TABS (EXCLUSIVE) =====
         function togglePanel(id) {
-            const p = document.getElementById('panel-' + id), b = document.getElementById('btn-' + id);
-            p.classList.toggle('active'); b.classList.toggle('active');
-            localStorage.setItem('panel-open-' + id, p.classList.contains('active'));
+            const ids = ['block','year','week','work','day'];
+            const wasActive = document.getElementById('panel-' + id).classList.contains('active');
+            ids.forEach(pid => {
+                document.getElementById('panel-' + pid).classList.remove('active');
+                document.getElementById('btn-' + pid).classList.remove('active');
+            });
+            if(!wasActive) {
+                document.getElementById('panel-' + id).classList.add('active');
+                document.getElementById('btn-' + id).classList.add('active');
+                localStorage.setItem('activeProgressPanel', id);
+            } else {
+                localStorage.removeItem('activeProgressPanel');
+            }
         }
-        function toggleQ(index) { document.getElementById(`q-content-${index}`).classList.toggle('active'); document.getElementById(`q-header-${index}`).classList.toggle('open'); }
+
+        function toggleQ(index) { 
+            document.getElementById(`q-content-${index}`).classList.toggle('active'); 
+            document.getElementById(`q-header-${index}`).classList.toggle('open'); 
+        }
         function toggleWeek(wNum) {
             const body = document.getElementById(`t-week-body-${wNum}`); const arrow = document.getElementById(`w-arrow-${wNum}`);
             body.classList.toggle('active'); arrow.style.transform = body.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
@@ -628,7 +693,6 @@
             else { wrap.classList.remove('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '−'; }
         }
 
-        // --- MODALES ---
         function openModal() { document.getElementById('modal-overlay').classList.add('active'); }
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
@@ -684,7 +748,6 @@
             container.innerHTML = html;
         }
 
-        // --- MARCADORES ---
         let activeMarker = null; let dragState = null;
         function addMarker(barId) {
             if(!markersData[barId]) markersData[barId] = [];
@@ -737,7 +800,6 @@
             saveMarkers(); renderMarkers(activeMarker.barId); closeModal();
         }
 
-        // --- TAREAS Y METRICAS ---
         function getTKey(wNum) { return `${currentYear}-${wNum}`; }
 
         function renderTasks(wNum) {
@@ -794,7 +856,6 @@
             }
         }
 
-        // --- BUCLE PRINCIPAL ---
         function update() {
             const now = new Date(); const year = now.getFullYear();
             const h = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
@@ -833,7 +894,6 @@
             const dP = (h / 24) * 100;
             document.getElementById('day-fill').style.width = dP.toFixed(4) + '%'; document.getElementById('day-timer').innerText = new Date((24 - h) * 3600 * 1000).toISOString().substr(11, 8); document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
 
-            // Actualizar Múltiples Temporizadores
             let timersChanged = false;
             customTimers.forEach(t => {
                 const el = document.getElementById(`t-val-${t.id}`);
@@ -865,19 +925,22 @@
             if(timersChanged) localStorage.setItem('wkCustomTimers', JSON.stringify(customTimers));
         }
 
-        // --- RENDERIZADO CALENDARIO ---
         function drawCalendar() {
             const now = new Date(); now.setHours(0,0,0,0); const year = currentYear; 
             let html = ""; let tBC = 0;
             
-            ['block', 'year', 'week', 'work', 'day'].forEach(id => {
-                if(localStorage.getItem('panel-open-' + id) === 'true') {
-                    document.getElementById('panel-'+id).classList.add('active'); document.getElementById('btn-'+id).classList.add('active');
-                }
-            });
+            // Restore single active progress panel
+            const activePanel = localStorage.getItem('activeProgressPanel');
+            if(activePanel && document.getElementById('panel-' + activePanel)) {
+                document.getElementById('panel-' + activePanel).classList.add('active');
+                document.getElementById('btn-' + activePanel).classList.add('active');
+            }
+
+            const currentQuarter = Math.floor(now.getMonth() / 3);
 
             for(let q=0; q<4; q++) {
-                html += `<div class="q-header" id="q-header-${q}" onclick="toggleQ(${q})"><div class="q-title">T${q+1} <span class="q-arrow">▼</span></div><div style="font-size: 0.65rem; color: var(--muted); font-weight:700;">OBJETIVOS</div></div><div class="q-content" id="q-content-${q}"><div class="task-mgr">`;
+                const isCurrentQ = q === currentQuarter;
+                html += `<div class="q-header ${isCurrentQ ? 'open' : ''}" id="q-header-${q}" onclick="toggleQ(${q})"><div class="q-title">T${q+1} <span class="q-arrow">▼</span></div><div style="font-size: 0.6rem; color: var(--muted); font-weight:700; letter-spacing: 0.08em; opacity: 0.6;">OBJETIVOS</div></div><div class="q-content ${isCurrentQ ? 'active' : ''}" id="q-content-${q}"><div class="task-mgr">`;
                 
                 for(let m=0; m<3; m++) {
                     let mI = q*3 + m;

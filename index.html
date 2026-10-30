@@ -461,7 +461,23 @@
         .qt-empty { color: var(--muted); font-size: 0.6rem; font-style: italic; text-align: center; padding: 10px 2px; }
         .qt-delete { color: var(--muted); font-size: 0.95rem; cursor: pointer; opacity: 0.5; font-weight: bold; padding: 0 2px; flex-shrink: 0; line-height: 1; transition: 0.2s; }
         .qt-delete:hover { opacity: 1; color: var(--sunday); }
+        
         .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.45rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
+        
+        /* NUEVA ETIQUETA DE DÍA PARA TAREAS (BADGE INLINE) */
+        .task-day-tag {
+            background: var(--input-bg);
+            border: 1px solid var(--border-input);
+            color: var(--subtext);
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-size: 0.42rem;
+            font-weight: 800;
+            display: inline-block;
+            margin-right: 4px;
+            position: relative;
+            top: -1px;
+        }
 
         @media (max-width: 380px) {
             .progress-btn { padding: 12px 2px; font-size: 0.75rem; }
@@ -1075,15 +1091,20 @@
                 tasksHtml += weekTasks.map(t => {
                     const tDay = getTaskDay(t);
                     let metaParts = [];
-                    if (tDay !== null) metaParts.push(diasFull[tDay].slice(0,3));
+                    // Ya no incluimos el día en metaParts porque va junto al título
                     if (t.hour) metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
                     const metaStr = metaParts.length > 0 ? `<div class="qt-meta">${metaParts.join(' · ')}</div>` : '';
+                    
+                    let dayTagHtml = '';
+                    if (tDay !== null) {
+                        dayTagHtml = `<span class="task-day-tag">${diasFull[tDay].slice(0,3).toUpperCase()}</span>`;
+                    }
                     
                     return `
                         <div class="qt-item ${t.done ? 'done' : ''}">
                             <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${wNum}, ${t.id})">
                             <div class="qt-info">
-                                <div class="qt-text">${t.text}</div>
+                                <div class="qt-text">${dayTagHtml}${t.text}</div>
                                 ${metaStr}
                             </div>
                             <span class="qt-delete" onclick="deleteManagedTask(${wNum}, ${t.id})">×</span>

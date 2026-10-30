@@ -67,53 +67,29 @@
             transition: background 0.3s ease, color 0.3s ease; 
         }
         
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 20px; }
-        #current-date { font-size: 1.1rem; font-weight: 600; color: var(--subtext); margin: 0; text-align: center; flex: 1; letter-spacing: -0.02em; }
-        
-        .theme-btn { 
-            background: var(--card); border: 1px solid var(--border); cursor: pointer; 
-            font-size: 1.15rem; color: var(--text); padding: 0; border-radius: 12px; 
-            width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: var(--card-shadow); 
-        }
-        .theme-btn:active { transform: scale(0.92); }
-        .theme-btn:hover { border-color: var(--accent); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin: 10px 4px 25px; }
+        .header-title { font-size: 1.3rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; margin: 0; }
+        .header-menu-btn { background: transparent; border: none; color: var(--text); font-size: 1.5rem; font-weight: bold; cursor: pointer; padding: 4px 12px; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
+        .header-menu-btn:active { transform: scale(0.9); }
 
         .section-label {
             display: flex; align-items: center; gap: 8px;
-            margin: 26px 0 12px 4px;
+            margin: 10px 0 12px 4px;
             font-size: 0.7rem; font-weight: 800;
             text-transform: uppercase; letter-spacing: 0.12em;
             color: var(--muted);
         }
         .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); margin-left: 4px; }
 
-        .clocks-container { 
-            display: flex; align-items: center; justify-content: center; gap: 35px; 
-            margin-bottom: 10px; background: var(--card); padding: 25px 20px; 
-            border-radius: 20px; border: 1px solid var(--border); 
-            box-shadow: var(--card-shadow); transition: all 0.3s ease; 
-        }
-        .digital-clock { font-size: 2.4rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-        .digital-clock span { font-size: 1.1rem; color: var(--muted); font-weight: 600; margin-left: 4px; }
-        .analog-clock { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--border-input); position: relative; background: var(--clock-future); }
-        .num { position: absolute; width: 100%; height: 100%; text-align: center; z-index: 1; }
-        .num span { display: inline-block; font-size: 10px; font-weight: 700; color: var(--subtext); padding-top: 5px; opacity: 0.8; }
-        .n1 { transform: rotate(30deg); } .n1 span { transform: rotate(-30deg); } .n2 { transform: rotate(60deg); } .n2 span { transform: rotate(-60deg); } .n3 { transform: rotate(90deg); } .n3 span { transform: rotate(-90deg); } .n4 { transform: rotate(120deg); } .n4 span { transform: rotate(-120deg); } .n5 { transform: rotate(150deg); } .n5 span { transform: rotate(-150deg); } .n6 { transform: rotate(180deg); } .n6 span { transform: rotate(-180deg); } .n7 { transform: rotate(210deg); } .n7 span { transform: rotate(-210deg); } .n8 { transform: rotate(240deg); } .n8 span { transform: rotate(-240deg); } .n9 { transform: rotate(270deg); } .n9 span { transform: rotate(-270deg); } .n10 { transform: rotate(300deg); } .n10 span { transform: rotate(-300deg); } .n11 { transform: rotate(330deg); } .n11 span { transform: rotate(-330deg); } .n12 { transform: rotate(360deg); } .n12 span { transform: rotate(-360deg); }
-        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 4px; z-index: 2; }
-        .hand.hour { width: 4px; height: 28px; margin-left: -2px; background: var(--text); } 
-        .hand.minute { width: 3px; height: 38px; margin-left: -1.5px; background: var(--subtext); } 
-        .hand.second { width: 2px; height: 42px; margin-left: -1px; background: var(--sunday); z-index: 3; }
-        .clock-center { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; background: var(--text); border-radius: 50%; transform: translate(-50%, -50%); z-index: 4; border: 2px solid var(--card); }
-
         .icon-btn { 
             background: var(--item-bg); color: var(--text); cursor: pointer; 
-            font-size: 0.7rem; font-weight: 600; padding: 5px 10px; border-radius: 8px; 
+            font-size: 1rem; font-weight: 800; padding: 2px 10px; border-radius: 8px; 
             transition: all 0.2s; border: 1px solid var(--border-input); 
+            display: flex; align-items: center; justify-content: center;
         }
         .icon-btn:hover { background: var(--border-input); }
         .icon-btn:active { transform: scale(0.95); }
+        .icon-btn.small-txt { font-size: 0.7rem; font-weight: 600; padding: 5px 10px; }
 
         .progress-buttons { display: flex; gap: 8px; margin-bottom: 4px; }
         .progress-btn {
@@ -140,9 +116,9 @@
         .label { font-size: 0.75rem; color: var(--subtext); display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
         .timer { font-size: 1.3rem; font-weight: 800; margin: 6px 0; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
         
-        .progress-container { margin-top: 12px; margin-bottom: 3px; }
+        .progress-container { margin-top: 12px; margin-bottom: 3px; position: relative; }
         .bar-wrapper { position: relative; width: 100%; height: 10px; border-radius: 5px; background: var(--border); }
-        .progress-bar { height: 100%; border-radius: 5px; overflow: hidden; position: absolute; width: 100%; top: 0; left: 0;}
+        .progress-bar { height: 100%; border-radius: inherit; overflow: hidden; position: absolute; width: 100%; top: 0; left: 0;}
         .fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         .ticks { display: flex; justify-content: space-between; padding: 0; margin-top: 8px; }
         .tick { font-size: 0.65rem; color: var(--muted); font-weight: 600; text-align: center; width: 24px; }
@@ -151,8 +127,19 @@
 
         .controls-group { display: flex; align-items: center; gap: 8px; }
 
+        /* Estilos específicos para la barra ancha del día */
+        .tall-bar { height: 32px !important; border-radius: 10px !important; }
+        .bar-text-overlay {
+            position: absolute; inset: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 14px; font-size: 0.75rem; font-weight: 700; color: #fff;
+            z-index: 10; pointer-events: none; text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+            letter-spacing: 0.02em;
+        }
+
         .bar-marker { position: absolute; top: -12px; width: 14px; height: 14px; background: var(--m-color); border-radius: 50%; transform: translateX(-50%); cursor: grab; z-index: 10; border: 2px solid var(--card); box-shadow: 0 2px 6px rgba(0,0,0,0.4); touch-action: none; transition: transform 0.1s; }
         .bar-marker::after { content: ''; position: absolute; top: 12px; left: 4px; width: 2px; height: 10px; background: var(--m-color); border-radius: 1px;}
+        .tall-bar .bar-marker::after { height: 32px; }
         .bar-marker:active { cursor: grabbing; transform: translateX(-50%) scale(1.15); }
 
         .years-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
@@ -374,25 +361,11 @@
         }
         .tc-field input[type="time"] { color-scheme: dark; }
         [data-theme="light"] .tc-field input[type="time"] { color-scheme: light; }
+        .tc-field input[type="color"] { padding: 2px; height: 32px; width: 48px; cursor: pointer; border-radius: 8px; }
 
-        /* Input de color en modal de tarea */
-        .tc-field input[type="color"] {
-            padding: 2px;
-            height: 32px;
-            width: 48px;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-
-        /* Marcas de tareas sobre la barra del día: segmentos de 1 hora */
         .day-task-mark {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            border-radius: 2px;
-            pointer-events: none;
-            z-index: 5;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
+            position: absolute; top: 0; height: 100%; border-radius: 2px;
+            pointer-events: none; z-index: 5; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
             transition: opacity 0.3s;
         }
 
@@ -408,22 +381,9 @@
         .m-progress { flex: 1; background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; position: relative; }
         .m-fill { height: 100%; background: var(--accent); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; border-radius: 5px;}
 
-        .months-container { 
-            display: grid; 
-            grid-template-columns: repeat(2, minmax(0, 1fr)); 
-            gap: 8px; 
-            align-items: stretch;
-        }
-        .month { 
-            background: var(--card); padding: 10px 8px; border-radius: 12px; 
-            border: 1px solid var(--border); transition: all 0.3s ease; 
-            box-shadow: var(--card-shadow); min-width: 0;
-        }
-        .month-name { 
-            font-size: 0.72rem; font-weight: 800; margin-bottom: 6px; color: var(--text); 
-            text-align: center; position: relative; cursor: pointer; user-select: none; 
-            letter-spacing: -0.01em;
-        }
+        .months-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
+        .month { background: var(--card); padding: 10px 8px; border-radius: 12px; border: 1px solid var(--border); transition: all 0.3s ease; box-shadow: var(--card-shadow); min-width: 0; }
+        .month-name { font-size: 0.72rem; font-weight: 800; margin-bottom: 6px; color: var(--text); text-align: center; position: relative; cursor: pointer; user-select: none; letter-spacing: -0.01em; }
         .month-toggle { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 0.95rem; color: var(--muted); font-weight: 400; }
         .month.collapsed { padding: 10px 8px; background: var(--item-bg); }
         .month.collapsed .days-grid { display: none; }
@@ -431,22 +391,11 @@
 
         .days-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; text-align: center; }
         .week-day { font-size: 0.48rem; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
-        .day { 
-            font-size: 0.6rem; aspect-ratio: 1; display: flex; align-items: center; 
-            justify-content: center; font-weight: 600; border: 1px solid transparent; 
-            box-sizing: border-box; margin-top: 3px; position: relative; border-radius: 4px; 
-            transition: transform 0.2s, background 0.2s, box-shadow 0.2s; cursor: pointer; min-width: 0;
-        }
+        .day { font-size: 0.6rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: 600; border: 1px solid transparent; box-sizing: border-box; margin-top: 3px; position: relative; border-radius: 4px; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; cursor: pointer; min-width: 0; }
         .day:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: var(--item-bg); }
         
         .block-label { position: absolute; top: -10px; left: 0; font-size: 0.42rem; color: var(--block-id); font-weight: 800; z-index: 10; }
-
-        .task-dot {
-            position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%);
-            width: 3px; height: 3px; border-radius: 50%;
-            background: var(--accent); box-shadow: 0 0 3px var(--accent);
-            pointer-events: none;
-        }
+        .task-dot { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 3px var(--accent); pointer-events: none; }
 
         @keyframes pulse-border { 0% { box-shadow: 0 0 0px var(--week-box-active); } 50% { box-shadow: 0 0 8px var(--week-box-active); } 100% { box-shadow: 0 0 0px var(--week-box-active); } }
         .current-week-glow .day { animation: pulse-border 2.5s infinite; z-index: 1; }
@@ -462,41 +411,25 @@
 
         .quarter-tasks-panel {
             background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-            padding: 10px 8px; box-shadow: var(--card-shadow);
-            display: flex; flex-direction: column;
+            padding: 10px 8px; box-shadow: var(--card-shadow); display: flex; flex-direction: column;
             height: 200px; overflow: hidden; min-width: 0;
         }
-        .qt-title {
-            font-size: 0.7rem; font-weight: 800; color: var(--text);
-            margin-bottom: 6px; text-align: center;
-            padding-bottom: 6px; border-bottom: 1px solid var(--border);
-            letter-spacing: -0.01em;
-        }
+        .qt-title { font-size: 0.7rem; font-weight: 800; color: var(--text); margin-bottom: 6px; text-align: center; padding-bottom: 6px; border-bottom: 1px solid var(--border); letter-spacing: -0.01em; }
         .qt-list { flex: 1; overflow-y: auto; padding-right: 3px; min-height: 0; }
         .qt-list::-webkit-scrollbar { width: 4px; }
         .qt-list::-webkit-scrollbar-track { background: transparent; }
         .qt-list::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 2px; }
-        .qt-item {
-            display: flex; align-items: flex-start; gap: 6px; padding: 5px 0;
-            border-bottom: 1px solid var(--border); font-size: 0.72rem;
-        }
+        .qt-item { display: flex; align-items: flex-start; gap: 6px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.72rem; }
         .qt-item:last-child { border-bottom: none; }
         .qt-item.done .qt-text { text-decoration: line-through; color: var(--muted); opacity: 0.65; }
         .qt-info { flex: 1; min-width: 0; }
         .qt-text { color: var(--text); font-weight: 500; line-height: 1.25; word-break: break-word; font-size: 0.72rem; }
         .qt-meta { font-size: 0.55rem; color: var(--muted); margin-top: 2px; font-weight: 600; letter-spacing: 0.02em; }
         .qt-empty { color: var(--muted); font-size: 0.68rem; font-style: italic; text-align: center; padding: 20px 6px; }
-        .qt-delete {
-            color: var(--muted); font-size: 0.95rem; cursor: pointer;
-            opacity: 0.5; font-weight: bold; padding: 0 2px;
-            flex-shrink: 0; line-height: 1; transition: 0.2s;
-        }
+        .qt-delete { color: var(--muted); font-size: 0.95rem; cursor: pointer; opacity: 0.5; font-weight: bold; padding: 0 2px; flex-shrink: 0; line-height: 1; transition: 0.2s; }
         .qt-delete:hover { opacity: 1; color: var(--sunday); }
 
         @media (max-width: 380px) {
-            .digital-clock { font-size: 1.9rem; }
-            .clocks-container { gap: 20px; padding: 20px 15px; }
-            .analog-clock { width: 85px; height: 85px; }
             .progress-btn { padding: 12px 2px; font-size: 0.75rem; }
             .day { font-size: 0.55rem; margin-top: 2px; }
             .week-day { font-size: 0.42rem; }
@@ -510,17 +443,8 @@
 </head>
 <body>
     <div class="header-top">
-        <button class="theme-btn" onclick="exportData()" title="Exportar">💾</button>
-        <h2 id="current-date">Cargando...</h2>
-        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Tema">🌙</button>
-    </div>
-
-    <div class="clocks-container">
-        <div class="analog-clock" id="analog-clock">
-            <div class="num n1"><span>1</span></div><div class="num n2"><span>2</span></div><div class="num n3"><span>3</span></div><div class="num n4"><span>4</span></div><div class="num n5"><span>5</span></div><div class="num n6"><span>6</span></div><div class="num n7"><span>7</span></div><div class="num n8"><span>8</span></div><div class="num n9"><span>9</span></div><div class="num n10"><span>10</span></div><div class="num n11"><span>11</span></div><div class="num n12"><span>12</span></div>
-            <div class="hand hour" id="hour-hand"></div><div class="hand minute" id="minute-hand"></div><div class="hand second" id="second-hand"></div><div class="clock-center"></div>
-        </div>
-        <div class="digital-clock" id="digital-clock">--:--:--</div>
+        <h2 class="header-title">Control Personal</h2>
+        <button class="header-menu-btn" onclick="openGeneralModal()" title="Menú">⋮</button>
     </div>
 
     <div class="section-label">📊 Progreso</div>
@@ -544,30 +468,38 @@
     </div>
 
     <div id="panel-block" class="dock-panel">
-        <div class="label"><span style="color: var(--bi-bar); font-weight: 800;" id="label-block">Bloque Años</span> <div class="controls-group"><span id="block-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openBlockModal()">⚙️</button><button class="icon-btn" onclick="addMarker('block')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--bi-bar); font-weight: 800;" id="label-block">Bloque Años</span> <div class="controls-group"><span id="block-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openBlockModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('block')">+📍</button></div></div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-block"><div class="progress-bar"><div id="block-fill" class="fill" style="background: var(--bi-bar);"></div></div></div><div class="ticks" id="block-ticks"></div></div>
     </div>
 
     <div id="panel-year" class="dock-panel">
-        <div class="label"><span style="color: var(--year-bar); font-weight: 800;" id="label-year">Año Actual</span> <div class="controls-group"><span id="year-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="addMarker('year')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--year-bar); font-weight: 800;" id="label-year">Año Actual</span> <div class="controls-group"><span id="year-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn small-txt" onclick="addMarker('year')">+📍</button></div></div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-year"><div class="progress-bar"><div id="year-fill" class="fill" style="background: var(--year-bar);"></div></div></div><div class="ticks"><span class="tick">E</span><span class="tick">F</span><span class="tick">M</span><span class="tick">A</span><span class="tick">M</span><span class="tick">J</span><span class="tick">J</span><span class="tick">A</span><span class="tick">S</span><span class="tick">O</span><span class="tick">N</span><span class="tick">D</span></div></div>
     </div>
 
     <div id="panel-week" class="dock-panel">
-        <div class="label"><span style="color: var(--week-bar); font-weight: 800;">Semana Actual</span> <div class="controls-group"><span id="week-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="addMarker('week')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--week-bar); font-weight: 800;">Semana Actual</span> <div class="controls-group"><span id="week-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn small-txt" onclick="addMarker('week')">+📍</button></div></div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-week"><div class="progress-bar"><div id="week-fill" class="fill" style="background: var(--week-bar);"></div></div></div><div class="ticks"><span class="tick">L</span><span class="tick">M</span><span class="tick">M</span><span class="tick">J</span><span class="tick">V</span><span class="tick">S</span><span class="tick">D</span></div></div>
     </div>
 
     <div id="panel-work" class="dock-panel">
-        <div class="label"><span id="label-work" style="font-weight: 800;">Jornada</span> <div class="controls-group"><span id="work-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openWorkModal()">⚙️</button><button class="icon-btn" onclick="addMarker('work')">+📍</button></div></div>
+        <div class="label"><span id="label-work" style="font-weight: 800;">Jornada</span> <div class="controls-group"><span id="work-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openWorkModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('work')">+📍</button></div></div>
         <div id="work-timer" class="timer" style="color: var(--work);">--:--:--</div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-work"><div class="progress-bar"><div id="work-fill" class="fill" style="background: var(--work)"></div></div></div><div class="ticks" id="work-ticks"></div></div>
     </div>
 
     <div id="panel-day" class="dock-panel">
-        <div class="label"><span style="font-weight: 800;">Día Actual (24h)</span> <div class="controls-group"><span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openDayModal()">⚙️</button><button class="icon-btn" onclick="addMarker('day')">+📍</button></div></div>
-        <div id="day-timer" class="timer" style="color: var(--day-bar);">--:--:--</div>
-        <div class="progress-container"><div class="bar-wrapper" id="bar-day"><div class="progress-bar"><div id="day-fill" class="fill" style="background: var(--day-bar)"></div></div></div><div class="ticks" id="day-ticks"></div></div>
+        <div class="label"><span style="font-weight: 800;">Día Actual (24h)</span> <div class="controls-group"><span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openDayModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('day')">+📍</button></div></div>
+        <div class="progress-container">
+            <div class="bar-wrapper tall-bar" id="bar-day">
+                <div class="progress-bar"><div id="day-fill" class="fill" style="background: var(--day-bar)"></div></div>
+                <div class="bar-text-overlay">
+                    <span id="overlay-date">Cargando...</span>
+                    <span id="overlay-time"></span>
+                </div>
+            </div>
+            <div class="ticks" id="day-ticks"></div>
+        </div>
     </div>
 
     <div class="section-label">📋 Calendario</div>
@@ -592,6 +524,16 @@
 
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
+            
+            <div id="modal-content-general" style="display:none;">
+                <h3 style="color: var(--accent); margin-bottom: 20px;">Configuración</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <button class="btn btn-cancel" onclick="toggleTheme(); closeModal()">Alternar Tema Oscuro / Claro</button>
+                    <button class="btn btn-cancel" onclick="exportData(); closeModal()">Exportar Datos (Copia de Seguridad)</button>
+                </div>
+                <div class="modal-actions" style="margin-top: 25px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div>
+            </div>
+
             <div id="modal-content-taskcreate" style="display:none;">
                 <h3>Nueva Tarea</h3>
                 <div class="tc-desc">
@@ -808,17 +750,17 @@
             URL.revokeObjectURL(url);
         }
 
-        function setInitialThemeIcon() {
-            const theme = document.documentElement.getAttribute('data-theme');
-            document.getElementById('theme-btn').innerText = theme === 'light' ? '☀️' : '🌙';
-        }
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', currentTheme);
             localStorage.setItem('wkTheme', currentTheme);
             document.getElementById('theme-color-meta').setAttribute('content', currentTheme === 'light' ? '#f9fafb' : '#0a0a0a');
-            document.getElementById('theme-btn').innerText = currentTheme === 'light' ? '☀️' : '🌙';
             update();
+        }
+
+        function openGeneralModal() {
+            document.getElementById('modal-content-general').style.display = 'block';
+            openModal();
         }
 
         function showDayStats(dateStr, wNum, dI) {
@@ -1293,7 +1235,7 @@
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
             document.getElementById('modal-overlay').classList.remove('active');
-            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics'].forEach(id => {
+            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
@@ -1394,7 +1336,6 @@
             saveMarkers(); renderMarkers(activeMarker.barId); closeModal();
         }
 
-        // NUEVO: pintar segmentos de 1 hora sobre la barra del día con el color de cada tarea
         let lastDayMarksSig = '';
         function renderDayTaskMarks() {
             const container = document.getElementById('bar-day');
@@ -1428,9 +1369,7 @@
                 const hour = parseInt(hStr);
                 const minute = parseInt(mStr) || 0;
 
-                // Posición de inicio (en % del día de 24h)
                 const startPct = ((hour * 60 + minute) / (24 * 60)) * 100;
-                // Duración de 1 hora → 100/24 ≈ 4.1667% del ancho total
                 const endPct = Math.min(100, startPct + (100 / 24));
 
                 const mark = document.createElement('div');
@@ -1447,19 +1386,14 @@
         function update() {
             const now = new Date(); const year = now.getFullYear();
             const h = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
-            
-            document.getElementById('current-date').innerText = `${now.getDate()} de ${meses[now.getMonth()]}, ${year}`;
-            const hh = now.getHours(), mm = now.getMinutes(), ss = now.getSeconds();
+            const hh = now.getHours(), mm = now.getMinutes();
             const ampm = hh >= 12 ? 'PM' : 'AM', displayHour = hh % 12 || 12; 
-            document.getElementById('digital-clock').innerHTML = `${String(displayHour).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')} <span>${ampm}</span>`;
-            
-            const hDeg = (hh % 12) * 30 + mm * 0.5, mDeg = mm * 6 + ss * 0.1, sDeg = ss * 6;
-            const pastColor = getComputedStyle(document.documentElement).getPropertyValue('--past').trim();
-            const clockFutureColor = getComputedStyle(document.documentElement).getPropertyValue('--clock-future').trim();
-            document.getElementById('hour-hand').style.transform = `rotate(${hDeg}deg)`;
-            document.getElementById('minute-hand').style.transform = `rotate(${mDeg}deg)`;
-            document.getElementById('second-hand').style.transform = `rotate(${sDeg}deg)`;
-            document.getElementById('analog-clock').style.background = `conic-gradient(${pastColor} ${hDeg}deg, ${clockFutureColor} ${hDeg}deg)`;
+
+            // Textos sobre la barra del Día Actual
+            const overlayDate = document.getElementById('overlay-date');
+            const overlayTime = document.getElementById('overlay-time');
+            if (overlayDate) overlayDate.innerText = `${now.getDate()} de ${meses[now.getMonth()]}, ${year}`;
+            if (overlayTime) overlayTime.innerText = `${displayHour}:${String(mm).padStart(2, '0')} ${ampm}`;
 
             const startBlock = blockConfig.startYear; const endBlock = startBlock + blockConfig.years;
             const blockTotalMs = new Date(endBlock, 0, 1) - new Date(startBlock, 0, 1);
@@ -1489,7 +1423,6 @@
 
             const dP = (h / 24) * 100;
             document.getElementById('day-fill').style.width = dP.toFixed(4) + '%';
-            document.getElementById('day-timer').innerText = new Date((24 - h) * 3600 * 1000).toISOString().substr(11, 8);
             document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
 
             renderDayTaskMarks();
@@ -1499,7 +1432,6 @@
             }
         }
 
-        setInitialThemeIcon();
         restoreBars();
         drawCalendar();
         renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();

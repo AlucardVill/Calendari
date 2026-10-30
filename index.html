@@ -464,27 +464,14 @@
         
         .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.45rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
         
-        /* NUEVA ETIQUETA DE DÍA PARA TAREAS (DESPUÉS DEL TEXTO) */
+        /* ETIQUETA DE DÍA DISCRETA (SOLO TEXTO AMARILLO/NARANJA) */
         .task-day-tag {
-            background: rgba(139, 92, 246, 0.15); /* Color morado suave */
-            color: var(--day-bar);
-            border: none;
-            padding: 2px 5px;
-            border-radius: 4px;
-            font-size: 0.45rem;
-            font-weight: 800;
+            color: var(--block-id);
+            font-size: 0.5rem;
+            font-weight: 700;
             display: inline-block;
-            margin-left: 6px; /* Separación al ponerla después del texto */
-            vertical-align: middle;
-            position: relative;
-            top: -1px;
-            letter-spacing: 0.05em;
-        }
-        /* ESTILO ESPECÍFICO PARA "HOY" */
-        .task-day-tag.today {
-            background: var(--accent);
-            color: var(--btn-text);
-            box-shadow: 0 2px 5px rgba(16, 185, 129, 0.3);
+            margin-left: 5px;
+            letter-spacing: 0.02em;
         }
 
         @media (max-width: 380px) {
@@ -1116,7 +1103,7 @@
                         }
 
                         if (isHoy) {
-                            dayTagHtml = `<span class="task-day-tag today">HOY</span>`;
+                            dayTagHtml = `<span class="task-day-tag">HOY</span>`;
                         } else {
                             dayTagHtml = `<span class="task-day-tag">${diasFull[tDay].slice(0,3).toUpperCase()}</span>`;
                         }

@@ -118,8 +118,13 @@
         
         .progress-container { margin-top: 12px; margin-bottom: 3px; position: relative; }
         .bar-wrapper { position: relative; width: 100%; height: 10px; border-radius: 5px; background: var(--border); }
-        .progress-bar { height: 100%; border-radius: inherit; overflow: hidden; position: absolute; width: 100%; top: 0; left: 0;}
+        
+        .progress-bar { height: 100%; border-radius: inherit; overflow: hidden; position: absolute; width: 100%; top: 0; left: 0; z-index: 2; pointer-events: none; }
         .fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        #day-fill { background: var(--day-bar); opacity: 0.7; mix-blend-mode: hard-light; }
+        [data-theme="light"] #day-fill { mix-blend-mode: multiply; opacity: 0.5; }
+
         .ticks { display: flex; justify-content: space-between; padding: 0; margin-top: 8px; }
         .tick { font-size: 0.65rem; color: var(--muted); font-weight: 600; text-align: center; width: 24px; }
         .tick.year-tick { width: 40px; } 
@@ -289,7 +294,10 @@
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .modal-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 22px; width: 300px; max-width: 90vw; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-        .modal-card h3 { margin: 0 0 16px; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+        .modal-card h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+        
+        .modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+
         .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--subtext); font-weight: 500;}
         .input-group input[type="text"], .input-group input[type="number"], .input-group input[type="time"], .input-group select { width: auto; min-width: 70px; max-width: 170px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 8px; border-radius: 8px; text-align: center; font-weight: 600; font-family: inherit; transition: border-color 0.2s; outline: none;}
         .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
@@ -334,9 +342,27 @@
         [data-theme="light"] .tc-field input[type="time"] { color-scheme: light; }
         .tc-field input[type="color"] { padding: 2px; height: 32px; width: 100%; cursor: pointer; border-radius: 8px; }
 
+        /* CHECKBOX GROUPS PARA ENTORNOS */
+        .checkbox-group { display: flex; gap: 4px; flex-wrap: wrap; }
+        .chk-btn {
+            background: var(--input-bg); border: 1px solid var(--border-input);
+            color: var(--muted); padding: 5px 8px; border-radius: 6px;
+            font-size: 0.72rem; font-weight: 700; cursor: pointer; user-select: none;
+            transition: all 0.2s; text-align: center; flex: 1; min-width: 25px;
+        }
+        .chk-btn.active {
+            background: var(--accent); color: var(--btn-text); border-color: var(--accent);
+        }
+
+        .toggle-mode-btn {
+            background: none; border: none; color: var(--accent); 
+            font-size: 0.7rem; font-weight: 700; cursor: pointer; 
+            padding: 4px; text-decoration: underline; text-underline-offset: 2px;
+        }
+
         .day-task-mark {
             position: absolute; top: 0; height: 100%; border-radius: 2px;
-            pointer-events: none; z-index: 5; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
+            pointer-events: none; z-index: 1; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
             transition: opacity 0.3s;
         }
 
@@ -383,7 +409,7 @@
         .quarter-tasks-panel {
             background: var(--card); border: 1px solid var(--border); border-radius: 12px;
             padding: 10px 8px; box-shadow: var(--card-shadow); display: flex; flex-direction: column;
-            height: 200px; overflow: hidden; min-width: 0;
+            height: 250px; overflow: hidden; min-width: 0; margin-top: 10px;
         }
         .qt-title { font-size: 0.7rem; font-weight: 800; color: var(--text); margin-bottom: 6px; text-align: center; padding-bottom: 6px; border-bottom: 1px solid var(--border); letter-spacing: -0.01em; }
         .qt-list { flex: 1; overflow-y: auto; padding-right: 3px; min-height: 0; }
@@ -399,6 +425,7 @@
         .qt-empty { color: var(--muted); font-size: 0.68rem; font-style: italic; text-align: center; padding: 20px 6px; }
         .qt-delete { color: var(--muted); font-size: 0.95rem; cursor: pointer; opacity: 0.5; font-weight: bold; padding: 0 2px; flex-shrink: 0; line-height: 1; transition: 0.2s; }
         .qt-delete:hover { opacity: 1; color: var(--sunday); }
+        .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.5rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
 
         @media (max-width: 380px) {
             .progress-btn { padding: 12px 2px; font-size: 0.75rem; }
@@ -408,7 +435,6 @@
             .block-label { font-size: 0.38rem; top: -8px; }
             .qt-text { font-size: 0.65rem; }
             .qt-meta { font-size: 0.5rem; }
-            .quarter-tasks-panel { padding: 8px 6px; height: 180px; }
         }
     </style>
 </head>
@@ -463,7 +489,7 @@
         <div class="label"><span style="font-weight: 800;">Día Actual (24h)</span> <div class="controls-group"><span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openDayModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('day')">+📍</button></div></div>
         <div class="progress-container">
             <div class="bar-wrapper tall-bar" id="bar-day">
-                <div class="progress-bar"><div id="day-fill" class="fill" style="background: var(--day-bar)"></div></div>
+                <div class="progress-bar"><div id="day-fill" class="fill"></div></div>
                 <div class="bar-text-overlay">
                     <span id="overlay-date">Cargando...</span>
                     <span id="overlay-time"></span>
@@ -481,7 +507,7 @@
         <div class="calendar-detail" onclick="event.stopPropagation()">
             <div class="calendar-detail-header">
                 <div class="header-btns left">
-                    <button class="add-task-btn" onclick="openTaskCreateModal()" title="Añadir tarea">＋</button>
+                    <button class="add-task-btn" onclick="openTaskCreateModal()" title="Añadir">＋</button>
                 </div>
                 <div class="calendar-detail-title" id="calendar-detail-title">T1</div>
                 <div class="header-btns right">
@@ -496,6 +522,7 @@
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             
+            <!-- MODAL GENERAL / OPCIONES -->
             <div id="modal-content-general" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 20px;">Configuración</h3>
                 <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -505,51 +532,80 @@
                 <div class="modal-actions" style="margin-top: 25px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div>
             </div>
 
+            <!-- MODAL CREADOR DUAL: TAREAS / ENTORNOS -->
             <div id="modal-content-taskcreate" style="display:none;">
-                <h3>Nueva Tarea</h3>
+                <div class="modal-header-flex">
+                    <h3 id="tc-main-title">Nueva Acción</h3>
+                    <button class="toggle-mode-btn" id="btn-toggle-tc" onclick="toggleTcMode()">⟲ Crear Entorno</button>
+                </div>
+                
                 <div class="tc-desc">
-                    <input type="text" id="inp-tc-title" placeholder="Descripción de la tarea...">
+                    <input type="text" id="inp-tc-title" placeholder="Descripción...">
                 </div>
+
                 <div class="tc-row">
-                    <div class="tc-field">
-                        <label>Mes</label>
-                        <select id="inp-tc-month" onchange="updateWeekDropdown()"></select>
-                    </div>
-                    <div class="tc-field">
-                        <label>Semana</label>
-                        <select id="inp-tc-week"></select>
+                    <div class="tc-field" style="grid-column: span 2;">
+                        <label>Color representativo</label>
+                        <input type="color" id="inp-tc-color" value="#3b82f6" style="width: 100%;">
                     </div>
                 </div>
-                <div class="tc-row">
-                    <div class="tc-field">
-                        <label>Día</label>
+
+                <!-- CAMPOS EXCLUSIVOS DE "ACCIÓN" (TAREA) -->
+                <div id="tc-tarea-fields">
+                    <div class="tc-row">
+                        <div class="tc-field"><label>Mes</label><select id="inp-tc-month" onchange="updateWeekDropdown()"></select></div>
+                        <div class="tc-field"><label>Semana</label><select id="inp-tc-week"></select></div>
+                    </div>
+                    <div class="tc-field" style="margin-bottom: 12px;">
+                        <label>Día (Opcional)</label>
                         <select id="inp-tc-day">
                             <option value="">—</option>
-                            <option value="0">Lunes</option>
-                            <option value="1">Martes</option>
-                            <option value="2">Miércoles</option>
-                            <option value="3">Jueves</option>
-                            <option value="4">Viernes</option>
-                            <option value="5">Sábado</option>
+                            <option value="0">Lunes</option><option value="1">Martes</option><option value="2">Miércoles</option>
+                            <option value="3">Jueves</option><option value="4">Viernes</option><option value="5">Sábado</option>
                             <option value="6">Domingo</option>
                         </select>
                     </div>
-                    <div class="tc-field">
-                        <label>Color Tarea</label>
-                        <input type="color" id="inp-tc-color" value="#3b82f6">
+                </div>
+
+                <!-- CAMPOS EXCLUSIVOS DE "ENTORNO" (RUTINA) -->
+                <div id="tc-entorno-fields" style="display:none;">
+                    <div class="tc-field" style="margin-bottom: 12px;">
+                        <label>Meses del Trimestre</label>
+                        <div class="checkbox-group" id="chk-months"></div>
+                    </div>
+                    <div class="tc-field" style="margin-bottom: 12px;">
+                        <label>Semanas del Mes</label>
+                        <div class="checkbox-group" id="chk-weeks">
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">W0</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="1">W1</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="2">W2</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="3">W3</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="4">W4</div>
+                        </div>
+                    </div>
+                    <div class="tc-field" style="margin-bottom: 12px;">
+                        <label>Días de la semana</label>
+                        <div class="checkbox-group" id="chk-days">
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">L</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="1">M</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="2">M</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="3">J</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="4">V</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="5">S</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="6">D</div>
+                        </div>
                     </div>
                 </div>
+
                 <div class="tc-row">
-                    <div class="tc-field">
-                        <label>Hora Inicio (Opcional)</label>
-                        <input type="time" id="inp-tc-hour">
-                    </div>
-                    <div class="tc-field">
-                        <label>Hora Fin (Opcional)</label>
-                        <input type="time" id="inp-tc-hourEnd">
-                    </div>
+                    <div class="tc-field"><label>Hora Inicio (Opc)</label><input type="time" id="inp-tc-hour"></div>
+                    <div class="tc-field"><label>Hora Fin (Opc)</label><input type="time" id="inp-tc-hourEnd"></div>
                 </div>
-                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveNewManagedTask()">Guardar</button></div>
+
+                <div class="modal-actions">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn btn-save" onclick="saveTcRecord()">Guardar</button>
+                </div>
             </div>
 
             <div id="modal-content-metrics" style="display:none;">
@@ -609,34 +665,14 @@
         
         let rawTasks = JSON.parse(localStorage.getItem('wkTasks')) || {};
         let tasksData = {};
-        let migrated = false;
         for (let key in rawTasks) {
-            if (!key.includes('-')) { tasksData[`${currentYear}-${key}`] = rawTasks[key]; migrated = true; } 
+            if (!key.includes('-')) { tasksData[`${currentYear}-${key}`] = rawTasks[key]; } 
             else { tasksData[key] = rawTasks[key]; }
         }
-        if (migrated) localStorage.setItem('wkTasks', JSON.stringify(tasksData));
+        localStorage.setItem('wkTasks', JSON.stringify(tasksData));
 
-        const MIGRATION_KEY = 'wkTaskMig_v3';
-        if (!localStorage.getItem(MIGRATION_KEY)) {
-            let migratedData = {};
-            for (let key in tasksData) {
-                const parts = key.split('-');
-                if (parts.length !== 2) { migratedData[key] = tasksData[key]; continue; }
-                const yearStr = parts[0];
-                const oldSlot = parseInt(parts[1]);
-                if (!isNaN(oldSlot) && oldSlot >= 1 && oldSlot <= 48) {
-                    const mI = Math.floor((oldSlot - 1) / 4);
-                    const localW = ((oldSlot - 1) % 4) + 1;
-                    const newSlot = mI * 5 + localW;
-                    migratedData[`${yearStr}-${newSlot}`] = tasksData[key];
-                } else {
-                    migratedData[key] = tasksData[key];
-                }
-            }
-            tasksData = migratedData;
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData));
-            localStorage.setItem(MIGRATION_KEY, 'true');
-        }
+        // NUEVO: Almacenamiento de Entornos
+        let entornosData = JSON.parse(localStorage.getItem('wkEntornos')) || [];
 
         // --- SISTEMA DE AÑOS TRACKEADOS ---
         let trackedYears = JSON.parse(localStorage.getItem('wkYears'));
@@ -653,61 +689,39 @@
             localStorage.setItem('wkYears', JSON.stringify(trackedYears));
         }
 
-        function getAvailableYears() {
-            return trackedYears.sort((a, b) => a - b);
-        }
-
+        function getAvailableYears() { return trackedYears.sort((a, b) => a - b); }
         function promptAddYear() {
             let y = prompt("Ingresa el año que deseas crear (ej. 2027):");
             if (y) {
                 y = parseInt(y);
                 if (!isNaN(y) && y > 2000 && y < 2100) {
                     if (!trackedYears.includes(y)) {
-                        trackedYears.push(y);
-                        localStorage.setItem('wkYears', JSON.stringify(trackedYears));
-                        drawCalendar();
-                    } else {
-                        alert("Ese año ya existe.");
-                    }
-                } else {
-                    alert("Por favor, ingresa un año válido.");
-                }
+                        trackedYears.push(y); localStorage.setItem('wkYears', JSON.stringify(trackedYears)); drawCalendar();
+                    } else alert("Ese año ya existe.");
+                } else alert("Por favor, ingresa un año válido.");
             }
         }
-
         function deleteYear(e, y) {
             e.stopPropagation();
-            if (y === new Date().getFullYear()) {
-                alert("No puedes eliminar el año actual.");
-                return;
-            }
-            if (confirm(`¿Estás seguro de eliminar el año ${y} y TODAS sus tareas guardadas?`)) {
+            if (y === new Date().getFullYear()) { alert("No puedes eliminar el año actual."); return; }
+            if (confirm(`¿Estás seguro de eliminar el año ${y} y TODOS sus registros?`)) {
                 trackedYears = trackedYears.filter(yr => yr !== y);
                 localStorage.setItem('wkYears', JSON.stringify(trackedYears));
-                
-                for(let key in tasksData) {
-                    if (key.startsWith(y + '-')) {
-                        delete tasksData[key];
-                    }
-                }
+                for(let key in tasksData) if (key.startsWith(y + '-')) delete tasksData[key];
                 localStorage.setItem('wkTasks', JSON.stringify(tasksData));
-                
-                if (selectedYear === y) {
-                    calendarView = 'years';
-                }
+                entornosData = entornosData.filter(en => en.year !== y);
+                localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
+                if (selectedYear === y) calendarView = 'years';
                 drawCalendar();
             }
         }
-        // ----------------------------------
 
         let workConfig = JSON.parse(localStorage.getItem('wkWorkCfg')) || { start: 7, end: 17 };
         let blockConfig = JSON.parse(localStorage.getItem('wkBlockCfg')) || { years: 2, startYear: currentYear };
         let dayConfig = JSON.parse(localStorage.getItem('wkDayCfg')) || { format: '24h' };
-        
         let markersData = JSON.parse(localStorage.getItem('wkMarkers')) || { block:[], year:[], week:[], work:[], day:[] };
         let collapsedMonths = JSON.parse(localStorage.getItem('wkCollapsedMonths')) || {};
 
-        if(markersData.bi) { markersData.block = markersData.bi; delete markersData.bi; localStorage.setItem('wkMarkers', JSON.stringify(markersData)); }
         if(!blockConfig.startYear) { blockConfig.startYear = currentYear; localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); }
 
         let calendarView = localStorage.getItem('wkCalView') || 'years';
@@ -718,17 +732,13 @@
         if (isNaN(selectedQuarter) || selectedQuarter < 0 || selectedQuarter > 3) selectedQuarter = 0;
 
         let quarterBarMode = parseInt(localStorage.getItem('wkQBarMode')) || 0;
-        if (isNaN(quarterBarMode) || quarterBarMode < 0 || quarterBarMode > 2) quarterBarMode = 0;
+        
+        let tcMode = 'tarea'; // 'tarea' o 'entorno'
 
-        function getTaskDay(t) {
-            if (t.day !== null && t.day !== undefined) return t.day;
-            if (t.type && dayTypeMap[t.type] !== undefined) return dayTypeMap[t.type];
-            return null;
-        }
+        function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
         function getWeeksForMonth(year, mI) {
-            const fD = new Date(year, mI, 1).getDay();
-            const off = fD === 0 ? 6 : fD - 1;
+            const fD = new Date(year, mI, 1).getDay(); const off = fD === 0 ? 6 : fD - 1;
             const dM = new Date(year, mI + 1, 0).getDate();
             let slots = [];
             for (let i = 0; i < off; i++) slots.push(null);
@@ -736,8 +746,7 @@
             while (slots.length % 7 !== 0) slots.push(null);
             let weeks = [];
             for (let i = 0; i < slots.length; i += 7) {
-                let dws = slots.slice(i, i + 7);
-                weeks.push({ dws, c: dws.filter(d => d !== null).length });
+                let dws = slots.slice(i, i + 7); weeks.push({ dws, c: dws.filter(d => d !== null).length });
             }
             return weeks;
         }
@@ -747,182 +756,134 @@
             const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
             for (let i = 0; i < weeks.length; i++) {
                 const dayIdx = weeks[i].dws.indexOf(dayNum);
-                if (dayIdx !== -1) {
-                    const localW = sI.includes(i) ? sI.indexOf(i) + 1 : 0;
-                    return { localW, weekIdx: i, dayIdx };
-                }
+                if (dayIdx !== -1) return { localW: sI.includes(i) ? sI.indexOf(i) + 1 : 0, weekIdx: i, dayIdx };
             }
             return null;
         }
 
         function exportData() {
-            let content = "=== COPIA DE SEGURIDAD - CONTROL PERSONAL ===\n";
-            content += "Fecha de exportación: " + new Date().toLocaleString() + "\n\n";
-            content += "--- TAREAS GUARDADAS ---\n";
-            let hasTasks = false;
-            for(let key in tasksData) {
-                if(tasksData[key].length > 0) {
-                    hasTasks = true;
-                    content += `\n[ AÑO / SLOT: ${key} ]\n`;
-                    tasksData[key].forEach(t => {
-                        let status = t.done ? "[x]" : "[ ]";
-                        let timeInfo = t.hour ? (t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour) : '';
-                        let dayInfo = getTaskDay(t) !== null ? ` [${diasFull[getTaskDay(t)]}${timeInfo ? ' ' + timeInfo : ''}]` : '';
-                        content += `${status}${dayInfo} ${t.text}\n`;
-                    });
-                }
-            }
-            if(!hasTasks) content += "No hay tareas guardadas.\n";
-            content += "\n\n--- DATOS DE SISTEMA (No modificar) ---\n";
-            let backup = {
-                tasks: tasksData, work: workConfig,
-                block: blockConfig, day: dayConfig, markers: markersData,
-                collapsed: collapsedMonths, trackedYears: trackedYears
-            };
-            content += JSON.stringify(backup);
-
-            const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `Control_Personal_Backup_${new Date().toISOString().slice(0,10)}.txt`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            let backup = { tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, day: dayConfig, markers: markersData, collapsed: collapsedMonths, trackedYears: trackedYears };
+            const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
+            const url = URL.createObjectURL(blob); const a = document.createElement("a");
+            a.href = url; a.download = `Control_Backup_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', currentTheme);
-            localStorage.setItem('wkTheme', currentTheme);
-            document.getElementById('theme-color-meta').setAttribute('content', currentTheme === 'light' ? '#f9fafb' : '#0a0a0a');
-            update();
+            document.documentElement.setAttribute('data-theme', currentTheme); localStorage.setItem('wkTheme', currentTheme);
+            document.getElementById('theme-color-meta').setAttribute('content', currentTheme === 'light' ? '#f9fafb' : '#0a0a0a'); update();
         }
 
-        function openGeneralModal() {
-            document.getElementById('modal-content-general').style.display = 'block';
-            openModal();
-        }
+        function openGeneralModal() { document.getElementById('modal-content-general').style.display = 'block'; openModal(); }
 
-        function showDayStats(dateStr, wNum, dI) {
+        function showDayStats(dateStr, wNum, dI, mI) {
             document.getElementById('modal-content-daystats').style.display = 'block';
             document.getElementById('ds-title').innerText = `Día: ${dateStr}`;
             
             const tasksList = document.getElementById('ds-tasks-list');
-            let tasks = [];
+            let tasks = []; let dayEntornos = [];
+            
+            // Obtener tareas del día
             if (wNum !== null && wNum !== undefined && dI !== null && dI !== undefined) {
                 const weekTasks = tasksData[`${selectedYear}-${wNum}`] || [];
                 tasks = weekTasks.filter(t => getTaskDay(t) === dI);
+                
+                // Obtener entornos que aplican a este día
+                const localW = wNum % 5;
+                const localM = mI % 3;
+                dayEntornos = entornosData.filter(e => 
+                    e.year === selectedYear && e.q === Math.floor(mI/3) &&
+                    e.months.includes(localM) && e.weeks.includes(localW) && e.days.includes(dI)
+                );
             }
             
+            let html = '';
+            if (dayEntornos.length > 0) {
+                dayEntornos.forEach(e => {
+                    const timeDisp = e.hour ? (e.hourEnd ? `${e.hour} - ${e.hourEnd}` : e.hour) : '';
+                    html += `<div style="font-size:0.85rem; padding:8px 8px; border-radius:8px; background: ${e.color}15; border-left: 3px solid ${e.color}; display:flex; flex-direction:column; margin-bottom:8px;">
+                        <span style="color:var(--text); font-weight:bold;">${e.text}</span>
+                        ${timeDisp ? `<span style="color:var(--muted); font-size:0.72rem;">${timeDisp}</span>` : ''}
+                    </div>`;
+                });
+            }
+
             if (tasks.length > 0) {
-                tasksList.innerHTML = tasks.map(t => {
+                html += tasks.map(t => {
                     const timeDisp = t.hour ? (t.hourEnd ? `${t.hour} - ${t.hourEnd}` : t.hour) : '';
                     return `<div style="font-size:0.85rem; padding:8px 0; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:8px;">
                         <span style="color:${t.done ? 'var(--muted)' : 'var(--accent)'}; font-weight:bold; flex-shrink:0;">${t.done ? '✓' : '○'}</span>
                         <span style="${t.done ? 'text-decoration: line-through; color: var(--muted);' : 'color: var(--text);'}">${t.text}${timeDisp ? `<span style="color:var(--muted); font-size:0.72rem; display:block;">${timeDisp}</span>` : ''}</span>
                     </div>`;
                 }).join('');
-            } else {
-                tasksList.innerHTML = '<div style="font-size:0.85rem; color:var(--muted); padding:10px 0;">Sin tareas este día.</div>';
             }
             
+            if (!html) html = '<div style="font-size:0.85rem; color:var(--muted); padding:10px 0;">Nada registrado para este día.</div>';
+            
+            tasksList.innerHTML = html;
             openModal();
         }
 
         function toggleBar(id) {
-            const panel = document.getElementById('panel-' + id);
-            const btn = document.getElementById('btn-' + id);
-            panel.classList.toggle('active');
-            btn.classList.toggle('active');
+            const panel = document.getElementById('panel-' + id); const btn = document.getElementById('btn-' + id);
+            panel.classList.toggle('active'); btn.classList.toggle('active');
             localStorage.setItem('wkBarOpen-' + id, panel.classList.contains('active'));
         }
         function restoreBars() {
             ['block', 'year', 'week', 'work', 'day'].forEach(id => {
                 if (localStorage.getItem('wkBarOpen-' + id) === 'true') {
-                    document.getElementById('panel-' + id).classList.add('active');
-                    document.getElementById('btn-' + id).classList.add('active');
+                    document.getElementById('panel-' + id).classList.add('active'); document.getElementById('btn-' + id).classList.add('active');
                 }
             });
         }
 
-        // ===== QUARTER BAR WIDGET =====
         function renderQuarterBarWidgetHTML() {
-            const modes = ['q', 'y', 'b'];
-            const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' };
-            const mode = modes[quarterBarMode];
-            return `
-                <div class="qbar-widget" data-mode="${mode}" onclick="cycleQuarterBar()" title="Toca para cambiar">
-                    <span class="qbar-badge" id="qbar-label">${labels[mode]}</span>
-                    <div class="qbar-track"><div class="qbar-fill" id="qbar-fill" style="width:0%"></div></div>
-                    <span class="qbar-pct" id="qbar-pct">0%</span>
-                </div>
-            `;
+            const modes = ['q', 'y', 'b']; const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' }; const mode = modes[quarterBarMode];
+            return `<div class="qbar-widget" data-mode="${mode}" onclick="cycleQuarterBar()" title="Toca para cambiar"><span class="qbar-badge" id="qbar-label">${labels[mode]}</span><div class="qbar-track"><div class="qbar-fill" id="qbar-fill" style="width:0%"></div></div><span class="qbar-pct" id="qbar-pct">0%</span></div>`;
         }
 
         function cycleQuarterBar() {
-            const widget = document.querySelector('.qbar-widget');
-            if (!widget) return;
-            const modes = ['q', 'y', 'b'];
-            const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' };
-            const current = widget.dataset.mode;
-            const nextIdx = (modes.indexOf(current) + 1) % 3;
-            quarterBarMode = nextIdx;
-            localStorage.setItem('wkQBarMode', nextIdx);
-            widget.dataset.mode = modes[nextIdx];
-            document.getElementById('qbar-label').textContent = labels[modes[nextIdx]];
-            updateQuarterBar();
+            const widget = document.querySelector('.qbar-widget'); if (!widget) return;
+            const modes = ['q', 'y', 'b']; const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' };
+            const nextIdx = (modes.indexOf(widget.dataset.mode) + 1) % 3; quarterBarMode = nextIdx;
+            localStorage.setItem('wkQBarMode', nextIdx); widget.dataset.mode = modes[nextIdx];
+            document.getElementById('qbar-label').textContent = labels[modes[nextIdx]]; updateQuarterBar();
         }
 
         function updateQuarterBar() {
-            const widget = document.querySelector('.qbar-widget');
-            const fill = document.getElementById('qbar-fill');
-            const pctEl = document.getElementById('qbar-pct');
+            const widget = document.querySelector('.qbar-widget'); const fill = document.getElementById('qbar-fill'); const pctEl = document.getElementById('qbar-pct');
             if (!widget || !fill || !pctEl) return;
-            
-            const mode = widget.dataset.mode;
-            const now = new Date();
-            const q = selectedQuarter;
-            const year = selectedYear;
-            
-            const qStart = new Date(year, q * 3, 1);
-            const qEnd = new Date(year, q * 3 + 3, 1);
-            
-            let refDate;
-            if (now >= qEnd) refDate = qEnd;
-            else if (now <= qStart) refDate = qStart;
-            else refDate = now;
-            
+            const mode = widget.dataset.mode; const now = new Date(); const q = selectedQuarter; const year = selectedYear;
+            const qStart = new Date(year, q * 3, 1); const qEnd = new Date(year, q * 3 + 3, 1);
+            let refDate = now >= qEnd ? qEnd : (now <= qStart ? qStart : now);
             let pct;
-            if (mode === 'q') {
-                const total = qEnd - qStart;
-                const elapsed = Math.max(0, refDate - qStart);
-                pct = (elapsed / total) * 100;
-            } else if (mode === 'y') {
-                const yearStart = new Date(year, 0, 1);
-                const yearEnd = new Date(year + 1, 0, 1);
-                const total = yearEnd - yearStart;
-                const elapsed = Math.max(0, refDate - yearStart);
-                pct = (elapsed / total) * 100;
-            } else {
-                const blockStart = new Date(blockConfig.startYear, 0, 1);
-                const blockEnd = new Date(blockConfig.startYear + blockConfig.years, 0, 1);
-                const total = blockEnd - blockStart;
-                const elapsed = Math.max(0, refDate - blockStart);
-                pct = (elapsed / total) * 100;
-            }
-            
-            pct = Math.max(0, Math.min(100, pct));
-            fill.style.width = pct.toFixed(2) + '%';
-            pctEl.textContent = pct.toFixed(1) + '%';
+            if (mode === 'q') pct = ((refDate - qStart) / (qEnd - qStart)) * 100;
+            else if (mode === 'y') pct = ((refDate - new Date(year, 0, 1)) / (new Date(year + 1, 0, 1) - new Date(year, 0, 1))) * 100;
+            else pct = ((refDate - new Date(blockConfig.startYear, 0, 1)) / (new Date(blockConfig.startYear + blockConfig.years, 0, 1) - new Date(blockConfig.startYear, 0, 1))) * 100;
+            pct = Math.max(0, Math.min(100, pct)); fill.style.width = pct.toFixed(2) + '%'; pctEl.textContent = pct.toFixed(1) + '%';
         }
 
-        // ===== TASK CREATION =====
+        // ===== SISTEMA DUAL: CREADOR =====
+        function toggleTcMode() {
+            tcMode = tcMode === 'tarea' ? 'entorno' : 'tarea';
+            document.getElementById('tc-main-title').innerText = tcMode === 'tarea' ? 'Nueva Acción' : 'Nuevo Entorno';
+            document.getElementById('btn-toggle-tc').innerText = tcMode === 'tarea' ? '⟲ Crear Entorno' : '⟲ Crear Acción';
+            
+            document.getElementById('tc-tarea-fields').style.display = tcMode === 'tarea' ? 'block' : 'none';
+            document.getElementById('tc-entorno-fields').style.display = tcMode === 'entorno' ? 'block' : 'none';
+        }
+
         function openTaskCreateModal() {
+            tcMode = 'entorno'; // forzamos toggle para que quede en tarea por defecto
+            toggleTcMode();
+
             const q = selectedQuarter;
             const nowMonth = new Date().getMonth();
             let defaultM = q * 3;
             if (Math.floor(nowMonth / 3) === q) defaultM = nowMonth;
             
+            // Llenar selects de tarea
             const monthSel = document.getElementById('inp-tc-month');
             let mHtml = '';
             for (let i = 0; i < 3; i++) {
@@ -930,9 +891,17 @@
                 mHtml += `<option value="${mI}" ${mI === defaultM ? 'selected' : ''}>${meses[mI]}</option>`;
             }
             monthSel.innerHTML = mHtml;
-            
             updateWeekDropdown();
             
+            // Llenar checkboxes de meses para entornos
+            const chkMonths = document.getElementById('chk-months');
+            chkMonths.innerHTML = '';
+            for(let i=0; i<3; i++) {
+                const mI = q * 3 + i;
+                chkMonths.innerHTML += `<div class="chk-btn" onclick="this.classList.toggle('active')" data-val="${i}">${meses[mI].slice(0,3)}</div>`;
+            }
+            document.querySelectorAll('.chk-btn').forEach(btn => btn.classList.remove('active'));
+
             document.getElementById('inp-tc-title').value = '';
             document.getElementById('inp-tc-day').value = '';
             document.getElementById('inp-tc-hour').value = '';
@@ -947,19 +916,16 @@
             const mI = parseInt(document.getElementById('inp-tc-month').value);
             const weeks = getWeeksForMonth(selectedYear, mI);
             const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
-            const hasW0 = weeks.length > sI.length;
-            
-            const weekSel = document.getElementById('inp-tc-week');
-            const prevVal = weekSel.value;
-            
-            let wHtml = '';
-            if (hasW0) wHtml += `<option value="0">W0</option>`;
+            const weekSel = document.getElementById('inp-tc-week'); const prevVal = weekSel.value;
+            let wHtml = (weeks.length > sI.length) ? `<option value="0">W0</option>` : '';
             for (let w = 1; w <= 4; w++) wHtml += `<option value="${w}">W${w}</option>`;
             weekSel.innerHTML = wHtml;
-            
-            if (prevVal && Array.from(weekSel.options).some(o => o.value === prevVal)) {
-                weekSel.value = prevVal;
-            }
+            if (prevVal && Array.from(weekSel.options).some(o => o.value === prevVal)) weekSel.value = prevVal;
+        }
+
+        function saveTcRecord() {
+            if (tcMode === 'tarea') saveNewManagedTask();
+            else saveNewEntorno();
         }
 
         function saveNewManagedTask() {
@@ -970,57 +936,92 @@
             const hour = document.getElementById('inp-tc-hour').value;
             const hourEnd = document.getElementById('inp-tc-hourEnd').value;
             const color = document.getElementById('inp-tc-color').value;
+            
             if (!title) { alert("Escribe una descripción"); return; }
-            const day = dayVal === '' ? null : parseInt(dayVal);
+            
             const wNum = mI * 5 + localW;
             const tKey = `${selectedYear}-${wNum}`;
             if (!tasksData[tKey]) tasksData[tKey] = [];
-            tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: day, hour: hour || null, hourEnd: hourEnd || null, color: color });
+            tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: dayVal === '' ? null : parseInt(dayVal), hour: hour || null, hourEnd: hourEnd || null, color: color });
             localStorage.setItem('wkTasks', JSON.stringify(tasksData));
-            closeModal();
-            renderQuarterDetailBody();
-            renderDayTaskMarks();
+            closeModal(); renderQuarterDetailBody(); renderDayTaskMarks();
+        }
+
+        function saveNewEntorno() {
+            const title = document.getElementById('inp-tc-title').value.trim();
+            const hour = document.getElementById('inp-tc-hour').value;
+            const hourEnd = document.getElementById('inp-tc-hourEnd').value;
+            const color = document.getElementById('inp-tc-color').value;
+
+            if (!title) { alert("Escribe una descripción para el entorno"); return; }
+
+            const selMonths = Array.from(document.getElementById('chk-months').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
+            const selWeeks = Array.from(document.getElementById('chk-weeks').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
+            const selDays = Array.from(document.getElementById('chk-days').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
+
+            if (selMonths.length === 0 || selWeeks.length === 0 || selDays.length === 0) {
+                alert("Debes seleccionar al menos un mes, una semana y un día."); return;
+            }
+
+            entornosData.push({
+                id: Date.now(), text: title, color: color, hour: hour || null, hourEnd: hourEnd || null,
+                year: selectedYear, q: selectedQuarter, months: selMonths, weeks: selWeeks, days: selDays
+            });
+            localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
+            closeModal(); renderQuarterDetailBody(); renderDayTaskMarks();
         }
 
         function toggleManagedTask(week, taskId) {
-            const tKey = `${selectedYear}-${week}`;
-            const t = (tasksData[tKey] || []).find(x => x.id === taskId);
-            if (t) t.done = !t.done;
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData));
-            renderQuarterDetailBody();
-            renderDayTaskMarks();
+            const tKey = `${selectedYear}-${week}`; const t = (tasksData[tKey] || []).find(x => x.id === taskId);
+            if (t) t.done = !t.done; localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderQuarterDetailBody(); renderDayTaskMarks();
         }
-
         function deleteManagedTask(week, taskId) {
-            const tKey = `${selectedYear}-${week}`;
-            tasksData[tKey] = (tasksData[tKey] || []).filter(x => x.id !== taskId);
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData));
-            renderQuarterDetailBody();
-            renderDayTaskMarks();
+            const tKey = `${selectedYear}-${week}`; tasksData[tKey] = (tasksData[tKey] || []).filter(x => x.id !== taskId);
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderQuarterDetailBody(); renderDayTaskMarks();
+        }
+        function deleteEntorno(id) {
+            entornosData = entornosData.filter(e => e.id !== id);
+            localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); renderQuarterDetailBody(); renderDayTaskMarks();
         }
 
         function renderMasterTaskList() {
-            const q = selectedQuarter;
-            const year = selectedYear;
+            const q = selectedQuarter; const year = selectedYear;
+            let html = '';
+            
+            // Sección Entornos
+            let qEntornos = entornosData.filter(e => e.year === year && e.q === q);
+            if(qEntornos.length > 0) {
+                html += `<div style="padding: 4px 0 8px;">`;
+                qEntornos.forEach(e => {
+                    const timeDisp = e.hour ? (e.hourEnd ? `${e.hour}-${e.hourEnd}` : e.hour) : 'Todo el día';
+                    html += `
+                    <div class="qt-item">
+                        <div class="qt-info">
+                            <div class="qt-text"><span class="entorno-tag" style="background:${e.color}20; color:${e.color};">ENTORNO</span> ${e.text}</div>
+                            <div class="qt-meta">Meses: ${e.months.map(m=>m+1).join(',')} | Sem: ${e.weeks.map(w=>'W'+w).join(',')} | Días: ${e.days.map(d=>diasL[d]).join(',')} · ${timeDisp}</div>
+                        </div>
+                        <span class="qt-delete" onclick="deleteEntorno(${e.id})">×</span>
+                    </div>`;
+                });
+                html += `</div><div style="border-bottom: 1px dashed var(--border); margin: 5px 0;"></div>`;
+            }
+
+            // Sección Acciones (Tareas)
             let allTasks = [];
             for (let m = 0; m < 3; m++) {
                 const mI = q * 3 + m;
                 for (let w = 0; w <= 4; w++) {
                     const wNum = mI * 5 + w;
-                    const tasks = tasksData[`${year}-${wNum}`] || [];
-                    tasks.forEach(t => allTasks.push({ ...t, week: wNum, month: mI, localW: w }));
+                    (tasksData[`${year}-${wNum}`] || []).forEach(t => allTasks.push({ ...t, week: wNum, month: mI, localW: w }));
                 }
             }
-            if (allTasks.length === 0) {
-                return `<div class="qt-empty">Sin tareas este trimestre.<br>Toca ＋ arriba.</div>`;
-            }
-            return allTasks.map(t => {
+            if (allTasks.length === 0 && qEntornos.length === 0) return `<div class="qt-empty">Sin registros este trimestre.<br>Toca ＋ arriba.</div>`;
+            
+            html += allTasks.map(t => {
                 const tDay = getTaskDay(t);
                 let metaParts = [`${meses[t.month].slice(0,3)} · W${t.localW}`];
                 if (tDay !== null) metaParts.push(diasFull[tDay].slice(0,3));
-                if (t.hour) {
-                    metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
-                }
+                if (t.hour) metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
                 return `
                     <div class="qt-item ${t.done ? 'done' : ''}">
                         <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${t.week}, ${t.id})">
@@ -1029,20 +1030,17 @@
                             <div class="qt-meta">${metaParts.join(' · ')}</div>
                         </div>
                         <span class="qt-delete" onclick="deleteManagedTask(${t.week}, ${t.id})">×</span>
-                    </div>
-                `;
+                    </div>`;
             }).join('');
+            return html;
         }
 
         function getQuarterStats(year, q) {
             let total = 0, done = 0;
             for (let m = 0; m < 3; m++) {
-                const mI = q * 3 + m;
                 for (let w = 0; w <= 4; w++) {
-                    const tKey = `${year}-${mI * 5 + w}`;
-                    const tasks = tasksData[tKey] || [];
-                    total += tasks.length;
-                    done += tasks.filter(t => t.done).length;
+                    const tasks = tasksData[`${year}-${(q * 3 + m) * 5 + w}`] || [];
+                    total += tasks.length; done += tasks.filter(t => t.done).length;
                 }
             }
             return { total, done, pct: total === 0 ? 0 : (done / total) * 100 };
@@ -1050,134 +1048,66 @@
 
         function getYearStats(year) {
             let total = 0, done = 0;
-            for (let q = 0; q < 4; q++) {
-                const s = getQuarterStats(year, q);
-                total += s.total; done += s.done;
-            }
+            for (let q = 0; q < 4; q++) { const s = getQuarterStats(year, q); total += s.total; done += s.done; }
             return { total, done, pct: total === 0 ? 0 : (done / total) * 100 };
         }
 
-        function selectYear(year) {
-            selectedYear = year;
-            localStorage.setItem('wkSelYear', year);
-            calendarView = 'quarters';
-            localStorage.setItem('wkCalView', calendarView);
-            drawCalendar();
-        }
-        function goBackToYears() {
-            calendarView = 'years';
-            localStorage.setItem('wkCalView', calendarView);
-            drawCalendar();
-        }
+        function selectYear(year) { selectedYear = year; localStorage.setItem('wkSelYear', year); calendarView = 'quarters'; localStorage.setItem('wkCalView', calendarView); drawCalendar(); }
+        function goBackToYears() { calendarView = 'years'; localStorage.setItem('wkCalView', calendarView); drawCalendar(); }
         function toggleMonth(mI) {
-            const yKey = `${selectedYear}-${mI}`; collapsedMonths[yKey] = !collapsedMonths[yKey];
-            localStorage.setItem('wkCollapsedMonths', JSON.stringify(collapsedMonths));
+            const yKey = `${selectedYear}-${mI}`; collapsedMonths[yKey] = !collapsedMonths[yKey]; localStorage.setItem('wkCollapsedMonths', JSON.stringify(collapsedMonths));
             const wrap = document.getElementById(`month-wrap-${mI}`);
             if(collapsedMonths[yKey]) { wrap.classList.add('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '+'; } 
             else { wrap.classList.remove('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '−'; }
         }
 
         function renderYearsView() {
-            const now = new Date();
-            const currentY = now.getFullYear();
-            const years = getAvailableYears();
+            const now = new Date(); const currentY = now.getFullYear(); const years = getAvailableYears();
             let html = '<div class="years-view">';
             years.forEach(year => {
-                const stats = getYearStats(year);
-                const isCurrent = year === currentY;
-                html += `
-                    <div class="year-box ${isCurrent ? 'current' : ''}" onclick="selectYear(${year})">
+                const stats = getYearStats(year); const isCurrent = year === currentY;
+                html += `<div class="year-box ${isCurrent ? 'current' : ''}" onclick="selectYear(${year})">
                         ${isCurrent ? '<div class="year-badge">Actual</div>' : ''}
                         ${!isCurrent ? `<span class="delete-year-btn" title="Eliminar año" onclick="deleteYear(event, ${year})">×</span>` : ''}
-                        <div class="year-num">${year}</div>
-                        <div class="year-progress"><div class="fill" style="width:${stats.pct}%;"></div></div>
-                        <div class="year-pct">${stats.pct.toFixed(0)}%</div>
-                    </div>
-                `;
+                        <div class="year-num">${year}</div><div class="year-progress"><div class="fill" style="width:${stats.pct}%;"></div></div><div class="year-pct">${stats.pct.toFixed(0)}%</div></div>`;
             });
-            html += `
-                    <div class="year-box add-year" onclick="promptAddYear()">
-                        <div class="year-num" style="font-size:2rem; margin:0;">+</div>
-                        <div class="year-pct" style="margin-top:5px;">Añadir Año</div>
-                    </div>
-                </div>
-            `;
+            html += `<div class="year-box add-year" onclick="promptAddYear()"><div class="year-num" style="font-size:2rem; margin:0;">+</div><div class="year-pct" style="margin-top:5px;">Añadir Año</div></div></div>`;
             return html;
         }
 
         function renderQuartersView() {
-            const now = new Date();
-            const currentY = now.getFullYear();
-            const currentQ = Math.floor(now.getMonth() / 3);
-            const isCurrentYear = selectedYear === currentY;
-            let html = `
-                <div class="quarters-header">
-                    <button class="back-btn" onclick="goBackToYears()">← Años</button>
-                    <div class="quarters-title">${selectedYear}</div>
-                    <div style="width:76px"></div>
-                </div>
-                <div class="quarters-grid">
-            `;
+            const now = new Date(); const currentY = now.getFullYear(); const currentQ = Math.floor(now.getMonth() / 3); const isCurrentYear = selectedYear === currentY;
+            let html = `<div class="quarters-header"><button class="back-btn" onclick="goBackToYears()">← Años</button><div class="quarters-title">${selectedYear}</div><div style="width:76px"></div></div><div class="quarters-grid">`;
             for (let q = 0; q < 4; q++) {
-                const stats = getQuarterStats(selectedYear, q);
-                const isCurrentQ = isCurrentYear && q === currentQ;
-                html += `
-                    <div class="quarter-compact ${isCurrentQ ? 'current' : ''}" onclick="openQuarterDetail(${q})">
-                        ${isCurrentQ ? '<div class="qc-badge">Actual</div>' : ''}
-                        <div class="qc-num">T${q + 1}</div>
-                        <div class="qc-bar"><div class="fill" style="width:${stats.pct}%;"></div></div>
-                        <div class="qc-pct">${stats.pct.toFixed(0)}%</div>
-                    </div>
-                `;
+                const stats = getQuarterStats(selectedYear, q); const isCurrentQ = isCurrentYear && q === currentQ;
+                html += `<div class="quarter-compact ${isCurrentQ ? 'current' : ''}" onclick="openQuarterDetail(${q})">
+                        ${isCurrentQ ? '<div class="qc-badge">Actual</div>' : ''}<div class="qc-num">T${q + 1}</div>
+                        <div class="qc-bar"><div class="fill" style="width:${stats.pct}%;"></div></div><div class="qc-pct">${stats.pct.toFixed(0)}%</div></div>`;
             }
-            html += '</div>';
-            return html;
+            return html + '</div>';
         }
 
-        function drawCalendar() {
-            const container = document.getElementById('calendar-container');
-            if (calendarView === 'quarters') {
-                container.innerHTML = renderQuartersView();
-            } else {
-                container.innerHTML = renderYearsView();
-            }
-        }
+        function drawCalendar() { document.getElementById('calendar-container').innerHTML = calendarView === 'quarters' ? renderQuartersView() : renderYearsView(); }
 
         function openQuarterDetail(q) {
-            selectedQuarter = q;
-            localStorage.setItem('wkSelQtr', q);
+            selectedQuarter = q; localStorage.setItem('wkSelQtr', q);
             document.getElementById('calendar-detail-title').innerText = `T${q + 1} · ${selectedYear}`;
-            renderQuarterDetailBody();
-            document.getElementById('calendar-overlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
+            renderQuarterDetailBody(); document.getElementById('calendar-overlay').classList.add('active'); document.body.style.overflow = 'hidden';
         }
-
         function closeQuarterDetail(e) {
             if (e && e.target.id !== 'calendar-overlay') return;
-            document.getElementById('calendar-overlay').classList.remove('active');
-            document.body.style.overflow = '';
+            document.getElementById('calendar-overlay').classList.remove('active'); document.body.style.overflow = '';
             if (calendarView === 'quarters') drawCalendar();
         }
 
-        function openMetricsModal() {
-            const q = selectedQuarter;
-            document.getElementById('ms-title').innerText = `Cumplimiento T${q + 1} · ${selectedYear}`;
-            renderMetricsModalBody(q);
-            document.getElementById('modal-content-metrics').style.display = 'block';
-            openModal();
-        }
-
+        function openMetricsModal() { document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; renderMetricsModalBody(selectedQuarter); document.getElementById('modal-content-metrics').style.display = 'block'; openModal(); }
         function renderMetricsModalBody(q) {
-            let html = '';
-            let qTotal = 0, qDone = 0;
+            let html = ''; let qTotal = 0, qDone = 0;
             for (let m = 0; m < 3; m++) {
-                const mI = q * 3 + m;
-                let mTotal = 0, mDone = 0;
+                const mI = q * 3 + m; let mTotal = 0, mDone = 0;
                 for (let w = 0; w <= 4; w++) {
-                    const tKey = `${selectedYear}-${mI * 5 + w}`;
-                    const tasks = tasksData[tKey] || [];
-                    mTotal += tasks.length;
-                    mDone += tasks.filter(t => t.done).length;
+                    const tasks = tasksData[`${selectedYear}-${mI * 5 + w}`] || [];
+                    mTotal += tasks.length; mDone += tasks.filter(t => t.done).length;
                 }
                 const mPct = mTotal === 0 ? 0 : (mDone / mTotal) * 100;
                 html += `<div class="m-bar-row"><div class="m-label">${meses[mI]}</div><div class="m-progress"><div class="m-fill" style="width:${mPct}%"></div></div><div class="m-pct">${Math.round(mPct)}%</div></div>`;
@@ -1189,33 +1119,21 @@
         }
 
         function renderQuarterDetailBody() {
-            const q = selectedQuarter;
-            const year = selectedYear;
-            const now = new Date(); now.setHours(0, 0, 0, 0);
-            
-            let html = renderQuarterBarWidgetHTML();
-            html += '<div class="months-container">';
+            const q = selectedQuarter; const year = selectedYear; const now = new Date(); now.setHours(0, 0, 0, 0);
+            let html = renderQuarterBarWidgetHTML() + '<div class="months-container">';
             
             for (let m = 0; m < 3; m++) {
-                const mI = q * 3 + m;
-                const weeks = getWeeksForMonth(year, mI);
+                const mI = q * 3 + m; const weeks = getWeeksForMonth(year, mI);
                 const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
-                const yKey = `${year}-${mI}`;
-                const isCol = collapsedMonths[yKey];
-                const colClass = isCol ? " collapsed" : "";
-                const tChar = isCol ? '+' : '−';
-
-                html += `<div class="month${colClass}" id="month-wrap-${mI}">
-                    <div class="month-name" onclick="toggleMonth(${mI})">${meses[mI]} <span id="toggle-m-${mI}" class="month-toggle">${tChar}</span></div>
-                    <div class="days-grid" id="grid-m-${mI}">`;
+                const yKey = `${year}-${mI}`; const isCol = collapsedMonths[yKey];
                 
+                html += `<div class="month${isCol ? " collapsed" : ""}" id="month-wrap-${mI}">
+                    <div class="month-name" onclick="toggleMonth(${mI})">${meses[mI]} <span id="toggle-m-${mI}" class="month-toggle">${isCol ? '+' : '−'}</span></div>
+                    <div class="days-grid" id="grid-m-${mI}">`;
                 diasL.forEach(d => html += `<div class="week-day">${d}</div>`);
                 
                 weeks.forEach((w, i) => {
-                    const isHighlighted = sI.includes(i);
-                    const localW = isHighlighted ? sI.indexOf(i) + 1 : 0;
-                    const wNum = mI * 5 + localW;
-                    
+                    const isHighlighted = sI.includes(i); const localW = isHighlighted ? sI.indexOf(i) + 1 : 0; const wNum = mI * 5 + localW;
                     let wCl = "", fR = -1, lR = -1;
                     for (let k = 0; k < 7; k++) { if (w.dws[k] !== null) { if (fR === -1) fR = k; lR = k; } }
                     
@@ -1224,48 +1142,33 @@
                         wCl = (endD >= now) ? "highlight-week-active" : "highlight-week-concluded";
                         if (now >= new Date(year, mI, w.dws[fR]) && now <= endD) wCl += " current-week-glow";
                     }
-                    
                     html += `<div class="week-wrapper ${wCl}" style="display: contents;">`;
-                    
                     const weekTasks = tasksData[`${year}-${wNum}`] || [];
                     
                     w.dws.forEach((d, dI) => {
-                        if (d === null) {
-                            html += `<div style="border:1px solid transparent; margin-top:3px;"></div>`;
-                        } else {
+                        if (d === null) { html += `<div style="border:1px solid transparent; margin-top:3px;"></div>`; } else {
                             let dt = new Date(year, mI, d), cl = "day";
                             let dtStr = `${year}-${String(mI + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                            if (dt < now) cl += " past";
-                            else if (dt.getTime() === now.getTime()) cl += " today";
+                            if (dt < now) cl += " past"; else if (dt.getTime() === now.getTime()) cl += " today";
                             else cl += (dt.getDay() === 6) ? " sat-future" : (dt.getDay() === 0) ? " sun-future" : " future";
                             
+                            // Evaluar si hay entornos que caen aquí
+                            const hasEntornos = entornosData.some(e => e.year === year && e.q === Math.floor(mI/3) && e.months.includes(mI % 3) && e.weeks.includes(localW) && e.days.includes(dI));
                             const hasTasks = weekTasks.some(t => getTaskDay(t) === dI);
-                            const taskDot = hasTasks ? '<span class="task-dot"></span>' : '';
-                            const clickHandler = `showDayStats('${dtStr}', ${wNum}, ${dI})`;
+                            const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
+                            const clickHandler = `showDayStats('${dtStr}', ${wNum}, ${dI}, ${mI})`;
                             
-                            if (isHighlighted && dI === fR) {
-                                html += `<div class="${cl} block-start" onclick="${clickHandler}"><span class="block-label">W${localW}</span>${d}${taskDot}</div>`;
-                            } else if (isHighlighted && dI === lR) {
-                                html += `<div class="${cl} block-end" onclick="${clickHandler}">${d}${taskDot}</div>`;
-                            } else {
-                                html += `<div class="${cl}" onclick="${clickHandler}">${d}${taskDot}</div>`;
-                            }
+                            if (isHighlighted && dI === fR) html += `<div class="${cl} block-start" onclick="${clickHandler}"><span class="block-label">W${localW}</span>${d}${taskDot}</div>`;
+                            else if (isHighlighted && dI === lR) html += `<div class="${cl} block-end" onclick="${clickHandler}">${d}${taskDot}</div>`;
+                            else html += `<div class="${cl}" onclick="${clickHandler}">${d}${taskDot}</div>`;
                         }
                     });
                     html += `</div>`;
                 });
                 html += `</div></div>`;
             }
-            
-            html += `<div class="quarter-tasks-panel">
-                <div class="qt-title">📋 Tareas</div>
-                <div class="qt-list">${renderMasterTaskList()}</div>
-            </div>`;
-            
-            html += `</div>`;
-            
-            document.getElementById('calendar-detail-body').innerHTML = html;
-            updateQuarterBar();
+            html += `<div class="quarter-tasks-panel"><div class="qt-title">📋 Lista General</div><div class="qt-list">${renderMasterTaskList()}</div></div></div>`;
+            document.getElementById('calendar-detail-body').innerHTML = html; updateQuarterBar();
         }
 
         function openModal() { document.getElementById('modal-overlay').classList.add('active'); }
@@ -1375,25 +1278,30 @@
 
         let lastDayMarksSig = '';
         function renderDayTaskMarks() {
-            const container = document.getElementById('bar-day');
-            if (!container) return;
+            const container = document.getElementById('bar-day'); if (!container) return;
 
-            const now = new Date();
-            const year = now.getFullYear();
-            const mI = now.getMonth();
-            const dayNum = now.getDate();
-
+            const now = new Date(); const year = now.getFullYear(); const mI = now.getMonth(); const dayNum = now.getDate();
             const weekInfo = getWeekForDay(year, mI, dayNum);
+            
             let sig = `${year}-${mI}-${dayNum}|`;
-            let todayTasks = [];
+            let itemsToRender = [];
 
             if (weekInfo) {
+                // Entornos
+                const localM = mI % 3;
+                const localW = weekInfo.localW;
+                const todayEntornos = entornosData.filter(e => 
+                    e.year === year && e.q === Math.floor(mI/3) &&
+                    e.months.includes(localM) && e.weeks.includes(localW) && e.days.includes(weekInfo.dayIdx)
+                ).map(e => ({...e, isEntorno: true}));
+                
+                // Tareas
                 const wNum = mI * 5 + weekInfo.localW;
                 const weekTasks = tasksData[`${year}-${wNum}`] || [];
-                todayTasks = weekTasks.filter(t =>
-                    getTaskDay(t) === weekInfo.dayIdx && t.hour && t.color
-                );
-                sig += todayTasks.map(t => `${t.id}:${t.hour}:${t.hourEnd||''}:${t.color}:${t.done}`).join('|');
+                const todayTasks = weekTasks.filter(t => getTaskDay(t) === weekInfo.dayIdx && t.hour && t.color);
+                
+                itemsToRender = [...todayEntornos, ...todayTasks];
+                sig += itemsToRender.map(t => `${t.id}:${t.hour}:${t.hourEnd||''}:${t.color}:${t.done||false}`).join('|');
             }
 
             if (sig === lastDayMarksSig) return;
@@ -1401,18 +1309,16 @@
 
             container.querySelectorAll('.day-task-mark').forEach(e => e.remove());
 
-            todayTasks.forEach(t => {
+            itemsToRender.forEach(t => {
+                if(!t.hour) return;
                 const [hStr, mStr] = t.hour.split(':');
-                const hour = parseInt(hStr);
-                const minute = parseInt(mStr) || 0;
-
+                const hour = parseInt(hStr); const minute = parseInt(mStr) || 0;
                 const startPct = ((hour * 60 + minute) / (24 * 60)) * 100;
                 let endPct;
                 
                 if (t.hourEnd) {
                     const [ehStr, emStr] = t.hourEnd.split(':');
-                    const eHour = parseInt(ehStr);
-                    const eMinute = parseInt(emStr) || 0;
+                    const eHour = parseInt(ehStr); const eMinute = parseInt(emStr) || 0;
                     endPct = ((eHour * 60 + eMinute) / (24 * 60)) * 100;
                     if (endPct <= startPct) endPct = startPct + (100 / 24); 
                 } else {
@@ -1424,7 +1330,15 @@
                 mark.style.left = startPct + '%';
                 mark.style.width = (endPct - startPct) + '%';
                 mark.style.background = t.color;
-                mark.style.opacity = t.done ? '1' : '0.7';
+                
+                // Si es entorno lo hacemos más transparente y lo enviamos más al fondo visualmente
+                if (t.isEntorno) {
+                    mark.style.opacity = '0.35';
+                    mark.style.mixBlendMode = 'screen'; // Efecto luminoso sutil
+                } else {
+                    mark.style.opacity = t.done ? '0.9' : '0.6';
+                }
+                
                 mark.title = `${t.text} · ${t.hour}${t.hourEnd ? ' - '+t.hourEnd : ''}`;
                 container.appendChild(mark);
             });
@@ -1436,8 +1350,7 @@
             const hh = now.getHours(), mm = now.getMinutes();
             const ampm = hh >= 12 ? 'PM' : 'AM', displayHour = hh % 12 || 12; 
 
-            const overlayDate = document.getElementById('overlay-date');
-            const overlayTime = document.getElementById('overlay-time');
+            const overlayDate = document.getElementById('overlay-date'); const overlayTime = document.getElementById('overlay-time');
             if (overlayDate) overlayDate.innerText = `${now.getDate()} de ${meses[now.getMonth()]}, ${year}`;
             if (overlayTime) overlayTime.innerText = `${displayHour}:${String(mm).padStart(2, '0')} ${ampm}`;
 
@@ -1446,43 +1359,30 @@
             const blockElapsedMs = now - new Date(startBlock, 0, 1);
             let blockPct = (blockElapsedMs / blockTotalMs * 100);
             if(blockPct < 0) blockPct = 0; else if(blockPct > 100) blockPct = 100;
-            document.getElementById('block-fill').style.width = blockPct.toFixed(4) + '%';
-            document.getElementById('block-pct').innerText = blockPct.toFixed(2) + '%';
+            document.getElementById('block-fill').style.width = blockPct.toFixed(4) + '%'; document.getElementById('block-pct').innerText = blockPct.toFixed(2) + '%';
 
             const yearPct = ((now - new Date(year,0,1)) / (new Date(year+1,0,1) - new Date(year,0,1)) * 100);
-            document.getElementById('year-fill').style.width = yearPct.toFixed(4) + '%';
-            document.getElementById('year-pct').innerText = yearPct.toFixed(2) + '%';
+            document.getElementById('year-fill').style.width = yearPct.toFixed(4) + '%'; document.getElementById('year-pct').innerText = yearPct.toFixed(2) + '%';
 
             let dW = now.getDay(), adj = dW === 0 ? 6 : dW - 1, sW = new Date(now); sW.setDate(now.getDate() - adj); sW.setHours(0,0,0,0);
             const wkP = ((now - sW) / (7 * 24 * 60 * 60 * 1000)) * 100;
-            document.getElementById('week-fill').style.width = wkP.toFixed(4) + '%';
-            document.getElementById('week-pct').innerText = wkP.toFixed(2) + '%';
+            document.getElementById('week-fill').style.width = wkP.toFixed(4) + '%'; document.getElementById('week-pct').innerText = wkP.toFixed(2) + '%';
 
             let wP = 0, wT = "Libre";
             if (h >= workConfig.start && h < workConfig.end) { 
                 wP = ((h - workConfig.start) / (workConfig.end - workConfig.start)) * 100;
                 wT = new Date((workConfig.end - h) * 3600 * 1000).toISOString().substr(11, 8); 
             } else if (h >= workConfig.end) { wP = 100; wT = "¡Finalizado!"; }
-            document.getElementById('work-fill').style.width = wP.toFixed(4) + '%';
-            document.getElementById('work-timer').innerText = wT;
-            document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
+            document.getElementById('work-fill').style.width = wP.toFixed(4) + '%'; document.getElementById('work-timer').innerText = wT; document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
 
-            const dP = (h / 24) * 100;
-            document.getElementById('day-fill').style.width = dP.toFixed(4) + '%';
-            document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
+            const dP = (h / 24) * 100; document.getElementById('day-fill').style.width = dP.toFixed(4) + '%'; document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
 
             renderDayTaskMarks();
-
-            if (document.getElementById('qbar-fill')) {
-                updateQuarterBar();
-            }
+            if (document.getElementById('qbar-fill')) updateQuarterBar();
         }
 
-        restoreBars();
-        drawCalendar();
-        renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();
-        setInterval(update, 1000);
-        update();
+        restoreBars(); drawCalendar(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();
+        setInterval(update, 1000); update();
     </script>
 </body>
 </html>

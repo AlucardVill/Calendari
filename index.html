@@ -138,54 +138,22 @@
         .icon-btn:active { transform: scale(0.95); }
 
         /* ===== PROGRESS BUTTONS ===== */
-        .progress-buttons {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
+        .progress-buttons { display: flex; gap: 8px; margin-bottom: 4px; }
         .progress-btn {
-            flex: 1;
-            padding: 14px 4px;
-            border-radius: 12px;
-            border: 1.5px solid var(--border);
-            background: var(--card);
-            font-family: inherit;
-            font-size: 0.8rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--card-shadow);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            position: relative;
+            flex: 1; padding: 14px 4px; border-radius: 12px;
+            border: 1.5px solid var(--border); background: var(--card);
+            font-family: inherit; font-size: 0.8rem; font-weight: 800;
+            cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--card-shadow); color: var(--text);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
         }
-        .progress-btn:hover {
-            transform: translateY(-2px);
-            border-color: currentColor;
-        }
-        .progress-btn.active {
-            border-color: currentColor;
-            background: var(--item-bg);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-        }
-        .progress-btn .pb-arrow {
-            font-size: 0.55rem;
-            opacity: 0.5;
-            transition: transform 0.3s;
-        }
-        .progress-btn.active .pb-arrow {
-            transform: rotate(180deg);
-            opacity: 1;
-        }
+        .progress-btn:hover { transform: translateY(-2px); border-color: currentColor; }
+        .progress-btn.active { border-color: currentColor; background: var(--item-bg); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
+        .progress-btn .pb-arrow { font-size: 0.55rem; opacity: 0.5; transition: transform 0.3s; }
+        .progress-btn.active .pb-arrow { transform: rotate(180deg); opacity: 1; }
 
-        /* ===== PROGRESS PANELS ===== */
         .dock-panel { 
-            display: none;
-            background: var(--card); border: 1px solid var(--border); 
+            display: none; background: var(--card); border: 1px solid var(--border); 
             border-radius: 14px; padding: 16px; margin-top: 10px;
             box-shadow: var(--card-shadow); 
         }
@@ -210,265 +178,110 @@
         .bar-marker::after { content: ''; position: absolute; top: 12px; left: 4px; width: 2px; height: 10px; background: var(--m-color); border-radius: 1px;}
         .bar-marker:active { cursor: grabbing; transform: translateX(-50%) scale(1.15); }
 
-        /* ===== CALENDAR — YEARS ===== */
-        .years-view {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-        }
+        /* ===== YEARS VIEW ===== */
+        .years-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
         .year-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 18px 14px;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--card-shadow);
-            position: relative;
-            text-align: center;
+            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 18px 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--card-shadow); position: relative; text-align: center;
         }
-        .year-box:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        }
-        .year-box.current {
-            border-color: var(--accent);
-            border-width: 2px;
-        }
-        .year-num {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--text);
-            letter-spacing: -0.02em;
-            margin-bottom: 8px;
-        }
+        .year-box:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .year-box.current { border-color: var(--accent); border-width: 2px; }
+        .year-num { font-size: 1.6rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; margin-bottom: 8px; }
         .year-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 0.5rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--accent);
-            background: rgba(16, 185, 129, 0.15);
-            padding: 3px 6px;
-            border-radius: 5px;
+            position: absolute; top: 10px; right: 10px;
+            font-size: 0.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--accent); background: rgba(16, 185, 129, 0.15);
+            padding: 3px 6px; border-radius: 5px;
         }
-        .year-progress {
-            height: 5px;
-            background: var(--border);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 8px 0 6px;
-        }
-        .year-progress .fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            background: var(--year-bar);
-        }
-        .year-pct {
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: var(--text);
-        }
+        .year-progress { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 8px 0 6px; }
+        .year-progress .fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--year-bar); }
+        .year-pct { font-size: 0.85rem; font-weight: 800; color: var(--text); }
 
-        /* ===== QUARTERS — COMPACT BOXES ===== */
-        .quarters-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            padding: 0 2px;
-        }
+        /* ===== QUARTERS ===== */
+        .quarters-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 0 2px; }
         .quarters-header .back-btn {
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 8px 14px;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: var(--card-shadow);
+            background: var(--card); border: 1px solid var(--border); color: var(--text);
+            padding: 8px 14px; border-radius: 10px; font-family: inherit; font-size: 0.8rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; box-shadow: var(--card-shadow);
         }
-        .quarters-header .back-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            transform: translateX(-2px);
-        }
-        .quarters-title {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--text);
-            letter-spacing: -0.02em;
-        }
+        .quarters-header .back-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateX(-2px); }
+        .quarters-title { font-size: 1.1rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
 
-        .quarters-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        .quarters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .quarter-compact {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 14px 12px;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--card-shadow);
-            position: relative;
-            text-align: center;
+            background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+            padding: 14px 12px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--card-shadow); position: relative; text-align: center;
         }
-        .quarter-compact:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        }
-        .quarter-compact.current {
-            border-color: var(--accent);
-            border-width: 2px;
-        }
-        .qc-num {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: var(--text);
-            letter-spacing: -0.02em;
-        }
+        .quarter-compact:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .quarter-compact.current { border-color: var(--accent); border-width: 2px; }
+        .qc-num { font-size: 1.15rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
         .qc-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            font-size: 0.45rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--accent);
-            background: rgba(16, 185, 129, 0.15);
-            padding: 2px 5px;
-            border-radius: 4px;
+            position: absolute; top: 8px; right: 8px;
+            font-size: 0.45rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--accent); background: rgba(16, 185, 129, 0.15);
+            padding: 2px 5px; border-radius: 4px;
         }
-        .qc-bar {
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-            overflow: hidden;
-            margin: 10px 0 6px;
-        }
-        .qc-bar .fill {
-            height: 100%;
-            border-radius: 2px;
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            background: var(--accent);
-        }
-        .qc-pct {
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: var(--text);
-        }
+        .qc-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin: 10px 0 6px; }
+        .qc-bar .fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--accent); }
+        .qc-pct { font-size: 0.85rem; font-weight: 800; color: var(--text); }
 
-        /* ===== FLOATING CALENDAR DETAIL ===== */
+        /* ===== FLOATING CALENDAR ===== */
         .calendar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--modal-bg);
-            z-index: 900;
-            align-items: flex-end;
-            justify-content: center;
+            display: none; position: fixed; inset: 0;
+            background: var(--modal-bg); z-index: 900;
+            align-items: flex-end; justify-content: center;
             backdrop-filter: blur(8px);
         }
-        .calendar-overlay.active {
-            display: flex;
-            animation: fadeIn 0.2s;
-        }
+        .calendar-overlay.active { display: flex; animation: fadeIn 0.2s; }
         .calendar-detail {
-            background: var(--bg);
-            border-radius: 22px 22px 0 0;
-            width: 100%;
-            max-width: 700px;
-            max-height: 92vh;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--border);
-            border-bottom: none;
-            animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: hidden;
+            background: var(--bg); border-radius: 22px 22px 0 0;
+            width: 100%; max-width: 700px; max-height: 92vh;
+            display: flex; flex-direction: column;
+            border: 1px solid var(--border); border-bottom: none;
+            animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden;
         }
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .calendar-detail-header {
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-            background: var(--card);
-            position: relative;
+            padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border); flex-shrink: 0;
+            background: var(--card); position: relative;
         }
         .calendar-detail-header::before {
-            content: '';
-            position: absolute;
-            top: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 4px;
-            border-radius: 2px;
-            background: var(--border-input);
+            content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 4px; border-radius: 2px; background: var(--border-input);
         }
-        .calendar-detail-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--text);
-            letter-spacing: -0.02em;
-            flex: 1;
-            text-align: center;
-        }
+        .calendar-detail-title { font-size: 1.05rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; flex: 1; text-align: center; }
         .close-btn {
-            background: var(--item-bg);
-            border: 1px solid var(--border-input);
-            color: var(--text);
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            font-weight: 700;
+            background: var(--item-bg); border: 1px solid var(--border-input); color: var(--text);
+            width: 32px; height: 32px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-weight: 700;
         }
-        .close-btn:hover {
-            color: var(--sunday);
-            border-color: var(--sunday);
+        .close-btn:hover { color: var(--sunday); border-color: var(--sunday); }
+        .add-task-btn {
+            background: var(--accent); color: var(--btn-text); border: none;
+            width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+            font-weight: 800; padding: 0; line-height: 1;
         }
+        .add-task-btn:hover { transform: scale(1.08); filter: brightness(1.1); }
+
         .calendar-detail-body {
-            padding: 16px;
-            overflow-y: auto;
-            flex: 1;
-            -webkit-overflow-scrolling: touch;
+            padding: 16px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;
         }
         .calendar-detail-body::-webkit-scrollbar { width: 6px; }
         .calendar-detail-body::-webkit-scrollbar-track { background: var(--bg); }
         .calendar-detail-body::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 3px; }
 
-        /* ===== MODALS (generic) ===== */
+        /* ===== MODALS ===== */
         .modal-overlay { display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; width: 300px; max-width: 90vw; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .modal-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; width: 320px; max-width: 90vw; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         .modal-card h3 { margin: 0 0 20px; font-size: 1.1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
         .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--subtext); font-weight: 500;}
-        .input-group input[type="text"], .input-group input[type="number"], .input-group select { width: auto; min-width: 70px; max-width: 140px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 8px; border-radius: 8px; text-align: center; font-weight: 600; font-family: inherit; transition: border-color 0.2s; outline: none;}
+        .input-group input[type="text"], .input-group input[type="number"], .input-group input[type="time"], .input-group select { width: auto; min-width: 70px; max-width: 170px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 8px; border-radius: 8px; text-align: center; font-weight: 600; font-family: inherit; transition: border-color 0.2s; outline: none;}
         .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
         .input-group input[type="color"] { background: none; border: none; padding: 0; width: 40px; height: 40px; cursor: pointer; border-radius: 8px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 25px; }
@@ -479,44 +292,11 @@
         .btn-cancel { background: var(--item-bg); color: var(--text); border: 1px solid var(--border-input); }
         .btn-delete { background: var(--sunday); color: var(--btn-text); }
 
-        /* ===== TASKS ===== */
-        .task-mgr { margin-bottom: 25px; }
-        .t-month { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; box-shadow: var(--card-shadow); }
-        .t-month-head { padding: 13px 18px; font-size: 0.9rem; font-weight: 700; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; transition: background 0.2s;}
-        .t-month-head:hover { background: var(--item-bg); }
-        .t-month-body { display: none; padding: 15px 18px; border-top: 1px solid var(--border); background: var(--bg); }
-        .t-month-body.active { display: block; animation: slideIn 0.2s; }
-        
-        .t-week { border-left: 3px solid var(--block-id); margin-left: 5px; padding-left: 15px; margin-bottom: 18px; }
-        .t-week:last-child { margin-bottom: 0; }
-        .t-week-title { font-size: 0.85rem; color: var(--block-id); font-weight: 800; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 4px 0;}
-        .t-week-body { display: none; }
-        .t-week-body.active { display: block; animation: fadeIn 0.3s ease-out; }
-        
-        .t-list { list-style: none; padding: 0; margin: 0 0 12px 0; }
-        .t-item { display: flex; align-items: flex-start; gap: 12px; font-size: 0.85rem; margin-bottom: 10px; color: var(--text); line-height: 1.4; transition: opacity 0.2s; padding: 4px 0;}
-        
+        /* ===== CHECKBOX ===== */
         .custom-check { appearance: none; background-color: var(--input-bg); margin: 0; width: 18px; height: 18px; border: 2px solid var(--border-input); border-radius: 5px; display: grid; place-content: center; transition: all 0.2s ease-in-out; margin-top: 2px; flex-shrink: 0; cursor: pointer; }
         .custom-check::before { content: ""; width: 10px; height: 10px; transform: scale(0); transition: 0.2s ease-in-out; box-shadow: inset 1em 1em var(--check-color); transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
         .custom-check:checked { background-color: var(--accent); border-color: var(--accent); }
         .custom-check:checked::before { transform: scale(1); }
-
-        .t-item.done span.text { text-decoration: line-through; color: var(--muted); opacity: 0.7; }
-        .delete-btn { color: var(--muted); font-size: 1.2rem; padding: 0 6px; cursor: pointer; transition: 0.2s; opacity: 0.5; font-weight: bold; }
-        .t-item:hover .delete-btn { opacity: 1; color: var(--sunday); }
-        .empty-tasks { color: var(--muted); font-size: 0.8rem; font-style: italic; padding: 5px 0 10px; }
-
-        .t-add { display: flex; gap: 8px; flex-wrap: wrap; }
-        .t-type-select { background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); border-radius: 8px; padding: 8px; font-size: 0.8rem; outline: none; font-weight: 500;}
-        .t-add input { flex: 1; min-width: 120px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; outline: none; transition: border-color 0.2s;}
-        .t-add input:focus { border-color: var(--accent); }
-        .t-add button { background: var(--accent); color: var(--btn-text); border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 1rem; transition: transform 0.2s;}
-        .t-add button:active { transform: scale(0.95); }
-
-        .t-badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; flex-shrink: 0;}
-        .badge-meta { background: var(--badge-meta-bg); color: var(--badge-meta-txt); }
-        .badge-diario { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .badge-dia { background: var(--badge-dia-bg); color: var(--badge-dia-txt); border: 1px solid var(--badge-dia-border); }
 
         /* ===== METRICS ===== */
         .metrics-wrapper { margin-top: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); }
@@ -533,21 +313,42 @@
         .m-progress { flex: 1; background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; position: relative; }
         .m-fill { height: 100%; background: var(--accent); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; border-radius: 5px;}
 
-        /* ===== CALENDAR MONTHS ===== */
-        .months-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; align-items: start; }
+        /* ===== MONTHS 2x2 GRID ===== */
+        .months-container { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+            align-items: stretch; 
+        }
+        @media (max-width: 520px) {
+            .months-container { grid-template-columns: 1fr; }
+        }
         .month { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); transition: all 0.3s ease; box-shadow: var(--card-shadow); }
-        .month-name { font-size: 0.95rem; font-weight: 800; margin-bottom: 15px; color: var(--text); text-align: center; position: relative; cursor: pointer; user-select: none; letter-spacing: -0.01em; }
-        .month-toggle { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--muted); font-weight: 400; }
+        .month-name { font-size: 0.9rem; font-weight: 800; margin-bottom: 14px; color: var(--text); text-align: center; position: relative; cursor: pointer; user-select: none; letter-spacing: -0.01em; }
+        .month-toggle { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: var(--muted); font-weight: 400; }
         .month.collapsed { padding: 12px 15px; background: var(--item-bg); }
         .month.collapsed .days-grid { display: none; }
         .month.collapsed .month-name { margin-bottom: 0; color: var(--subtext); }
 
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
-        .week-day { font-size: 0.65rem; color: var(--muted); margin-bottom: 8px; font-weight: 700; }
-        .day { font-size: 0.75rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: 600; border: 1.5px solid transparent; box-sizing: border-box; margin-top: 6px; position: relative; border-radius: 8px; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+        .week-day { font-size: 0.6rem; color: var(--muted); margin-bottom: 8px; font-weight: 700; }
+        .day { font-size: 0.72rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: 600; border: 1.5px solid transparent; box-sizing: border-box; margin-top: 6px; position: relative; border-radius: 8px; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; cursor: pointer; }
         .day:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: var(--item-bg); }
         
         .block-label { position: absolute; top: -14px; left: 0; font-size: 0.55rem; color: var(--block-id); font-weight: 800; z-index: 10; }
+
+        .task-dot {
+            position: absolute;
+            bottom: 1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 4px var(--accent);
+            pointer-events: none;
+        }
 
         @keyframes pulse-border { 0% { box-shadow: 0 0 0px var(--week-box-active); } 50% { box-shadow: 0 0 10px var(--week-box-active); } 100% { box-shadow: 0 0 0px var(--week-box-active); } }
         .current-week-glow .day { animation: pulse-border 2.5s infinite; z-index: 1; }
@@ -560,7 +361,86 @@
         .highlight-week-active .day { border-top-color: var(--week-box-active); border-bottom-color: var(--week-box-active); border-radius: 0; } 
         .highlight-week-active .block-start { border-left-color: var(--week-box-active); border-top-left-radius: 8px; border-bottom-left-radius: 8px; } 
         .highlight-week-active .block-end { border-right-color: var(--week-box-active); border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
-        
+
+        /* ===== QUARTER TASKS PANEL (4th slot) ===== */
+        .quarter-tasks-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            max-height: 420px;
+            min-height: 200px;
+            overflow: hidden;
+        }
+        .qt-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 10px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            letter-spacing: -0.01em;
+        }
+        .qt-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .qt-list::-webkit-scrollbar { width: 6px; }
+        .qt-list::-webkit-scrollbar-track { background: transparent; }
+        .qt-list::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 3px; }
+        .qt-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+        .qt-item:last-child { border-bottom: none; }
+        .qt-item.done .qt-text { 
+            text-decoration: line-through; 
+            color: var(--muted); 
+            opacity: 0.65; 
+        }
+        .qt-info { flex: 1; min-width: 0; }
+        .qt-text { 
+            color: var(--text); 
+            font-weight: 500;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        .qt-meta { 
+            font-size: 0.62rem; 
+            color: var(--muted); 
+            margin-top: 3px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .qt-empty {
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-style: italic;
+            text-align: center;
+            padding: 30px 10px;
+        }
+        .qt-delete {
+            color: var(--muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            opacity: 0.5;
+            font-weight: bold;
+            padding: 0 4px;
+            flex-shrink: 0;
+            line-height: 1;
+            transition: 0.2s;
+        }
+        .qt-delete:hover { opacity: 1; color: var(--sunday); }
+
         #ds-list::-webkit-scrollbar { width: 6px; }
         #ds-list::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
         #ds-list::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 4px; }
@@ -647,13 +527,12 @@
 
     <div id="calendar-container"></div>
 
-    <!-- FLOATING CALENDAR DETAIL -->
     <div id="calendar-overlay" class="calendar-overlay" onclick="closeQuarterDetail(event)">
         <div class="calendar-detail" onclick="event.stopPropagation()">
             <div class="calendar-detail-header">
-                <button class="close-btn" onclick="closeQuarterDetail()">✕</button>
+                <button class="add-task-btn" onclick="openTaskCreateModal()" title="Añadir tarea">＋</button>
                 <div class="calendar-detail-title" id="calendar-detail-title">T1</div>
-                <div style="width: 32px;"></div>
+                <button class="close-btn" onclick="closeQuarterDetail()">✕</button>
             </div>
             <div class="calendar-detail-body" id="calendar-detail-body"></div>
         </div>
@@ -670,9 +549,31 @@
                 <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveCustomTimer()">Iniciar</button></div>
             </div>
 
+            <div id="modal-content-taskcreate" style="display:none;">
+                <h3>Nueva Tarea</h3>
+                <div class="input-group"><label>Descripción:</label><input type="text" id="inp-tc-title" placeholder="Ej. Revisar informe" style="width: 170px;"></div>
+                <div class="input-group"><label>Semana:</label><select id="inp-tc-week"></select></div>
+                <div class="input-group"><label>Día:</label><select id="inp-tc-day">
+                    <option value="">Sin día específico</option>
+                    <option value="0">Lunes</option>
+                    <option value="1">Martes</option>
+                    <option value="2">Miércoles</option>
+                    <option value="3">Jueves</option>
+                    <option value="4">Viernes</option>
+                    <option value="5">Sábado</option>
+                    <option value="6">Domingo</option>
+                </select></div>
+                <div class="input-group"><label>Hora:</label><input type="time" id="inp-tc-hour"></div>
+                <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveNewManagedTask()">Guardar</button></div>
+            </div>
+
             <div id="modal-content-daystats" style="display:none;">
                 <h3 id="ds-title" style="color: var(--accent); margin-bottom: 5px;">Estadísticas del Día</h3>
                 <div id="ds-points" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 15px; color: var(--text);">0 Puntos Totales</div>
+                <div id="ds-tasks-section" style="display:none; margin-bottom: 15px;">
+                    <div style="font-size: 0.8rem; font-weight: 600; color: var(--subtext); margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Tareas del día:</div>
+                    <div id="ds-tasks-list"></div>
+                </div>
                 <div style="font-size: 0.8rem; font-weight: 600; color: var(--subtext); margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Historial de Temporizadores:</div>
                 <div id="ds-list" style="max-height: 200px; overflow-y: auto; text-align: left; padding-right: 5px;"></div>
                 <div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div>
@@ -717,7 +618,9 @@
     <script>
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const diasL = ["L", "M", "M", "J", "V", "S", "D"];
+        const diasFull = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
         const currentYear = new Date().getFullYear();
+        const dayTypeMap = { 'Lun': 0, 'Mar': 1, 'Mié': 2, 'Jue': 3, 'Vie': 4, 'Sáb': 5, 'Dom': 6 };
         
         let rawTasks = JSON.parse(localStorage.getItem('wkTasks')) || {};
         let tasksData = {};
@@ -745,13 +648,18 @@
         if(markersData.bi) { markersData.block = markersData.bi; delete markersData.bi; localStorage.setItem('wkMarkers', JSON.stringify(markersData)); }
         if(!blockConfig.startYear) { blockConfig.startYear = currentYear; localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); }
 
-        // ===== CALENDAR NAV STATE =====
         let calendarView = localStorage.getItem('wkCalView') || 'years';
         if (!['years', 'quarters'].includes(calendarView)) calendarView = 'years';
         let selectedYear = parseInt(localStorage.getItem('wkSelYear')) || currentYear;
         let selectedQuarter = parseInt(localStorage.getItem('wkSelQtr')) || 0;
         if (isNaN(selectedYear) || selectedYear < 2000 || selectedYear > 2100) selectedYear = currentYear;
         if (isNaN(selectedQuarter) || selectedQuarter < 0 || selectedQuarter > 3) selectedQuarter = 0;
+
+        function getTaskDay(t) {
+            if (t.day !== null && t.day !== undefined) return t.day;
+            if (t.type && dayTypeMap[t.type] !== undefined) return dayTypeMap[t.type];
+            return null;
+        }
 
         function exportData() {
             let content = "=== COPIA DE SEGURIDAD - CONTROL PERSONAL ===\n";
@@ -764,7 +672,8 @@
                     content += `\n[ AÑO / SEMANA: ${key} ]\n`;
                     tasksData[key].forEach(t => {
                         let status = t.done ? "[x]" : "[ ]";
-                        content += `${status} (${t.type}) ${t.text}\n`;
+                        let dayInfo = getTaskDay(t) !== null ? ` [${diasFull[getTaskDay(t)]}${t.hour ? ' ' + t.hour : ''}]` : '';
+                        content += `${status}${dayInfo} ${t.text}\n`;
                     });
                 }
             }
@@ -827,12 +736,14 @@
             localStorage.setItem('wkDayLogs', JSON.stringify(logs));
         }
 
-        function showDayStats(dateStr) {
+        function showDayStats(dateStr, wNum, dI) {
             let logs = JSON.parse(localStorage.getItem('wkDayLogs')) || {};
             let dayData = logs[dateStr] || { points: 0, timers: [] };
+            
             document.getElementById('modal-content-daystats').style.display = 'block';
             document.getElementById('ds-title').innerText = `Día: ${dateStr}`;
             document.getElementById('ds-points').innerText = `${dayData.points} Puntos Totales`;
+            
             let tHtml = dayData.timers.map(t => 
                 `<div style="font-size:0.85rem; border-bottom:1px solid var(--border); padding:8px 0; display:flex; justify-content:space-between; align-items:center;">
                     <span><strong style="color:var(--text)">${t.time}</strong> - ${t.name} <span style="color:var(--muted); font-size:0.75rem">(${t.duration}m)</span></span>
@@ -841,6 +752,29 @@
             ).reverse().join('');
             if(!tHtml) tHtml = '<div style="font-size:0.85rem; color:var(--muted); padding:10px 0;">No hay temporizadores registrados este día.</div>';
             document.getElementById('ds-list').innerHTML = tHtml;
+            
+            // Show tasks assigned to this day
+            const tasksSection = document.getElementById('ds-tasks-section');
+            const tasksList = document.getElementById('ds-tasks-list');
+            if (wNum !== null && wNum !== undefined && dI !== null && dI !== undefined) {
+                const weekTasks = tasksData[`${selectedYear}-${wNum}`] || [];
+                const dayTasks = weekTasks.filter(t => getTaskDay(t) === dI);
+                if (dayTasks.length > 0) {
+                    tasksSection.style.display = 'block';
+                    tasksList.innerHTML = dayTasks.map(t => {
+                        const hour = t.hour ? ` · ${t.hour}` : '';
+                        return `<div style="font-size:0.85rem; padding:6px 0; display:flex; align-items:flex-start; gap:8px;">
+                            <span style="color:${t.done ? 'var(--muted)' : 'var(--accent)'}; font-weight:bold; flex-shrink:0;">${t.done ? '✓' : '○'}</span>
+                            <span style="${t.done ? 'text-decoration: line-through; color: var(--muted);' : 'color: var(--text);'}">${t.text}${hour ? `<span style="color:var(--muted); font-size:0.72rem;">${hour}</span>` : ''}</span>
+                        </div>`;
+                    }).join('');
+                } else {
+                    tasksSection.style.display = 'none';
+                }
+            } else {
+                tasksSection.style.display = 'none';
+            }
+            
             openModal();
         }
 
@@ -902,7 +836,7 @@
         function renderTimersList() {
             const list = document.getElementById('timers-list');
             if(customTimers.length === 0) {
-                list.innerHTML = `<div class="empty-tasks" style="padding: 10px 0;">No hay temporizadores activos.</div>`;
+                list.innerHTML = `<div class="qt-empty" style="padding: 10px 0;">No hay temporizadores activos.</div>`;
                 return;
             }
             list.innerHTML = customTimers.map(t => `
@@ -925,7 +859,6 @@
             btn.classList.toggle('active');
             localStorage.setItem('wkBarOpen-' + id, panel.classList.contains('active'));
         }
-
         function restoreBars() {
             ['block', 'year', 'week', 'work', 'day'].forEach(id => {
                 if (localStorage.getItem('wkBarOpen-' + id) === 'true') {
@@ -935,36 +868,97 @@
             });
         }
 
-        // ===== CALENDAR =====
-        function getTKey(wNum) { return `${selectedYear}-${wNum}`; }
+        // ===== TASK MANAGEMENT =====
+        function openTaskCreateModal() {
+            const weekSel = document.getElementById('inp-tc-week');
+            const q = selectedQuarter;
+            let html = '';
+            for (let i = 0; i < 3; i++) {
+                const mI = q * 3 + i;
+                for (let w = 1; w <= 4; w++) {
+                    const wNum = mI * 4 + w;
+                    html += `<option value="${wNum}">${meses[mI].slice(0,3)} · W${w} (W${wNum})</option>`;
+                }
+            }
+            weekSel.innerHTML = html;
+            weekSel.selectedIndex = 0;
+            document.getElementById('inp-tc-title').value = '';
+            document.getElementById('inp-tc-day').value = '';
+            document.getElementById('inp-tc-hour').value = '';
+            document.getElementById('modal-content-taskcreate').style.display = 'block';
+            openModal();
+        }
 
-        function renderTasks(wNum) {
-            const list = document.getElementById(`t-list-${wNum}`); if(!list) return;
-            const tKey = getTKey(wNum); const tasks = tasksData[tKey] || [];
-            if(tasks.length === 0) { list.innerHTML = `<li class="empty-tasks">Sin tareas añadidas...</li>`; return; }
-            list.innerHTML = tasks.map(t => {
-                const type = t.type || 'Meta'; let badgeClass = 'badge-dia';
-                if(type === 'Meta') badgeClass = 'badge-meta'; if(type === 'Diario') badgeClass = 'badge-diario';
-                return `<li class="t-item ${t.done ? 'done' : ''}"><input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleTask(${wNum}, ${t.id})"><span class="t-badge ${badgeClass}">${type}</span><span class="text" style="flex:1;">${t.text}</span><span class="delete-btn" onclick="deleteTask(${wNum}, ${t.id})" title="Eliminar">×</span></li>`
+        function saveNewManagedTask() {
+            const title = document.getElementById('inp-tc-title').value.trim();
+            const week = parseInt(document.getElementById('inp-tc-week').value);
+            const dayVal = document.getElementById('inp-tc-day').value;
+            const hour = document.getElementById('inp-tc-hour').value;
+            if (!title) { alert("Escribe una descripción"); return; }
+            const day = dayVal === '' ? null : parseInt(dayVal);
+            const tKey = `${selectedYear}-${week}`;
+            if (!tasksData[tKey]) tasksData[tKey] = [];
+            tasksData[tKey].push({
+                id: Date.now(),
+                text: title,
+                done: false,
+                day: day,
+                hour: hour || null
+            });
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData));
+            closeModal();
+            renderQuarterDetailBody();
+        }
+
+        function toggleManagedTask(week, taskId) {
+            const tKey = `${selectedYear}-${week}`;
+            const t = (tasksData[tKey] || []).find(x => x.id === taskId);
+            if (t) t.done = !t.done;
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData));
+            renderQuarterDetailBody();
+        }
+
+        function deleteManagedTask(week, taskId) {
+            const tKey = `${selectedYear}-${week}`;
+            tasksData[tKey] = (tasksData[tKey] || []).filter(x => x.id !== taskId);
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData));
+            renderQuarterDetailBody();
+        }
+
+        function renderMasterTaskList() {
+            const q = selectedQuarter;
+            const year = selectedYear;
+            let allTasks = [];
+            for (let m = 0; m < 3; m++) {
+                const mI = q * 3 + m;
+                for (let w = 1; w <= 4; w++) {
+                    const wNum = mI * 4 + w;
+                    const tasks = tasksData[`${year}-${wNum}`] || [];
+                    tasks.forEach(t => allTasks.push({ ...t, week: wNum }));
+                }
+            }
+            if (allTasks.length === 0) {
+                return `<div class="qt-empty">Sin tareas este trimestre.<br>Toca ＋ arriba para añadir.</div>`;
+            }
+            return allTasks.map(t => {
+                const tDay = getTaskDay(t);
+                let metaParts = [`W${t.week}`];
+                if (tDay !== null) metaParts.push(diasFull[tDay].slice(0,3));
+                if (t.hour) metaParts.push(t.hour);
+                return `
+                    <div class="qt-item ${t.done ? 'done' : ''}">
+                        <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${t.week}, ${t.id})">
+                        <div class="qt-info">
+                            <div class="qt-text">${t.text}</div>
+                            <div class="qt-meta">${metaParts.join(' · ')}</div>
+                        </div>
+                        <span class="qt-delete" onclick="deleteManagedTask(${t.week}, ${t.id})">×</span>
+                    </div>
+                `;
             }).join('');
         }
 
-        function addTask(wNum) {
-            const input = document.getElementById(`t-input-${wNum}`); const select = document.getElementById(`t-type-${wNum}`);
-            if(!input.value.trim()) return; 
-            const tKey = getTKey(wNum); if(!tasksData[tKey]) tasksData[tKey] = [];
-            tasksData[tKey].push({ id: Date.now(), text: input.value.trim(), done: false, type: select.value });
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); input.value = ''; renderTasks(wNum); updateAllMetrics();
-        }
-        function toggleTask(wNum, taskId) {
-            const tKey = getTKey(wNum); const t = tasksData[tKey].find(x => x.id === taskId); if(t) t.done = !t.done;
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wNum); updateAllMetrics();
-        }
-        function deleteTask(wNum, taskId) {
-            const tKey = getTKey(wNum); tasksData[tKey] = tasksData[tKey].filter(x => x.id !== taskId);
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); renderTasks(wNum); updateAllMetrics();
-        }
-
+        // ===== CALENDAR =====
         function getAvailableYears() {
             const now = new Date();
             const currentY = now.getFullYear();
@@ -1009,16 +1003,10 @@
             localStorage.setItem('wkCalView', calendarView);
             drawCalendar();
         }
-
         function goBackToYears() {
             calendarView = 'years';
             localStorage.setItem('wkCalView', calendarView);
             drawCalendar();
-        }
-
-        function toggleWeek(wNum) {
-            const body = document.getElementById(`t-week-body-${wNum}`); const arrow = document.getElementById(`w-arrow-${wNum}`);
-            body.classList.toggle('active'); arrow.style.transform = body.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
         }
         function toggleMonth(mI) {
             const yKey = `${selectedYear}-${mI}`; collapsedMonths[yKey] = !collapsedMonths[yKey];
@@ -1027,7 +1015,6 @@
             if(collapsedMonths[yKey]) { wrap.classList.add('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '+'; } 
             else { wrap.classList.remove('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '−'; }
         }
-
         function toggleMetricsView(q) {
             const mBlock = document.getElementById(`metrics-m-${q}`), qBlock = document.getElementById(`metrics-q-${q}`), btnText = document.getElementById(`m-toggle-btn-${q}`);
             if(mBlock.classList.contains('active')) { mBlock.classList.remove('active'); qBlock.classList.add('active'); btnText.innerText = 'Ver por Mes'; } 
@@ -1041,7 +1028,7 @@
                 const mI = q * 3 + m;
                 let mTotal = 0, mDone = 0;
                 for (let w = 1; w <= 4; w++) {
-                    const tKey = getTKey(mI * 4 + w);
+                    const tKey = `${selectedYear}-${mI * 4 + w}`;
                     const tasks = tasksData[tKey] || [];
                     mTotal += tasks.length;
                     mDone += tasks.filter(t => t.done).length;
@@ -1060,7 +1047,6 @@
             if (qPctTxt) qPctTxt.innerText = Math.round(qPct) + '%';
         }
 
-        // ===== VIEWS =====
         function renderYearsView() {
             const now = new Date();
             const currentY = now.getFullYear();
@@ -1087,7 +1073,6 @@
             const currentY = now.getFullYear();
             const currentQ = Math.floor(now.getMonth() / 3);
             const isCurrentYear = selectedYear === currentY;
-            
             let html = `
                 <div class="quarters-header">
                     <button class="back-btn" onclick="goBackToYears()">← Años</button>
@@ -1121,7 +1106,6 @@
             }
         }
 
-        // ===== FLOATING DETAIL =====
         function openQuarterDetail(q) {
             selectedQuarter = q;
             localStorage.setItem('wkSelQtr', q);
@@ -1135,7 +1119,6 @@
             if (e && e.target.id !== 'calendar-overlay') return;
             document.getElementById('calendar-overlay').classList.remove('active');
             document.body.style.overflow = '';
-            // Refresh quarter stats in case tasks changed
             if (calendarView === 'quarters') drawCalendar();
         }
 
@@ -1145,25 +1128,13 @@
             const now = new Date(); now.setHours(0, 0, 0, 0);
             let tBC = q * 12;
             
-            let html = '<div class="task-mgr">';
-            
-            for (let m = 0; m < 3; m++) {
-                const mI = q * 3 + m;
-                html += `<div class="t-month"><div class="t-month-head" onclick="this.nextElementSibling.classList.toggle('active')">${meses[mI]} <span style="font-size: 0.6rem; color: var(--muted);">▼</span></div><div class="t-month-body">`;
-                for (let w = 1; w <= 4; w++) {
-                    const wNum = mI * 4 + w;
-                    html += `<div class="t-week"><div class="t-week-title" onclick="toggleWeek(${wNum})">W${wNum} <span id="w-arrow-${wNum}" style="font-size: 0.5rem; transition: transform 0.2s; color:var(--muted)">▼</span></div><div class="t-week-body" id="t-week-body-${wNum}"><ul class="t-list" id="t-list-${wNum}"></ul><div class="t-add"><select id="t-type-${wNum}" class="t-type-select"><option value="Meta">Meta</option><option value="Diario">Diario</option><option value="Lun">Lun</option><option value="Mar">Mar</option><option value="Mié">Mié</option><option value="Jue">Jue</option><option value="Vie">Vie</option><option value="Sáb">Sáb</option><option value="Dom">Dom</option></select><input type="text" id="t-input-${wNum}" placeholder="Añadir tarea..." onkeypress="if(event.key==='Enter') addTask(${wNum})"><button onclick="addTask(${wNum})">+</button></div></div></div>`;
-                }
-                html += `</div></div>`;
-            }
-            html += `</div><div class="months-container">`;
+            let html = '<div class="months-container">';
             
             for (let m = 0; m < 3; m++) {
                 const mI = q * 3 + m;
                 const fD = new Date(year, mI, 1).getDay();
                 const off = fD === 0 ? 6 : fD - 1;
                 const dM = new Date(year, mI + 1, 0).getDate();
-                
                 const yKey = `${year}-${mI}`;
                 const isCol = collapsedMonths[yKey];
                 const colClass = isCol ? " collapsed" : "";
@@ -1181,8 +1152,12 @@
                 let weeks = [];
                 for (let i = 0; i < slots.length; i += 7) { let dws = slots.slice(i, i + 7); weeks.push({ dws, c: dws.filter(d => d !== null).length }); }
                 let sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
+                
                 weeks.forEach((w, i) => {
                     let h = sI.includes(i), wCl = "", fR = -1, lR = -1;
+                    const localW = sI.indexOf(i) + 1; // 1-4 for highlighted weeks
+                    const wNum = mI * 4 + localW;
+                    
                     for (let k = 0; k < 7; k++) { if (w.dws[k] !== null) { if (fR === -1) fR = k; lR = k; } }
                     if (h) {
                         tBC++;
@@ -1199,9 +1174,22 @@
                             if (dt < now) cl += " past";
                             else if (dt.getTime() === now.getTime()) cl += " today";
                             else cl += (dt.getDay() === 6) ? " sat-future" : (dt.getDay() === 0) ? " sun-future" : " future";
-                            if (h && dI === fR) html += `<div class="${cl} block-start" onclick="showDayStats('${dtStr}')"><span class="block-label">W${tBC}</span>${d}</div>`;
-                            else if (h && dI === lR) html += `<div class="${cl} block-end" onclick="showDayStats('${dtStr}')">${d}</div>`;
-                            else html += `<div class="${cl}" onclick="showDayStats('${dtStr}')">${d}</div>`;
+                            
+                            // Check tasks for this specific week + day
+                            let hasTasks = false;
+                            if (h) {
+                                const weekTasks = tasksData[`${year}-${wNum}`] || [];
+                                hasTasks = weekTasks.some(t => getTaskDay(t) === dI);
+                            }
+                            
+                            const taskDot = hasTasks ? '<span class="task-dot"></span>' : '';
+                            const clickHandler = h 
+                                ? `showDayStats('${dtStr}', ${wNum}, ${dI})`
+                                : `showDayStats('${dtStr}', null, null)`;
+                            
+                            if (h && dI === fR) html += `<div class="${cl} block-start" onclick="${clickHandler}"><span class="block-label">W${localW}</span>${d}${taskDot}</div>`;
+                            else if (h && dI === lR) html += `<div class="${cl} block-end" onclick="${clickHandler}">${d}${taskDot}</div>`;
+                            else html += `<div class="${cl}" onclick="${clickHandler}">${d}${taskDot}</div>`;
                         }
                     });
                     html += `</div>`;
@@ -1209,7 +1197,16 @@
                 html += `</div></div>`;
             }
             
-            html += `</div><div class="metrics-wrapper"><div class="metrics-header"><span class="metrics-title">CUMPLIMIENTO T${q + 1}</span><div class="toggle-view" id="m-toggle-btn-${q}" onclick="toggleMetricsView(${q})">Ver Trimestre</div></div><div id="metrics-m-${q}" class="metrics-view active">`;
+            // 4th slot: task list
+            html += `<div class="quarter-tasks-panel">
+                <div class="qt-title">📋 Tareas del Trimestre</div>
+                <div class="qt-list">${renderMasterTaskList()}</div>
+            </div>`;
+            
+            html += `</div>`;
+            
+            // Metrics
+            html += `<div class="metrics-wrapper"><div class="metrics-header"><span class="metrics-title">CUMPLIMIENTO T${q + 1}</span><div class="toggle-view" id="m-toggle-btn-${q}" onclick="toggleMetricsView(${q})">Ver Trimestre</div></div><div id="metrics-m-${q}" class="metrics-view active">`;
             for (let m = 0; m < 3; m++) {
                 const mI = q * 3 + m;
                 html += `<div class="m-bar-row"><div class="m-label">${meses[mI]}</div><div class="m-progress"><div id="fill-m-${mI}" class="m-fill"></div></div><div id="pct-m-${mI}" class="m-pct">0%</div></div>`;
@@ -1217,27 +1214,18 @@
             html += `</div><div id="metrics-q-${q}" class="metrics-view"><div class="m-bar-row"><div class="m-label">T${q + 1} Total</div><div class="m-progress"><div id="fill-q-${q}" class="m-fill" style="background: var(--year-bar)"></div></div><div id="pct-q-${q}" class="m-pct">0%</div></div></div></div>`;
             
             document.getElementById('calendar-detail-body').innerHTML = html;
-            
-            for (let m = 0; m < 3; m++) {
-                const mI = q * 3 + m;
-                for (let w = 1; w <= 4; w++) {
-                    renderTasks(mI * 4 + w);
-                }
-            }
             updateAllMetrics();
         }
 
-        // ===== GENERIC MODALS =====
+        // ===== MODALS =====
         function openModal() { document.getElementById('modal-overlay').classList.add('active'); }
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
             document.getElementById('modal-overlay').classList.remove('active');
-            document.getElementById('modal-content-work').style.display = 'none';
-            document.getElementById('modal-content-marker').style.display = 'none';
-            document.getElementById('modal-content-block').style.display = 'none';
-            document.getElementById('modal-content-day').style.display = 'none';
-            document.getElementById('modal-content-timer').style.display = 'none';
-            document.getElementById('modal-content-daystats').style.display = 'none';
+            ['work', 'marker', 'block', 'day', 'timer', 'daystats', 'taskcreate'].forEach(id => {
+                const el = document.getElementById('modal-content-' + id);
+                if (el) el.style.display = 'none';
+            });
         }
 
         function openBlockModal() { document.getElementById('modal-content-block').style.display = 'block'; document.getElementById('inp-block-start').value = blockConfig.startYear; document.getElementById('inp-block-years').value = blockConfig.years; openModal(); }

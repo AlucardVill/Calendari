@@ -74,7 +74,7 @@
         .header-menu-btn { background: transparent; border: none; color: var(--text); font-size: 1.5rem; font-weight: bold; cursor: pointer; padding: 4px 12px; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
         .header-menu-btn:active { transform: scale(0.9); }
 
-        /* Estilos del Temporizador Widget */
+        /* Estilos del Temporizador Widget Principal */
         .timer-widget {
             display: flex; align-items: center; justify-content: space-between; gap: 12px;
             margin: -10px 4px 15px; padding: 12px 16px;
@@ -94,8 +94,6 @@
             color: var(--text); letter-spacing: -0.02em; flex: 1; text-align: center;
         }
         .timer-display.running { color: var(--accent); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-        .timer-display.ended { color: var(--sunday); animation: pulseEnd 1s infinite; }
-        @keyframes pulseEnd { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .timer-controls { display: flex; gap: 8px; }
         .t-btn { 
             width: 36px; height: 36px; border-radius: 10px; background: var(--item-bg); 
@@ -105,6 +103,28 @@
         .t-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
         .t-btn.active { background: var(--sunday); border-color: var(--sunday); color: #fff; }
         .t-btn.active:hover { border-color: #f43f5e; background: #f43f5e; color: #fff; }
+
+        /* Estilos del Temporizador Flotante (Esquina Superior Izquierda) */
+        #floating-timer {
+            display: none; position: fixed; 
+            top: max(12px, env(safe-area-inset-top)); 
+            left: 12px; z-index: 10000; 
+            align-items: center; gap: 6px;
+        }
+        #floating-time {
+            color: var(--block-id); /* Amarillo/Dorado sutil */
+            font-size: 0.75rem; font-weight: 300; 
+            letter-spacing: 0.05em; font-variant-numeric: tabular-nums;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.85);
+        }
+        .floating-stop-btn {
+            background: rgba(0,0,0,0.45); border: 1px solid rgba(253,224,71,0.25);
+            color: var(--block-id); border-radius: 4px;
+            width: 16px; height: 16px; font-size: 0.45rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; padding: 0;
+            backdrop-filter: blur(4px); transition: all 0.2s;
+        }
+        .floating-stop-btn:active { transform: scale(0.9); background: rgba(0,0,0,0.8); }
 
         .section-label {
             display: flex; align-items: center; gap: 8px;
@@ -763,6 +783,12 @@
     </style>
 </head>
 <body>
+    <!-- NUEVO: Widget Flotante del Temporizador (Esquina Superior Izquierda) -->
+    <div id="floating-timer">
+        <span id="floating-time">00:00</span>
+        <button class="floating-stop-btn" onclick="resetTimer()" title="Detener/Reiniciar">■</button>
+    </div>
+
     <div class="header-top">
         <h2 class="header-title">Tiempo</h2>
         <button class="header-menu-btn" onclick="openGeneralModal()" title="Menú" aria-label="Menú">
@@ -777,10 +803,10 @@
     <!-- NUEVO: Temporizador Widget -->
     <div class="timer-widget" id="custom-timer-widget">
         <div class="timer-input-group">
-            <input type="number" id="timer-input-m" value="25" min="1" max="999">
+            <input type="number" id="timer-input-m" placeholder="0" min="0" max="999" title="Deja en 0 o vacío para usar como cronómetro">
             <span>min</span>
         </div>
-        <div class="timer-display" id="timer-display">25:00</div>
+        <div class="timer-display" id="timer-display">00:00</div>
         <div class="timer-controls">
             <button class="t-btn" id="btn-timer-toggle" onclick="toggleTimer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
@@ -1045,81 +1071,102 @@
         // VARIABLES GLOBALES (incluyendo la memoria de Hora de Fin)
         let globalLastHourEnd = localStorage.getItem('wkLastHourEnd') || '';
         
-        // TEMPORIZADOR LOGIC
-        let timerTarget = null;
-        let timerDuration = 0;
-        let timerIsRunning = false;
+        // TEMPORIZADOR LOGIC Y ESTADO UNIVERSAL
+        let tMode = 'up';      // 'up' = Cronómetro, 'down' = Temporizador
+        let tRunning = false;
+        let tRef = 0;          // Referencia Date.now() del último cambio
+        let tAcc = 0;          // Ms acumulados o restantes
 
         function toggleTimer() {
-            if (timerIsRunning) {
+            if (tRunning) {
                 // Pausar
-                const now = Date.now();
-                timerDuration = Math.max(0, timerTarget - now); 
-                timerTarget = null;
-                timerIsRunning = false;
-                document.getElementById('btn-timer-toggle').innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-                document.getElementById('btn-timer-toggle').classList.remove('active');
-            } else {
-                // Iniciar o Reanudar
-                if (timerTarget === null && timerDuration === 0) {
-                    let mins = parseInt(document.getElementById('timer-input-m').value) || 25;
-                    timerDuration = mins * 60 * 1000;
+                if (tMode === 'up') {
+                    tAcc += Date.now() - tRef;
+                } else {
+                    tAcc -= Date.now() - tRef;
                 }
-                timerTarget = Date.now() + timerDuration;
-                timerIsRunning = true;
-                document.getElementById('timer-display').classList.remove('ended');
-                document.getElementById('btn-timer-toggle').innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-                document.getElementById('btn-timer-toggle').classList.add('active');
+                tRunning = false;
+            } else {
+                // Iniciar/Reanudar
+                if (tAcc === 0) {
+                    let m = parseFloat(document.getElementById('timer-input-m').value) || 0;
+                    if (m > 0) {
+                        tMode = 'down';
+                        tAcc = m * 60000;
+                    } else {
+                        tMode = 'up';
+                        tAcc = 0;
+                    }
+                }
+                tRef = Date.now();
+                tRunning = true;
             }
-            updateTimerDisplay();
+            updateTimerUI();
+            saveTimerState();
         }
 
         function resetTimer() {
-            timerIsRunning = false;
-            timerTarget = null;
-            let mins = parseInt(document.getElementById('timer-input-m').value) || 25;
-            timerDuration = mins * 60 * 1000;
-            document.getElementById('btn-timer-toggle').innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-            document.getElementById('btn-timer-toggle').classList.remove('active');
-            document.getElementById('timer-display').classList.remove('ended');
-            updateTimerDisplay();
+            tRunning = false;
+            tAcc = 0;
+            tRef = 0;
+            updateTimerUI();
+            saveTimerState();
         }
 
-        function updateTimerDisplay() {
-            let remMs = timerDuration;
-            let displayEl = document.getElementById('timer-display');
-            
-            if (timerIsRunning && timerTarget !== null) {
-                remMs = timerTarget - Date.now();
-                displayEl.classList.add('running');
-                if (remMs <= 0) {
-                    remMs = 0;
-                    timerIsRunning = false;
-                    timerTarget = null;
-                    timerDuration = 0;
-                    document.getElementById('btn-timer-toggle').innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-                    document.getElementById('btn-timer-toggle').classList.remove('active');
-                    displayEl.classList.remove('running');
-                    displayEl.classList.add('ended');
-                    alert("¡Tiempo del temporizador cumplido!");
+        function updateTimerUI() {
+            let current = tAcc;
+            if (tRunning) {
+                if (tMode === 'up') current += Date.now() - tRef;
+                else current -= Date.now() - tRef;
+
+                if (tMode === 'down' && current <= 0) {
+                    current = 0;
+                    tRunning = false;
+                    tAcc = 0;
+                    alert("¡Tiempo cumplido!");
                 }
-            } else {
-                displayEl.classList.remove('running');
             }
-            
-            let totalSecs = Math.ceil(remMs / 1000);
-            let h = Math.floor(totalSecs / 3600);
-            let m = Math.floor((totalSecs % 3600) / 60);
-            let s = totalSecs % 60;
-            
-            let disp = '';
-            if (h > 0) disp = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-            else disp = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-            
-            displayEl.innerText = disp;
-            
-            localStorage.setItem('wkTimerState', JSON.stringify({ isRunning: timerIsRunning, target: timerTarget, duration: timerDuration }));
+
+            let totalSec = Math.floor(current / 1000);
+            let h = Math.floor(totalSec / 3600);
+            let m = Math.floor((totalSec % 3600) / 60);
+            let s = totalSec % 60;
+            let disp = h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+            document.getElementById('timer-display').innerText = disp;
+            document.getElementById('floating-time').innerText = disp;
+
+            const floatEl = document.getElementById('floating-timer');
+            if (tRunning || current > 0) {
+                floatEl.style.display = 'flex';
+            } else {
+                floatEl.style.display = 'none';
+            }
+
+            const btnToggle = document.getElementById('btn-timer-toggle');
+            if (tRunning) {
+                btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                btnToggle.classList.add('active');
+                document.getElementById('timer-display').classList.add('running');
+            } else {
+                btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+                btnToggle.classList.remove('active');
+                document.getElementById('timer-display').classList.remove('running');
+            }
         }
+
+        function saveTimerState() {
+            localStorage.setItem('wkTimerEx', JSON.stringify({ tMode, tRunning, tRef, tAcc }));
+        }
+
+        let savedT = JSON.parse(localStorage.getItem('wkTimerEx'));
+        if (savedT) {
+            tMode = savedT.tMode || 'up';
+            tRunning = savedT.tRunning || false;
+            tRef = savedT.tRef || 0;
+            tAcc = savedT.tAcc || 0;
+        }
+
 
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const diasL = ["L", "M", "M", "J", "V", "S", "D"];
@@ -1395,7 +1442,6 @@
             document.querySelectorAll('.chk-btn').forEach(btn => btn.classList.remove('active'));
 
             document.getElementById('inp-tc-title').value = '';
-            // Aquí cargamos la última hora de fin que teníamos memorizada globalmente
             document.getElementById('inp-tc-hour').value = globalLastHourEnd;
             document.getElementById('inp-tc-hourEnd').value = '';
             document.getElementById('inp-tc-color').value = '#3b82f6';
@@ -1441,7 +1487,6 @@
             renderQuarterDetailBody(); 
             renderDayTaskMarks();
 
-            // Memoria Global de Horas 
             if (hourEnd) {
                 globalLastHourEnd = hourEnd;
                 localStorage.setItem('wkLastHourEnd', globalLastHourEnd);
@@ -1491,7 +1536,6 @@
             renderQuarterDetailBody(); 
             renderDayTaskMarks();
 
-            // Memoria Global de Horas
             if (hourEnd) {
                 globalLastHourEnd = hourEnd;
                 localStorage.setItem('wkLastHourEnd', globalLastHourEnd);
@@ -2044,27 +2088,11 @@
             const dayTimerEl = document.getElementById('day-timer');
             if (dayTimerEl) dayTimerEl.innerText = dayTimerStr;
 
-            // Novedad: Comprobación del temporizador principal
-            if (timerIsRunning || timerTarget !== null) {
-                updateTimerDisplay();
-            }
+            updateTimerUI();
 
             renderDayTaskMarks();
             renderNowMarker();
             if (document.getElementById('qbar-fill')) updateQuarterBar();
-        }
-
-        // CARGA INICIAL DEL ESTADO DEL TEMPORIZADOR
-        let savedTimer = JSON.parse(localStorage.getItem('wkTimerState'));
-        if (savedTimer) {
-            timerIsRunning = savedTimer.isRunning;
-            timerTarget = savedTimer.target;
-            timerDuration = savedTimer.duration;
-            if (timerIsRunning) {
-                document.getElementById('btn-timer-toggle').innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-                document.getElementById('btn-timer-toggle').classList.add('active');
-            }
-            updateTimerDisplay();
         }
 
         restoreBars(); drawCalendar(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();

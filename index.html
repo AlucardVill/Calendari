@@ -120,7 +120,7 @@
         .floating-stop-btn {
             background: rgba(0,0,0,0.45); border: 1px solid rgba(253,224,71,0.25);
             color: var(--block-id); border-radius: 4px;
-            width: 16px; height: 16px; font-size: 0.45rem; cursor: pointer;
+            width: 18px; height: 18px; font-size: 0.45rem; cursor: pointer;
             display: flex; align-items: center; justify-content: center; padding: 0;
             backdrop-filter: blur(4px); transition: all 0.2s;
         }
@@ -786,7 +786,8 @@
     <!-- NUEVO: Widget Flotante del Temporizador (Esquina Superior Izquierda) -->
     <div id="floating-timer">
         <span id="floating-time">00:00</span>
-        <button class="floating-stop-btn" onclick="resetTimer()" title="Detener/Reiniciar">■</button>
+        <!-- Ahora el botón llama a toggleTimer() y su ícono cambiará dinámicamente -->
+        <button id="floating-toggle-btn" class="floating-stop-btn" onclick="toggleTimer()" title="Pausar/Reanudar"></button>
     </div>
 
     <div class="header-top">
@@ -1136,6 +1137,7 @@
             document.getElementById('timer-display').innerText = disp;
             document.getElementById('floating-time').innerText = disp;
 
+            // Mostrar el widget flotante si está corriendo o tiene tiempo guardado (pausado)
             const floatEl = document.getElementById('floating-timer');
             if (tRunning || current > 0) {
                 floatEl.style.display = 'flex';
@@ -1143,15 +1145,24 @@
                 floatEl.style.display = 'none';
             }
 
+            // Actualizar botones principales y el botón flotante (íconos de Play/Pausa)
             const btnToggle = document.getElementById('btn-timer-toggle');
+            const floatBtn = document.getElementById('floating-toggle-btn');
+            
             if (tRunning) {
                 btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
                 btnToggle.classList.add('active');
                 document.getElementById('timer-display').classList.add('running');
+                
+                // Ícono de PAUSA para el widget flotante
+                floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
             } else {
                 btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
                 btnToggle.classList.remove('active');
                 document.getElementById('timer-display').classList.remove('running');
+                
+                // Ícono de PLAY para el widget flotante (cuando está pausado)
+                floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
             }
         }
 

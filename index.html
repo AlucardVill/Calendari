@@ -523,7 +523,6 @@
         .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.45rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
         .task-day-tag { color: var(--block-id); font-size: 0.5rem; font-weight: 700; display: inline-block; margin-left: 5px; letter-spacing: 0.02em; }
 
-        /* Botón toggle esquina inferior derecha para listar Entornos/Acciones */
         .mode-toggle-corner {
             position: absolute; bottom: 4px; right: 4px; z-index: 10;
             background: var(--item-bg); border: 1px solid var(--border-input);
@@ -794,6 +793,16 @@
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             
+            <!-- MODAL: OBJETIVO LOGRADO (NUEVA MÉTRICA) -->
+            <div id="modal-content-goal" style="display:none; text-align: center;">
+                <h3 style="color: var(--accent); margin-bottom: 10px;">¡Tiempo Finalizado!</h3>
+                <p style="font-size: 0.85rem; color: var(--subtext); margin-bottom: 20px;">¿Objetivo logrado?</p>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-cancel" onclick="recordGoal(false)" style="background: var(--sunday); color: #fff;">No</button>
+                    <button class="btn btn-save" onclick="recordGoal(true)">Sí</button>
+                </div>
+            </div>
+
             <div id="modal-content-general" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 20px;">Configuración</h3>
                 <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -933,7 +942,9 @@
         let tRef = 0;
         let tAcc = 0;
         
-        // Variables para la alarma continua
+        // Almacenamiento de estadísticas del temporizador en localStorage
+        let timerStats = JSON.parse(localStorage.getItem('wkTimerStats')) || [];
+
         let audioCtx = null;
         let alarmInterval = null;
 
@@ -952,7 +963,7 @@
                     let osc = audioCtx.createOscillator();
                     let gain = audioCtx.createGain();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Tono agudo claro
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
                     gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
                     osc.connect(gain);
@@ -962,7 +973,7 @@
                 };
 
                 playBeep();
-                alarmInterval = setInterval(playBeep, 800); // Repetir cada 800ms
+                alarmInterval = setInterval(playBeep, 800); 
             } catch(e) {
                 console.log("Audio not allowed or supported yet", e);
             }
@@ -976,7 +987,7 @@
         }
 
         function toggleTimer() {
-            stopAlarmSound(); // Al interactuar se detiene la alarma
+            stopAlarmSound(); 
             if (tRunning) {
                 if (tMode === 'up') {
                     tAcc += Date.now() - tRef;
@@ -984,6 +995,10 @@
                     tAcc -= Date.now() - tRef;
                 }
                 tRunning = false;
+                // Al pausar o detener un temporizador cuenta regresiva activo, preguntar por objetivo logrado
+                if (tMode === 'down' && tAcc < (parseFloat(document.getElementById('timer-input-m').value || 0) * 60000)) {
+                    openGoalModal();
+                }
             } else {
                 if (tAcc === 0) {
                     let m = parseFloat(document.getElementById('timer-input-m').value) || 0;
@@ -1004,11 +1019,29 @@
 
         function resetTimer() {
             stopAlarmSound();
+            if (tRunning && tMode === 'down') {
+                openGoalModal();
+            }
             tRunning = false;
             tAcc = 0;
             tRef = 0;
             updateTimerUI();
             saveTimerState();
+        }
+
+        function openGoalModal() {
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-goal').style.display = 'block';
+            openModal();
+        }
+
+        function recordGoal(success) {
+            timerStats.push({
+                date: new Date().toISOString(),
+                success: success
+            });
+            localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
+            closeModal();
         }
 
         function updateTimerUI() {
@@ -1021,7 +1054,8 @@
                     current = 0;
                     tRunning = false;
                     tAcc = 0;
-                    startAlarmSound(); // Activar sonido continuo al finalizar
+                    startAlarmSound(); 
+                    openGoalModal(); // Preguntar si se logró el objetivo al terminar la cuenta atrás
                 }
             }
 
@@ -1152,7 +1186,7 @@
 
         let activeTabM = 0;
         let activeTabW = 1;
-        let listDisplayMode = 'acciones'; // 'acciones' o 'entornos'
+        let listDisplayMode = 'acciones';
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
@@ -1198,7 +1232,7 @@
         }
 
         function exportData() {
-            let backup = { tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, day: dayConfig, markers: markersData, collapsed: collapsedMonths, trackedYears: trackedYears };
+            let backup = { tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, day: dayConfig, markers: markersData, collapsed: collapsedMonths, trackedYears: trackedYears, timerStats: timerStats };
             const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
             const url = URL.createObjectURL(blob); const a = document.createElement("a");
             a.href = url; a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
@@ -1211,9 +1245,14 @@
             document.getElementById('theme-color-meta').setAttribute('content', currentTheme === 'light' ? '#f9fafb' : '#0a0a0a'); update();
         }
 
-        function openGeneralModal() { document.getElementById('modal-content-general').style.display = 'block'; openModal(); }
+        function openGeneralModal() { 
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-general').style.display = 'block'; 
+            openModal(); 
+        }
 
         function showDayStats(dateStr, wNum, dI, mI) {
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-daystats').style.display = 'block';
             document.getElementById('ds-title').innerText = `Día: ${dateStr}`;
             
@@ -1350,6 +1389,7 @@
             document.getElementById('inp-tc-hourEnd').value = '';
             document.getElementById('inp-tc-color').value = '#3b82f6';
             
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-taskcreate').style.display = 'block';
             openModal();
         }
@@ -1472,25 +1512,18 @@
             localStorage.setItem('wkTasks', JSON.stringify(tasksData)); updateMasterTaskList(); renderDayTaskMarks();
         }
         
-        // Nueva función para eliminar un entorno únicamente de un día específico
         function removeEntornoDay(entornoId, monthIdx, weekVal, dayIdx) {
             let ent = entornosData.find(e => e.id === entornoId);
             if (!ent) return;
-            
-            // Si el entorno abarca exactamente este día, removemos el día de su arreglo de días
             ent.days = ent.days.filter(d => d !== dayIdx);
-            
-            // Si ya no le quedan días en absoluto, lo eliminamos por completo
             if (ent.days.length === 0) {
                 entornosData = entornosData.filter(e => e.id !== entornoId);
             }
-            
             localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
             updateMasterTaskList();
             renderDayTaskMarks();
         }
 
-        // Función para eliminar completamente el entorno
         function deleteEntornoCompletely(id) {
             if (confirm("¿Estás seguro de eliminar este entorno por completo?")) {
                 entornosData = entornosData.filter(e => e.id !== id);
@@ -1604,7 +1637,6 @@
                 }
             }
             
-            // Botón toggle en la esquina inferior derecha para cambiar entre Acciones y Entornos
             const toggleIcon = listDisplayMode === 'acciones' ? 'E' : 'A';
             const toggleTitle = listDisplayMode === 'acciones' ? 'Ver Entornos' : 'Ver Acciones';
             tasksHtml += `<div class="mode-toggle-corner" onclick="toggleListDisplayMode()" title="${toggleTitle}">${toggleIcon}</div>`;
@@ -1723,7 +1755,14 @@
             updateTimerUI();
         }
 
-        function openMetricsModal() { document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; renderMetricsModalBody(selectedQuarter); document.getElementById('modal-content-metrics').style.display = 'block'; openModal(); }
+        function openMetricsModal() { 
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; 
+            renderMetricsModalBody(selectedQuarter); 
+            document.getElementById('modal-content-metrics').style.display = 'block'; 
+            openModal(); 
+        }
+        
         function renderMetricsModalBody(q) {
             let html = ''; let qTotal = 0, qDone = 0;
             for (let m = 0; m < 3; m++) {
@@ -1738,6 +1777,13 @@
             }
             const qPct = qTotal === 0 ? 0 : (qDone / qTotal) * 100;
             html += `<div class="m-bar-row" style="margin-top:15px; padding-top:15px; border-top:1px solid var(--border);"><div class="m-label" style="color:var(--text);font-weight:700;">T${q + 1}</div><div class="m-progress"><div class="m-fill" style="width:${qPct}%;background:var(--year-bar);"></div></div><div class="m-pct">${Math.round(qPct)}%</div></div>`;
+            
+            // Añadir métrica de objetivos de temporizadores logrados
+            let totalTimers = timerStats.length;
+            let successTimers = timerStats.filter(t => t.success).length;
+            let timerPct = totalTimers === 0 ? 0 : (successTimers / totalTimers) * 100;
+            html += `<div class="m-bar-row" style="margin-top:15px; padding-top:15px; border-top:1px solid var(--border);"><div class="m-label" style="color:var(--text);font-weight:700;">Temporizador</div><div class="m-progress"><div class="m-fill" style="width:${timerPct}%;background:var(--accent);"></div></div><div class="m-pct">${Math.round(timerPct)}% (${successTimers}/${totalTimers})</div></div>`;
+
             document.getElementById('ms-body').innerHTML = html;
         }
 
@@ -1811,14 +1857,20 @@
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
             document.getElementById('modal-overlay').classList.remove('active');
-            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general'].forEach(id => {
+            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
             updateTimerUI();
         }
 
-        function openBlockModal() { document.getElementById('modal-content-block').style.display = 'block'; document.getElementById('inp-block-start').value = blockConfig.startYear; document.getElementById('inp-block-years').value = blockConfig.years; openModal(); }
+        function openBlockModal() { 
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-block').style.display = 'block'; 
+            document.getElementById('inp-block-start').value = blockConfig.startYear; 
+            document.getElementById('inp-block-years').value = blockConfig.years; 
+            openModal(); 
+        }
         function saveBlockSettings() { blockConfig.years = parseInt(document.getElementById('inp-block-years').value); blockConfig.startYear = parseInt(document.getElementById('inp-block-start').value); localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); renderBlockTicks(); update(); updateQuarterBar(); closeModal(); }
         function renderBlockTicks() {
             const container = document.getElementById('block-ticks'); document.getElementById('label-block').innerText = `Bloque ${blockConfig.years} Años`;
@@ -1830,7 +1882,13 @@
             container.innerHTML = html;
         }
 
-        function openWorkModal() { document.getElementById('modal-content-work').style.display = 'block'; document.getElementById('inp-work-start').value = workConfig.start; document.getElementById('inp-work-end').value = workConfig.end; openModal(); }
+        function openWorkModal() { 
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-work').style.display = 'block'; 
+            document.getElementById('inp-work-start').value = workConfig.start; 
+            document.getElementById('inp-work-end').value = workConfig.end; 
+            openModal(); 
+        }
         function saveWorkSettings() {
             let s = parseInt(document.getElementById('inp-work-start').value); let e = parseInt(document.getElementById('inp-work-end').value);
             if(isNaN(s) || isNaN(e) || s >= e) { alert("Horario inválido. Inicio debe ser menor a Fin."); return; }
@@ -1846,7 +1904,12 @@
             container.innerHTML = html;
         }
 
-        function openDayModal() { document.getElementById('modal-content-day').style.display = 'block'; document.getElementById('inp-day-format').value = dayConfig.format; openModal(); }
+        function openDayModal() { 
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-day').style.display = 'block'; 
+            document.getElementById('inp-day-format').value = dayConfig.format; 
+            openModal(); 
+        }
         function saveDaySettings() { dayConfig.format = document.getElementById('inp-day-format').value; localStorage.setItem('wkDayCfg', JSON.stringify(dayConfig)); renderDayTicks(); closeModal(); }
         function renderDayTicks() {
             const container = document.getElementById('day-ticks'); let html = '';
@@ -1901,7 +1964,9 @@
             dragState = null;
         }
         function openMarkerModal(barId, markerObj) {
-            activeMarker = { barId, obj: markerObj }; document.getElementById('modal-content-marker').style.display = 'block';
+            activeMarker = { barId, obj: markerObj }; 
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-marker').style.display = 'block';
             document.getElementById('inp-marker-color').value = markerObj.color; openModal();
         }
         function saveMarkerSettings() {

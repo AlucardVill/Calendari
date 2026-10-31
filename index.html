@@ -1137,9 +1137,12 @@
             document.getElementById('timer-display').innerText = disp;
             document.getElementById('floating-time').innerText = disp;
 
-            // Mostrar el widget flotante si está corriendo o tiene tiempo guardado (pausado)
+            // Verificar si NO estamos en la pantalla principal
+            const isNotMainScreen = document.getElementById('calendar-overlay').classList.contains('active') || document.getElementById('modal-overlay').classList.contains('active');
+
+            // Mostrar el widget flotante SOLO si hay tiempo guardado y no estamos en la principal
             const floatEl = document.getElementById('floating-timer');
-            if (tRunning || current > 0) {
+            if ((tRunning || current > 0) && isNotMainScreen) {
                 floatEl.style.display = 'flex';
             } else {
                 floatEl.style.display = 'none';
@@ -1784,12 +1787,14 @@
             renderQuarterDetailBody(); 
             document.getElementById('calendar-overlay').classList.add('active'); 
             document.body.style.overflow = 'hidden';
+            updateTimerUI(); // Forzar actualización visual para mostrar el widget flotante si está corriendo
         }
         
         function closeQuarterDetail(e) {
             if (e && e.target.id !== 'calendar-overlay') return;
             document.getElementById('calendar-overlay').classList.remove('active'); document.body.style.overflow = '';
             if (calendarView === 'quarters') drawCalendar();
+            updateTimerUI(); // Forzar actualización para ocultar el widget flotante al regresar
         }
 
         function openMetricsModal() { document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; renderMetricsModalBody(selectedQuarter); document.getElementById('modal-content-metrics').style.display = 'block'; openModal(); }
@@ -1872,7 +1877,11 @@
             updateMasterTaskList();
         }
 
-        function openModal() { document.getElementById('modal-overlay').classList.add('active'); }
+        function openModal() { 
+            document.getElementById('modal-overlay').classList.add('active'); 
+            updateTimerUI(); // Forzar actualización visual
+        }
+        
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
             document.getElementById('modal-overlay').classList.remove('active');
@@ -1880,6 +1889,7 @@
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
+            updateTimerUI(); // Forzar actualización visual
         }
 
         function openBlockModal() { document.getElementById('modal-content-block').style.display = 'block'; document.getElementById('inp-block-start').value = blockConfig.startYear; document.getElementById('inp-block-years').value = blockConfig.years; openModal(); }

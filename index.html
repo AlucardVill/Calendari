@@ -482,8 +482,8 @@
         }
 
         /* ============================================================
-           TIEMPO · Mejoras estéticas v2
-           Aurora + Iconografía SVG + refinamientos
+           TIEMPO · Mejoras estéticas v3
+           Aurora + Iconografía SVG + refinamientos + Marcador "ahora"
            ============================================================ */
 
         /* ── 1. FONDO AURORA ───────────────────────────────────── */
@@ -567,6 +567,12 @@
             color: var(--accent);
             opacity: 0.9;
             flex-shrink: 0;
+        }
+        .icon-btn.small-txt { padding: 5px 8px; }
+        .icon-btn.small-txt svg {
+            width: 13px;
+            height: 13px;
+            display: block;
         }
 
         /* ── 4. BOTONES DE PROGRESO con glow ───────────────────── */
@@ -690,6 +696,55 @@
             from { opacity: 0; transform: translateY(-6px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+
+        /* ── 12. MARCADOR "AHORA" en la barra del Día ──────────── */
+        .now-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent);
+            transform: translateX(-50%);
+            z-index: 15;
+            pointer-events: none;
+            border-radius: 1px;
+            box-shadow:
+                0 0 6px var(--accent),
+                0 0 14px var(--accent);
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .now-marker::before {
+            content: '';
+            position: absolute;
+            top: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow:
+                0 0 0 2px var(--card),
+                0 0 8px var(--accent);
+            animation: nowDotPulse 1.8s ease-in-out infinite;
+        }
+        @keyframes nowDotPulse {
+            0%, 100% {
+                box-shadow:
+                    0 0 0 2px var(--card),
+                    0 0 8px var(--accent);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 2px var(--card),
+                    0 0 16px var(--accent),
+                    0 0 26px var(--accent);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .now-marker::before { animation: none; }
+            .now-marker { transition: none; }
+        }
     </style>
 </head>
 <body>
@@ -731,28 +786,28 @@
     </div>
 
     <div id="panel-block" class="dock-panel">
-        <div class="label"><span style="color: var(--bi-bar); font-weight: 800;" id="label-block">Bloque Años</span> <div class="controls-group"><span id="block-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openBlockModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('block')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--bi-bar); font-weight: 800;" id="label-block">Bloque Años</span> <div class="controls-group"><span id="block-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openBlockModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('block')" title="Añadir marcador" aria-label="Añadir marcador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></button></div></div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-block"><div class="progress-bar"><div id="block-fill" class="fill" style="background: var(--bi-bar);"></div></div></div><div class="ticks" id="block-ticks"></div></div>
     </div>
 
     <div id="panel-year" class="dock-panel">
-        <div class="label"><span style="color: var(--year-bar); font-weight: 800;" id="label-year">Año Actual</span> <div class="controls-group"><span id="year-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn small-txt" onclick="addMarker('year')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--year-bar); font-weight: 800;" id="label-year">Año Actual</span> <div class="controls-group"><span id="year-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn small-txt" onclick="addMarker('year')" title="Añadir marcador" aria-label="Añadir marcador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></button></div></div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-year"><div class="progress-bar"><div id="year-fill" class="fill" style="background: var(--year-bar);"></div></div></div><div class="ticks"><span class="tick">E</span><span class="tick">F</span><span class="tick">M</span><span class="tick">A</span><span class="tick">M</span><span class="tick">J</span><span class="tick">J</span><span class="tick">A</span><span class="tick">S</span><span class="tick">O</span><span class="tick">N</span><span class="tick">D</span></div></div>
     </div>
 
     <div id="panel-week" class="dock-panel">
-        <div class="label"><span style="color: var(--week-bar); font-weight: 800;">Semana Actual</span> <div class="controls-group"><span id="week-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn small-txt" onclick="addMarker('week')">+📍</button></div></div>
+        <div class="label"><span style="color: var(--week-bar); font-weight: 800;">Semana Actual</span> <div class="controls-group"><span id="week-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn small-txt" onclick="addMarker('week')" title="Añadir marcador" aria-label="Añadir marcador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></button></div></div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-week"><div class="progress-bar"><div id="week-fill" class="fill" style="background: var(--week-bar);"></div></div></div><div class="ticks"><span class="tick">L</span><span class="tick">M</span><span class="tick">M</span><span class="tick">J</span><span class="tick">V</span><span class="tick">S</span><span class="tick">D</span></div></div>
     </div>
 
     <div id="panel-work" class="dock-panel">
-        <div class="label"><span id="label-work" style="font-weight: 800;">Jornada</span> <div class="controls-group"><span id="work-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openWorkModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('work')">+📍</button></div></div>
+        <div class="label"><span id="label-work" style="font-weight: 800;">Jornada</span> <div class="controls-group"><span id="work-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openWorkModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('work')" title="Añadir marcador" aria-label="Añadir marcador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></button></div></div>
         <div id="work-timer" class="timer" style="color: var(--work);">--:--:--</div>
         <div class="progress-container"><div class="bar-wrapper" id="bar-work"><div class="progress-bar"><div id="work-fill" class="fill" style="background: var(--work)"></div></div></div><div class="ticks" id="work-ticks"></div></div>
     </div>
 
     <div id="panel-day" class="dock-panel">
-        <div class="label"><span style="font-weight: 800;">Día Actual (24h)</span> <div class="controls-group"><span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openDayModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('day')">+📍</button></div></div>
+        <div class="label"><span style="font-weight: 800;">Día Actual (24h)</span> <div class="controls-group"><span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openDayModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('day')" title="Añadir marcador" aria-label="Añadir marcador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></button></div></div>
         <div class="progress-container">
             <div class="bar-wrapper tall-bar" id="bar-day">
                 <div class="progress-bar"><div id="day-fill" class="fill"></div></div>
@@ -1752,6 +1807,21 @@
             });
         }
 
+        function renderNowMarker() {
+            const container = document.getElementById('bar-day');
+            if (!container) return;
+            let nowMarker = container.querySelector('.now-marker');
+            if (!nowMarker) {
+                nowMarker = document.createElement('div');
+                nowMarker.className = 'now-marker';
+                container.appendChild(nowMarker);
+            }
+            const now = new Date();
+            const h = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+            const pct = (h / 24) * 100;
+            nowMarker.style.left = pct.toFixed(4) + '%';
+        }
+
         function update() {
             const now = new Date(); const year = now.getFullYear();
             const h = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
@@ -1786,6 +1856,7 @@
             const dP = (h / 24) * 100; document.getElementById('day-fill').style.width = dP.toFixed(4) + '%'; document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
 
             renderDayTaskMarks();
+            renderNowMarker();
             if (document.getElementById('qbar-fill')) updateQuarterBar();
         }
 

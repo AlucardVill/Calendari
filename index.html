@@ -481,12 +481,6 @@
             .block-label { font-size: 0.38rem; top: -8px; }
         }
 
-        /* ============================================================
-           TIEMPO · Mejoras estéticas v3
-           Aurora + Iconografía SVG + refinamientos + Marcador "ahora"
-           ============================================================ */
-
-        /* ── 1. FONDO AURORA ───────────────────────────────────── */
         html {
             background: var(--bg);
             min-height: 100%;
@@ -523,7 +517,6 @@
             html::before { animation: none; }
         }
 
-        /* ── 2. HEADER ─────────────────────────────────────────── */
         .header-title {
             display: flex;
             align-items: center;
@@ -555,7 +548,6 @@
             transform: scale(1.05);
         }
 
-        /* ── 3. ICONOGRAFÍA SVG ────────────────────────────────── */
         .header-menu-btn svg { width: 18px; height: 18px; display: block; }
         .metrics-btn svg,
         .close-btn svg,
@@ -575,7 +567,6 @@
             display: block;
         }
 
-        /* ── 4. BOTONES DE PROGRESO con glow ───────────────────── */
         .progress-btn {
             border-radius: 14px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -593,7 +584,6 @@
                 inset 0 -20px 20px -20px currentColor;
         }
 
-        /* ── 5. BARRAS con relieve ─────────────────────────────── */
         .bar-wrapper {
             height: 12px;
             border-radius: 6px;
@@ -621,7 +611,6 @@
             font-size: 0.78rem;
         }
 
-        /* ── 6. TICKS Y PORCENTAJES ────────────────────────────── */
         .tick {
             font-size: 0.62rem;
             letter-spacing: 0.02em;
@@ -633,7 +622,6 @@
             letter-spacing: -0.02em;
         }
 
-        /* ── 7. DÍA "HOY": anillo elegante ─────────────────────── */
         .day.today {
             border-radius: 6px;
             outline: none;
@@ -651,7 +639,6 @@
                 0 6px 18px rgba(16,185,129,0.45) !important;
         }
 
-        /* ── 8. CELDAS DEL CALENDARIO ──────────────────────────── */
         .day {
             border-radius: 5px;
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
@@ -663,7 +650,6 @@
             box-shadow: 0 3px 8px rgba(0,0,0,0.18);
         }
 
-        /* ── 9. MODALES con profundidad atmosférica ────────────── */
         .modal-card,
         .calendar-detail {
             border-radius: 22px;
@@ -678,7 +664,6 @@
                 0 0 0 1px rgba(0,0,0,0.04);
         }
 
-        /* ── 10. AÑOS / TRIMESTRES ─────────────────────────────── */
         .year-box,
         .quarter-compact {
             border-radius: 18px;
@@ -688,7 +673,6 @@
             box-shadow: 0 14px 32px -10px rgba(0,0,0,0.35);
         }
 
-        /* ── 11. PANELES DOCK ──────────────────────────────────── */
         .dock-panel.active {
             animation: panelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -697,7 +681,6 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── 12. MARCADOR "AHORA" en la barra del Día ──────────── */
         .now-marker {
             position: absolute;
             top: 0;
@@ -807,7 +790,16 @@
     </div>
 
     <div id="panel-day" class="dock-panel">
-        <div class="label"><span style="font-weight: 800;">Día Actual (24h)</span> <div class="controls-group"><span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span><button class="icon-btn" onclick="openDayModal()">⋮</button><button class="icon-btn small-txt" onclick="addMarker('day')" title="Añadir marcador" aria-label="Añadir marcador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></button></div></div>
+        <div class="label">
+            <span style="font-weight: 800;">Día Actual (24h)</span> 
+            <div class="controls-group">
+                <!-- Novedad: Aquí está el tiempo restante del día -->
+                <span id="day-timer" style="margin-right:8px; font-weight:800; color:var(--day-bar); font-variant-numeric:tabular-nums;">--:--:--</span>
+                <span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span>
+                <button class="icon-btn" onclick="openDayModal()">⋮</button>
+                <button class="icon-btn small-txt" onclick="addMarker('day')" title="Añadir marcador" aria-label="Añadir marcador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></button>
+            </div>
+        </div>
         <div class="progress-container">
             <div class="bar-wrapper tall-bar" id="bar-day">
                 <div class="progress-bar"><div id="day-fill" class="fill"></div></div>
@@ -948,8 +940,9 @@
                 </div>
 
                 <div class="modal-actions">
-                    <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
-                    <button class="btn btn-save" onclick="saveTcRecord()">Guardar</button>
+                    <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
+                    <!-- Identificador agregado para la animación visual -->
+                    <button class="btn btn-save" id="btn-save-tc" onclick="saveTcRecord()">Guardar</button>
                 </div>
             </div>
 
@@ -1146,6 +1139,7 @@
 
         function openGeneralModal() { document.getElementById('modal-content-general').style.display = 'block'; openModal(); }
 
+        // Función original de vista de detalle de día (se deja en código por si la requieres utilizar luego)
         function showDayStats(dateStr, wNum, dI, mI) {
             document.getElementById('modal-content-daystats').style.display = 'block';
             document.getElementById('ds-title').innerText = `Día: ${dateStr}`;
@@ -1240,14 +1234,14 @@
             document.getElementById('tc-entorno-fields').style.display = tcMode === 'entorno' ? 'block' : 'none';
         }
 
-        function openTaskCreateModal() {
+        // Modificado: Ahora recibe el mes, la semana y el día opcionalmente para autocompletar
+        function openTaskCreateModal(prefillM, prefillW, prefillD) {
             tcMode = 'entorno'; 
-            toggleTcMode();
+            toggleTcMode(); // Fija el modo a 'tarea' para empezar.
 
             const q = selectedQuarter;
             const nowMonth = new Date().getMonth();
-            let defaultM = q * 3;
-            if (Math.floor(nowMonth / 3) === q) defaultM = nowMonth;
+            let defaultM = prefillM !== undefined ? prefillM : (Math.floor(nowMonth / 3) === q ? nowMonth : q * 3);
             
             const monthSel = document.getElementById('inp-tc-month');
             let mHtml = '';
@@ -1258,6 +1252,16 @@
             monthSel.innerHTML = mHtml;
             updateWeekDropdown();
             
+            if (prefillW !== undefined) {
+                document.getElementById('inp-tc-week').value = prefillW;
+            }
+            
+            if (prefillD !== undefined) {
+                document.getElementById('inp-tc-day').value = prefillD;
+            } else {
+                document.getElementById('inp-tc-day').value = '';
+            }
+
             const chkMonths = document.getElementById('chk-months');
             chkMonths.innerHTML = '';
             for(let i=0; i<3; i++) {
@@ -1267,9 +1271,9 @@
             document.querySelectorAll('.chk-btn').forEach(btn => btn.classList.remove('active'));
 
             document.getElementById('inp-tc-title').value = '';
-            document.getElementById('inp-tc-day').value = '';
             document.getElementById('inp-tc-hour').value = '';
             document.getElementById('inp-tc-hourEnd').value = '';
+            // Reiniciamos color si entras nuevo, pero no afectará el flujo continuo.
             document.getElementById('inp-tc-color').value = '#3b82f6';
             
             document.getElementById('modal-content-taskcreate').style.display = 'block';
@@ -1293,6 +1297,7 @@
             else saveNewEntorno();
         }
 
+        // Modificado: Ahora no se cierra, traslada hora de fin a inicio, borra titulo, muestra guardado.
         function saveNewManagedTask() {
             const title = document.getElementById('inp-tc-title').value.trim();
             const mI = parseInt(document.getElementById('inp-tc-month').value);
@@ -1309,9 +1314,32 @@
             if (!tasksData[tKey]) tasksData[tKey] = [];
             tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: dayVal === '' ? null : parseInt(dayVal), hour: hour || null, hourEnd: hourEnd || null, color: color });
             localStorage.setItem('wkTasks', JSON.stringify(tasksData));
-            closeModal(); renderQuarterDetailBody(); renderDayTaskMarks();
+            
+            renderQuarterDetailBody(); 
+            renderDayTaskMarks();
+
+            // Lógica de traslado de datos para continuidad sin cerrar
+            if (hourEnd) {
+                document.getElementById('inp-tc-hour').value = hourEnd;
+            } else {
+                document.getElementById('inp-tc-hour').value = '';
+            }
+            document.getElementById('inp-tc-hourEnd').value = '';
+            document.getElementById('inp-tc-title').value = '';
+            document.getElementById('inp-tc-title').focus();
+            
+            // Animación visual rápida de botón guardado
+            const btn = document.getElementById('btn-save-tc');
+            const oldText = btn.innerText;
+            btn.innerText = '¡Guardado!';
+            btn.style.backgroundColor = '#10b981'; // accent color
+            setTimeout(() => {
+                btn.innerText = oldText;
+                btn.style.backgroundColor = '';
+            }, 1000);
         }
 
+        // Modificado al igual que saveNewManagedTask
         function saveNewEntorno() {
             const title = document.getElementById('inp-tc-title').value.trim();
             const hour = document.getElementById('inp-tc-hour').value;
@@ -1333,7 +1361,28 @@
                 year: selectedYear, q: selectedQuarter, months: selMonths, weeks: selWeeks, days: selDays
             });
             localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
-            closeModal(); renderQuarterDetailBody(); renderDayTaskMarks();
+            
+            renderQuarterDetailBody(); 
+            renderDayTaskMarks();
+
+            // Traslado
+            if (hourEnd) {
+                document.getElementById('inp-tc-hour').value = hourEnd;
+            } else {
+                document.getElementById('inp-tc-hour').value = '';
+            }
+            document.getElementById('inp-tc-hourEnd').value = '';
+            document.getElementById('inp-tc-title').value = '';
+            document.getElementById('inp-tc-title').focus();
+            
+            const btn = document.getElementById('btn-save-tc');
+            const oldText = btn.innerText;
+            btn.innerText = '¡Guardado!';
+            btn.style.backgroundColor = '#10b981';
+            setTimeout(() => {
+                btn.innerText = oldText;
+                btn.style.backgroundColor = '';
+            }, 1000);
         }
 
         function toggleManagedTask(week, taskId) {
@@ -1620,7 +1669,9 @@
                             const hasEntornos = entornosData.some(e => e.year === year && e.q === Math.floor(mI/3) && e.months.includes(mI % 3) && e.weeks.includes(localW) && e.days.includes(dI));
                             const hasTasks = weekTasks.some(t => getTaskDay(t) === dI);
                             const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
-                            const clickHandler = `showDayStats('${dtStr}', ${wNum}, ${dI}, ${mI})`;
+                            
+                            // Modificado: Ahora el click llama directamente a crear tarea en el día específico
+                            const clickHandler = `openTaskCreateModal(${mI}, ${localW}, ${dI})`;
                             
                             if (w.isMain && dI === fR) html += `<div class="${cl} block-start" onclick="${clickHandler}"><span class="block-label">W${localW}</span>${d}${taskDot}</div>`;
                             else if (w.isMain && dI === lR) html += `<div class="${cl} block-end" onclick="${clickHandler}">${d}${taskDot}</div>`;
@@ -1854,6 +1905,16 @@
             document.getElementById('work-fill').style.width = wP.toFixed(4) + '%'; document.getElementById('work-timer').innerText = wT; document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
 
             const dP = (h / 24) * 100; document.getElementById('day-fill').style.width = dP.toFixed(4) + '%'; document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
+
+            // Novedad: Cálculo del temporizador restante del día.
+            const endOfDay = new Date(year, now.getMonth(), now.getDate(), 23, 59, 59, 999);
+            const msLeftDay = endOfDay - now;
+            const hLeftDay = Math.floor(msLeftDay / 3600000);
+            const mLeftDay = Math.floor((msLeftDay % 3600000) / 60000);
+            const sLeftDay = Math.floor((msLeftDay % 60000) / 1000);
+            const dayTimerStr = `-${String(hLeftDay).padStart(2,'0')}:${String(mLeftDay).padStart(2,'0')}:${String(sLeftDay).padStart(2,'0')}`;
+            const dayTimerEl = document.getElementById('day-timer');
+            if (dayTimerEl) dayTimerEl.innerText = dayTimerStr;
 
             renderDayTaskMarks();
             renderNowMarker();

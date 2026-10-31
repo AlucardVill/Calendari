@@ -622,6 +622,7 @@
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="2">W2</div>
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="3">W3</div>
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="4">W4</div>
+                            <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="5">W5</div>
                         </div>
                     </div>
                     <div class="tc-field" style="margin-bottom: 12px;">
@@ -707,8 +708,7 @@
         let rawTasks = JSON.parse(localStorage.getItem('wkTasks')) || {};
         let tasksData = {};
         for (let key in rawTasks) {
-            if (!key.includes('-')) { tasksData[`${currentYear}-${key}`] = rawTasks[key]; } 
-            else { tasksData[key] = rawTasks[key]; }
+            tasksData[key] = rawTasks[key]; 
         }
         localStorage.setItem('wkTasks', JSON.stringify(tasksData));
 
@@ -778,6 +778,7 @@
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
+        // Nueva lógica de numeración cronológica inteligente de semanas (W0 a W5)
         function getWeeksForMonth(year, mI) {
             const fD = new Date(year, mI, 1).getDay(); const off = fD === 0 ? 6 : fD - 1;
             const dM = new Date(year, mI + 1, 0).getDate();
@@ -785,19 +786,27 @@
             for (let i = 0; i < off; i++) slots.push(null);
             for (let d = 1; d <= dM; d++) slots.push(d);
             while (slots.length % 7 !== 0) slots.push(null);
+            
             let weeks = [];
             for (let i = 0; i < slots.length; i += 7) {
-                let dws = slots.slice(i, i + 7); weeks.push({ dws, c: dws.filter(d => d !== null).length });
+                let dws = slots.slice(i, i + 7); 
+                weeks.push({ dws, c: dws.filter(d => d !== null).length });
             }
+            
+            // Determinar si la primera semana es W0 (si tiene menos de 4 días) o arranca en W1
+            let wName = weeks[0].c < 4 ? 0 : 1;
+            weeks.forEach(w => {
+                w.localW = wName;
+                wName++;
+            });
             return weeks;
         }
 
         function getWeekForDay(year, mI, dayNum) {
             const weeks = getWeeksForMonth(year, mI);
-            const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
             for (let i = 0; i < weeks.length; i++) {
                 const dayIdx = weeks[i].dws.indexOf(dayNum);
-                if (dayIdx !== -1) return { localW: sI.includes(i) ? sI.indexOf(i) + 1 : 0, weekIdx: i, dayIdx };
+                if (dayIdx !== -1) return { localW: weeks[i].localW, weekIdx: i, dayIdx };
             }
             return null;
         }
@@ -829,7 +838,7 @@
                 const weekTasks = tasksData[`${selectedYear}-${wNum}`] || [];
                 tasks = weekTasks.filter(t => getTaskDay(t) === dI);
                 
-                const localW = wNum % 5;
+                const localW = wNum % 10;
                 const localM = mI % 3;
                 dayEntornos = entornosData.filter(e => 
                     e.year === selectedYear && e.q === Math.floor(mI/3) &&
@@ -951,10 +960,11 @@
         function updateWeekDropdown() {
             const mI = parseInt(document.getElementById('inp-tc-month').value);
             const weeks = getWeeksForMonth(selectedYear, mI);
-            const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
             const weekSel = document.getElementById('inp-tc-week'); const prevVal = weekSel.value;
-            let wHtml = (weeks.length > sI.length) ? `<option value="0">W0</option>` : '';
-            for (let w = 1; w <= 4; w++) wHtml += `<option value="${w}">W${w}</option>`;
+            let wHtml = '';
+            weeks.forEach(w => {
+                wHtml += `<option value="${w.localW}">W${w.localW}</option>`;
+            });
             weekSel.innerHTML = wHtml;
             if (prevVal && Array.from(weekSel.options).some(o => o.value === prevVal)) weekSel.value = prevVal;
         }
@@ -975,7 +985,7 @@
             
             if (!title) { alert("Escribe una descripción"); return; }
             
-            const wNum = mI * 5 + localW;
+            const wNum = mI * 10 + localW; // Multiplicamos por 10 para soportar holgadamente índices 0-5 sin cruces
             const tKey = `${selectedYear}-${wNum}`;
             if (!tasksData[tKey]) tasksData[tKey] = [];
             tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: dayVal === '' ? null : parseInt(dayVal), hour: hour || null, hourEnd: hourEnd || null, color: color });
@@ -1024,9 +1034,10 @@
             activeTabM = m;
             const activeMonthAbs = selectedQuarter * 3 + m;
             const weeks = getWeeksForMonth(selectedYear, activeMonthAbs);
-            const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
-            const hasW0 = weeks.length > sI.length;
-            if(activeTabW === 0 && !hasW0) activeTabW = 1;
+            // Verifica que la semana activa exista en este mes; si no, escoge la primera
+            if (!weeks.some(w => w.localW === activeTabW)) {
+                activeTabW = weeks[0].localW;
+            }
             updateMasterTaskList();
         }
 
@@ -1047,13 +1058,11 @@
             
             const activeMonthAbs = q * 3 + activeTabM;
             const weeks = getWeeksForMonth(year, activeMonthAbs);
-            const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
-            const hasW0 = weeks.length > sI.length;
-
-            if (hasW0) tabsHtml += `<button class="tab-btn ${activeTabW === 0 ? 'active' : ''}" onclick="setActiveTabW(0)">W0</button>`;
-            for (let i = 1; i <= 4; i++) {
-                tabsHtml += `<button class="tab-btn ${activeTabW === i ? 'active' : ''}" onclick="setActiveTabW(${i})">W${i}</button>`;
-            }
+            
+            // Genera botones de tabs basados EXACTAMENTE en las semanas que existen este mes (W0 a W5)
+            weeks.forEach(w => {
+                tabsHtml += `<button class="tab-btn ${activeTabW === w.localW ? 'active' : ''}" onclick="setActiveTabW(${w.localW})">W${w.localW}</button>`;
+            });
             tabsHtml += '</div></div>';
             
             document.getElementById('qt-tabs-container').innerHTML = tabsHtml;
@@ -1077,10 +1086,9 @@
                 tasksHtml += `</div><div style="border-bottom: 1px dashed var(--border); margin: 0 0 5px;"></div>`;
             }
 
-            const wNum = activeMonthAbs * 5 + activeTabW;
+            const wNum = activeMonthAbs * 10 + activeTabW; // Nueva distribución *10
             const weekTasks = tasksData[`${year}-${wNum}`] || [];
             
-            // Logic to determine "HOY"
             const today = new Date();
             const currentYear = today.getFullYear();
             const currentMonth = today.getMonth();
@@ -1127,8 +1135,8 @@
         function getQuarterStats(year, q) {
             let total = 0, done = 0;
             for (let m = 0; m < 3; m++) {
-                for (let w = 0; w <= 4; w++) {
-                    const tasks = tasksData[`${year}-${(q * 3 + m) * 5 + w}`] || [];
+                for (let w = 0; w <= 5; w++) { // Actualizado para soportar hasta W5
+                    const tasks = tasksData[`${year}-${(q * 3 + m) * 10 + w}`] || [];
                     total += tasks.length; done += tasks.filter(t => t.done).length;
                 }
             }
@@ -1189,7 +1197,10 @@
                 const wInfo = getWeekForDay(now.getFullYear(), currentM, now.getDate());
                 activeTabW = wInfo ? wInfo.localW : 1;
             } else {
-                activeTabM = 0; activeTabW = 1;
+                activeTabM = 0; 
+                // Asegurarse de que el tab inicie en el primer W válido (W0 o W1)
+                const defaultWeeks = getWeeksForMonth(selectedYear, q * 3);
+                activeTabW = defaultWeeks[0].localW;
             }
 
             renderQuarterDetailBody(); document.getElementById('calendar-overlay').classList.add('active'); document.body.style.overflow = 'hidden';
@@ -1206,8 +1217,8 @@
             let html = ''; let qTotal = 0, qDone = 0;
             for (let m = 0; m < 3; m++) {
                 const mI = q * 3 + m; let mTotal = 0, mDone = 0;
-                for (let w = 0; w <= 4; w++) {
-                    const tasks = tasksData[`${selectedYear}-${mI * 5 + w}`] || [];
+                for (let w = 0; w <= 5; w++) { // Hasta W5
+                    const tasks = tasksData[`${selectedYear}-${mI * 10 + w}`] || [];
                     mTotal += tasks.length; mDone += tasks.filter(t => t.done).length;
                 }
                 const mPct = mTotal === 0 ? 0 : (mDone / mTotal) * 100;
@@ -1225,7 +1236,6 @@
             
             for (let m = 0; m < 3; m++) {
                 const mI = q * 3 + m; const weeks = getWeeksForMonth(year, mI);
-                const sI = weeks.map((w, i) => ({ i, c: w.c })).sort((a, b) => b.c - a.c).slice(0, 4).map(x => x.i);
                 const yKey = `${year}-${mI}`; const isCol = collapsedMonths[yKey];
                 
                 html += `<div class="month${isCol ? " collapsed" : ""}" id="month-wrap-${mI}">
@@ -1234,7 +1244,11 @@
                 diasL.forEach(d => html += `<div class="week-day">${d}</div>`);
                 
                 weeks.forEach((w, i) => {
-                    const isHighlighted = sI.includes(i); const localW = isHighlighted ? sI.indexOf(i) + 1 : 0; const wNum = mI * 5 + localW;
+                    const localW = w.localW;
+                    const wNum = mI * 10 + localW; // Nuevo ID
+                    // Solo resaltamos W1, W2, W3 y W4 (W0 y W5 quedan sin los bordes intensos)
+                    const isHighlighted = (localW >= 1 && localW <= 4);
+                    
                     let wCl = "", fR = -1, lR = -1;
                     for (let k = 0; k < 7; k++) { if (w.dws[k] !== null) { if (fR === -1) fR = k; lR = k; } }
                     
@@ -1258,6 +1272,7 @@
                             const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
                             const clickHandler = `showDayStats('${dtStr}', ${wNum}, ${dI}, ${mI})`;
                             
+                            // Bloques y labels solo aplican a isHighlighted (W1-W4)
                             if (isHighlighted && dI === fR) html += `<div class="${cl} block-start" onclick="${clickHandler}"><span class="block-label">W${localW}</span>${d}${taskDot}</div>`;
                             else if (isHighlighted && dI === lR) html += `<div class="${cl} block-end" onclick="${clickHandler}">${d}${taskDot}</div>`;
                             else html += `<div class="${cl}" onclick="${clickHandler}">${d}${taskDot}</div>`;
@@ -1396,7 +1411,7 @@
                     e.months.includes(localM) && e.weeks.includes(localW) && e.days.includes(weekInfo.dayIdx)
                 ).map(e => ({...e, isEntorno: true}));
                 
-                const wNum = mI * 5 + weekInfo.localW;
+                const wNum = mI * 10 + weekInfo.localW;
                 const weekTasks = tasksData[`${year}-${wNum}`] || [];
                 const todayTasks = weekTasks.filter(t => getTaskDay(t) === weekInfo.dayIdx && t.hour && t.color);
                 

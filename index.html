@@ -74,7 +74,6 @@
         .header-menu-btn { background: transparent; border: none; color: var(--text); font-size: 1.5rem; font-weight: bold; cursor: pointer; padding: 4px 12px; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
         .header-menu-btn:active { transform: scale(0.9); }
 
-        /* Estilos del Temporizador Widget Principal */
         .timer-widget {
             display: flex; align-items: center; justify-content: space-between; gap: 12px;
             margin: -10px 4px 15px; padding: 12px 16px;
@@ -104,7 +103,6 @@
         .t-btn.active { background: var(--sunday); border-color: var(--sunday); color: #fff; }
         .t-btn.active:hover { border-color: #f43f5e; background: #f43f5e; color: #fff; }
 
-        /* Estilos del Temporizador Flotante (Esquina Superior Izquierda) */
         #floating-timer {
             display: none; position: fixed; 
             top: max(45px, calc(env(safe-area-inset-top) + 25px)); 
@@ -508,7 +506,7 @@
         .tab-btn:hover:not(.active) { border-color: var(--muted); transform: translateY(-1px); }
         .tab-btn:active { transform: scale(0.95); }
         
-        .qt-list { flex: 1; overflow-y: auto; padding-right: 2px; min-height: 0; }
+        .qt-list { flex: 1; overflow-y: auto; padding-right: 2px; min-height: 0; position: relative; padding-bottom: 24px; }
         .qt-list::-webkit-scrollbar { width: 4px; }
         .qt-list::-webkit-scrollbar-track { background: transparent; }
         .qt-list::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 2px; }
@@ -525,6 +523,17 @@
         .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.45rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
         .task-day-tag { color: var(--block-id); font-size: 0.5rem; font-weight: 700; display: inline-block; margin-left: 5px; letter-spacing: 0.02em; }
 
+        /* Botón toggle esquina inferior derecha para listar Entornos/Acciones */
+        .mode-toggle-corner {
+            position: absolute; bottom: 4px; right: 4px; z-index: 10;
+            background: var(--item-bg); border: 1px solid var(--border-input);
+            color: var(--subtext); width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.55rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: all 0.2s;
+        }
+        .mode-toggle-corner:hover { color: var(--accent); border-color: var(--accent); transform: scale(1.1); }
+
         @media (max-width: 380px) {
             .progress-btn { padding: 12px 2px; font-size: 0.75rem; }
             .day { font-size: 0.55rem; margin-top: 2px; }
@@ -533,26 +542,15 @@
             .block-label { font-size: 0.38rem; top: -8px; }
         }
 
-        html {
-            background: var(--bg);
-            min-height: 100%;
-        }
-        body {
-            background: transparent;
-            background-image: none;
-        }
+        html { background: var(--bg); min-height: 100%; }
+        body { background: transparent; background-image: none; }
         html::before {
-            content: '';
-            position: fixed;
-            inset: -30%;
-            z-index: -1;
-            pointer-events: none;
+            content: ''; position: fixed; inset: -30%; z-index: -1; pointer-events: none;
             background:
                 radial-gradient(circle at 20% 30%, rgba(16,185,129,0.16), transparent 42%),
                 radial-gradient(circle at 80% 65%, rgba(59,130,246,0.13), transparent 42%),
                 radial-gradient(circle at 45% 90%, rgba(236,72,153,0.09), transparent 42%);
-            animation: auroraDrift 32s ease-in-out infinite alternate;
-            will-change: transform;
+            animation: auroraDrift 32s ease-in-out infinite alternate; will-change: transform;
         }
         [data-theme="light"] html::before {
             background:
@@ -565,228 +563,88 @@
             50%  { transform: translate(2%, 2%) scale(1.05); }
             100% { transform: translate(-1%, 3%) scale(1.02); }
         }
-        @media (prefers-reduced-motion: reduce) {
-            html::before { animation: none; }
-        }
+        @media (prefers-reduced-motion: reduce) { html::before { animation: none; } }
 
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.55rem;
-            letter-spacing: -0.04em;
-        }
+        .header-title { display: flex; align-items: center; gap: 10px; font-size: 1.55rem; letter-spacing: -0.04em; }
         .header-title::before {
-            content: '';
-            width: 4px;
-            height: 24px;
-            border-radius: 2px;
+            content: ''; width: 4px; height: 24px; border-radius: 2px;
             background: linear-gradient(180deg, var(--accent) 0%, var(--year-bar) 55%, var(--bi-bar) 100%);
-            box-shadow: 0 0 14px rgba(16,185,129,0.45);
-            flex-shrink: 0;
+            box-shadow: 0 0 14px rgba(16,185,129,0.45); flex-shrink: 0;
         }
-        .header-menu-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: var(--item-bg);
-            border: 1px solid var(--border);
-            padding: 0;
-            transition: all 0.2s;
-        }
-        .header-menu-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            transform: scale(1.05);
-        }
+        .header-menu-btn { width: 38px; height: 38px; border-radius: 12px; background: var(--item-bg); border: 1px solid var(--border); padding: 0; transition: all 0.2s; }
+        .header-menu-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
 
         .header-menu-btn svg { width: 18px; height: 18px; display: block; }
-        .metrics-btn svg,
-        .close-btn svg,
-        .add-task-btn svg { width: 15px; height: 15px; display: block; }
-        .section-label svg {
-            width: 14px;
-            height: 14px;
-            display: block;
-            color: var(--accent);
-            opacity: 0.9;
-            flex-shrink: 0;
-        }
+        .metrics-btn svg, .close-btn svg, .add-task-btn svg { width: 15px; height: 15px; display: block; }
+        .section-label svg { width: 14px; height: 14px; display: block; color: var(--accent); opacity: 0.9; flex-shrink: 0; }
         .icon-btn.small-txt { padding: 5px 8px; }
-        .icon-btn.small-txt svg {
-            width: 13px;
-            height: 13px;
-            display: block;
-        }
+        .icon-btn.small-txt svg { width: 13px; height: 13px; display: block; }
 
-        .progress-btn {
-            border-radius: 14px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .progress-btn { border-radius: 14px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .progress-btn.active {
-            box-shadow:
-                0 8px 24px -10px currentColor,
-                inset 0 1px 0 rgba(255,255,255,0.06),
-                inset 0 -20px 20px -20px currentColor;
+            box-shadow: 0 8px 24px -10px currentColor, inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -20px 20px -20px currentColor;
         }
         [data-theme="light"] .progress-btn.active {
-            box-shadow:
-                0 8px 24px -10px currentColor,
-                inset 0 1px 0 rgba(255,255,255,0.7),
-                inset 0 -20px 20px -20px currentColor;
+            box-shadow: 0 8px 24px -10px currentColor, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -20px 20px -20px currentColor;
         }
 
-        .bar-wrapper {
-            height: 12px;
-            border-radius: 6px;
-            background: var(--item-bg);
-            box-shadow: inset 0 1px 4px rgba(0,0,0,0.35);
-        }
-        .progress-bar {
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
-        }
-        [data-theme="light"] .bar-wrapper {
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.14);
-        }
-        [data-theme="light"] .progress-bar {
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
-        }
+        .bar-wrapper { height: 12px; border-radius: 6px; background: var(--item-bg); box-shadow: inset 0 1px 4px rgba(0,0,0,0.35); }
+        .progress-bar { border-radius: 6px; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); }
+        [data-theme="light"] .bar-wrapper { box-shadow: inset 0 1px 3px rgba(0,0,0,0.14); }
+        [data-theme="light"] .progress-bar { box-shadow: inset 0 1px 0 rgba(255,255,255,0.55); }
 
-        .tall-bar {
-            height: 42px !important;
-            border-radius: 12px !important;
-        }
-        .bar-text-overlay {
-            padding: 0 16px;
-            font-size: 0.78rem;
-        }
+        .tall-bar { height: 42px !important; border-radius: 12px !important; }
+        .bar-text-overlay { padding: 0 16px; font-size: 0.78rem; }
 
-        .tick {
-            font-size: 0.62rem;
-            letter-spacing: 0.02em;
-            opacity: 0.85;
-        }
-        #block-pct, #year-pct, #week-pct, #work-pct, #day-pct {
-            font-variant-numeric: tabular-nums;
-            font-size: 0.85rem;
-            letter-spacing: -0.02em;
-        }
+        .tick { font-size: 0.62rem; letter-spacing: 0.02em; opacity: 0.85; }
+        #block-pct, #year-pct, #week-pct, #work-pct, #day-pct { font-variant-numeric: tabular-nums; font-size: 0.85rem; letter-spacing: -0.02em; }
 
         .day.today {
-            border-radius: 6px;
-            outline: none;
-            transform: scale(1.06);
-            box-shadow:
-                0 0 0 2px var(--bg),
-                0 0 0 3.5px var(--accent),
-                0 4px 14px rgba(16,185,129,0.35) !important;
+            border-radius: 6px; outline: none; transform: scale(1.06);
+            box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--accent), 0 4px 14px rgba(16,185,129,0.35) !important;
         }
         .day.today:hover {
             transform: scale(1.1);
-            box-shadow:
-                0 0 0 2px var(--bg),
-                0 0 0 3.5px var(--accent),
-                0 6px 18px rgba(16,185,129,0.45) !important;
+            box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--accent), 0 6px 18px rgba(16,185,129,0.45) !important;
         }
-
         .day {
-            border-radius: 5px;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-                        background-color 0.2s ease,
-                        box-shadow 0.2s ease;
+            border-radius: 5px; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .day:not(.today):hover {
-            transform: translateY(-1px) scale(1.04);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+        .day:not(.today):hover { transform: translateY(-1px) scale(1.04); box-shadow: 0 3px 8px rgba(0,0,0,0.18); }
+
+        .modal-card, .calendar-detail {
+            border-radius: 22px; box-shadow: 0 32px 64px -12px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
+        }
+        [data-theme="light"] .modal-card, [data-theme="light"] .calendar-detail {
+            box-shadow: 0 32px 64px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04);
         }
 
-        .modal-card,
-        .calendar-detail {
-            border-radius: 22px;
-            box-shadow:
-                0 32px 64px -12px rgba(0,0,0,0.65),
-                0 0 0 1px rgba(255,255,255,0.04);
-        }
-        [data-theme="light"] .modal-card,
-        [data-theme="light"] .calendar-detail {
-            box-shadow:
-                0 32px 64px -12px rgba(0,0,0,0.18),
-                0 0 0 1px rgba(0,0,0,0.04);
-        }
+        .year-box, .quarter-compact { border-radius: 18px; }
+        .year-box:hover, .quarter-compact:hover { box-shadow: 0 14px 32px -10px rgba(0,0,0,0.35); }
 
-        .year-box,
-        .quarter-compact {
-            border-radius: 18px;
-        }
-        .year-box:hover,
-        .quarter-compact:hover {
-            box-shadow: 0 14px 32px -10px rgba(0,0,0,0.35);
-        }
-
-        .dock-panel.active {
-            animation: panelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @keyframes panelIn {
-            from { opacity: 0; transform: translateY(-6px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+        .dock-panel.active { animation: panelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes panelIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
         .now-marker {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--accent);
-            transform: translateX(-50%);
-            z-index: 15;
-            pointer-events: none;
-            border-radius: 1px;
-            box-shadow:
-                0 0 6px var(--accent),
-                0 0 14px var(--accent);
-            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent);
+            transform: translateX(-50%); z-index: 15; pointer-events: none; border-radius: 1px;
+            box-shadow: 0 0 6px var(--accent), 0 0 14px var(--accent); transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .now-marker::before {
-            content: '';
-            position: absolute;
-            top: -7px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent);
-            box-shadow:
-                0 0 0 2px var(--card),
-                0 0 8px var(--accent);
-            animation: nowDotPulse 1.8s ease-in-out infinite;
+            content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+            width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+            box-shadow: 0 0 0 2px var(--card), 0 0 8px var(--accent); animation: nowDotPulse 1.8s ease-in-out infinite;
         }
         @keyframes nowDotPulse {
-            0%, 100% {
-                box-shadow:
-                    0 0 0 2px var(--card),
-                    0 0 8px var(--accent);
-            }
-            50% {
-                box-shadow:
-                    0 0 0 2px var(--card),
-                    0 0 16px var(--accent),
-                    0 0 26px var(--accent);
-            }
+            0%, 100% { box-shadow: 0 0 0 2px var(--card), 0 0 8px var(--accent); }
+            50% { box-shadow: 0 0 0 2px var(--card), 0 0 16px var(--accent), 0 0 26px var(--accent); }
         }
-        @media (prefers-reduced-motion: reduce) {
-            .now-marker::before { animation: none; }
-            .now-marker { transition: none; }
-        }
+        @media (prefers-reduced-motion: reduce) { .now-marker::before { animation: none; } .now-marker { transition: none; } }
     </style>
 </head>
 <body>
-    <!-- NUEVO: Widget Flotante del Temporizador (Esquina Superior Izquierda) -->
     <div id="floating-timer">
         <span id="floating-time">00:00</span>
-        <!-- Ahora el botón llama a toggleTimer() y su ícono cambiará dinámicamente -->
         <button id="floating-toggle-btn" class="floating-stop-btn" onclick="toggleTimer()" title="Pausar/Reanudar"></button>
     </div>
 
@@ -801,7 +659,6 @@
         </button>
     </div>
 
-    <!-- NUEVO: Temporizador Widget -->
     <div class="timer-widget" id="custom-timer-widget">
         <div class="timer-input-group">
             <input type="number" id="timer-input-m" placeholder="0" min="0" max="999" title="Deja en 0 o vacío para usar como cronómetro">
@@ -1069,18 +926,58 @@
     </script>
 
     <script>
-        // VARIABLES GLOBALES (incluyendo la memoria de Hora de Fin)
         let globalLastHourEnd = localStorage.getItem('wkLastHourEnd') || '';
         
-        // TEMPORIZADOR LOGIC Y ESTADO UNIVERSAL
-        let tMode = 'up';      // 'up' = Cronómetro, 'down' = Temporizador
+        let tMode = 'up';
         let tRunning = false;
-        let tRef = 0;          // Referencia Date.now() del último cambio
-        let tAcc = 0;          // Ms acumulados o restantes
+        let tRef = 0;
+        let tAcc = 0;
+        
+        // Variables para la alarma continua
+        let audioCtx = null;
+        let alarmInterval = null;
+
+        function startAlarmSound() {
+            if (alarmInterval) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const playBeep = () => {
+                    if (!audioCtx) return;
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Tono agudo claro
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                };
+
+                playBeep();
+                alarmInterval = setInterval(playBeep, 800); // Repetir cada 800ms
+            } catch(e) {
+                console.log("Audio not allowed or supported yet", e);
+            }
+        }
+
+        function stopAlarmSound() {
+            if (alarmInterval) {
+                clearInterval(alarmInterval);
+                alarmInterval = null;
+            }
+        }
 
         function toggleTimer() {
+            stopAlarmSound(); // Al interactuar se detiene la alarma
             if (tRunning) {
-                // Pausar
                 if (tMode === 'up') {
                     tAcc += Date.now() - tRef;
                 } else {
@@ -1088,7 +985,6 @@
                 }
                 tRunning = false;
             } else {
-                // Iniciar/Reanudar
                 if (tAcc === 0) {
                     let m = parseFloat(document.getElementById('timer-input-m').value) || 0;
                     if (m > 0) {
@@ -1107,6 +1003,7 @@
         }
 
         function resetTimer() {
+            stopAlarmSound();
             tRunning = false;
             tAcc = 0;
             tRef = 0;
@@ -1124,7 +1021,7 @@
                     current = 0;
                     tRunning = false;
                     tAcc = 0;
-                    alert("¡Tiempo cumplido!");
+                    startAlarmSound(); // Activar sonido continuo al finalizar
                 }
             }
 
@@ -1137,10 +1034,8 @@
             document.getElementById('timer-display').innerText = disp;
             document.getElementById('floating-time').innerText = disp;
 
-            // Verificar si NO estamos en la pantalla principal
             const isNotMainScreen = document.getElementById('calendar-overlay').classList.contains('active') || document.getElementById('modal-overlay').classList.contains('active');
 
-            // Mostrar el widget flotante SOLO si hay tiempo guardado y no estamos en la principal
             const floatEl = document.getElementById('floating-timer');
             if ((tRunning || current > 0) && isNotMainScreen) {
                 floatEl.style.display = 'flex';
@@ -1148,7 +1043,6 @@
                 floatEl.style.display = 'none';
             }
 
-            // Actualizar botones principales y el botón flotante (íconos de Play/Pausa)
             const btnToggle = document.getElementById('btn-timer-toggle');
             const floatBtn = document.getElementById('floating-toggle-btn');
             
@@ -1156,15 +1050,11 @@
                 btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
                 btnToggle.classList.add('active');
                 document.getElementById('timer-display').classList.add('running');
-                
-                // Ícono de PAUSA para el widget flotante
                 floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
             } else {
                 btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
                 btnToggle.classList.remove('active');
                 document.getElementById('timer-display').classList.remove('running');
-                
-                // Ícono de PLAY para el widget flotante (cuando está pausado)
                 floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
             }
         }
@@ -1181,18 +1071,14 @@
             tAcc = savedT.tAcc || 0;
         }
 
-
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const diasL = ["L", "M", "M", "J", "V", "S", "D"];
         const diasFull = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
         const currentYear = new Date().getFullYear();
-        const dayTypeMap = { 'Lun': 0, 'Mar': 1, 'Mié': 2, 'Jue': 3, 'Vie': 4, 'Sáb': 5, 'Dom': 6 };
         
         let rawTasks = JSON.parse(localStorage.getItem('wkTasks')) || {};
         let tasksData = {};
-        for (let key in rawTasks) {
-            tasksData[key] = rawTasks[key]; 
-        }
+        for (let key in rawTasks) tasksData[key] = rawTasks[key];
         localStorage.setItem('wkTasks', JSON.stringify(tasksData));
 
         let entornosData = JSON.parse(localStorage.getItem('wkEntornos')) || [];
@@ -1266,6 +1152,7 @@
 
         let activeTabM = 0;
         let activeTabW = 1;
+        let listDisplayMode = 'acciones'; // 'acciones' o 'entornos'
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
@@ -1350,7 +1237,10 @@
                 dayEntornos.forEach(e => {
                     const timeDisp = e.hour ? (e.hourEnd ? `${e.hour} - ${e.hourEnd}` : e.hour) : '';
                     html += `<div style="font-size:0.85rem; padding:8px 8px; border-radius:8px; background: ${e.color}15; border-left: 3px solid ${e.color}; display:flex; flex-direction:column; margin-bottom:8px;">
-                        <span style="color:var(--text); font-weight:bold;">${e.text}</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:var(--text); font-weight:bold;">${e.text}</span>
+                            <span class="qt-delete" style="cursor:pointer;" onclick="removeEntornoDay(${e.id}, ${mI % 3}, ${wNum % 10}, ${dI}); showDayStats('${dateStr}', ${wNum}, ${dI}, ${mI});" title="Quitar este día">×</span>
+                        </div>
                         ${timeDisp ? `<span style="color:var(--muted); font-size:0.72rem;">${timeDisp}</span>` : ''}
                     </div>`;
                 });
@@ -1581,9 +1471,33 @@
             const tKey = `${selectedYear}-${week}`; tasksData[tKey] = (tasksData[tKey] || []).filter(x => x.id !== taskId);
             localStorage.setItem('wkTasks', JSON.stringify(tasksData)); updateMasterTaskList(); renderDayTaskMarks();
         }
-        function deleteEntorno(id) {
-            entornosData = entornosData.filter(e => e.id !== id);
-            localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); updateMasterTaskList(); renderDayTaskMarks();
+        
+        // Nueva función para eliminar un entorno únicamente de un día específico
+        function removeEntornoDay(entornoId, monthIdx, weekVal, dayIdx) {
+            let ent = entornosData.find(e => e.id === entornoId);
+            if (!ent) return;
+            
+            // Si el entorno abarca exactamente este día, removemos el día de su arreglo de días
+            ent.days = ent.days.filter(d => d !== dayIdx);
+            
+            // Si ya no le quedan días en absoluto, lo eliminamos por completo
+            if (ent.days.length === 0) {
+                entornosData = entornosData.filter(e => e.id !== entornoId);
+            }
+            
+            localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
+            updateMasterTaskList();
+            renderDayTaskMarks();
+        }
+
+        // Función para eliminar completamente el entorno
+        function deleteEntornoCompletely(id) {
+            if (confirm("¿Estás seguro de eliminar este entorno por completo?")) {
+                entornosData = entornosData.filter(e => e.id !== id);
+                localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); 
+                updateMasterTaskList(); 
+                renderDayTaskMarks();
+            }
         }
 
         function setActiveTabM(m) {
@@ -1598,6 +1512,11 @@
 
         function setActiveTabW(w) {
             activeTabW = w;
+            updateMasterTaskList();
+        }
+
+        function toggleListDisplayMode() {
+            listDisplayMode = listDisplayMode === 'acciones' ? 'entornos' : 'acciones';
             updateMasterTaskList();
         }
 
@@ -1623,66 +1542,73 @@
 
             let tasksHtml = '';
             
-            let qEntornos = entornosData.filter(e => e.year === year && e.q === q && e.months.includes(activeTabM) && e.weeks.includes(activeTabW));
-            if (qEntornos.length > 0) {
-                tasksHtml += `<div style="padding: 0 0 8px;">`;
-                qEntornos.forEach(e => {
-                    const timeDisp = e.hour ? (e.hourEnd ? `${e.hour}-${e.hourEnd}` : e.hour) : 'Todo el día';
-                    tasksHtml += `
-                    <div class="qt-item">
-                        <div class="qt-info">
-                            <div class="qt-text"><span class="entorno-tag" style="background:${e.color}20; color:${e.color};">ENTORNO</span> ${e.text}</div>
-                            <div class="qt-meta">Días: ${e.days.map(d=>diasL[d]).join(',')} · ${timeDisp}</div>
-                        </div>
-                        <span class="qt-delete" onclick="deleteEntorno(${e.id})">×</span>
-                    </div>`;
-                });
-                tasksHtml += `</div><div style="border-bottom: 1px dashed var(--border); margin: 0 0 5px;"></div>`;
-            }
-
-            const wNum = activeMonthAbs * 10 + activeTabW;
-            const weekTasks = tasksData[`${year}-${wNum}`] || [];
-            
-            const today = new Date();
-            const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth();
-            const todayWeekInfo = getWeekForDay(currentYear, currentMonth, today.getDate());
-
-            if (weekTasks.length === 0 && qEntornos.length === 0) {
-                tasksHtml += `<div class="qt-empty">Sin registros en esta semana.</div>`;
-            } else {
-                tasksHtml += weekTasks.map(t => {
-                    const tDay = getTaskDay(t);
-                    let metaParts = [];
-                    if (t.hour) metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
-                    const metaStr = metaParts.length > 0 ? `<div class="qt-meta">${metaParts.join(' · ')}</div>` : '';
-                    
-                    let dayTagHtml = '';
-                    if (tDay !== null) {
-                        let isHoy = false;
-                        if (year === currentYear && activeMonthAbs === currentMonth && todayWeekInfo && todayWeekInfo.localW === activeTabW && tDay === todayWeekInfo.dayIdx) {
-                            isHoy = true;
-                        }
-
-                        if (isHoy) {
-                            dayTagHtml = `<span class="task-day-tag">HOY</span>`;
-                        } else {
-                            dayTagHtml = `<span class="task-day-tag">${diasFull[tDay].slice(0,3).toUpperCase()}</span>`;
-                        }
-                    }
-                    
-                    return `
-                        <div class="qt-item ${t.done ? 'done' : ''}">
-                            <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${wNum}, ${t.id})">
+            if (listDisplayMode === 'entornos') {
+                let qEntornos = entornosData.filter(e => e.year === year && e.q === q && e.months.includes(activeTabM) && e.weeks.includes(activeTabW));
+                if (qEntornos.length === 0) {
+                    tasksHtml += `<div class="qt-empty">Sin entornos en esta semana.</div>`;
+                } else {
+                    qEntornos.forEach(e => {
+                        const timeDisp = e.hour ? (e.hourEnd ? `${e.hour}-${e.hourEnd}` : e.hour) : 'Todo el día';
+                        tasksHtml += `
+                        <div class="qt-item">
                             <div class="qt-info">
-                                <div class="qt-text">${t.text}${dayTagHtml}</div>
-                                ${metaStr}
+                                <div class="qt-text"><span class="entorno-tag" style="background:${e.color}20; color:${e.color};">ENTORNO</span> ${e.text}</div>
+                                <div class="qt-meta">Días: ${e.days.map(d=>diasL[d]).join(',')} · ${timeDisp}</div>
                             </div>
-                            <span class="qt-delete" onclick="deleteManagedTask(${wNum}, ${t.id})">×</span>
+                            <span class="qt-delete" title="Eliminar entorno" onclick="deleteEntornoCompletely(${e.id})">×</span>
                         </div>`;
-                }).join('');
+                    });
+                }
+            } else {
+                const wNum = activeMonthAbs * 10 + activeTabW;
+                const weekTasks = tasksData[`${year}-${wNum}`] || [];
+                
+                const today = new Date();
+                const currentYear = today.getFullYear();
+                const currentMonth = today.getMonth();
+                const todayWeekInfo = getWeekForDay(currentYear, currentMonth, today.getDate());
+
+                if (weekTasks.length === 0) {
+                    tasksHtml += `<div class="qt-empty">Sin acciones en esta semana.</div>`;
+                } else {
+                    tasksHtml += weekTasks.map(t => {
+                        const tDay = getTaskDay(t);
+                        let metaParts = [];
+                        if (t.hour) metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
+                        const metaStr = metaParts.length > 0 ? `<div class="qt-meta">${metaParts.join(' · ')}</div>` : '';
+                        
+                        let dayTagHtml = '';
+                        if (tDay !== null) {
+                            let isHoy = false;
+                            if (year === currentYear && activeMonthAbs === currentMonth && todayWeekInfo && todayWeekInfo.localW === activeTabW && tDay === todayWeekInfo.dayIdx) {
+                                isHoy = true;
+                            }
+
+                            if (isHoy) {
+                                dayTagHtml = `<span class="task-day-tag">HOY</span>`;
+                            } else {
+                                dayTagHtml = `<span class="task-day-tag">${diasFull[tDay].slice(0,3).toUpperCase()}</span>`;
+                            }
+                        }
+                        
+                        return `
+                            <div class="qt-item ${t.done ? 'done' : ''}">
+                                <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${wNum}, ${t.id})">
+                                <div class="qt-info">
+                                    <div class="qt-text">${t.text}${dayTagHtml}</div>
+                                    ${metaStr}
+                                </div>
+                                <span class="qt-delete" onclick="deleteManagedTask(${wNum}, ${t.id})">×</span>
+                            </div>`;
+                    }).join('');
+                }
             }
             
+            // Botón toggle en la esquina inferior derecha para cambiar entre Acciones y Entornos
+            const toggleIcon = listDisplayMode === 'acciones' ? 'E' : 'A';
+            const toggleTitle = listDisplayMode === 'acciones' ? 'Ver Entornos' : 'Ver Acciones';
+            tasksHtml += `<div class="mode-toggle-corner" onclick="toggleListDisplayMode()" title="${toggleTitle}">${toggleIcon}</div>`;
+
             document.getElementById('qt-list-container').innerHTML = tasksHtml;
         }
 
@@ -1787,14 +1713,14 @@
             renderQuarterDetailBody(); 
             document.getElementById('calendar-overlay').classList.add('active'); 
             document.body.style.overflow = 'hidden';
-            updateTimerUI(); // Forzar actualización visual para mostrar el widget flotante si está corriendo
+            updateTimerUI();
         }
         
         function closeQuarterDetail(e) {
             if (e && e.target.id !== 'calendar-overlay') return;
             document.getElementById('calendar-overlay').classList.remove('active'); document.body.style.overflow = '';
             if (calendarView === 'quarters') drawCalendar();
-            updateTimerUI(); // Forzar actualización para ocultar el widget flotante al regresar
+            updateTimerUI();
         }
 
         function openMetricsModal() { document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; renderMetricsModalBody(selectedQuarter); document.getElementById('modal-content-metrics').style.display = 'block'; openModal(); }
@@ -1879,7 +1805,7 @@
 
         function openModal() { 
             document.getElementById('modal-overlay').classList.add('active'); 
-            updateTimerUI(); // Forzar actualización visual
+            updateTimerUI();
         }
         
         function closeModal(e) { 
@@ -1889,7 +1815,7 @@
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
-            updateTimerUI(); // Forzar actualización visual
+            updateTimerUI();
         }
 
         function openBlockModal() { document.getElementById('modal-content-block').style.display = 'block'; document.getElementById('inp-block-start').value = blockConfig.startYear; document.getElementById('inp-block-years').value = blockConfig.years; openModal(); }

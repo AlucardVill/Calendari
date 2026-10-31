@@ -31,7 +31,7 @@
             --work: #f59e0b; --day-bar: #8b5cf6; --year-bar: #3b82f6;
             --week-bar: #10b981; --bi-bar: #ec4899;
             --week-box-active: #10b981; --week-box-concluded: #3f3f46;
-            --current-week-bg: rgba(16, 185, 129, 0.15); /* Tinte de fondo para la semana actual */
+            --current-week-bg: rgba(16, 185, 129, 0.15);
             --block-id: #fde047;
             --modal-bg: rgba(0,0,0,0.75); 
             --btn-text: #000; --today-text: #000;
@@ -51,7 +51,7 @@
             --work: #d97706; --day-bar: #7c3aed; --year-bar: #2563eb;
             --week-bar: #059669; --bi-bar: #db2777;
             --week-box-active: #10b981; --week-box-concluded: #d1d5db;
-            --current-week-bg: rgba(5, 150, 105, 0.12); /* Tinte de fondo para la semana actual (claro) */
+            --current-week-bg: rgba(5, 150, 105, 0.12);
             --block-id: #ca8a04;
             --modal-bg: rgba(255,255,255,0.75);
             --btn-text: #ffffff; --today-text: #ffffff;
@@ -407,7 +407,6 @@
         .block-label { position: absolute; top: -10px; left: 0; font-size: 0.42rem; color: var(--block-id); font-weight: 800; z-index: 10; }
         .task-dot { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 3px var(--accent); pointer-events: none; }
 
-        /* NUEVO: Resaltado estático y elegante para la semana actual (fondo suave) */
         .current-week-glow .day:not(.today) { 
             background-color: var(--current-week-bg); 
             z-index: 1; 
@@ -416,7 +415,6 @@
         .day.future { color: var(--future); } 
         .day.past { color: var(--subtext); background: var(--past) !important; border-radius: 4px; } 
         
-        /* NUEVO: Diseño de Anillo de Enfoque (Focus Ring) para el día actual */
         .day.today { 
             background: var(--today) !important; 
             color: var(--today-text); 
@@ -482,15 +480,237 @@
             .month-name { font-size: 0.65rem; }
             .block-label { font-size: 0.38rem; top: -8px; }
         }
+
+        /* ============================================================
+           TIEMPO · Mejoras estéticas v2
+           Aurora + Iconografía SVG + refinamientos
+           ============================================================ */
+
+        /* ── 1. FONDO AURORA ───────────────────────────────────── */
+        html {
+            background: var(--bg);
+            min-height: 100%;
+        }
+        body {
+            background: transparent;
+            background-image: none;
+        }
+        html::before {
+            content: '';
+            position: fixed;
+            inset: -30%;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(16,185,129,0.16), transparent 42%),
+                radial-gradient(circle at 80% 65%, rgba(59,130,246,0.13), transparent 42%),
+                radial-gradient(circle at 45% 90%, rgba(236,72,153,0.09), transparent 42%);
+            animation: auroraDrift 32s ease-in-out infinite alternate;
+            will-change: transform;
+        }
+        [data-theme="light"] html::before {
+            background:
+                radial-gradient(circle at 20% 30%, rgba(5,150,105,0.11), transparent 42%),
+                radial-gradient(circle at 80% 65%, rgba(37,99,235,0.09), transparent 42%),
+                radial-gradient(circle at 45% 90%, rgba(219,39,119,0.06), transparent 42%);
+        }
+        @keyframes auroraDrift {
+            0%   { transform: translate(-2%, -1%) scale(1); }
+            50%  { transform: translate(2%, 2%) scale(1.05); }
+            100% { transform: translate(-1%, 3%) scale(1.02); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html::before { animation: none; }
+        }
+
+        /* ── 2. HEADER ─────────────────────────────────────────── */
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.55rem;
+            letter-spacing: -0.04em;
+        }
+        .header-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            border-radius: 2px;
+            background: linear-gradient(180deg, var(--accent) 0%, var(--year-bar) 55%, var(--bi-bar) 100%);
+            box-shadow: 0 0 14px rgba(16,185,129,0.45);
+            flex-shrink: 0;
+        }
+        .header-menu-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: var(--item-bg);
+            border: 1px solid var(--border);
+            padding: 0;
+            transition: all 0.2s;
+        }
+        .header-menu-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* ── 3. ICONOGRAFÍA SVG ────────────────────────────────── */
+        .header-menu-btn svg { width: 18px; height: 18px; display: block; }
+        .metrics-btn svg,
+        .close-btn svg,
+        .add-task-btn svg { width: 15px; height: 15px; display: block; }
+        .section-label svg {
+            width: 14px;
+            height: 14px;
+            display: block;
+            color: var(--accent);
+            opacity: 0.9;
+            flex-shrink: 0;
+        }
+
+        /* ── 4. BOTONES DE PROGRESO con glow ───────────────────── */
+        .progress-btn {
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .progress-btn.active {
+            box-shadow:
+                0 8px 24px -10px currentColor,
+                inset 0 1px 0 rgba(255,255,255,0.06),
+                inset 0 -20px 20px -20px currentColor;
+        }
+        [data-theme="light"] .progress-btn.active {
+            box-shadow:
+                0 8px 24px -10px currentColor,
+                inset 0 1px 0 rgba(255,255,255,0.7),
+                inset 0 -20px 20px -20px currentColor;
+        }
+
+        /* ── 5. BARRAS con relieve ─────────────────────────────── */
+        .bar-wrapper {
+            height: 12px;
+            border-radius: 6px;
+            background: var(--item-bg);
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.35);
+        }
+        .progress-bar {
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        [data-theme="light"] .bar-wrapper {
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.14);
+        }
+        [data-theme="light"] .progress-bar {
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+        }
+
+        .tall-bar {
+            height: 42px !important;
+            border-radius: 12px !important;
+        }
+        .bar-text-overlay {
+            padding: 0 16px;
+            font-size: 0.78rem;
+        }
+
+        /* ── 6. TICKS Y PORCENTAJES ────────────────────────────── */
+        .tick {
+            font-size: 0.62rem;
+            letter-spacing: 0.02em;
+            opacity: 0.85;
+        }
+        #block-pct, #year-pct, #week-pct, #work-pct, #day-pct {
+            font-variant-numeric: tabular-nums;
+            font-size: 0.85rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* ── 7. DÍA "HOY": anillo elegante ─────────────────────── */
+        .day.today {
+            border-radius: 6px;
+            outline: none;
+            transform: scale(1.06);
+            box-shadow:
+                0 0 0 2px var(--bg),
+                0 0 0 3.5px var(--accent),
+                0 4px 14px rgba(16,185,129,0.35) !important;
+        }
+        .day.today:hover {
+            transform: scale(1.1);
+            box-shadow:
+                0 0 0 2px var(--bg),
+                0 0 0 3.5px var(--accent),
+                0 6px 18px rgba(16,185,129,0.45) !important;
+        }
+
+        /* ── 8. CELDAS DEL CALENDARIO ──────────────────────────── */
+        .day {
+            border-radius: 5px;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.2s ease,
+                        box-shadow 0.2s ease;
+        }
+        .day:not(.today):hover {
+            transform: translateY(-1px) scale(1.04);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+        }
+
+        /* ── 9. MODALES con profundidad atmosférica ────────────── */
+        .modal-card,
+        .calendar-detail {
+            border-radius: 22px;
+            box-shadow:
+                0 32px 64px -12px rgba(0,0,0,0.65),
+                0 0 0 1px rgba(255,255,255,0.04);
+        }
+        [data-theme="light"] .modal-card,
+        [data-theme="light"] .calendar-detail {
+            box-shadow:
+                0 32px 64px -12px rgba(0,0,0,0.18),
+                0 0 0 1px rgba(0,0,0,0.04);
+        }
+
+        /* ── 10. AÑOS / TRIMESTRES ─────────────────────────────── */
+        .year-box,
+        .quarter-compact {
+            border-radius: 18px;
+        }
+        .year-box:hover,
+        .quarter-compact:hover {
+            box-shadow: 0 14px 32px -10px rgba(0,0,0,0.35);
+        }
+
+        /* ── 11. PANELES DOCK ──────────────────────────────────── */
+        .dock-panel.active {
+            animation: panelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes panelIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
     <div class="header-top">
         <h2 class="header-title">Tiempo</h2>
-        <button class="header-menu-btn" onclick="openGeneralModal()" title="Menú">⋮</button>
+        <button class="header-menu-btn" onclick="openGeneralModal()" title="Menú" aria-label="Menú">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <circle cx="12" cy="5" r="1.8"/>
+                <circle cx="12" cy="12" r="1.8"/>
+                <circle cx="12" cy="19" r="1.8"/>
+            </svg>
+        </button>
     </div>
 
-    <div class="section-label">📊 Progreso</div>
+    <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 17l6-6 4 4 8-8"/>
+            <path d="M14 7h7v7"/>
+        </svg>
+        Progreso
+    </div>
 
     <div class="progress-buttons">
         <button class="progress-btn" id="btn-block" style="color: var(--bi-bar);" onclick="toggleBar('block')">
@@ -545,7 +765,13 @@
         </div>
     </div>
 
-    <div class="section-label">📋 Calendario</div>
+    <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4.5" width="18" height="17" rx="2.5"/>
+            <path d="M16 2v5M8 2v5M3 10.5h18"/>
+        </svg>
+        Calendario
+    </div>
 
     <div id="calendar-container"></div>
 
@@ -553,7 +779,11 @@
         <div class="calendar-detail" onclick="event.stopPropagation()">
             <div class="calendar-detail-header">
                 <div class="header-btns left">
-                    <button class="add-task-btn" onclick="openTaskCreateModal()" title="Añadir">＋</button>
+                    <button class="add-task-btn" onclick="openTaskCreateModal()" title="Añadir" aria-label="Añadir">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                    </button>
                 </div>
                 
                 <div class="calendar-detail-title">
@@ -563,8 +793,19 @@
                 </div>
 
                 <div class="header-btns right">
-                    <button class="metrics-btn" onclick="openMetricsModal()" title="Ver cumplimiento">📊</button>
-                    <button class="close-btn" onclick="closeQuarterDetail()">✕</button>
+                    <button class="metrics-btn" onclick="openMetricsModal()" title="Ver cumplimiento" aria-label="Ver cumplimiento">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 20h18"/>
+                            <rect x="5" y="13" width="3" height="6" rx="0.6"/>
+                            <rect x="10.5" y="9" width="3" height="10" rx="0.6"/>
+                            <rect x="16" y="4" width="3" height="15" rx="0.6"/>
+                        </svg>
+                    </button>
+                    <button class="close-btn" onclick="closeQuarterDetail()" aria-label="Cerrar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                            <path d="M6 6l12 12M18 6l-12 12"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
             <div class="calendar-detail-body" id="calendar-detail-body"></div>

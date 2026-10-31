@@ -523,7 +523,6 @@
         .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.45rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
         .task-day-tag { color: var(--block-id); font-size: 0.5rem; font-weight: 700; display: inline-block; margin-left: 5px; letter-spacing: 0.02em; }
 
-        /* Botón toggle esquina inferior derecha para listar Entornos/Acciones */
         .mode-toggle-corner {
             position: absolute; bottom: 4px; right: 4px; z-index: 10;
             background: var(--item-bg); border: 1px solid var(--border-input);
@@ -923,6 +922,11 @@
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
             });
         }
+        
+        // Solicitar permisos de notificación al cargar para que funcione en segundo plano
+        if ('Notification' in window && Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        }
     </script>
 
     <script>
@@ -933,12 +937,28 @@
         let tRef = 0;
         let tAcc = 0;
         
-        // Variables para la alarma continua
         let audioCtx = null;
         let alarmInterval = null;
 
         function startAlarmSound() {
             if (alarmInterval) return;
+            
+            // Intentar activar vibración del dispositivo (funciona muy bien en segundo plano en Android)
+            if ('vibrate' in navigator) {
+                try { navigator.vibrate([500, 250, 500, 250, 500]); } catch(e) {}
+            }
+
+            // Lanzar notificación flotante nativa del sistema
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    new Notification("¡Tiempo cumplido!", {
+                        body: "El temporizador ha llegado a su fin.",
+                        icon: "https://cdn-icons-png.flaticon.com/512/2370/2370264.png",
+                        tag: "timer-alarm"
+                    });
+                } catch(e) {}
+            }
+
             try {
                 if (!audioCtx) {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -952,17 +972,22 @@
                     let osc = audioCtx.createOscillator();
                     let gain = audioCtx.createGain();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Tono agudo claro
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
                     gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     osc.start();
                     osc.stop(audioCtx.currentTime + 0.4);
+                    
+                    // Repetir vibración en cada pulso de alarma
+                    if ('vibrate' in navigator) {
+                        try { navigator.vibrate(300); } catch(e) {}
+                    }
                 };
 
                 playBeep();
-                alarmInterval = setInterval(playBeep, 800); // Repetir cada 800ms
+                alarmInterval = setInterval(playBeep, 800);
             } catch(e) {
                 console.log("Audio not allowed or supported yet", e);
             }
@@ -973,10 +998,13 @@
                 clearInterval(alarmInterval);
                 alarmInterval = null;
             }
+            if ('vibrate' in navigator) {
+                try { navigator.vibrate(0); } catch(e) {}
+            }
         }
 
         function toggleTimer() {
-            stopAlarmSound(); // Al interactuar se detiene la alarma
+            stopAlarmSound();
             if (tRunning) {
                 if (tMode === 'up') {
                     tAcc += Date.now() - tRef;
@@ -1021,7 +1049,7 @@
                     current = 0;
                     tRunning = false;
                     tAcc = 0;
-                    startAlarmSound(); // Activar sonido continuo al finalizar
+                    startAlarmSound();
                 }
             }
 
@@ -1152,7 +1180,7 @@
 
         let activeTabM = 0;
         let activeTabW = 1;
-        let listDisplayMode = 'acciones'; // 'acciones' o 'entornos'
+        let listDisplayMode = 'acciones';
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
@@ -1472,25 +1500,18 @@
             localStorage.setItem('wkTasks', JSON.stringify(tasksData)); updateMasterTaskList(); renderDayTaskMarks();
         }
         
-        // Nueva función para eliminar un entorno únicamente de un día específico
         function removeEntornoDay(entornoId, monthIdx, weekVal, dayIdx) {
             let ent = entornosData.find(e => e.id === entornoId);
             if (!ent) return;
-            
-            // Si el entorno abarca exactamente este día, removemos el día de su arreglo de días
             ent.days = ent.days.filter(d => d !== dayIdx);
-            
-            // Si ya no le quedan días en absoluto, lo eliminamos por completo
             if (ent.days.length === 0) {
                 entornosData = entornosData.filter(e => e.id !== entornoId);
             }
-            
             localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
             updateMasterTaskList();
             renderDayTaskMarks();
         }
 
-        // Función para eliminar completamente el entorno
         function deleteEntornoCompletely(id) {
             if (confirm("¿Estás seguro de eliminar este entorno por completo?")) {
                 entornosData = entornosData.filter(e => e.id !== id);
@@ -1604,7 +1625,6 @@
                 }
             }
             
-            // Botón toggle en la esquina inferior derecha para cambiar entre Acciones y Entornos
             const toggleIcon = listDisplayMode === 'acciones' ? 'E' : 'A';
             const toggleTitle = listDisplayMode === 'acciones' ? 'Ver Entornos' : 'Ver Acciones';
             tasksHtml += `<div class="mode-toggle-corner" onclick="toggleListDisplayMode()" title="${toggleTitle}">${toggleIcon}</div>`;

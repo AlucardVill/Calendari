@@ -74,34 +74,64 @@
         .header-menu-btn { background: transparent; border: none; color: var(--text); font-size: 1.5rem; font-weight: bold; cursor: pointer; padding: 4px 12px; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
         .header-menu-btn:active { transform: scale(0.9); }
 
-        .timer-widget {
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
-            margin: -10px 4px 15px; padding: 12px 16px;
-            background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-            box-shadow: var(--card-shadow);
+        /* Barra de control de plegado de temporizadores adicionales */
+        .timers-header-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin: -5px 6px 6px 6px; font-size: 0.65rem; color: var(--muted); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.08em;
         }
-        .timer-input-group { display: flex; align-items: center; gap: 6px; }
+        .timers-toggle-btn {
+            background: transparent; border: none; color: var(--muted); cursor: pointer;
+            font-size: 0.65rem; font-weight: 700; display: flex; align-items: center; gap: 4px;
+            padding: 2px 4px; transition: color 0.2s;
+        }
+        .timers-toggle-btn:hover { color: var(--accent); }
+
+        .timers-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .timers-container.collapsed .extra-timer { display: none !important; }
+
+        .timer-widget {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            margin: 0 4px; padding: 12px 16px;
+            background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+            box-shadow: var(--card-shadow); position: relative;
+        }
+        .timer-title { position: absolute; top: 4px; left: 16px; font-size: 0.55rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .timer-input-group { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
         .timer-input-group input { 
-            width: 45px; background: var(--input-bg); border: 1px solid var(--border-input); 
-            color: var(--text); padding: 6px; border-radius: 8px; text-align: center; 
-            font-weight: 700; font-family: inherit; font-size: 0.9rem; outline: none;
+            width: 36px; background: var(--input-bg); border: 1px solid var(--border-input); 
+            color: var(--text); padding: 5px 2px; border-radius: 6px; text-align: center; 
+            font-weight: 700; font-family: inherit; font-size: 0.8rem; outline: none;
         }
         .timer-input-group input:focus { border-color: var(--accent); }
-        .timer-input-group span { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+        .timer-input-group span { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+        
         .timer-display { 
-            font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; 
-            color: var(--text); letter-spacing: -0.02em; flex: 1; text-align: center;
+            font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; 
+            color: var(--text); letter-spacing: -0.02em; flex: 1; text-align: center; margin-top: 6px;
         }
         .timer-display.running { color: var(--accent); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-        .timer-controls { display: flex; gap: 8px; }
+        .timer-controls { display: flex; gap: 6px; margin-top: 6px; align-items: center; }
+        
         .t-btn { 
-            width: 36px; height: 36px; border-radius: 10px; background: var(--item-bg); 
+            width: 34px; height: 34px; border-radius: 10px; background: var(--item-bg); 
             border: 1px solid var(--border-input); color: var(--text); display: flex; 
             align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
         }
         .t-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
         .t-btn.active { background: var(--sunday); border-color: var(--sunday); color: #fff; }
         .t-btn.active:hover { border-color: #f43f5e; background: #f43f5e; color: #fff; }
+        
+        .t-btn-delete { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 4px; font-size: 1rem; border-radius: 6px; transition: color 0.2s; }
+        .t-btn-delete:hover { color: var(--sunday); }
+
+        .add-timer-inline-btn {
+            background: transparent; border: 1px dashed var(--border-input); color: var(--muted);
+            width: 24px; height: 24px; border-radius: 50%; font-size: 0.85rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
+            margin-left: auto;
+        }
+        .add-timer-inline-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--item-bg); }
 
         #floating-timer {
             display: none; position: fixed; 
@@ -644,7 +674,7 @@
 <body>
     <div id="floating-timer">
         <span id="floating-time">00:00</span>
-        <button id="floating-toggle-btn" class="floating-stop-btn" onclick="toggleTimer()" title="Pausar/Reanudar"></button>
+        <button id="floating-toggle-btn" class="floating-stop-btn" onclick="toggleTimer('general')" title="Pausar/Reanudar"></button>
     </div>
 
     <div class="header-top">
@@ -658,21 +688,16 @@
         </button>
     </div>
 
-    <div class="timer-widget" id="custom-timer-widget">
-        <div class="timer-input-group">
-            <input type="number" id="timer-input-m" placeholder="0" min="0" max="999" title="Deja en 0 o vacío para usar como cronómetro">
-            <span>min</span>
-        </div>
-        <div class="timer-display" id="timer-display">00:00</div>
-        <div class="timer-controls">
-            <button class="t-btn" id="btn-timer-toggle" onclick="toggleTimer()">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            </button>
-            <button class="t-btn" onclick="resetTimer()">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            </button>
-        </div>
+    <!-- BARRA DE PLEGADO DISCRETA PARA TEMPORIZADORES ADICIONALES -->
+    <div class="timers-header-bar" id="timers-header-bar" style="display: none;">
+        <span id="timers-count-label">Temporizadores adicionales</span>
+        <button class="timers-toggle-btn" id="timers-toggle-btn" onclick="toggleExtraTimersFold()">
+            <span id="timers-toggle-txt">Ocultar</span> <span id="timers-toggle-icon">▲</span>
+        </button>
     </div>
+
+    <!-- CONTENEDOR DE TEMPORIZADORES -->
+    <div class="timers-container" id="timers-container"></div>
 
     <div class="section-label">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -793,13 +818,33 @@
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             
-            <!-- MODAL: OBJETIVO LOGRADO (NUEVA MÉTRICA) -->
             <div id="modal-content-goal" style="display:none; text-align: center;">
                 <h3 style="color: var(--accent); margin-bottom: 10px;">¡Tiempo Finalizado!</h3>
-                <p style="font-size: 0.85rem; color: var(--subtext); margin-bottom: 20px;">¿Objetivo logrado?</p>
+                <p id="goal-modal-title" style="font-size: 0.85rem; color: var(--subtext); margin-bottom: 20px;">¿Objetivo logrado?</p>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-cancel" onclick="recordGoal(false)" style="background: var(--sunday); color: #fff;">No</button>
                     <button class="btn btn-save" onclick="recordGoal(true)">Sí</button>
+                </div>
+            </div>
+
+            <div id="modal-content-addtimer" style="display:none;">
+                <h3 style="color: var(--accent); margin-bottom: 15px;">Nuevo Temporizador</h3>
+                <div class="tc-desc" style="margin-bottom: 12px;">
+                    <input type="text" id="inp-newt-name" placeholder="Nombre (ej. Leer, Estudiar...)">
+                </div>
+                <div class="tc-row">
+                    <div class="tc-field">
+                        <label>Horas</label>
+                        <input type="number" id="inp-newt-h" placeholder="0" min="0" max="99">
+                    </div>
+                    <div class="tc-field">
+                        <label>Minutos</label>
+                        <input type="number" id="inp-newt-m" placeholder="0" min="0" max="59">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn btn-save" onclick="saveNewTimer()">Crear</button>
                 </div>
             </div>
 
@@ -937,13 +982,13 @@
     <script>
         let globalLastHourEnd = localStorage.getItem('wkLastHourEnd') || '';
         
-        let tMode = 'up';
-        let tRunning = false;
-        let tRef = 0;
-        let tAcc = 0;
-        
-        // Almacenamiento de estadísticas del temporizador en localStorage
+        let timersList = JSON.parse(localStorage.getItem('wkTimersList')) || [
+            { id: 'general', name: 'General', tMode: 'up', tRunning: false, tRef: 0, tAcc: 0 }
+        ];
+
+        let extraTimersFolded = localStorage.getItem('wkExtraTimersFolded') === 'true';
         let timerStats = JSON.parse(localStorage.getItem('wkTimerStats')) || [];
+        let activeTimerForGoal = null; 
 
         let audioCtx = null;
         let alarmInterval = null;
@@ -986,51 +1031,185 @@
             }
         }
 
-        function toggleTimer() {
-            stopAlarmSound(); 
-            if (tRunning) {
-                if (tMode === 'up') {
-                    tAcc += Date.now() - tRef;
+        function renderTimersUI() {
+            const container = document.getElementById('timers-container');
+            const headerBar = document.getElementById('timers-header-bar');
+            let html = '';
+            
+            let extraCount = timersList.filter(t => t.id !== 'general').length;
+            
+            if (extraCount > 0) {
+                headerBar.style.display = 'flex';
+                document.getElementById('timers-count-label').innerText = `Adicionales (${extraCount})`;
+                document.getElementById('timers-toggle-txt').innerText = extraTimersFolded ? 'Mostrar' : 'Ocultar';
+                document.getElementById('timers-toggle-icon').innerText = extraTimersFolded ? '▼' : '▲';
+                if (extraTimersFolded) {
+                    container.classList.add('collapsed');
                 } else {
-                    tAcc -= Date.now() - tRef;
+                    container.classList.remove('collapsed');
                 }
-                tRunning = false;
-                // Al pausar o detener un temporizador cuenta regresiva activo, preguntar por objetivo logrado
-                if (tMode === 'down' && tAcc < (parseFloat(document.getElementById('timer-input-m').value || 0) * 60000)) {
+            } else {
+                headerBar.style.display = 'none';
+                container.classList.remove('collapsed');
+            }
+
+            timersList.forEach((t) => {
+                const isGeneral = t.id === 'general';
+                const cardClass = isGeneral ? 'timer-widget' : 'timer-widget extra-timer';
+                const deleteBtnHtml = !isGeneral ? `<button class="t-btn-delete" onclick="deleteTimer('${t.id}')" title="Eliminar">×</button>` : '';
+                const addBtnHtml = isGeneral ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
+
+                html += `
+                <div class="${cardClass}" id="widget-${t.id}">
+                    <span class="timer-title">${t.name}</span>
+                    <div class="timer-input-group">
+                        <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas">
+                        <span>h</span>
+                        <input type="number" id="t-input-m-${t.id}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos">
+                        <span>min</span>
+                    </div>
+                    <div class="timer-display" id="t-display-${t.id}">00:00</div>
+                    <div class="timer-controls">
+                        <button class="t-btn" id="t-btn-toggle-${t.id}" onclick="toggleTimer('${t.id}')">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <button class="t-btn" onclick="resetTimer('${t.id}')">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        </button>
+                        ${deleteBtnHtml}
+                        ${addBtnHtml}
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+            updateTimersDisplayValues();
+        }
+
+        function toggleExtraTimersFold() {
+            extraTimersFolded = !extraTimersFolded;
+            localStorage.setItem('wkExtraTimersFolded', extraTimersFolded);
+            renderTimersUI();
+        }
+
+        function openAddTimerModal() {
+            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-addtimer').style.display = 'block';
+            document.getElementById('inp-newt-name').value = '';
+            document.getElementById('inp-newt-h').value = '';
+            document.getElementById('inp-newt-m').value = '';
+            openModal();
+            document.getElementById('inp-newt-name').focus();
+        }
+
+        function saveNewTimer() {
+            const name = document.getElementById('inp-newt-name').value.trim() || `Temporizador ${timersList.length}`;
+            const h = parseInt(document.getElementById('inp-newt-h').value) || 0;
+            const m = parseInt(document.getElementById('inp-newt-m').value) || 0;
+            
+            const newId = 't_' + Date.now();
+            let initialAcc = 0;
+            let initialMode = 'up';
+            let totalMs = (h * 3600 + m * 60) * 1000;
+            
+            if (totalMs > 0) {
+                initialMode = 'down';
+                initialAcc = totalMs;
+            }
+
+            timersList.push({
+                id: newId,
+                name: name,
+                tMode: initialMode,
+                tRunning: false,
+                tRef: 0,
+                tAcc: initialAcc,
+                inputH: h > 0 ? h : '',
+                inputM: m > 0 ? m : ''
+            });
+
+            // Al añadir uno nuevo, los desplegamos para que se vea
+            extraTimersFolded = false;
+            localStorage.setItem('wkExtraTimersFolded', extraTimersFolded);
+
+            saveTimersState();
+            renderTimersUI();
+            closeModal();
+        }
+
+        function deleteTimer(id) {
+            if (confirm("¿Estás seguro de eliminar este temporizador?")) {
+                timersList = timersList.filter(t => t.id !== id);
+                saveTimersState();
+                renderTimersUI();
+            }
+        }
+
+        function toggleTimer(id) {
+            stopAlarmSound();
+            let t = timersList.find(x => x.id === id);
+            if (!t) return;
+
+            if (t.tRunning) {
+                if (t.tMode === 'up') {
+                    t.tAcc += Date.now() - t.tRef;
+                } else {
+                    t.tAcc -= Date.now() - t.tRef;
+                }
+                t.tRunning = false;
+                
+                let inputH = parseInt(document.getElementById(`t-input-h-${id}`).value) || 0;
+                let inputM = parseInt(document.getElementById(`t-input-m-${id}`).value) || 0;
+                let initialTotalMs = (inputH * 3600 + inputM * 60) * 1000;
+
+                if (t.tMode === 'down' && initialTotalMs > 0 && t.tAcc < initialTotalMs) {
+                    activeTimerForGoal = t.name;
                     openGoalModal();
                 }
             } else {
-                if (tAcc === 0) {
-                    let m = parseFloat(document.getElementById('timer-input-m').value) || 0;
-                    if (m > 0) {
-                        tMode = 'down';
-                        tAcc = m * 60000;
+                if (t.tAcc === 0) {
+                    let h = parseInt(document.getElementById(`t-input-h-${id}`).value) || 0;
+                    let m = parseInt(document.getElementById(`t-input-m-${id}`).value) || 0;
+                    let totalMs = (h * 3600 + m * 60) * 1000;
+                    
+                    if (totalMs > 0) {
+                        t.tMode = 'down';
+                        t.tAcc = totalMs;
                     } else {
-                        tMode = 'up';
-                        tAcc = 0;
+                        t.tMode = 'up';
+                        t.tAcc = 0;
                     }
                 }
-                tRef = Date.now();
-                tRunning = true;
+                t.tRef = Date.now();
+                t.tRunning = true;
             }
-            updateTimerUI();
-            saveTimerState();
+            saveTimersState();
+            updateTimersDisplayValues();
         }
 
-        function resetTimer() {
+        function resetTimer(id) {
             stopAlarmSound();
-            if (tRunning && tMode === 'down') {
+            let t = timersList.find(x => x.id === id);
+            if (!t) return;
+
+            let inputH = parseInt(document.getElementById(`t-input-h-${id}`).value) || 0;
+            let inputM = parseInt(document.getElementById(`t-input-m-${id}`).value) || 0;
+            let initialTotalMs = (inputH * 3600 + inputM * 60) * 1000;
+
+            if (t.tRunning && t.tMode === 'down' && initialTotalMs > 0) {
+                activeTimerForGoal = t.name;
                 openGoalModal();
             }
-            tRunning = false;
-            tAcc = 0;
-            tRef = 0;
-            updateTimerUI();
-            saveTimerState();
+
+            t.tRunning = false;
+            t.tAcc = 0;
+            t.tRef = 0;
+            saveTimersState();
+            updateTimersDisplayValues();
         }
 
         function openGoalModal() {
             document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('goal-modal-title').innerText = `¿Objetivo logrado para "${activeTimerForGoal || 'Temporizador'}"?`;
             document.getElementById('modal-content-goal').style.display = 'block';
             openModal();
         }
@@ -1038,71 +1217,74 @@
         function recordGoal(success) {
             timerStats.push({
                 date: new Date().toISOString(),
+                timerName: activeTimerForGoal || 'General',
                 success: success
             });
             localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
+            activeTimerForGoal = null;
             closeModal();
         }
 
-        function updateTimerUI() {
-            let current = tAcc;
-            if (tRunning) {
-                if (tMode === 'up') current += Date.now() - tRef;
-                else current -= Date.now() - tRef;
+        function updateTimersDisplayValues() {
+            let anyRunningOrActive = false;
+            let firstRunningDisp = "00:00";
 
-                if (tMode === 'down' && current <= 0) {
-                    current = 0;
-                    tRunning = false;
-                    tAcc = 0;
-                    startAlarmSound(); 
-                    openGoalModal(); // Preguntar si se logró el objetivo al terminar la cuenta atrás
+            timersList.forEach(t => {
+                let current = t.tAcc;
+                if (t.tRunning) {
+                    if (t.tMode === 'up') current += Date.now() - t.tRef;
+                    else current -= Date.now() - t.tRef;
+
+                    if (t.tMode === 'down' && current <= 0) {
+                        current = 0;
+                        t.tRunning = false;
+                        t.tAcc = 0;
+                        startAlarmSound();
+                        activeTimerForGoal = t.name;
+                        openGoalModal();
+                    }
                 }
-            }
 
-            let totalSec = Math.floor(current / 1000);
-            let h = Math.floor(totalSec / 3600);
-            let m = Math.floor((totalSec % 3600) / 60);
-            let s = totalSec % 60;
-            let disp = h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                let totalSec = Math.floor(current / 1000);
+                let h = Math.floor(totalSec / 3600);
+                let m = Math.floor((totalSec % 3600) / 60);
+                let s = totalSec % 60;
+                let disp = h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
-            document.getElementById('timer-display').innerText = disp;
-            document.getElementById('floating-time').innerText = disp;
+                const displayEl = document.getElementById(`t-display-${t.id}`);
+                if (displayEl) displayEl.innerText = disp;
+
+                if (t.tRunning || current > 0) {
+                    anyRunningOrActive = true;
+                    firstRunningDisp = disp;
+                }
+
+                const btnToggle = document.getElementById(`t-btn-toggle-${t.id}`);
+                if (btnToggle) {
+                    if (t.tRunning) {
+                        btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                        btnToggle.classList.add('active');
+                        if (displayEl) displayEl.classList.add('running');
+                    } else {
+                        btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+                        btnToggle.classList.remove('active');
+                        if (displayEl) displayEl.classList.remove('running');
+                    }
+                }
+            });
 
             const isNotMainScreen = document.getElementById('calendar-overlay').classList.contains('active') || document.getElementById('modal-overlay').classList.contains('active');
-
             const floatEl = document.getElementById('floating-timer');
-            if ((tRunning || current > 0) && isNotMainScreen) {
+            document.getElementById('floating-time').innerText = firstRunningDisp;
+            if (anyRunningOrActive && isNotMainScreen) {
                 floatEl.style.display = 'flex';
             } else {
                 floatEl.style.display = 'none';
             }
-
-            const btnToggle = document.getElementById('btn-timer-toggle');
-            const floatBtn = document.getElementById('floating-toggle-btn');
-            
-            if (tRunning) {
-                btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-                btnToggle.classList.add('active');
-                document.getElementById('timer-display').classList.add('running');
-                floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-            } else {
-                btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-                btnToggle.classList.remove('active');
-                document.getElementById('timer-display').classList.remove('running');
-                floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-            }
         }
 
-        function saveTimerState() {
-            localStorage.setItem('wkTimerEx', JSON.stringify({ tMode, tRunning, tRef, tAcc }));
-        }
-
-        let savedT = JSON.parse(localStorage.getItem('wkTimerEx'));
-        if (savedT) {
-            tMode = savedT.tMode || 'up';
-            tRunning = savedT.tRunning || false;
-            tRef = savedT.tRef || 0;
-            tAcc = savedT.tAcc || 0;
+        function saveTimersState() {
+            localStorage.setItem('wkTimersList', JSON.stringify(timersList));
         }
 
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -1232,7 +1414,7 @@
         }
 
         function exportData() {
-            let backup = { tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, day: dayConfig, markers: markersData, collapsed: collapsedMonths, trackedYears: trackedYears, timerStats: timerStats };
+            let backup = { tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, day: dayConfig, markers: markersData, collapsed: collapsedMonths, trackedYears: trackedYears, timerStats: timerStats, timersList: timersList };
             const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
             const url = URL.createObjectURL(blob); const a = document.createElement("a");
             a.href = url; a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
@@ -1745,14 +1927,14 @@
             renderQuarterDetailBody(); 
             document.getElementById('calendar-overlay').classList.add('active'); 
             document.body.style.overflow = 'hidden';
-            updateTimerUI();
+            updateTimersDisplayValues();
         }
         
         function closeQuarterDetail(e) {
             if (e && e.target.id !== 'calendar-overlay') return;
             document.getElementById('calendar-overlay').classList.remove('active'); document.body.style.overflow = '';
             if (calendarView === 'quarters') drawCalendar();
-            updateTimerUI();
+            updateTimersDisplayValues();
         }
 
         function openMetricsModal() { 
@@ -1778,7 +1960,6 @@
             const qPct = qTotal === 0 ? 0 : (qDone / qTotal) * 100;
             html += `<div class="m-bar-row" style="margin-top:15px; padding-top:15px; border-top:1px solid var(--border);"><div class="m-label" style="color:var(--text);font-weight:700;">T${q + 1}</div><div class="m-progress"><div class="m-fill" style="width:${qPct}%;background:var(--year-bar);"></div></div><div class="m-pct">${Math.round(qPct)}%</div></div>`;
             
-            // Añadir métrica de objetivos de temporizadores logrados
             let totalTimers = timerStats.length;
             let successTimers = timerStats.filter(t => t.success).length;
             let timerPct = totalTimers === 0 ? 0 : (successTimers / totalTimers) * 100;
@@ -1851,17 +2032,17 @@
 
         function openModal() { 
             document.getElementById('modal-overlay').classList.add('active'); 
-            updateTimerUI();
+            updateTimersDisplayValues();
         }
         
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
             document.getElementById('modal-overlay').classList.remove('active');
-            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal'].forEach(id => {
+            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
-            updateTimerUI();
+            updateTimersDisplayValues();
         }
 
         function openBlockModal() { 
@@ -2100,7 +2281,7 @@
             const dayTimerEl = document.getElementById('day-timer');
             if (dayTimerEl) dayTimerEl.innerText = dayTimerStr;
 
-            updateTimerUI();
+            updateTimersDisplayValues();
 
             renderDayTaskMarks();
             renderNowMarker();
@@ -2108,6 +2289,7 @@
         }
 
         restoreBars(); drawCalendar(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();
+        renderTimersUI();
         setInterval(update, 1000); update();
     </script>
 </body>

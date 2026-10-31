@@ -387,18 +387,35 @@
 
         .days-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; text-align: center; }
         .week-day { font-size: 0.48rem; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
+        
         .day { font-size: 0.6rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: 600; border: 1px solid transparent; box-sizing: border-box; margin-top: 3px; position: relative; border-radius: 4px; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; cursor: pointer; min-width: 0; }
         .day:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: var(--item-bg); }
         
         .block-label { position: absolute; top: -10px; left: 0; font-size: 0.42rem; color: var(--block-id); font-weight: 800; z-index: 10; }
         .task-dot { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 3px var(--accent); pointer-events: none; }
 
+        /* Animación para toda la fila si es la semana actual */
         @keyframes pulse-border { 0% { box-shadow: 0 0 0px var(--week-box-active); } 50% { box-shadow: 0 0 8px var(--week-box-active); } 100% { box-shadow: 0 0 0px var(--week-box-active); } }
-        .current-week-glow .day { animation: pulse-border 2.5s infinite; z-index: 1; }
+        .current-week-glow .day:not(.today) { animation: pulse-border 2.5s infinite; z-index: 1; }
+        
+        /* Animación INDEPENDIENTE Y FUERTE para el día de HOY para que jamás se apague */
+        @keyframes pulse-today { 0% { box-shadow: var(--shadow-today); } 50% { box-shadow: 0 0 12px var(--accent); } 100% { box-shadow: var(--shadow-today); } }
+
         .day.future { color: var(--future); } 
         .day.past { color: var(--subtext); background: var(--past) !important; border-radius: 4px; } 
-        .day.today { background: var(--today) !important; color: var(--today-text); font-weight: 900; box-shadow: var(--shadow-today); border-radius: 4px; transform: scale(1.05); z-index: 5; } 
+        
+        .day.today { 
+            background: var(--today) !important; 
+            color: var(--today-text); 
+            font-weight: 900; 
+            box-shadow: var(--shadow-today); 
+            border-radius: 4px; 
+            transform: scale(1.05); 
+            z-index: 5; 
+            animation: pulse-today 2s infinite; 
+        } 
         .day.today:hover { transform: scale(1.1); }
+        
         .day.sat-future { color: var(--saturday); } .day.sun-future { color: var(--sunday); }
         
         .highlight-week-active .day { border-top-color: var(--week-box-active); border-bottom-color: var(--week-box-active); border-radius: 0; } 
@@ -778,7 +795,7 @@
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
-        // Nueva lógica de numeración cronológica inteligente de semanas (W0 a W5)
+        // Nueva lógica matemática: Selecciona siempre los 4 bloques más grandes para asignar W1-W4
         function getWeeksForMonth(year, mI) {
             const fD = new Date(year, mI, 1).getDay(); const off = fD === 0 ? 6 : fD - 1;
             const dM = new Date(year, mI + 1, 0).getDate();
@@ -790,14 +807,25 @@
             let weeks = [];
             for (let i = 0; i < slots.length; i += 7) {
                 let dws = slots.slice(i, i + 7); 
-                weeks.push({ dws, c: dws.filter(d => d !== null).length });
+                weeks.push({ dws, c: dws.filter(d => d !== null).length, origIdx: i/7 });
             }
             
-            // Determinar si la primera semana es W0 (si tiene menos de 4 días) o arranca en W1
-            let wName = weeks[0].c < 4 ? 0 : 1;
-            weeks.forEach(w => {
-                w.localW = wName;
-                wName++;
+            // Obtenemos las 4 semanas con mayor cantidad de días
+            let top4 = [...weeks].sort((a, b) => b.c - a.c).slice(0, 4);
+            // Ordenamos cronológicamente el índice original de esas 4 semanas principales
+            let top4Indices = top4.map(w => w.origIdx).sort((a, b) => a - b);
+            
+            weeks.forEach((w, index) => {
+                if (top4Indices.includes(index)) {
+                    w.localW = top4Indices.indexOf(index) + 1; // Le tocará 1, 2, 3 o 4
+                    w.isMain = true; // Se resaltará con líneas sólidas
+                } else if (index < top4Indices[0]) {
+                    w.localW = 0; // W0 porque quedó antes del bloque principal
+                    w.isMain = false;
+                } else {
+                    w.localW = 5; // W5 porque quedó después
+                    w.isMain = false;
+                }
             });
             return weeks;
         }
@@ -806,7 +834,7 @@
             const weeks = getWeeksForMonth(year, mI);
             for (let i = 0; i < weeks.length; i++) {
                 const dayIdx = weeks[i].dws.indexOf(dayNum);
-                if (dayIdx !== -1) return { localW: weeks[i].localW, weekIdx: i, dayIdx };
+                if (dayIdx !== -1) return { localW: weeks[i].localW, weekIdx: i, dayIdx, isMain: weeks[i].isMain };
             }
             return null;
         }
@@ -985,7 +1013,7 @@
             
             if (!title) { alert("Escribe una descripción"); return; }
             
-            const wNum = mI * 10 + localW; // Multiplicamos por 10 para soportar holgadamente índices 0-5 sin cruces
+            const wNum = mI * 10 + localW;
             const tKey = `${selectedYear}-${wNum}`;
             if (!tasksData[tKey]) tasksData[tKey] = [];
             tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: dayVal === '' ? null : parseInt(dayVal), hour: hour || null, hourEnd: hourEnd || null, color: color });
@@ -1034,9 +1062,9 @@
             activeTabM = m;
             const activeMonthAbs = selectedQuarter * 3 + m;
             const weeks = getWeeksForMonth(selectedYear, activeMonthAbs);
-            // Verifica que la semana activa exista en este mes; si no, escoge la primera
             if (!weeks.some(w => w.localW === activeTabW)) {
-                activeTabW = weeks[0].localW;
+                // Si la semana actual del tab no existe en este mes, se ajusta al primer W disponible
+                activeTabW = weeks.find(w => w.localW === 1) ? 1 : weeks[0].localW;
             }
             updateMasterTaskList();
         }
@@ -1086,7 +1114,7 @@
                 tasksHtml += `</div><div style="border-bottom: 1px dashed var(--border); margin: 0 0 5px;"></div>`;
             }
 
-            const wNum = activeMonthAbs * 10 + activeTabW; // Nueva distribución *10
+            const wNum = activeMonthAbs * 10 + activeTabW;
             const weekTasks = tasksData[`${year}-${wNum}`] || [];
             
             const today = new Date();
@@ -1135,7 +1163,7 @@
         function getQuarterStats(year, q) {
             let total = 0, done = 0;
             for (let m = 0; m < 3; m++) {
-                for (let w = 0; w <= 5; w++) { // Actualizado para soportar hasta W5
+                for (let w = 0; w <= 5; w++) {
                     const tasks = tasksData[`${year}-${(q * 3 + m) * 10 + w}`] || [];
                     total += tasks.length; done += tasks.filter(t => t.done).length;
                 }
@@ -1198,9 +1226,9 @@
                 activeTabW = wInfo ? wInfo.localW : 1;
             } else {
                 activeTabM = 0; 
-                // Asegurarse de que el tab inicie en el primer W válido (W0 o W1)
                 const defaultWeeks = getWeeksForMonth(selectedYear, q * 3);
-                activeTabW = defaultWeeks[0].localW;
+                // Si existe un W1 (suele existir), arranca allí. Si no, en W0.
+                activeTabW = defaultWeeks.find(w => w.localW === 1) ? 1 : defaultWeeks[0].localW;
             }
 
             renderQuarterDetailBody(); document.getElementById('calendar-overlay').classList.add('active'); document.body.style.overflow = 'hidden';
@@ -1245,18 +1273,24 @@
                 
                 weeks.forEach((w, i) => {
                     const localW = w.localW;
-                    const wNum = mI * 10 + localW; // Nuevo ID
-                    // Solo resaltamos W1, W2, W3 y W4 (W0 y W5 quedan sin los bordes intensos)
-                    const isHighlighted = (localW >= 1 && localW <= 4);
+                    const wNum = mI * 10 + localW; 
                     
                     let wCl = "", fR = -1, lR = -1;
                     for (let k = 0; k < 7; k++) { if (w.dws[k] !== null) { if (fR === -1) fR = k; lR = k; } }
                     
-                    if (isHighlighted) {
-                        let endD = new Date(year, mI, w.dws[lR]);
-                        wCl = (endD >= now) ? "highlight-week-active" : "highlight-week-concluded";
-                        if (now >= new Date(year, mI, w.dws[fR]) && now <= endD) wCl += " current-week-glow";
+                    let startD = new Date(year, mI, w.dws[fR]);
+                    let endD = new Date(year, mI, w.dws[lR]);
+                    
+                    // La fila actual SIEMPRE brillará, sea W0, W3 o W5
+                    if (now >= startD && now <= endD) {
+                        wCl += " current-week-glow";
                     }
+
+                    // Pero los bordes intensos sólo se añaden si es una de las 4 semanas principales
+                    if (w.isMain) {
+                        wCl += (endD >= now) ? " highlight-week-active" : " highlight-week-concluded";
+                    }
+
                     html += `<div class="week-wrapper ${wCl}" style="display: contents;">`;
                     const weekTasks = tasksData[`${year}-${wNum}`] || [];
                     
@@ -1272,9 +1306,9 @@
                             const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
                             const clickHandler = `showDayStats('${dtStr}', ${wNum}, ${dI}, ${mI})`;
                             
-                            // Bloques y labels solo aplican a isHighlighted (W1-W4)
-                            if (isHighlighted && dI === fR) html += `<div class="${cl} block-start" onclick="${clickHandler}"><span class="block-label">W${localW}</span>${d}${taskDot}</div>`;
-                            else if (isHighlighted && dI === lR) html += `<div class="${cl} block-end" onclick="${clickHandler}">${d}${taskDot}</div>`;
+                            // Las etiquetas de bloque solo se aplican a las semanas principales
+                            if (w.isMain && dI === fR) html += `<div class="${cl} block-start" onclick="${clickHandler}"><span class="block-label">W${localW}</span>${d}${taskDot}</div>`;
+                            else if (w.isMain && dI === lR) html += `<div class="${cl} block-end" onclick="${clickHandler}">${d}${taskDot}</div>`;
                             else html += `<div class="${cl}" onclick="${clickHandler}">${d}${taskDot}</div>`;
                         }
                     });

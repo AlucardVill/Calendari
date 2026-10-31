@@ -231,7 +231,19 @@
             border-bottom: 1px solid var(--border); flex-shrink: 0;
             background: var(--card);
         }
-        .calendar-detail-title { font-size: 1.05rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; text-align: center; justify-self: center; }
+        
+        /* ESTILOS NUEVOS PARA LA NAVEGACIÓN DEL MODAL */
+        .calendar-detail-title { display: flex; align-items: center; justify-content: center; gap: 4px; justify-self: center; }
+        .calendar-title-text { font-size: 1.05rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; min-width: 75px; text-align: center; }
+        .nav-btn { 
+            background: transparent; border: none; color: var(--muted); font-size: 1.4rem; 
+            cursor: pointer; padding: 0 8px; transition: color 0.2s, transform 0.2s; 
+            font-weight: 600; line-height: 1; display: flex; align-items: center; 
+            justify-content: center; margin-top: -2px;
+        }
+        .nav-btn:hover { color: var(--accent); transform: scale(1.15); }
+        .nav-btn:active { transform: scale(0.9); }
+
         .header-btns { display: flex; gap: 6px; }
         .header-btns.left { justify-self: start; }
         .header-btns.right { justify-self: end; }
@@ -394,11 +406,9 @@
         .block-label { position: absolute; top: -10px; left: 0; font-size: 0.42rem; color: var(--block-id); font-weight: 800; z-index: 10; }
         .task-dot { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 3px var(--accent); pointer-events: none; }
 
-        /* Animación para toda la fila si es la semana actual */
         @keyframes pulse-border { 0% { box-shadow: 0 0 0px var(--week-box-active); } 50% { box-shadow: 0 0 8px var(--week-box-active); } 100% { box-shadow: 0 0 0px var(--week-box-active); } }
         .current-week-glow .day:not(.today) { animation: pulse-border 2.5s infinite; z-index: 1; }
         
-        /* Animación INDEPENDIENTE Y FUERTE para el día de HOY para que jamás se apague */
         @keyframes pulse-today { 0% { box-shadow: var(--shadow-today); } 50% { box-shadow: 0 0 12px var(--accent); } 100% { box-shadow: var(--shadow-today); } }
 
         .day.future { color: var(--future); } 
@@ -422,47 +432,26 @@
         .highlight-week-active .block-start { border-left-color: var(--week-box-active); border-top-left-radius: 4px; border-bottom-left-radius: 4px; } 
         .highlight-week-active .block-end { border-right-color: var(--week-box-active); border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
 
-        /* CONTENEDOR RELATIVO PARA BLOQUEAR LA EXPANSIÓN DEL GRID */
-        .quarter-tasks-wrapper {
-            position: relative;
-            height: 100%;
-        }
-
-        /* PANEL DE TAREAS EN POSICIÓN ABSOLUTA PARA ADAPTARSE SIN ESTIRAR */
+        .quarter-tasks-wrapper { position: relative; height: 100%; }
         .quarter-tasks-panel {
             background: var(--card); border: 1px solid var(--border); border-radius: 12px;
             padding: 8px; box-shadow: var(--card-shadow); display: flex; flex-direction: column;
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
         }
         
-        /* SISTEMA DE BOTONES PARA LA LISTA GENERAL (MESES Y SEMANAS) */
         .list-tabs { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
         .tab-row { display: flex; gap: 4px; justify-content: center; }
         .tab-btn { 
-            flex: 1; 
-            background: var(--item-bg); 
-            color: var(--text); 
-            border: 1px solid var(--border-input); 
-            padding: 6px 2px; 
-            font-size: 0.55rem; 
-            font-weight: 800; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            letter-spacing: 0.02em;
+            flex: 1; background: var(--item-bg); color: var(--text); border: 1px solid var(--border-input); 
+            padding: 6px 2px; font-size: 0.55rem; font-weight: 800; border-radius: 6px; 
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); letter-spacing: 0.02em;
         }
         .tab-btn.active { 
-            background: var(--accent); 
-            color: var(--btn-text); 
-            border-color: var(--accent); 
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); 
-            transform: translateY(-2px); 
+            background: var(--accent); color: var(--btn-text); border-color: var(--accent); 
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); transform: translateY(-2px); 
         }
-        .tab-btn:hover:not(.active) {
-            border-color: var(--muted);
-            transform: translateY(-1px);
-        }
+        .tab-btn:hover:not(.active) { border-color: var(--muted); transform: translateY(-1px); }
         .tab-btn:active { transform: scale(0.95); }
         
         .qt-list { flex: 1; overflow-y: auto; padding-right: 2px; min-height: 0; }
@@ -480,16 +469,7 @@
         .qt-delete:hover { opacity: 1; color: var(--sunday); }
         
         .entorno-tag { background: rgba(59, 130, 246, 0.15); color: var(--year-bar); padding: 2px 4px; border-radius: 4px; font-size: 0.45rem; font-weight: bold; display: inline-block; margin-bottom: 2px;}
-        
-        /* ETIQUETA DE DÍA DISCRETA (SOLO TEXTO AMARILLO/NARANJA) */
-        .task-day-tag {
-            color: var(--block-id);
-            font-size: 0.5rem;
-            font-weight: 700;
-            display: inline-block;
-            margin-left: 5px;
-            letter-spacing: 0.02em;
-        }
+        .task-day-tag { color: var(--block-id); font-size: 0.5rem; font-weight: 700; display: inline-block; margin-left: 5px; letter-spacing: 0.02em; }
 
         @media (max-width: 380px) {
             .progress-btn { padding: 12px 2px; font-size: 0.75rem; }
@@ -571,7 +551,14 @@
                 <div class="header-btns left">
                     <button class="add-task-btn" onclick="openTaskCreateModal()" title="Añadir">＋</button>
                 </div>
-                <div class="calendar-detail-title" id="calendar-detail-title">T1</div>
+                
+                <!-- NUEVO MÓDULO DE NAVEGACIÓN -->
+                <div class="calendar-detail-title">
+                    <button class="nav-btn" onclick="prevQuarter()">‹</button>
+                    <span id="calendar-detail-title-text" class="calendar-title-text">T1</span>
+                    <button class="nav-btn" onclick="nextQuarter()">›</button>
+                </div>
+
                 <div class="header-btns right">
                     <button class="metrics-btn" onclick="openMetricsModal()" title="Ver cumplimiento">📊</button>
                     <button class="close-btn" onclick="closeQuarterDetail()">✕</button>
@@ -745,6 +732,15 @@
             localStorage.setItem('wkYears', JSON.stringify(trackedYears));
         }
 
+        // Función para asegurar que un año nuevo se registra al navegar
+        function ensureYearTracked(y) {
+            if (!trackedYears.includes(y)) {
+                trackedYears.push(y);
+                trackedYears.sort((a, b) => a - b);
+                localStorage.setItem('wkYears', JSON.stringify(trackedYears));
+            }
+        }
+
         function getAvailableYears() { return trackedYears.sort((a, b) => a - b); }
         function promptAddYear() {
             let y = prompt("Ingresa el año que deseas crear (ej. 2027):");
@@ -795,7 +791,6 @@
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
-        // Nueva lógica matemática: Selecciona siempre los 4 bloques más grandes para asignar W1-W4
         function getWeeksForMonth(year, mI) {
             const fD = new Date(year, mI, 1).getDay(); const off = fD === 0 ? 6 : fD - 1;
             const dM = new Date(year, mI + 1, 0).getDate();
@@ -810,20 +805,18 @@
                 weeks.push({ dws, c: dws.filter(d => d !== null).length, origIdx: i/7 });
             }
             
-            // Obtenemos las 4 semanas con mayor cantidad de días
             let top4 = [...weeks].sort((a, b) => b.c - a.c).slice(0, 4);
-            // Ordenamos cronológicamente el índice original de esas 4 semanas principales
             let top4Indices = top4.map(w => w.origIdx).sort((a, b) => a - b);
             
             weeks.forEach((w, index) => {
                 if (top4Indices.includes(index)) {
-                    w.localW = top4Indices.indexOf(index) + 1; // Le tocará 1, 2, 3 o 4
-                    w.isMain = true; // Se resaltará con líneas sólidas
+                    w.localW = top4Indices.indexOf(index) + 1; 
+                    w.isMain = true; 
                 } else if (index < top4Indices[0]) {
-                    w.localW = 0; // W0 porque quedó antes del bloque principal
+                    w.localW = 0; 
                     w.isMain = false;
                 } else {
-                    w.localW = 5; // W5 porque quedó después
+                    w.localW = 5; 
                     w.isMain = false;
                 }
             });
@@ -1063,7 +1056,6 @@
             const activeMonthAbs = selectedQuarter * 3 + m;
             const weeks = getWeeksForMonth(selectedYear, activeMonthAbs);
             if (!weeks.some(w => w.localW === activeTabW)) {
-                // Si la semana actual del tab no existe en este mes, se ajusta al primer W disponible
                 activeTabW = weeks.find(w => w.localW === 1) ? 1 : weeks[0].localW;
             }
             updateMasterTaskList();
@@ -1087,7 +1079,6 @@
             const activeMonthAbs = q * 3 + activeTabM;
             const weeks = getWeeksForMonth(year, activeMonthAbs);
             
-            // Genera botones de tabs basados EXACTAMENTE en las semanas que existen este mes (W0 a W5)
             weeks.forEach(w => {
                 tabsHtml += `<button class="tab-btn ${activeTabW === w.localW ? 'active' : ''}" onclick="setActiveTabW(${w.localW})">W${w.localW}</button>`;
             });
@@ -1214,9 +1205,39 @@
 
         function drawCalendar() { document.getElementById('calendar-container').innerHTML = calendarView === 'quarters' ? renderQuartersView() : renderYearsView(); }
 
+        // FUNCIONES DE NAVEGACIÓN
+        function prevQuarter() {
+            if (selectedQuarter > 0) {
+                selectedQuarter--;
+            } else {
+                if (selectedYear <= 2000) return; // Limite mínimo
+                selectedQuarter = 3;
+                selectedYear--;
+                ensureYearTracked(selectedYear);
+            }
+            localStorage.setItem('wkSelYear', selectedYear);
+            if (calendarView === 'quarters') drawCalendar(); // Actualiza el fondo invisible
+            openQuarterDetail(selectedQuarter);
+        }
+
+        function nextQuarter() {
+            if (selectedQuarter < 3) {
+                selectedQuarter++;
+            } else {
+                if (selectedYear >= 2100) return; // Limite máximo
+                selectedQuarter = 0;
+                selectedYear++;
+                ensureYearTracked(selectedYear);
+            }
+            localStorage.setItem('wkSelYear', selectedYear);
+            if (calendarView === 'quarters') drawCalendar(); // Actualiza el fondo invisible
+            openQuarterDetail(selectedQuarter);
+        }
+
         function openQuarterDetail(q) {
             selectedQuarter = q; localStorage.setItem('wkSelQtr', q);
-            document.getElementById('calendar-detail-title').innerText = `T${q + 1} · ${selectedYear}`;
+            // Actualiza SOLO el texto del título para no borrar las flechas
+            document.getElementById('calendar-detail-title-text').innerText = `T${q + 1} · ${selectedYear}`;
             
             const now = new Date();
             const currentM = now.getMonth();
@@ -1227,11 +1248,12 @@
             } else {
                 activeTabM = 0; 
                 const defaultWeeks = getWeeksForMonth(selectedYear, q * 3);
-                // Si existe un W1 (suele existir), arranca allí. Si no, en W0.
                 activeTabW = defaultWeeks.find(w => w.localW === 1) ? 1 : defaultWeeks[0].localW;
             }
 
-            renderQuarterDetailBody(); document.getElementById('calendar-overlay').classList.add('active'); document.body.style.overflow = 'hidden';
+            renderQuarterDetailBody(); 
+            document.getElementById('calendar-overlay').classList.add('active'); 
+            document.body.style.overflow = 'hidden';
         }
         
         function closeQuarterDetail(e) {
@@ -1281,12 +1303,10 @@
                     let startD = new Date(year, mI, w.dws[fR]);
                     let endD = new Date(year, mI, w.dws[lR]);
                     
-                    // La fila actual SIEMPRE brillará, sea W0, W3 o W5
                     if (now >= startD && now <= endD) {
                         wCl += " current-week-glow";
                     }
 
-                    // Pero los bordes intensos sólo se añaden si es una de las 4 semanas principales
                     if (w.isMain) {
                         wCl += (endD >= now) ? " highlight-week-active" : " highlight-week-concluded";
                     }
@@ -1306,7 +1326,6 @@
                             const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
                             const clickHandler = `showDayStats('${dtStr}', ${wNum}, ${dI}, ${mI})`;
                             
-                            // Las etiquetas de bloque solo se aplican a las semanas principales
                             if (w.isMain && dI === fR) html += `<div class="${cl} block-start" onclick="${clickHandler}"><span class="block-label">W${localW}</span>${d}${taskDot}</div>`;
                             else if (w.isMain && dI === lR) html += `<div class="${cl} block-end" onclick="${clickHandler}">${d}${taskDot}</div>`;
                             else html += `<div class="${cl}" onclick="${clickHandler}">${d}${taskDot}</div>`;

@@ -31,6 +31,7 @@
             --work: #f59e0b; --day-bar: #8b5cf6; --year-bar: #3b82f6;
             --week-bar: #10b981; --bi-bar: #ec4899;
             --week-box-active: #10b981; --week-box-concluded: #3f3f46;
+            --current-week-bg: rgba(16, 185, 129, 0.15); /* Tinte de fondo para la semana actual */
             --block-id: #fde047;
             --modal-bg: rgba(0,0,0,0.75); 
             --btn-text: #000; --today-text: #000;
@@ -50,6 +51,7 @@
             --work: #d97706; --day-bar: #7c3aed; --year-bar: #2563eb;
             --week-bar: #059669; --bi-bar: #db2777;
             --week-box-active: #10b981; --week-box-concluded: #d1d5db;
+            --current-week-bg: rgba(5, 150, 105, 0.12); /* Tinte de fondo para la semana actual (claro) */
             --block-id: #ca8a04;
             --modal-bg: rgba(255,255,255,0.75);
             --btn-text: #ffffff; --today-text: #ffffff;
@@ -232,7 +234,6 @@
             background: var(--card);
         }
         
-        /* ESTILOS NUEVOS PARA LA NAVEGACIÓN DEL MODAL */
         .calendar-detail-title { display: flex; align-items: center; justify-content: center; gap: 4px; justify-self: center; }
         .calendar-title-text { font-size: 1.05rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; min-width: 75px; text-align: center; }
         .nav-btn { 
@@ -406,23 +407,26 @@
         .block-label { position: absolute; top: -10px; left: 0; font-size: 0.42rem; color: var(--block-id); font-weight: 800; z-index: 10; }
         .task-dot { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 3px var(--accent); pointer-events: none; }
 
-        @keyframes pulse-border { 0% { box-shadow: 0 0 0px var(--week-box-active); } 50% { box-shadow: 0 0 8px var(--week-box-active); } 100% { box-shadow: 0 0 0px var(--week-box-active); } }
-        .current-week-glow .day:not(.today) { animation: pulse-border 2.5s infinite; z-index: 1; }
+        /* NUEVO: Resaltado estático y elegante para la semana actual (fondo suave) */
+        .current-week-glow .day:not(.today) { 
+            background-color: var(--current-week-bg); 
+            z-index: 1; 
+        }
         
-        @keyframes pulse-today { 0% { box-shadow: var(--shadow-today); } 50% { box-shadow: 0 0 12px var(--accent); } 100% { box-shadow: var(--shadow-today); } }
-
         .day.future { color: var(--future); } 
         .day.past { color: var(--subtext); background: var(--past) !important; border-radius: 4px; } 
         
+        /* NUEVO: Diseño de Anillo de Enfoque (Focus Ring) para el día actual */
         .day.today { 
             background: var(--today) !important; 
             color: var(--today-text); 
             font-weight: 900; 
-            box-shadow: var(--shadow-today); 
             border-radius: 4px; 
             transform: scale(1.05); 
             z-index: 5; 
-            animation: pulse-today 2s infinite; 
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
         } 
         .day.today:hover { transform: scale(1.1); }
         
@@ -552,7 +556,6 @@
                     <button class="add-task-btn" onclick="openTaskCreateModal()" title="Añadir">＋</button>
                 </div>
                 
-                <!-- NUEVO MÓDULO DE NAVEGACIÓN -->
                 <div class="calendar-detail-title">
                     <button class="nav-btn" onclick="prevQuarter()">‹</button>
                     <span id="calendar-detail-title-text" class="calendar-title-text">T1</span>
@@ -732,7 +735,6 @@
             localStorage.setItem('wkYears', JSON.stringify(trackedYears));
         }
 
-        // Función para asegurar que un año nuevo se registra al navegar
         function ensureYearTracked(y) {
             if (!trackedYears.includes(y)) {
                 trackedYears.push(y);
@@ -1205,18 +1207,17 @@
 
         function drawCalendar() { document.getElementById('calendar-container').innerHTML = calendarView === 'quarters' ? renderQuartersView() : renderYearsView(); }
 
-        // FUNCIONES DE NAVEGACIÓN
         function prevQuarter() {
             if (selectedQuarter > 0) {
                 selectedQuarter--;
             } else {
-                if (selectedYear <= 2000) return; // Limite mínimo
+                if (selectedYear <= 2000) return; 
                 selectedQuarter = 3;
                 selectedYear--;
                 ensureYearTracked(selectedYear);
             }
             localStorage.setItem('wkSelYear', selectedYear);
-            if (calendarView === 'quarters') drawCalendar(); // Actualiza el fondo invisible
+            if (calendarView === 'quarters') drawCalendar(); 
             openQuarterDetail(selectedQuarter);
         }
 
@@ -1224,19 +1225,18 @@
             if (selectedQuarter < 3) {
                 selectedQuarter++;
             } else {
-                if (selectedYear >= 2100) return; // Limite máximo
+                if (selectedYear >= 2100) return; 
                 selectedQuarter = 0;
                 selectedYear++;
                 ensureYearTracked(selectedYear);
             }
             localStorage.setItem('wkSelYear', selectedYear);
-            if (calendarView === 'quarters') drawCalendar(); // Actualiza el fondo invisible
+            if (calendarView === 'quarters') drawCalendar(); 
             openQuarterDetail(selectedQuarter);
         }
 
         function openQuarterDetail(q) {
             selectedQuarter = q; localStorage.setItem('wkSelQtr', q);
-            // Actualiza SOLO el texto del título para no borrar las flechas
             document.getElementById('calendar-detail-title-text').innerText = `T${q + 1} · ${selectedYear}`;
             
             const now = new Date();
@@ -1267,7 +1267,7 @@
             let html = ''; let qTotal = 0, qDone = 0;
             for (let m = 0; m < 3; m++) {
                 const mI = q * 3 + m; let mTotal = 0, mDone = 0;
-                for (let w = 0; w <= 5; w++) { // Hasta W5
+                for (let w = 0; w <= 5; w++) { 
                     const tasks = tasksData[`${selectedYear}-${mI * 10 + w}`] || [];
                     mTotal += tasks.length; mDone += tasks.filter(t => t.done).length;
                 }

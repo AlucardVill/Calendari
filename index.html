@@ -395,13 +395,13 @@
         
         .modal-card { 
             background: var(--card); border: 1px solid var(--border); border-radius: 20px; 
-            padding: 22px; width: 300px; max-width: 90vw; 
+            padding: 16px 20px; width: 300px; max-width: 90vw; /* Padding reducido para hacerlo más compacto */
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
             animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
         }
 
         .modal-card.wide {
-            width: 500px; max-width: 92vw;
+            width: 550px; max-width: 95vw;
         }
         
         /* Reglas CSS dinámicas para cuando se abre el modo dual (pulsación larga en un día) */
@@ -417,38 +417,39 @@
 
         .modal-card h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
         
-        .modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 
-        .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--subtext); font-weight: 500;}
-        .input-group input[type="text"], .input-group input[type="number"], .input-group input[type="time"], .input-group select { width: auto; min-width: 70px; max-width: 170px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 8px; border-radius: 8px; text-align: center; font-weight: 600; font-family: inherit; transition: border-color 0.2s; outline: none;}
+        .input-group { margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--subtext); font-weight: 500;}
+        .input-group input[type="text"], .input-group input[type="number"], .input-group input[type="time"], .input-group select { width: auto; min-width: 70px; max-width: 170px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 6px; border-radius: 8px; text-align: center; font-weight: 600; font-family: inherit; transition: border-color 0.2s; outline: none;}
         .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
-        .input-group input[type="color"] { background: none; border: none; padding: 0; width: 40px; height: 40px; cursor: pointer; border-radius: 8px; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;}
+        .input-group input[type="color"] { background: none; border: none; padding: 0; width: 36px; height: 36px; cursor: pointer; border-radius: 8px; }
+        .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
+        .btn { flex: 1; padding: 8px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;}
         .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
         .btn:active { transform: scale(0.96); }
         .btn-save { background: var(--accent); color: var(--btn-text); }
         .btn-cancel { background: var(--item-bg); color: var(--text); border: 1px solid var(--border-input); }
         .btn-delete { background: var(--sunday); color: var(--btn-text); }
 
-        .tc-desc { margin-bottom: 8px; }
+        /* Estilos ultra-compactos para el modal de registros */
+        .tc-desc { margin-bottom: 6px; }
         .tc-desc input {
             width: 100%; box-sizing: border-box;
             background: var(--input-bg); border: 1px solid var(--border-input);
-            color: var(--text); padding: 6px 8px; border-radius: 9px;
+            color: var(--text); padding: 4px 8px; border-radius: 6px; height: 30px;
             font-size: 0.8rem; font-family: inherit; font-weight: 500;
             outline: none; transition: border-color 0.2s;
         }
         .tc-desc input:focus { border-color: var(--accent); }
         .tc-desc input::placeholder { color: var(--muted); }
 
-        .tc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-        .tc-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-        .tc-field label { font-size: 0.55rem; color: var(--subtext); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+        .tc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+        .tc-field { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .tc-field label { font-size: 0.52rem; color: var(--subtext); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
         .tc-field select, .tc-field input {
             width: 100%; box-sizing: border-box;
             background: var(--input-bg); border: 1px solid var(--border-input);
-            color: var(--text); padding: 5px 8px; border-radius: 8px;
+            color: var(--text); padding: 2px 6px; border-radius: 6px; height: 30px;
             font-size: 0.8rem; font-family: inherit; font-weight: 500;
             outline: none; transition: border-color 0.2s;
         }
@@ -456,19 +457,19 @@
         .tc-field select {
             -webkit-appearance: none; appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat; background-position: right 8px center;
-            background-size: 12px; padding-right: 26px; cursor: pointer;
+            background-repeat: no-repeat; background-position: right 6px center;
+            background-size: 10px; padding-right: 22px; cursor: pointer;
         }
         .tc-field input[type="time"] { color-scheme: dark; }
         [data-theme="light"] .tc-field input[type="time"] { color-scheme: light; }
-        .tc-field input[type="color"] { padding: 2px; height: 32px; width: 100%; cursor: pointer; border-radius: 8px; }
+        .tc-field input[type="color"] { padding: 1px; height: 28px; width: 100%; cursor: pointer; border-radius: 6px; }
 
-        .checkbox-group { display: flex; gap: 4px; flex-wrap: wrap; }
+        .checkbox-group { display: flex; gap: 3px; flex-wrap: wrap; }
         .chk-btn {
             background: var(--input-bg); border: 1px solid var(--border-input);
-            color: var(--muted); padding: 5px 8px; border-radius: 6px;
-            font-size: 0.72rem; font-weight: 700; cursor: pointer; user-select: none;
-            transition: all 0.2s; text-align: center; flex: 1; min-width: 25px;
+            color: var(--muted); padding: 3px 6px; border-radius: 4px;
+            font-size: 0.68rem; font-weight: 700; cursor: pointer; user-select: none;
+            transition: all 0.2s; text-align: center; flex: 1; min-width: 22px;
         }
         .chk-btn.active {
             background: var(--accent); color: var(--btn-text); border-color: var(--accent);
@@ -491,12 +492,12 @@
         .custom-check:checked { background-color: var(--accent); border-color: var(--accent); }
         .custom-check:checked::before { transform: scale(1); }
 
-        .m-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .m-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .m-bar-row:last-child { margin-bottom: 0; }
         .m-label { width: 80px; font-size: 0.8rem; color: var(--subtext); text-align: right; font-weight: 500; }
         .m-pct { width: 45px; font-size: 0.8rem; color: var(--text); font-weight: 800; text-align: left; }
-        .m-progress { flex: 1; background: var(--track-bg); height: 10px; border-radius: 5px; overflow: hidden; position: relative; }
-        .m-fill { height: 100%; background: var(--accent); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; border-radius: 5px;}
+        .m-progress { flex: 1; background: var(--track-bg); height: 8px; border-radius: 4px; overflow: hidden; position: relative; }
+        .m-fill { height: 100%; background: var(--accent); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; border-radius: 4px;}
 
         .months-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
         .month { background: var(--card); padding: 10px 8px; border-radius: 12px; border: 1px solid var(--border); transition: all 0.3s ease; box-shadow: var(--card-shadow); min-width: 0; }
@@ -874,11 +875,11 @@
                 <div class="tc-row" style="gap:10px;">
                     <div class="tc-field">
                         <label style="font-size:0.65rem;">Horas</label>
-                        <input type="number" id="inp-newt-h" placeholder="0" min="0" max="99" style="padding:7px 10px;">
+                        <input type="number" id="inp-newt-h" placeholder="0" min="0" max="99" style="padding:7px 10px; height:auto;">
                     </div>
                     <div class="tc-field">
                         <label style="font-size:0.65rem;">Minutos</label>
-                        <input type="number" id="inp-newt-m" placeholder="0" min="0" max="59" style="padding:7px 10px;">
+                        <input type="number" id="inp-newt-m" placeholder="0" min="0" max="59" style="padding:7px 10px; height:auto;">
                     </div>
                 </div>
                 <div class="modal-actions">
@@ -938,7 +939,7 @@
                         <div class="tc-field"><label>Mes</label><select id="inp-tc-month" onchange="updateWeekDropdown()"></select></div>
                         <div class="tc-field"><label>Semana</label><select id="inp-tc-week"></select></div>
                     </div>
-                    <div class="tc-field" style="margin-bottom: 8px;">
+                    <div class="tc-field" style="margin-bottom: 6px;">
                         <label>Día (Opcional)</label>
                         <select id="inp-tc-day">
                             <option value="">—</option>
@@ -950,11 +951,11 @@
                 </div>
 
                 <div id="tc-entorno-fields" style="display:none;">
-                    <div class="tc-field" style="margin-bottom: 8px;">
+                    <div class="tc-field" style="margin-bottom: 6px;">
                         <label>Meses del Trimestre</label>
                         <div class="checkbox-group" id="chk-months"></div>
                     </div>
-                    <div class="tc-field" style="margin-bottom: 8px;">
+                    <div class="tc-field" style="margin-bottom: 6px;">
                         <label>Semanas del Mes</label>
                         <div class="checkbox-group" id="chk-weeks">
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">W0</div>
@@ -965,7 +966,7 @@
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="5">W5</div>
                         </div>
                     </div>
-                    <div class="tc-field" style="margin-bottom: 8px;">
+                    <div class="tc-field" style="margin-bottom: 6px;">
                         <label>Días de la semana</label>
                         <div class="checkbox-group" id="chk-days">
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">L</div>
@@ -1039,7 +1040,7 @@
                 </div>
                 <input type="date" id="notes-date-picker" style="display:none; margin-bottom:12px; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:8px; border-radius:8px; outline:none; font-family:inherit;" onchange="loadNoteForPicker()">
                 
-                <textarea id="notes-main-textarea" style="flex:1; min-height: 300px; width:100%; box-sizing:border-box; resize:vertical; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:10px; font-family:inherit; font-size:0.85rem;" oninput="saveMainNote()"></textarea>
+                <textarea id="notes-main-textarea" style="flex:1; min-height: 50vh; width:100%; box-sizing:border-box; resize:vertical; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:12px; font-family:inherit; font-size:0.9rem;" oninput="saveMainNote()"></textarea>
             
                 <div class="modal-actions" style="margin-top:15px;">
                     <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>

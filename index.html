@@ -129,7 +129,7 @@
             display: none;
             align-items: center;
             gap: 6px;
-            margin: 0 4px 10px 4px;
+            margin: 0 4px;
             padding: 5px 10px;
             background: var(--card);
             border: 1px solid var(--border);
@@ -203,6 +203,31 @@
         .hidden-timer-pill.is-running .pill-dot { animation: dotPulse 1.8s ease-in-out infinite; }
 
         .timer-title { position: absolute; top: 4px; left: 16px; font-size: 0.55rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .t-btn-hide {
+            position: absolute;
+            top: 5px;
+            right: 6px;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            width: 18px;
+            height: 18px;
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.45;
+            transition: opacity 0.2s, color 0.2s, transform 0.2s;
+            border-radius: 5px;
+            z-index: 10;
+        }
+        .t-btn-hide svg { width: 12px; height: 12px; display: block; }
+        .timer-widget:hover .t-btn-hide { opacity: 1; }
+        .t-btn-hide:hover  { color: var(--accent); opacity: 1; transform: scale(1.15); }
+        .t-btn-hide:active { transform: scale(0.85); }
+
         .timer-input-group { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
         .timer-input-group input { 
             width: 36px; background: var(--input-bg); border: 1px solid var(--border-input); 
@@ -864,7 +889,6 @@
         </button>
     </div>
 
-    <div class="hidden-timers-bar" id="hidden-timers-bar"></div>
     <div class="timers-container" id="timers-container"></div>
 
     <div class="section-label">
@@ -1299,6 +1323,11 @@
             const t = timersList.find(x => x.id === id);
             if (!t || t.id === 'general') return;
             t.hidden = !t.hidden;
+
+            if (!t.hidden && extraTimersFolded) {
+                extraTimersFolded = false;
+                localStorage.setItem('wkExtraTimersFolded', extraTimersFolded);
+            }
             saveTimersState();
             renderTimersUI();
         }
@@ -1315,7 +1344,6 @@
         function renderTimersUI() {
             const container = document.getElementById('timers-container');
             const headerBar = document.getElementById('timers-header-bar');
-            const hiddenBar = document.getElementById('hidden-timers-bar');
 
             const visibleExtras = timersList.filter(t => t.id !== 'general' && !t.hidden).length;
             const hiddenList    = timersList.filter(t => t.id !== 'general' && t.hidden);
@@ -1324,13 +1352,11 @@
             if (totalExtras > 0) {
                 headerBar.style.display = 'flex';
                 const label = hiddenList.length
-                    ? `Adicionales (${visibleExtras}) · ${hiddenList.length} oculto${hiddenList.length>1?'s':''}`
+                    ? `Adicionales (${visibleExtras}) · ${hiddenList.length} oculto${hiddenList.length > 1 ? 's' : ''}`
                     : `Adicionales (${visibleExtras})`;
                 document.getElementById('timers-count-label').innerText = label;
-                document.getElementById('timers-toggle-txt').innerText =
-                    extraTimersFolded ? 'Mostrar' : 'Ocultar';
-                document.getElementById('timers-toggle-icon').innerText =
-                    extraTimersFolded ? '▼' : '▲';
+                document.getElementById('timers-toggle-txt').innerText = extraTimersFolded ? 'Mostrar' : 'Ocultar';
+                document.getElementById('timers-toggle-icon').innerText = extraTimersFolded ? '▼' : '▲';
                 container.classList.toggle('collapsed', extraTimersFolded);
             } else {
                 headerBar.style.display = 'none';
@@ -1338,66 +1364,17 @@
             }
 
             let html = '';
-            timersList.forEach((t, index) => {
-                if (t.hidden) return;
-                const isGeneral = t.id === 'general';
-                const cardClass = isGeneral
-                    ? 'timer-widget'
-                    : 'timer-widget extra-timer';
-                const styleAttr = t.color ? `style="--timer-color:${t.color}"` : '';
-                const deleteBtn = !isGeneral
-                    ? `<button class="t-btn-delete" onclick="deleteTimer('${t.id}')" title="Eliminar">×</button>` : '';
-                const addBtn = isGeneral
-                    ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
-                const hideBtn = !isGeneral
-                    ? `<button class="t-btn" onclick="toggleTimerHidden('${t.id}')" title="Ocultar" style="width:28px; height:28px; border-radius:8px; background:var(--item-bg); border:1px solid var(--border-input); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer;">▲</button>` : '';
 
-                let dragAttrs = '';
-                if (!isGeneral) {
-                    dragAttrs = `draggable="true" ondragstart="onDragStart(event, ${index})" ondragover="onDragOver(event)" ondrop="onDrop(event, ${index})" ondragend="onDragEnd(event)" ontouchstart="onTouchStart(event, ${index})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)"`;
-                }
+            const generalIdx = timersList.findIndex(t => t.id === 'general');
+            if (generalIdx !== -1) html += renderTimerCard(timersList[generalIdx], generalIdx);
 
-                html += `
-                <div class="${cardClass}" id="widget-${t.id}" data-index="${index}" ${styleAttr} ${dragAttrs}>
-                    <span class="timer-title">
-                        <span class="timer-color-dot" onclick="event.stopPropagation();cycleTimerColor('${t.id}')" title="Cambiar color"></span>${t.name}
-                    </span>
-                    <div class="timer-input-group">
-                        <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" onchange="syncTimerInputs('${t.id}')">
-                        <span>h</span>
-                        <input type="number" id="t-input-m-${t.id}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos" onchange="syncTimerInputs('${t.id}')">
-                        <span>min</span>
-                    </div>
-                    <div class="timer-display" id="t-display-${t.id}">00:00</div>
-                    <div class="timer-controls">
-                        <button class="t-btn" id="t-btn-toggle-${t.id}" onclick="toggleTimer('${t.id}')" title="Iniciar / Pausar">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                        </button>
-                        <button class="t-btn" onclick="stopTimer('${t.id}')" title="Detener">
-                            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
-                        </button>
-                        <button class="t-btn" onclick="resetTimer('${t.id}')" title="Reiniciar">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                        </button>
-                        ${hideBtn}
-                        ${deleteBtn}
-                        ${addBtn}
-                    </div>
-                </div>`;
-            });
-            container.innerHTML = html;
-
-            // Barra colapsable de timers ocultos
             if (hiddenList.length > 0) {
-                hiddenBar.classList.add('active');
-                hiddenBar.classList.toggle('expanded', hiddenBarExpanded);
-
                 const dotsHtml = hiddenList.map(t => `
                     <button class="hidden-dot ${t.tRunning ? 'is-running' : ''}"
                             style="--dot-color:${t.color}"
                             onclick="toggleTimerHidden('${t.id}')"
-                            title="${t.name}${t.tRunning ? ' · corriendo' : ''} — clic para mostrar"></button>
-                `).join('');
+                            title="${t.name}${t.tRunning ? ' · corriendo' : ''} — clic para mostrar"></button>`
+                ).join('');
 
                 const pillsHtml = hiddenList.map(t => `
                     <div class="hidden-timer-pill ${t.tRunning ? 'is-running' : ''}"
@@ -1407,23 +1384,77 @@
                         <span class="pill-dot"></span>
                         <span class="pill-name">${t.name}</span>
                         <span class="pill-time" id="pill-time-${t.id}">00:00</span>
-                    </div>
-                `).join('');
+                    </div>`
+                ).join('');
 
-                hiddenBar.innerHTML = `
-                    <button class="hidden-bar-toggle"
-                            onclick="toggleHiddenBar()"
-                            title="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}">${hiddenBarExpanded ? '▾' : '▸'}</button>
-                    <div class="hidden-bar-dots">${dotsHtml}</div>
-                    <div class="hidden-bar-pills">${pillsHtml}</div>
-                `;
-            } else {
-                hiddenBar.classList.remove('active');
-                hiddenBar.classList.remove('expanded');
-                hiddenBar.innerHTML = '';
+                html += `
+                    <div class="hidden-timers-bar active ${hiddenBarExpanded ? 'expanded' : ''}" id="hidden-timers-bar">
+                        <button class="hidden-bar-toggle"
+                                onclick="toggleHiddenBar()"
+                                title="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}">${hiddenBarExpanded ? '▾' : '▸'}</button>
+                        <div class="hidden-bar-dots">${dotsHtml}</div>
+                        <div class="hidden-bar-pills">${pillsHtml}</div>
+                    </div>`;
             }
 
+            timersList.forEach((t, index) => {
+                if (t.id === 'general' || t.hidden) return;
+                html += renderTimerCard(t, index);
+            });
+
+            container.innerHTML = html;
             updateTimersDisplayValues();
+        }
+
+        function renderTimerCard(t, index) {
+            const isGeneral = t.id === 'general';
+            const cardClass = isGeneral ? 'timer-widget' : 'timer-widget extra-timer';
+            const styleAttr = t.color ? `style="--timer-color:${t.color}"` : '';
+
+            const deleteBtn = !isGeneral
+                ? `<button class="t-btn-delete" onclick="deleteTimer('${t.id}')" title="Eliminar">×</button>` : '';
+            const addBtn = isGeneral
+                ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
+            const hideBtn = !isGeneral
+                ? `<button class="t-btn-hide" onclick="toggleTimerHidden('${t.id}')" title="Ocultar" aria-label="Ocultar">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+                            stroke-linecap="round" stroke-linejoin="round">
+                           <path d="M18 15l-6-6-6 6"/>
+                       </svg>
+                   </button>` : '';
+
+            let dragAttrs = '';
+            if (!isGeneral) {
+                dragAttrs = `draggable="true" ondragstart="onDragStart(event, ${index})" ondragover="onDragOver(event)" ondrop="onDrop(event, ${index})" ondragend="onDragEnd(event)" ontouchstart="onTouchStart(event, ${index})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)"`;
+            }
+
+            return `
+            <div class="${cardClass}" id="widget-${t.id}" data-index="${index}" ${styleAttr} ${dragAttrs}>
+                <span class="timer-title">
+                    <span class="timer-color-dot" onclick="event.stopPropagation();cycleTimerColor('${t.id}')" title="Cambiar color"></span>${t.name}
+                </span>
+                ${hideBtn}
+                <div class="timer-input-group">
+                    <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" onchange="syncTimerInputs('${t.id}')">
+                    <span>h</span>
+                    <input type="number" id="t-input-m-${t.id}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos" onchange="syncTimerInputs('${t.id}')">
+                    <span>min</span>
+                </div>
+                <div class="timer-display" id="t-display-${t.id}">00:00</div>
+                <div class="timer-controls">
+                    <button class="t-btn" id="t-btn-toggle-${t.id}" onclick="toggleTimer('${t.id}')" title="Iniciar / Pausar">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button class="t-btn" onclick="stopTimer('${t.id}')" title="Detener">
+                        <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+                    </button>
+                    <button class="t-btn" onclick="resetTimer('${t.id}')" title="Reiniciar">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                    ${deleteBtn}
+                    ${addBtn}
+                </div>
+            </div>`;
         }
 
         function syncTimerInputs(id) {

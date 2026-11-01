@@ -1908,26 +1908,6 @@
             return null;
         }
 
-        function exportData() {
-            let backup = { 
-                tasks: tasksData, 
-                entornos: entornosData, 
-                work: workConfig, 
-                block: blockConfig, 
-                day: dayConfig, 
-                markers: markersData, 
-                collapsed: collapsedMonths, 
-                trackedYears: trackedYears, 
-                timerStats: timerStats, 
-                timersList: timersList,
-                notes: notesData
-            };
-            const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
-            const url = URL.createObjectURL(blob); const a = document.createElement("a");
-            a.href = url; a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        }
-
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', currentTheme); localStorage.setItem('wkTheme', currentTheme);
@@ -2929,51 +2909,52 @@
 
         async function syncExport() {
             let backup = { 
-                tasks: tasksData, 
-                entornos: entornosData, 
-                work: workConfig, 
-                block: blockConfig, 
-                day: dayConfig, 
-                markers: markersData, 
-                collapsed: collapsedMonths, 
-                trackedYears: trackedYears, 
-                timerStats: timerStats, 
-                timersList: timersList,
-                notes: notesData
+                tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, 
+                day: dayConfig, markers: markersData, collapsed: collapsedMonths, 
+                trackedYears: trackedYears, timerStats: timerStats, timersList: timersList, notes: notesData
             };
             const jsonStr = JSON.stringify(backup, null, 2);
+            const fileName = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
 
+            // 1. Intentar usar el menú nativo de compartir de Android/iOS
+            if (navigator.share && navigator.canShare) {
+                try {
+                    const file = new File([jsonStr], fileName, { type: "application/json" });
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Copia de Seguridad',
+                            text: 'Guardar copia de Tiempo'
+                        });
+                        return; // Si se compartió con éxito, terminamos aquí
+                    }
+                } catch (err) {
+                    if (err.name !== 'AbortError') console.log('Error compartiendo:', err);
+                }
+            }
+
+            // 2. Si está en PC, usar la ventana para elegir carpeta
             if ('showSaveFilePicker' in window) {
                 try {
                     const fileHandle = await window.showSaveFilePicker({
-                        suggestedName: `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`,
-                        types: [{
-                            description: 'Archivo JSON',
-                            accept: { 'application/json': ['.json'] },
-                        }],
+                        suggestedName: fileName,
+                        types: [{ description: 'Archivo JSON', accept: { 'application/json': ['.json'] } }],
                     });
                     const writable = await fileHandle.createWritable();
                     await writable.write(jsonStr);
                     await writable.close();
-                    alert("✅ Copia guardada exitosamente en la carpeta elegida.");
+                    alert("✅ Copia guardada exitosamente.");
                 } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        console.error("Error al guardar:", err);
-                        alert("Error al guardar el archivo.");
-                    }
+                    if (err.name !== 'AbortError') alert("Error al guardar.");
                 }
             } else {
+                // 3. Fallback (Descarga normal en Android antiguo)
                 const blob = new Blob([jsonStr], { type: "application/json" });
                 const url = URL.createObjectURL(blob); 
                 const a = document.createElement("a");
-                a.href = url; 
-                a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
-                document.body.appendChild(a); 
-                a.click(); 
-                document.body.removeChild(a); 
+                a.href = url; a.download = fileName;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); 
                 URL.revokeObjectURL(url);
-                
-                alert("✅ Copia guardada en tu carpeta de Descargas. Si usas Google Drive, se sincronizará automáticamente.");
             }
         }
 
@@ -3023,4 +3004,3 @@
     </script>
 </body>
 </html>
-

@@ -96,6 +96,20 @@
             margin: 0 4px; padding: 12px 16px;
             background: var(--card); border: 1px solid var(--border); border-radius: 14px;
             box-shadow: var(--card-shadow); position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .timer-widget.dragging {
+            opacity: 0.85;
+            transform: scale(1.02);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+            z-index: 1000;
+            border-color: var(--accent);
+        }
+        .extra-timer {
+            cursor: grab;
+        }
+        .extra-timer:active {
+            cursor: grabbing;
         }
         .timer-title { position: absolute; top: 4px; left: 16px; font-size: 0.55rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .timer-input-group { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
@@ -915,7 +929,7 @@
                     </div>
                     <div class="tc-field">
                         <label style="font-size:0.65rem;">Minutos</label>
-                        <input type="number" id="inp-newt-m" placeholder="0" min="0" max="59" style="padding:7px 10px; height:auto;">
+                        <input type="number" id="inp-newt-m" placeholder="0" min="0" max="999" style="padding:7px 10px; height:auto;">
                     </div>
                 </div>
                 <div class="modal-actions">
@@ -1199,19 +1213,24 @@
                 container.classList.remove('collapsed');
             }
 
-            timersList.forEach((t) => {
+            timersList.forEach((t, index) => {
                 const isGeneral = t.id === 'general';
                 const cardClass = isGeneral ? 'timer-widget' : 'timer-widget extra-timer';
                 const deleteBtnHtml = !isGeneral ? `<button class="t-btn-delete" onclick="deleteTimer('${t.id}')" title="Eliminar">×</button>` : '';
                 const addBtnHtml = isGeneral ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
 
+                let dragAttrs = '';
+                if (!isGeneral) {
+                    dragAttrs = `draggable="true" ondragstart="onDragStart(event, ${index})" ondragover="onDragOver(event)" ondrop="onDrop(event, ${index})" ondragend="onDragEnd(event)" ontouchstart="onTouchStart(event, ${index})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)"`;
+                }
+
                 html += `
-                <div class="${cardClass}" id="widget-${t.id}">
+                <div class="${cardClass}" id="widget-${t.id}" data-index="${index}" ${dragAttrs}>
                     <span class="timer-title">${t.name}</span>
                     <div class="timer-input-group">
-                        <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas">
+                        <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" onchange="syncTimerInputs('${t.id}')">
                         <span>h</span>
-                        <input type="number" id="t-input-m-${t.id}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos">
+                        <input type="number" id="t-input-m-${t.id}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos" onchange="syncTimerInputs('${t.id}')">
                         <span>min</span>
                     </div>
                     <div class="timer-display" id="t-display-${t.id}">00:00</div>
@@ -1233,6 +1252,102 @@
             container.innerHTML = html;
             updateTimersDisplayValues();
         }
+
+        function syncTimerInputs(id) {
+            let t = timersList.find(x => x.id === id);
+            if (!t) return;
+            t.inputH = parseInt(document.getElementById(`t-input-h-${id}`).value) || '';
+            t.inputM = parseInt(document.getElementById(`t-input-m-${id}`).value) || '';
+            saveTimersState();
+        }
+
+        /* --- LÓGICA DE DRAG & DROP (ESCRITORIO Y TÁCTIL) PARA TEMPORIZADORES SECUNDARIOS --- */
+        let draggedIndex = null;
+        let touchDragEl = null;
+        let touchStartY = 0;
+        let originalY = 0;
+
+        function onDragStart(e, index) {
+            if (timersList[index].id === 'general') return;
+            draggedIndex = index;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function onDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function onDrop(e, targetIndex) {
+            e.preventDefault();
+            if (draggedIndex === null || draggedIndex === targetIndex) return;
+            if (timersList[targetIndex].id === 'general') return; // No mover sobre el general
+
+            let movedItem = timersList.splice(draggedIndex, 1)[0];
+            timersList.splice(targetIndex, 0, movedItem);
+            
+            saveTimersState();
+            renderTimersUI();
+        }
+
+        function onDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedIndex = null;
+        }
+
+        // Soporte táctil avanzado para reordenar
+        function onTouchStart(e, index) {
+            if (timersList[index].id === 'general') return;
+            // Evitar arrastre si se toca un botón o input
+            if (['INPUT', 'BUTTON', 'SVG', 'PATH', 'RECT', 'CIRCLE'].includes(e.target.tagName)) return;
+            
+            draggedIndex = index;
+            touchDragEl = e.currentTarget;
+            touchStartY = e.touches[0].clientY;
+            
+            touchDragEl.classList.add('dragging');
+        }
+
+        function onTouchMove(e) {
+            if (draggedIndex === null || !touchDragEl) return;
+            e.preventDefault(); // Prevenir scroll mientras se reordena
+            
+            let currentY = e.touches[0].clientY;
+            let diffY = currentY - touchStartY;
+            touchDragEl.style.transform = `translateY(${diffY}px)`;
+
+            // Encontrar elemento bajo el toque
+            let touch = e.touches[0];
+            let elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            let targetWidget = elementBelow ? elementBelow.closest('.extra-timer') : null;
+
+            if (targetWidget && targetWidget !== touchDragEl) {
+                let targetIndex = parseInt(targetWidget.dataset.index);
+                if (!isNaN(targetIndex) && targetIndex !== draggedIndex) {
+                    let movedItem = timersList.splice(draggedIndex, 1)[0];
+                    timersList.splice(targetIndex, 0, movedItem);
+                    draggedIndex = targetIndex;
+                    touchStartY = currentY; // Resetear base
+                    saveTimersState();
+                    renderTimersUI();
+                    // Reasignar el elemento arrastrado tras el re-render
+                    touchDragEl = document.querySelector(`[data-index='${draggedIndex}']`);
+                    if (touchDragEl) touchDragEl.classList.add('dragging');
+                }
+            }
+        }
+
+        function onTouchEnd(e) {
+            if (touchDragEl) {
+                touchDragEl.classList.remove('dragging');
+                touchDragEl.style.transform = '';
+            }
+            draggedIndex = null;
+            touchDragEl = null;
+            renderTimersUI();
+        }
+        /* -------------------------------------------------------------------------------- */
 
         function toggleExtraTimersFold() {
             extraTimersFolded = !extraTimersFolded;

@@ -388,22 +388,26 @@
         .modal-overlay { 
             display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; 
             align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 16px; 
-            flex-direction: column; 
+            flex-direction: column; /* Permite apilar modales en modo dual */
         }
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
         .modal-card { 
             background: var(--card); border: 1px solid var(--border); border-radius: 20px; 
-            padding: 18px; width: 310px; max-width: 90vw; 
+            padding: 22px; width: 300px; max-width: 90vw; 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
             animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
         }
+
+        .modal-card.wide {
+            width: 500px; max-width: 92vw;
+        }
         
+        /* Reglas CSS dinámicas para cuando se abre el modo dual (pulsación larga en un día) */
         .modal-overlay.dual-mode-active .modal-card {
             height: auto;
             max-height: 45vh;
-            min-height: 25vh;
             width: 320px;
             overflow-y: auto;
         }
@@ -413,15 +417,13 @@
 
         .modal-card h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
         
-        .modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 
         .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--subtext); font-weight: 500;}
         .input-group input[type="text"], .input-group input[type="number"], .input-group input[type="time"], .input-group select { width: auto; min-width: 70px; max-width: 170px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 8px; border-radius: 8px; text-align: center; font-weight: 600; font-family: inherit; transition: border-color 0.2s; outline: none;}
         .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
         .input-group input[type="color"] { background: none; border: none; padding: 0; width: 40px; height: 40px; cursor: pointer; border-radius: 8px; }
-        
-        .modal-actions { display: flex; gap: 10px; margin-top: 14px; }
-        
+        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
         .btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;}
         .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
         .btn:active { transform: scale(0.96); }
@@ -429,45 +431,44 @@
         .btn-cancel { background: var(--item-bg); color: var(--text); border: 1px solid var(--border-input); }
         .btn-delete { background: var(--sunday); color: var(--btn-text); }
 
-        /* Estilos compactos para Modal de Tareas/Entornos */
-        .tc-desc { margin-bottom: 10px; }
+        .tc-desc { margin-bottom: 8px; }
         .tc-desc input {
             width: 100%; box-sizing: border-box;
             background: var(--input-bg); border: 1px solid var(--border-input);
-            color: var(--text); padding: 7px 9px; border-radius: 7px;
+            color: var(--text); padding: 6px 8px; border-radius: 9px;
             font-size: 0.8rem; font-family: inherit; font-weight: 500;
             outline: none; transition: border-color 0.2s;
         }
         .tc-desc input:focus { border-color: var(--accent); }
         .tc-desc input::placeholder { color: var(--muted); }
 
-        .tc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .tc-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-        .tc-field label { font-size: 0.6rem; color: var(--subtext); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .tc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+        .tc-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .tc-field label { font-size: 0.55rem; color: var(--subtext); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
         .tc-field select, .tc-field input {
             width: 100%; box-sizing: border-box;
             background: var(--input-bg); border: 1px solid var(--border-input);
-            color: var(--text); padding: 6px 8px; border-radius: 6px;
-            font-size: 0.78rem; font-family: inherit; font-weight: 500;
-            outline: none; transition: border-color 0.2s; height: 30px;
+            color: var(--text); padding: 5px 8px; border-radius: 8px;
+            font-size: 0.8rem; font-family: inherit; font-weight: 500;
+            outline: none; transition: border-color 0.2s;
         }
         .tc-field select:focus, .tc-field input:focus { border-color: var(--accent); }
         .tc-field select {
             -webkit-appearance: none; appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat; background-position: right 6px center;
-            background-size: 10px; padding-right: 22px; cursor: pointer;
+            background-repeat: no-repeat; background-position: right 8px center;
+            background-size: 12px; padding-right: 26px; cursor: pointer;
         }
         .tc-field input[type="time"] { color-scheme: dark; }
         [data-theme="light"] .tc-field input[type="time"] { color-scheme: light; }
-        .tc-field input[type="color"] { padding: 1px; height: 30px; width: 100%; cursor: pointer; border-radius: 6px; }
+        .tc-field input[type="color"] { padding: 2px; height: 32px; width: 100%; cursor: pointer; border-radius: 8px; }
 
         .checkbox-group { display: flex; gap: 4px; flex-wrap: wrap; }
         .chk-btn {
             background: var(--input-bg); border: 1px solid var(--border-input);
-            color: var(--muted); padding: 4px 6px; border-radius: 5px;
-            font-size: 0.68rem; font-weight: 700; cursor: pointer; user-select: none;
-            transition: all 0.2s; text-align: center; flex: 1; min-width: 22px;
+            color: var(--muted); padding: 5px 8px; border-radius: 6px;
+            font-size: 0.72rem; font-weight: 700; cursor: pointer; user-select: none;
+            transition: all 0.2s; text-align: center; flex: 1; min-width: 25px;
         }
         .chk-btn.active {
             background: var(--accent); color: var(--btn-text); border-color: var(--accent);
@@ -515,6 +516,7 @@
         
         .task-dot { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 3px var(--accent); pointer-events: none; }
         
+        /* Nuevo indicador visual para notas guardadas */
         .note-dot { position: absolute; top: 2px; right: 2px; width: 3px; height: 3px; border-radius: 50%; background: var(--work); box-shadow: 0 0 3px var(--work); pointer-events: none; }
 
         .current-week-glow .day:not(.today) { 
@@ -849,7 +851,7 @@
         <!-- Modal Secundario de Notas (Solo visible en Modo Dual al mantener presionado un día) -->
         <div class="modal-card" id="dual-notes-card" style="display:none; margin-bottom: 12px; flex-direction:column;" onclick="event.stopPropagation()">
             <h3 id="dual-notes-title" style="color: var(--accent); margin-top:0; margin-bottom: 10px;">Notas</h3>
-            <textarea id="dual-notes-text" style="flex:1; width:100%; box-sizing:border-box; resize:vertical; min-height: 120px; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:10px; font-family:inherit; font-size:0.85rem;" oninput="saveDualNotes()"></textarea>
+            <textarea id="dual-notes-text" style="flex:1; width:100%; box-sizing:border-box; resize:vertical; min-height:80px; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:10px; font-family:inherit; font-size:0.85rem;" oninput="saveDualNotes()"></textarea>
         </div>
 
         <!-- Modal Principal -->
@@ -866,17 +868,17 @@
 
             <div id="modal-content-addtimer" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 15px;">Nuevo Temporizador</h3>
-                <div class="tc-desc" style="margin-bottom: 10px;">
-                    <input type="text" id="inp-newt-name" placeholder="Nombre (ej. Leer, Estudiar...)">
+                <div class="tc-desc" style="margin-bottom: 12px;">
+                    <input type="text" id="inp-newt-name" placeholder="Nombre (ej. Leer, Estudiar...)" style="padding:9px 11px; font-size:0.85rem;">
                 </div>
-                <div class="tc-row">
+                <div class="tc-row" style="gap:10px;">
                     <div class="tc-field">
-                        <label>Horas</label>
-                        <input type="number" id="inp-newt-h" placeholder="0" min="0" max="99">
+                        <label style="font-size:0.65rem;">Horas</label>
+                        <input type="number" id="inp-newt-h" placeholder="0" min="0" max="99" style="padding:7px 10px;">
                     </div>
                     <div class="tc-field">
-                        <label>Minutos</label>
-                        <input type="number" id="inp-newt-m" placeholder="0" min="0" max="59">
+                        <label style="font-size:0.65rem;">Minutos</label>
+                        <input type="number" id="inp-newt-m" placeholder="0" min="0" max="59" style="padding:7px 10px;">
                     </div>
                 </div>
                 <div class="modal-actions">
@@ -936,7 +938,7 @@
                         <div class="tc-field"><label>Mes</label><select id="inp-tc-month" onchange="updateWeekDropdown()"></select></div>
                         <div class="tc-field"><label>Semana</label><select id="inp-tc-week"></select></div>
                     </div>
-                    <div class="tc-field" style="margin-bottom: 10px;">
+                    <div class="tc-field" style="margin-bottom: 8px;">
                         <label>Día (Opcional)</label>
                         <select id="inp-tc-day">
                             <option value="">—</option>
@@ -948,11 +950,11 @@
                 </div>
 
                 <div id="tc-entorno-fields" style="display:none;">
-                    <div class="tc-field" style="margin-bottom: 10px;">
+                    <div class="tc-field" style="margin-bottom: 8px;">
                         <label>Meses del Trimestre</label>
                         <div class="checkbox-group" id="chk-months"></div>
                     </div>
-                    <div class="tc-field" style="margin-bottom: 10px;">
+                    <div class="tc-field" style="margin-bottom: 8px;">
                         <label>Semanas del Mes</label>
                         <div class="checkbox-group" id="chk-weeks">
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">W0</div>
@@ -963,7 +965,7 @@
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="5">W5</div>
                         </div>
                     </div>
-                    <div class="tc-field" style="margin-bottom: 10px;">
+                    <div class="tc-field" style="margin-bottom: 8px;">
                         <label>Días de la semana</label>
                         <div class="checkbox-group" id="chk-days">
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">L</div>
@@ -1026,7 +1028,7 @@
                 <div class="modal-actions" style="flex-wrap: wrap;"><button class="btn btn-delete" onclick="deleteActiveMarker()" style="flex-basis: 100%; margin-bottom: 5px;">Eliminar Marcador</button><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveMarkerSettings()">Guardar</button></div>
             </div>
 
-            <!-- Nuevo contenido del modal de Notas (Ajustable y más alto) -->
+            <!-- Nuevo contenido del modal de Notas -->
             <div id="modal-content-notes" style="display:none; flex-direction:column; height:100%;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="color:var(--accent); margin:0;">Notas</h3>
@@ -1037,7 +1039,7 @@
                 </div>
                 <input type="date" id="notes-date-picker" style="display:none; margin-bottom:12px; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:8px; border-radius:8px; outline:none; font-family:inherit;" onchange="loadNoteForPicker()">
                 
-                <textarea id="notes-main-textarea" style="flex:1; min-height: 320px; height: 40vh; max-height: 70vh; width:100%; box-sizing:border-box; resize:vertical; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:12px; font-family:inherit; font-size:0.9rem; line-height: 1.4;" oninput="saveMainNote()"></textarea>
+                <textarea id="notes-main-textarea" style="flex:1; min-height: 300px; width:100%; box-sizing:border-box; resize:vertical; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:10px; font-family:inherit; font-size:0.85rem;" oninput="saveMainNote()"></textarea>
             
                 <div class="modal-actions" style="margin-top:15px;">
                     <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
@@ -1594,6 +1596,9 @@
             content.style.display = 'flex';
             document.getElementById('notes-mode').value = 'general';
             toggleNotesMode();
+            
+            // Añadir clase para hacer el modal más ancho
+            document.getElementById('main-modal-card').classList.add('wide');
             openModal();
         }
 
@@ -1636,7 +1641,7 @@
                 }
             }
             localStorage.setItem('wkNotes', JSON.stringify(notesData));
-            renderDayTaskMarks(); 
+            renderDayTaskMarks(); // Por si hay que actualizar puntos del calendario
         }
         
         function saveDualNotes() {
@@ -1645,7 +1650,7 @@
             if (date) {
                 notesData[date] = ta.value;
                 localStorage.setItem('wkNotes', JSON.stringify(notesData));
-                renderQuarterDetailBody(); 
+                renderQuarterDetailBody(); // Actualiza el punto indicador visual en tiempo real
             }
         }
         
@@ -2288,6 +2293,7 @@
                             const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
                             const noteDot = hasNotesDay ? '<span class="note-dot"></span>' : '';
                             
+                            // Eventos Pointer para distinguir toque corto vs largo
                             const pressHandlers = `onpointerdown="handleDayPointerDown(event, ${year}, ${mI}, ${localW}, ${dI}, '${dtStr}')" onpointerup="handleDayPointerUp(event, ${year}, ${mI}, ${localW}, ${dI}, '${dtStr}')" onpointercancel="handleDayPointerCancel(event)" onpointerleave="handleDayPointerCancel(event)" oncontextmenu="event.preventDefault();"`;
                             
                             if (w.isMain && dI === fR) html += `<div class="${cl} block-start" ${pressHandlers}><span class="block-label">W${localW}</span>${d}${taskDot}${noteDot}</div>`;
@@ -2314,7 +2320,9 @@
             if(e && e.target.id !== 'modal-overlay') return;
             document.getElementById('modal-overlay').classList.remove('active');
             
+            // Restablecer estilos de modo dual y notas anchas
             document.getElementById('modal-overlay').classList.remove('dual-mode-active');
+            document.getElementById('main-modal-card').classList.remove('wide');
             document.getElementById('dual-notes-card').style.display = 'none';
             
             ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes'].forEach(id => {

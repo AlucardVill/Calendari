@@ -96,8 +96,7 @@
             margin: 0 4px; padding: 12px 16px;
             background: var(--card); border: 1px solid var(--border); border-radius: 14px;
             box-shadow: var(--card-shadow); position: relative;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, max-height 0.3s ease, padding 0.3s ease;
-            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .timer-widget.dragging {
             opacity: 0.85;
@@ -113,15 +112,10 @@
             cursor: grabbing;
         }
         
-        /* Estilos de minimización individual para temporizadores secundarios */
+        /* Estilos de minimización individual */
         .timer-widget.minimized {
             padding: 8px 16px;
             background: var(--item-bg);
-        }
-        .timer-widget.minimized .timer-input-group,
-        .timer-widget.minimized .timer-controls,
-        .timer-widget.minimized .t-btn-collapse {
-            /* Mantenemos el botón de colapsar visible pero ocultamos el resto de controles de la tarjeta */
         }
         .timer-widget.minimized .timer-input-group,
         .timer-widget.minimized .timer-controls {

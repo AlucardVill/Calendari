@@ -24,6 +24,7 @@
         :root {
             --bg: #0a0a0a; --card: #141414; --text: #f3f4f6;
             --border: #262626; --border-input: #333333;
+            --track-bg: #262626; /* Separamos el fondo de las barras del borde general */
             --muted: #737373; --subtext: #a3a3a3;
             --item-bg: #1a1a1a; --input-bg: #0a0a0a;
             --past: #1f1f22; --today: #ffffff; --future: #10b981;
@@ -44,6 +45,7 @@
         [data-theme="light"] {
             --bg: #f9fafb; --card: #ffffff; --text: #111827;
             --border: #e5e7eb; --border-input: #d1d5db;
+            --track-bg: #e5e7eb;
             --muted: #9ca3af; --subtext: #4b5563;
             --item-bg: #f3f4f6; --input-bg: #ffffff;
             --past: #f3f4f6; --today: #111827; --future: #059669;
@@ -110,10 +112,10 @@
             color: var(--text); letter-spacing: -0.02em; flex: 1; text-align: center; margin-top: 6px;
         }
         .timer-display.running { color: var(--accent); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-        .timer-controls { display: flex; gap: 4px; margin-top: 6px; align-items: center; }
         
+        .timer-controls { display: flex; gap: 6px; margin-top: 6px; align-items: center; }
         .t-btn { 
-            width: 34px; height: 34px; border-radius: 10px; background: var(--item-bg); 
+            width: 28px; height: 28px; border-radius: 8px; background: var(--item-bg); 
             border: 1px solid var(--border-input); color: var(--text); display: flex; 
             align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
         }
@@ -136,22 +138,23 @@
             display: none; position: fixed; 
             top: max(45px, calc(env(safe-area-inset-top) + 25px)); 
             left: 16px; z-index: 10000; 
-            align-items: center; gap: 6px;
+            align-items: center; gap: 8px;
         }
         #floating-time {
             color: var(--block-id); 
-            font-size: 0.75rem; font-weight: 300; 
+            font-size: 0.75rem; font-weight: 600; 
             letter-spacing: 0.05em; font-variant-numeric: tabular-nums;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.85);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.85);
         }
         .floating-stop-btn {
-            background: rgba(0,0,0,0.45); border: 1px solid rgba(253,224,71,0.25);
-            color: var(--block-id); border-radius: 4px;
-            width: 18px; height: 18px; font-size: 0.45rem; cursor: pointer;
+            background: transparent; border: none;
+            color: var(--muted); border-radius: 4px;
+            width: 18px; height: 18px; cursor: pointer;
             display: flex; align-items: center; justify-content: center; padding: 0;
-            backdrop-filter: blur(4px); transition: all 0.2s;
+            transition: all 0.2s;
         }
-        .floating-stop-btn:active { transform: scale(0.9); background: rgba(0,0,0,0.8); }
+        .floating-stop-btn:hover { color: var(--text); transform: scale(1.1); }
+        .floating-stop-btn:active { transform: scale(0.9); }
 
         .section-label {
             display: flex; align-items: center; gap: 8px;
@@ -251,7 +254,7 @@
             transition: all 0.2s; z-index: 10;
         }
         .delete-year-btn:hover { color: var(--sunday); background: rgba(251, 113, 133, 0.15); }
-        .year-progress { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 8px 0 6px; }
+        .year-progress { height: 5px; background: var(--track-bg); border-radius: 3px; overflow: hidden; margin: 8px 0 6px; }
         .year-progress .fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--year-bar); }
         .year-pct { font-size: 0.85rem; font-weight: 800; color: var(--text); }
         .year-box.add-year {
@@ -284,7 +287,7 @@
             color: var(--accent); background: rgba(16, 185, 129, 0.15);
             padding: 2px 5px; border-radius: 4px;
         }
-        .qc-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin: 10px 0 6px; }
+        .qc-bar { height: 4px; background: var(--track-bg); border-radius: 2px; overflow: hidden; margin: 10px 0 6px; }
         .qc-bar .fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--accent); }
         .qc-pct { font-size: 0.85rem; font-weight: 800; color: var(--text); }
 
@@ -369,7 +372,7 @@
         .qbar-widget[data-mode="q"] .qbar-badge { color: var(--accent); background: rgba(16, 185, 129, 0.15); }
         .qbar-widget[data-mode="y"] .qbar-badge { color: var(--year-bar); background: rgba(59, 130, 246, 0.15); }
         .qbar-widget[data-mode="b"] .qbar-badge { color: var(--bi-bar); background: rgba(236, 72, 153, 0.15); }
-        .qbar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+        .qbar-track { flex: 1; height: 5px; background: var(--track-bg); border-radius: 3px; overflow: hidden; }
         .qbar-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s; }
         .qbar-widget[data-mode="q"] .qbar-fill { background: var(--accent); }
         .qbar-widget[data-mode="y"] .qbar-fill { background: var(--year-bar); }
@@ -466,7 +469,7 @@
         .m-bar-row:last-child { margin-bottom: 0; }
         .m-label { width: 80px; font-size: 0.8rem; color: var(--subtext); text-align: right; font-weight: 500; }
         .m-pct { width: 45px; font-size: 0.8rem; color: var(--text); font-weight: 800; text-align: left; }
-        .m-progress { flex: 1; background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; position: relative; }
+        .m-progress { flex: 1; background: var(--track-bg); height: 10px; border-radius: 5px; overflow: hidden; position: relative; }
         .m-fill { height: 100%; background: var(--accent); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; border-radius: 5px;}
 
         .months-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
@@ -673,7 +676,7 @@
 <body>
     <div id="floating-timer">
         <span id="floating-time">00:00</span>
-        <button id="floating-toggle-btn" class="floating-stop-btn" onclick="toggleTimer('general')" title="Pausar/Reanudar"></button>
+        <button id="floating-toggle-btn" class="floating-stop-btn" title="Pausar/Reanudar"></button>
     </div>
 
     <div class="header-top">
@@ -1119,13 +1122,13 @@
                     <div class="timer-display" id="t-display-${t.id}">00:00</div>
                     <div class="timer-controls">
                         <button class="t-btn" id="t-btn-toggle-${t.id}" onclick="toggleTimer('${t.id}')" title="Iniciar / Pausar">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                         </button>
                         <button class="t-btn" onclick="stopTimer('${t.id}')" title="Detener">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+                            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
                         </button>
                         <button class="t-btn" onclick="resetTimer('${t.id}')" title="Reiniciar">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                         </button>
                         ${deleteBtnHtml}
                         ${addBtnHtml}
@@ -1289,8 +1292,7 @@
         }
 
         function updateTimersDisplayValues() {
-            let anyRunningOrActive = false;
-            let firstRunningDisp = "00:00";
+            let activeTimerInfo = null;
 
             timersList.forEach(t => {
                 let current = t.tAcc;
@@ -1317,19 +1319,20 @@
                 const displayEl = document.getElementById(`t-display-${t.id}`);
                 if (displayEl) displayEl.innerText = disp;
 
-                if (t.tRunning || current > 0) {
-                    anyRunningOrActive = true;
-                    firstRunningDisp = disp;
+                if (t.tRunning || (current > 0 && !activeTimerInfo)) {
+                    if (!activeTimerInfo || t.tRunning) {
+                        activeTimerInfo = { id: t.id, disp: disp, isRunning: t.tRunning };
+                    }
                 }
 
                 const btnToggle = document.getElementById(`t-btn-toggle-${t.id}`);
                 if (btnToggle) {
                     if (t.tRunning) {
-                        btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                        btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
                         btnToggle.classList.add('active');
                         if (displayEl) displayEl.classList.add('running');
                     } else {
-                        btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+                        btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
                         btnToggle.classList.remove('active');
                         if (displayEl) displayEl.classList.remove('running');
                     }
@@ -1338,9 +1341,23 @@
 
             const isNotMainScreen = document.getElementById('calendar-overlay').classList.contains('active') || document.getElementById('modal-overlay').classList.contains('active');
             const floatEl = document.getElementById('floating-timer');
-            document.getElementById('floating-time').innerText = firstRunningDisp;
-            if (anyRunningOrActive && isNotMainScreen) {
-                floatEl.style.display = 'flex';
+            
+            if (activeTimerInfo) {
+                document.getElementById('floating-time').innerText = activeTimerInfo.disp;
+                const floatBtn = document.getElementById('floating-toggle-btn');
+                floatBtn.onclick = () => toggleTimer(activeTimerInfo.id);
+                
+                if (activeTimerInfo.isRunning) {
+                    floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                } else {
+                    floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+                }
+
+                if (isNotMainScreen) {
+                    floatEl.style.display = 'flex';
+                } else {
+                    floatEl.style.display = 'none';
+                }
             } else {
                 floatEl.style.display = 'none';
             }

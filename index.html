@@ -388,14 +388,14 @@
         .modal-overlay { 
             display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; 
             align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 16px; 
-            flex-direction: column; /* Permite apilar modales en modo dual */
+            flex-direction: column;
         }
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
         .modal-card { 
             background: var(--card); border: 1px solid var(--border); border-radius: 20px; 
-            padding: 16px 20px; width: 300px; max-width: 90vw; /* Padding reducido para hacerlo más compacto */
+            padding: 16px 20px; width: 300px; max-width: 90vw; 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
             animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
         }
@@ -404,16 +404,31 @@
             width: 550px; max-width: 95vw;
         }
         
-        /* Reglas CSS dinámicas para cuando se abre el modo dual (pulsación larga en un día) */
+        /* ------------- NUEVAS REGLAS MODO DUAL (NOTAS GRANDES, ACCIÓN PEQUEÑA) ------------- */
+        .modal-overlay.dual-mode-active {
+            padding: 20px;
+        }
         .modal-overlay.dual-mode-active .modal-card {
-            height: auto;
-            max-height: 45vh;
-            width: 320px;
-            overflow-y: auto;
+            width: 340px;
+            max-width: 95vw;
+            overflow-y: auto; /* Permite scroll interno si es necesario */
         }
         .modal-overlay.dual-mode-active #dual-notes-card {
             display: flex !important;
+            flex: 1.2; /* Permite que la tarjeta de notas crezca más */
+            max-height: 55vh; /* Expande la nota hasta un 55% de la pantalla */
+            min-height: 200px;
+            margin-bottom: 12px;
         }
+        .modal-overlay.dual-mode-active #main-modal-card {
+            flex: 0.8; /* Mantiene la tarjeta de acción más contenida */
+            max-height: 35vh; /* Restringe la altura máxima de la creación de tarea */
+        }
+        .modal-overlay.dual-mode-active #dual-notes-text {
+            height: 100%; /* Obliga al cuadro de texto a llenar su tarjeta grande */
+            resize: none; /* Deshabilita el redimensionamiento manual porque ya ocupa todo el espacio */
+        }
+        /* ---------------------------------------------------------------------------------- */
 
         .modal-card h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
         
@@ -431,7 +446,6 @@
         .btn-cancel { background: var(--item-bg); color: var(--text); border: 1px solid var(--border-input); }
         .btn-delete { background: var(--sunday); color: var(--btn-text); }
 
-        /* Estilos ultra-compactos para el modal de registros */
         .tc-desc { margin-bottom: 6px; }
         .tc-desc input {
             width: 100%; box-sizing: border-box;
@@ -517,7 +531,6 @@
         
         .task-dot { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 3px var(--accent); pointer-events: none; }
         
-        /* Nuevo indicador visual para notas guardadas */
         .note-dot { position: absolute; top: 2px; right: 2px; width: 3px; height: 3px; border-radius: 50%; background: var(--work); box-shadow: 0 0 3px var(--work); pointer-events: none; }
 
         .current-week-glow .day:not(.today) { 
@@ -850,9 +863,10 @@
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         
         <!-- Modal Secundario de Notas (Solo visible en Modo Dual al mantener presionado un día) -->
-        <div class="modal-card" id="dual-notes-card" style="display:none; margin-bottom: 12px; flex-direction:column;" onclick="event.stopPropagation()">
+        <div class="modal-card" id="dual-notes-card" style="display:none; flex-direction:column;" onclick="event.stopPropagation()">
             <h3 id="dual-notes-title" style="color: var(--accent); margin-top:0; margin-bottom: 10px;">Notas</h3>
-            <textarea id="dual-notes-text" style="flex:1; width:100%; box-sizing:border-box; resize:vertical; min-height:80px; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:10px; font-family:inherit; font-size:0.85rem;" oninput="saveDualNotes()"></textarea>
+            <!-- Se quitan estilos inline que limitaban la altura, ahora el CSS se encarga de que llene todo el espacio flex -->
+            <textarea id="dual-notes-text" style="width:100%; box-sizing:border-box; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:10px; font-family:inherit; font-size:0.85rem;" oninput="saveDualNotes()"></textarea>
         </div>
 
         <!-- Modal Principal -->
@@ -1598,7 +1612,6 @@
             document.getElementById('notes-mode').value = 'general';
             toggleNotesMode();
             
-            // Añadir clase para hacer el modal más ancho
             document.getElementById('main-modal-card').classList.add('wide');
             openModal();
         }
@@ -1642,7 +1655,7 @@
                 }
             }
             localStorage.setItem('wkNotes', JSON.stringify(notesData));
-            renderDayTaskMarks(); // Por si hay que actualizar puntos del calendario
+            renderDayTaskMarks(); 
         }
         
         function saveDualNotes() {
@@ -1651,7 +1664,7 @@
             if (date) {
                 notesData[date] = ta.value;
                 localStorage.setItem('wkNotes', JSON.stringify(notesData));
-                renderQuarterDetailBody(); // Actualiza el punto indicador visual en tiempo real
+                renderQuarterDetailBody(); 
             }
         }
         
@@ -1669,7 +1682,7 @@
                     isPressing = false;
                     handleLongPress(year, mI, localW, dI, dtStr);
                 }
-            }, 500); // 500ms para disparar pulsación larga (Dual Modal)
+            }, 500); 
         }
 
         function handleDayPointerUp(e, year, mI, localW, dI, dtStr) {
@@ -1677,7 +1690,7 @@
                 clearTimeout(pressTimer);
                 isPressing = false;
                 let dist = Math.hypot(e.clientX - pressStartPos.x, e.clientY - pressStartPos.y);
-                if (dist < 15) { // Tolerancia para que no se considere scroll
+                if (dist < 15) { 
                     handleShortPress(year, mI, localW, dI, dtStr);
                 }
             }
@@ -1689,13 +1702,11 @@
         }
 
         function handleShortPress(year, mI, localW, dI, dtStr) {
-            // Un solo toque: ordena automáticamente los tabs para mostrar los registros correspondientes
             setActiveTabM(mI % 3);
             setActiveTabW(localW);
         }
 
         function handleLongPress(year, mI, localW, dI, dtStr) {
-            // Pulsación larga: Abre el modo Dual con Notas y Tareas
             document.getElementById('modal-overlay').classList.add('dual-mode-active');
             
             document.getElementById('dual-notes-card').style.display = 'flex';
@@ -2294,7 +2305,6 @@
                             const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
                             const noteDot = hasNotesDay ? '<span class="note-dot"></span>' : '';
                             
-                            // Eventos Pointer para distinguir toque corto vs largo
                             const pressHandlers = `onpointerdown="handleDayPointerDown(event, ${year}, ${mI}, ${localW}, ${dI}, '${dtStr}')" onpointerup="handleDayPointerUp(event, ${year}, ${mI}, ${localW}, ${dI}, '${dtStr}')" onpointercancel="handleDayPointerCancel(event)" onpointerleave="handleDayPointerCancel(event)" oncontextmenu="event.preventDefault();"`;
                             
                             if (w.isMain && dI === fR) html += `<div class="${cl} block-start" ${pressHandlers}><span class="block-label">W${localW}</span>${d}${taskDot}${noteDot}</div>`;
@@ -2321,7 +2331,6 @@
             if(e && e.target.id !== 'modal-overlay') return;
             document.getElementById('modal-overlay').classList.remove('active');
             
-            // Restablecer estilos de modo dual y notas anchas
             document.getElementById('modal-overlay').classList.remove('dual-mode-active');
             document.getElementById('main-modal-card').classList.remove('wide');
             document.getElementById('dual-notes-card').style.display = 'none';

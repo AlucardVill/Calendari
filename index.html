@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1069,7 +1070,13 @@
 
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 25px;">
                     <button class="btn btn-cancel" onclick="toggleTheme()">Alternar Tema Oscuro / Claro</button>
-                    <button class="btn btn-cancel" onclick="exportData(); closeModal()">Exportar Datos (Copia de Seguridad)</button>
+                    
+                    <button class="btn btn-save" onclick="syncExport()" style="background: var(--accent); color: #000;">📥 Guardar Copia de Seguridad</button>
+                    <label class="btn btn-cancel" style="text-align: center; cursor: pointer; display: flex; justify-content: center; align-items: center;">
+                        📤 Cargar Copia de Seguridad
+                        <input type="file" id="import-file-input" accept=".json" onchange="syncImport(event)" style="display: none;">
+                    </label>
+                    
                 </div>
                 <div class="modal-actions" style="margin-top: 25px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div>
             </div>
@@ -2917,6 +2924,99 @@
             if (document.getElementById('qbar-fill')) updateQuarterBar();
         }
 
+        // ==========================================
+        // SISTEMA DE SINCRONIZACIÓN (HÍBRIDO PC/ANDROID)
+        // ==========================================
+
+        async function syncExport() {
+            let backup = { 
+                tasks: tasksData, 
+                entornos: entornosData, 
+                work: workConfig, 
+                block: blockConfig, 
+                day: dayConfig, 
+                markers: markersData, 
+                collapsed: collapsedMonths, 
+                trackedYears: trackedYears, 
+                timerStats: timerStats, 
+                timersList: timersList,
+                notes: notesData
+            };
+            const jsonStr = JSON.stringify(backup, null, 2);
+
+            if ('showSaveFilePicker' in window) {
+                try {
+                    const fileHandle = await window.showSaveFilePicker({
+                        suggestedName: `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`,
+                        types: [{
+                            description: 'Archivo JSON',
+                            accept: { 'application/json': ['.json'] },
+                        }],
+                    });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(jsonStr);
+                    await writable.close();
+                    alert("✅ Copia guardada exitosamente en la carpeta elegida.");
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error("Error al guardar:", err);
+                        alert("Error al guardar el archivo.");
+                    }
+                }
+            } else {
+                const blob = new Blob([jsonStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob); 
+                const a = document.createElement("a");
+                a.href = url; 
+                a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a); 
+                a.click(); 
+                document.body.removeChild(a); 
+                URL.revokeObjectURL(url);
+                
+                alert("✅ Copia guardada en tu carpeta de Descargas. Si usas Google Drive, se sincronizará automáticamente.");
+            }
+        }
+
+        function syncImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.tasks || !data.timersList) {
+                        alert("⚠️ El archivo no parece ser una copia de seguridad válida de Tiempo.");
+                        return;
+                    }
+
+                    if(confirm("⚠️ ¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.")) {
+                        if (data.tasks) localStorage.setItem('wkTasks', JSON.stringify(data.tasks));
+                        if (data.entornos) localStorage.setItem('wkEntornos', JSON.stringify(data.entornos));
+                        if (data.work) localStorage.setItem('wkWorkCfg', JSON.stringify(data.work));
+                        if (data.block) localStorage.setItem('wkBlockCfg', JSON.stringify(data.block));
+                        if (data.day) localStorage.setItem('wkDayCfg', JSON.stringify(data.day));
+                        if (data.markers) localStorage.setItem('wkMarkers', JSON.stringify(data.markers));
+                        if (data.collapsed) localStorage.setItem('wkCollapsedMonths', JSON.stringify(data.collapsed));
+                        if (data.trackedYears) localStorage.setItem('wkYears', JSON.stringify(data.trackedYears));
+                        if (data.timerStats) localStorage.setItem('wkTimerStats', JSON.stringify(data.timerStats));
+                        if (data.timersList) localStorage.setItem('wkTimersList', JSON.stringify(data.timersList));
+                        if (data.notes) localStorage.setItem('wkNotes', JSON.stringify(data.notes));
+
+                        alert("✅ Datos restaurados correctamente. La página se reiniciará para aplicar los cambios.");
+                        location.reload(); 
+                    }
+                } catch (err) {
+                    alert("❌ Error al leer el archivo. Asegúrate de que sea un JSON válido.");
+                    console.error(err);
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
         applyThemeColors();
         restoreBars(); drawCalendar(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();
         renderTimersUI();
@@ -2924,3 +3024,4 @@
     </script>
 </body>
 </html>
+```

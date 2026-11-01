@@ -404,10 +404,10 @@
             width: 550px; max-width: 95vw;
         }
         
-        /* ------------- TAMAÑOS FIJOS Y EXACTOS PARA EL MODO DUAL ------------- */
+        /* ------------- TAMAÑOS EXACTOS Y FIJOS (ACCIÓN A LA MITAD DE ALTURA) ------------- */
         .modal-overlay.dual-mode-active {
-            padding: 10px;
-            gap: 10px; /* Separación fija entre las dos tarjetas */
+            padding: 8px;
+            gap: 8px;
         }
         
         /* Tarjeta superior: NOTAS (Grande y fija) */
@@ -416,22 +416,23 @@
             flex-direction: column;
             width: 340px;
             max-width: 95vw;
-            height: 220px; /* Tamaño fijo superior */
-            min-height: 220px;
-            max-height: 220px;
+            height: 260px;
+            min-height: 260px;
+            max-height: 260px;
             margin-bottom: 0;
             box-sizing: border-box;
         }
         
-        /* Tarjeta inferior: NUEVA ACCIÓN (Más pequeña y fija con scroll interno si hace falta) */
+        /* Tarjeta inferior: NUEVA ACCIÓN (Reducida a la mitad de tamaño, fija, con scroll interno) */
         .modal-overlay.dual-mode-active #main-modal-card {
             width: 340px;
             max-width: 95vw;
-            height: 290px; /* Tamaño fijo inferior compacto */
-            min-height: 290px;
-            max-height: 290px;
-            overflow-y: auto; /* Permite desplazarse dentro de la acción si el contenido es largo */
+            height: 175px; /* Altura compacta equivalente a la mitad */
+            min-height: 175px;
+            max-height: 175px;
+            overflow-y: auto; /* Permite desplazarse internamente por los campos de acción */
             box-sizing: border-box;
+            padding: 10px 16px;
         }
 
         /* Cuadro de texto de notas llenando exactamente su tarjeta grande */
@@ -454,38 +455,38 @@
 
         .modal-card h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
         
-        .modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 
         .input-group { margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--subtext); font-weight: 500;}
         .input-group input[type="text"], .input-group input[type="number"], .input-group input[type="time"], .input-group select { width: auto; min-width: 70px; max-width: 170px; background: var(--input-bg); border: 1px solid var(--border-input); color: var(--text); padding: 6px; border-radius: 8px; text-align: center; font-weight: 600; font-family: inherit; transition: border-color 0.2s; outline: none;}
         .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
         .input-group input[type="color"] { background: none; border: none; padding: 0; width: 36px; height: 36px; cursor: pointer; border-radius: 8px; }
-        .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
-        .btn { flex: 1; padding: 8px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;}
+        .modal-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .btn { flex: 1; padding: 6px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;}
         .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
         .btn:active { transform: scale(0.96); }
         .btn-save { background: var(--accent); color: var(--btn-text); }
         .btn-cancel { background: var(--item-bg); color: var(--text); border: 1px solid var(--border-input); }
         .btn-delete { background: var(--sunday); color: var(--btn-text); }
 
-        .tc-desc { margin-bottom: 6px; }
+        .tc-desc { margin-bottom: 4px; }
         .tc-desc input {
             width: 100%; box-sizing: border-box;
             background: var(--input-bg); border: 1px solid var(--border-input);
-            color: var(--text); padding: 4px 8px; border-radius: 6px; height: 30px;
+            color: var(--text); padding: 4px 8px; border-radius: 6px; height: 26px;
             font-size: 0.8rem; font-family: inherit; font-weight: 500;
             outline: none; transition: border-color 0.2s;
         }
         .tc-desc input:focus { border-color: var(--accent); }
         .tc-desc input::placeholder { color: var(--muted); }
 
-        .tc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+        .tc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 4px; }
         .tc-field { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
         .tc-field label { font-size: 0.52rem; color: var(--subtext); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
         .tc-field select, .tc-field input {
             width: 100%; box-sizing: border-box;
             background: var(--input-bg); border: 1px solid var(--border-input);
-            color: var(--text); padding: 2px 6px; border-radius: 6px; height: 30px;
+            color: var(--text); padding: 2px 6px; border-radius: 6px; height: 26px;
             font-size: 0.8rem; font-family: inherit; font-weight: 500;
             outline: none; transition: border-color 0.2s;
         }
@@ -498,7 +499,7 @@
         }
         .tc-field input[type="time"] { color-scheme: dark; }
         [data-theme="light"] .tc-field input[type="time"] { color-scheme: light; }
-        .tc-field input[type="color"] { padding: 1px; height: 28px; width: 100%; cursor: pointer; border-radius: 6px; }
+        .tc-field input[type="color"] { padding: 1px; height: 26px; width: 100%; cursor: pointer; border-radius: 6px; }
 
         .checkbox-group { display: flex; gap: 3px; flex-wrap: wrap; }
         .chk-btn {
@@ -974,7 +975,7 @@
                         <div class="tc-field"><label>Mes</label><select id="inp-tc-month" onchange="updateWeekDropdown()"></select></div>
                         <div class="tc-field"><label>Semana</label><select id="inp-tc-week"></select></div>
                     </div>
-                    <div class="tc-field" style="margin-bottom: 6px;">
+                    <div class="tc-field" style="margin-bottom: 4px;">
                         <label>Día (Opcional)</label>
                         <select id="inp-tc-day">
                             <option value="">—</option>
@@ -986,11 +987,11 @@
                 </div>
 
                 <div id="tc-entorno-fields" style="display:none;">
-                    <div class="tc-field" style="margin-bottom: 6px;">
+                    <div class="tc-field" style="margin-bottom: 4px;">
                         <label>Meses del Trimestre</label>
                         <div class="checkbox-group" id="chk-months"></div>
                     </div>
-                    <div class="tc-field" style="margin-bottom: 6px;">
+                    <div class="tc-field" style="margin-bottom: 4px;">
                         <label>Semanas del Mes</label>
                         <div class="checkbox-group" id="chk-weeks">
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">W0</div>
@@ -1001,7 +1002,7 @@
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="5">W5</div>
                         </div>
                     </div>
-                    <div class="tc-field" style="margin-bottom: 6px;">
+                    <div class="tc-field" style="margin-bottom: 4px;">
                         <label>Días de la semana</label>
                         <div class="checkbox-group" id="chk-days">
                             <div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">L</div>

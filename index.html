@@ -111,27 +111,6 @@
         .extra-timer:active {
             cursor: grabbing;
         }
-        
-        /* Estilos de minimización individual */
-        .timer-widget.minimized {
-            padding: 8px 16px;
-            background: var(--item-bg);
-        }
-        .timer-widget.minimized .timer-input-group,
-        .timer-widget.minimized .timer-controls {
-            display: none !important;
-        }
-        .timer-widget.minimized .timer-display {
-            font-size: 0.9rem;
-            margin-top: 0;
-            text-align: right;
-            padding-right: 24px;
-        }
-        .timer-widget.minimized .timer-title {
-            position: static;
-            font-size: 0.65rem;
-        }
-
         .timer-title { position: absolute; top: 4px; left: 16px; font-size: 0.55rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .timer-input-group { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
         .timer-input-group input { 
@@ -160,13 +139,6 @@
         
         .t-btn-delete { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 4px; font-size: 1rem; border-radius: 6px; transition: color 0.2s; }
         .t-btn-delete:hover { color: var(--sunday); }
-
-        .t-btn-collapse {
-            position: absolute; top: 4px; right: 8px; background: transparent; border: none;
-            color: var(--muted); font-size: 0.7rem; font-weight: bold; cursor: pointer; padding: 2px 6px;
-            transition: color 0.2s; z-index: 10;
-        }
-        .t-btn-collapse:hover { color: var(--accent); }
 
         .add-timer-inline-btn {
             background: transparent; border: 1px dashed var(--border-input); color: var(--muted);
@@ -446,11 +418,13 @@
             width: 550px; max-width: 95vw;
         }
         
+        /* ------------- TAMAÑOS EXACTOS Y FIJOS (ACCIÓN A LA MITAD DE ALTURA) ------------- */
         .modal-overlay.dual-mode-active {
             padding: 8px;
             gap: 8px;
         }
         
+        /* Tarjeta superior: NOTAS (Grande y fija) */
         .modal-overlay.dual-mode-active #dual-notes-card {
             display: flex !important;
             flex-direction: column;
@@ -463,17 +437,19 @@
             box-sizing: border-box;
         }
         
+        /* Tarjeta inferior: NUEVA ACCIÓN (Reducida a la mitad de tamaño, fija, con scroll interno) */
         .modal-overlay.dual-mode-active #main-modal-card {
             width: 340px;
             max-width: 95vw;
-            height: 175px; 
+            height: 175px; /* Altura compacta equivalente a la mitad */
             min-height: 175px;
             max-height: 175px;
-            overflow-y: auto; 
+            overflow-y: auto; /* Permite desplazarse internamente por los campos de acción */
             box-sizing: border-box;
             padding: 10px 16px;
         }
 
+        /* Cuadro de texto de notas llenando exactamente su tarjeta grande */
         .modal-overlay.dual-mode-active #dual-notes-text {
             flex: 1;
             width: 100%;
@@ -489,6 +465,7 @@
             font-size: 0.85rem;
             outline: none;
         }
+        /* ---------------------------------------------------------------------------------- */
 
         .modal-card h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
         
@@ -1164,7 +1141,7 @@
         let globalLastHourEnd = localStorage.getItem('wkLastHourEnd') || '';
         
         let timersList = JSON.parse(localStorage.getItem('wkTimersList')) || [
-            { id: 'general', name: 'General', tMode: 'up', tRunning: false, tRef: 0, tAcc: 0, minimized: false }
+            { id: 'general', name: 'General', tMode: 'up', tRunning: false, tRef: 0, tAcc: 0 }
         ];
 
         let extraTimersFolded = localStorage.getItem('wkExtraTimersFolded') === 'true';
@@ -1238,13 +1215,9 @@
 
             timersList.forEach((t, index) => {
                 const isGeneral = t.id === 'general';
-                const isMinimized = t.minimized === true;
-                const cardClass = isGeneral ? `timer-widget ${isMinimized ? 'minimized' : ''}` : `timer-widget extra-timer ${isMinimized ? 'minimized' : ''}`;
+                const cardClass = isGeneral ? 'timer-widget' : 'timer-widget extra-timer';
                 const deleteBtnHtml = !isGeneral ? `<button class="t-btn-delete" onclick="deleteTimer('${t.id}')" title="Eliminar">×</button>` : '';
                 const addBtnHtml = isGeneral ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
-                
-                // Botón de colapsar individual para todos los temporizadores
-                const collapseBtnHtml = `<button class="t-btn-collapse" onclick="toggleMinimizeTimer('${t.id}')" title="${isMinimized ? 'Expandir' : 'Minimizar'}">${isMinimized ? '▼' : '▲'}</button>`;
 
                 let dragAttrs = '';
                 if (!isGeneral) {
@@ -1254,7 +1227,6 @@
                 html += `
                 <div class="${cardClass}" id="widget-${t.id}" data-index="${index}" ${dragAttrs}>
                     <span class="timer-title">${t.name}</span>
-                    ${collapseBtnHtml}
                     <div class="timer-input-group">
                         <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" onchange="syncTimerInputs('${t.id}')">
                         <span>h</span>
@@ -1281,14 +1253,6 @@
             updateTimersDisplayValues();
         }
 
-        function toggleMinimizeTimer(id) {
-            let t = timersList.find(x => x.id === id);
-            if (!t) return;
-            t.minimized = !t.minimized;
-            saveTimersState();
-            renderTimersUI();
-        }
-
         function syncTimerInputs(id) {
             let t = timersList.find(x => x.id === id);
             if (!t) return;
@@ -1297,9 +1261,11 @@
             saveTimersState();
         }
 
+        /* --- LÓGICA DE DRAG & DROP (ESCRITORIO Y TÁCTIL) PARA TEMPORIZADORES SECUNDARIOS --- */
         let draggedIndex = null;
         let touchDragEl = null;
         let touchStartY = 0;
+        let originalY = 0;
 
         function onDragStart(e, index) {
             if (timersList[index].id === 'general') return;
@@ -1316,7 +1282,7 @@
         function onDrop(e, targetIndex) {
             e.preventDefault();
             if (draggedIndex === null || draggedIndex === targetIndex) return;
-            if (timersList[targetIndex].id === 'general') return;
+            if (timersList[targetIndex].id === 'general') return; // No mover sobre el general
 
             let movedItem = timersList.splice(draggedIndex, 1)[0];
             timersList.splice(targetIndex, 0, movedItem);
@@ -1330,8 +1296,10 @@
             draggedIndex = null;
         }
 
+        // Soporte táctil avanzado para reordenar
         function onTouchStart(e, index) {
             if (timersList[index].id === 'general') return;
+            // Evitar arrastre si se toca un botón o input
             if (['INPUT', 'BUTTON', 'SVG', 'PATH', 'RECT', 'CIRCLE'].includes(e.target.tagName)) return;
             
             draggedIndex = index;
@@ -1343,12 +1311,13 @@
 
         function onTouchMove(e) {
             if (draggedIndex === null || !touchDragEl) return;
-            e.preventDefault();
+            e.preventDefault(); // Prevenir scroll mientras se reordena
             
             let currentY = e.touches[0].clientY;
             let diffY = currentY - touchStartY;
             touchDragEl.style.transform = `translateY(${diffY}px)`;
 
+            // Encontrar elemento bajo el toque
             let touch = e.touches[0];
             let elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             let targetWidget = elementBelow ? elementBelow.closest('.extra-timer') : null;
@@ -1359,9 +1328,10 @@
                     let movedItem = timersList.splice(draggedIndex, 1)[0];
                     timersList.splice(targetIndex, 0, movedItem);
                     draggedIndex = targetIndex;
-                    touchStartY = currentY;
+                    touchStartY = currentY; // Resetear base
                     saveTimersState();
                     renderTimersUI();
+                    // Reasignar el elemento arrastrado tras el re-render
                     touchDragEl = document.querySelector(`[data-index='${draggedIndex}']`);
                     if (touchDragEl) touchDragEl.classList.add('dragging');
                 }
@@ -1377,6 +1347,7 @@
             touchDragEl = null;
             renderTimersUI();
         }
+        /* -------------------------------------------------------------------------------- */
 
         function toggleExtraTimersFold() {
             extraTimersFolded = !extraTimersFolded;
@@ -1417,8 +1388,7 @@
                 tRef: 0,
                 tAcc: initialAcc,
                 inputH: h > 0 ? h : '',
-                inputM: m > 0 ? m : '',
-                minimized: false
+                inputM: m > 0 ? m : ''
             });
 
             extraTimersFolded = false;
@@ -1769,6 +1739,8 @@
             openModal(); 
         }
         
+        /* -------------- LÓGICA DE NOTAS -------------- */
+        
         function openNotesModal() {
             document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             
@@ -1833,6 +1805,7 @@
             }
         }
         
+        /* -------------- LÓGICA DE PULSACIÓN CORTA Y LARGA -------------- */
         let pressTimer = null;
         let isPressing = false;
         let pressStartPos = {x:0, y:0};
@@ -1880,6 +1853,7 @@
             
             openTaskCreateModal(mI, localW, dI);
         }
+
 
         function showDayStats(dateStr, wNum, dI, mI) {
             document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');

@@ -74,7 +74,6 @@
         .header-menu-btn { background: transparent; border: none; color: var(--text); font-size: 1.5rem; font-weight: bold; cursor: pointer; padding: 4px 12px; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
         .header-menu-btn:active { transform: scale(0.9); }
 
-        /* Barra de control de plegado de temporizadores adicionales */
         .timers-header-bar {
             display: flex; justify-content: space-between; align-items: center;
             margin: -5px 6px 6px 6px; font-size: 0.65rem; color: var(--muted); font-weight: 700;
@@ -111,7 +110,7 @@
             color: var(--text); letter-spacing: -0.02em; flex: 1; text-align: center; margin-top: 6px;
         }
         .timer-display.running { color: var(--accent); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-        .timer-controls { display: flex; gap: 6px; margin-top: 6px; align-items: center; }
+        .timer-controls { display: flex; gap: 4px; margin-top: 6px; align-items: center; }
         
         .t-btn { 
             width: 34px; height: 34px; border-radius: 10px; background: var(--item-bg); 
@@ -850,8 +849,28 @@
 
             <div id="modal-content-general" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 20px;">Configuración</h3>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <button class="btn btn-cancel" onclick="toggleTheme(); closeModal()">Alternar Tema Oscuro / Claro</button>
+                
+                <h4 style="color: var(--subtext); margin-bottom: 10px; font-size: 0.85rem;">Colores de Interfaz</h4>
+                <div class="input-group">
+                    <label>Semana Pendiente:</label>
+                    <select id="theme-week-color" onchange="changeThemeColors()">
+                        <option value="green">Verde</option>
+                        <option value="blue">Azul</option>
+                        <option value="orange">Naranja</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Contornos Generales:</label>
+                    <select id="theme-border-color" onchange="changeThemeColors()">
+                        <option value="default">Por Defecto</option>
+                        <option value="green">Verde</option>
+                        <option value="blue">Azul</option>
+                        <option value="orange">Naranja</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 25px;">
+                    <button class="btn btn-cancel" onclick="toggleTheme()">Alternar Tema Oscuro / Claro</button>
                     <button class="btn btn-cancel" onclick="exportData(); closeModal()">Exportar Datos (Copia de Seguridad)</button>
                 </div>
                 <div class="modal-actions" style="margin-top: 25px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div>
@@ -980,6 +999,35 @@
     </script>
 
     <script>
+        const themeColors = {
+            green: '#10b981',
+            blue: '#3b82f6',
+            orange: '#f59e0b'
+        };
+
+        function changeThemeColors() {
+            const weekC = document.getElementById('theme-week-color').value;
+            const borderC = document.getElementById('theme-border-color').value;
+            localStorage.setItem('wkWeekColor', weekC);
+            localStorage.setItem('wkBorderColor', borderC);
+            applyThemeColors();
+        }
+
+        function applyThemeColors() {
+            const weekC = localStorage.getItem('wkWeekColor') || 'green';
+            const borderC = localStorage.getItem('wkBorderColor') || 'default';
+            
+            document.documentElement.style.setProperty('--week-box-active', themeColors[weekC] || themeColors.green);
+            
+            if (borderC === 'default') {
+                document.documentElement.style.removeProperty('--border');
+                document.documentElement.style.removeProperty('--border-input');
+            } else {
+                document.documentElement.style.setProperty('--border', themeColors[borderC]);
+                document.documentElement.style.setProperty('--border-input', themeColors[borderC]);
+            }
+        }
+
         let globalLastHourEnd = localStorage.getItem('wkLastHourEnd') || '';
         
         let timersList = JSON.parse(localStorage.getItem('wkTimersList')) || [
@@ -1070,10 +1118,13 @@
                     </div>
                     <div class="timer-display" id="t-display-${t.id}">00:00</div>
                     <div class="timer-controls">
-                        <button class="t-btn" id="t-btn-toggle-${t.id}" onclick="toggleTimer('${t.id}')">
+                        <button class="t-btn" id="t-btn-toggle-${t.id}" onclick="toggleTimer('${t.id}')" title="Iniciar / Pausar">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                         </button>
-                        <button class="t-btn" onclick="resetTimer('${t.id}')">
+                        <button class="t-btn" onclick="stopTimer('${t.id}')" title="Detener">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+                        </button>
+                        <button class="t-btn" onclick="resetTimer('${t.id}')" title="Reiniciar">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                         </button>
                         ${deleteBtnHtml}
@@ -1127,7 +1178,6 @@
                 inputM: m > 0 ? m : ''
             });
 
-            // Al añadir uno nuevo, los desplegamos para que se vea
             extraTimersFolded = false;
             localStorage.setItem('wkExtraTimersFolded', extraTimersFolded);
 
@@ -1186,6 +1236,18 @@
             updateTimersDisplayValues();
         }
 
+        function stopTimer(id) {
+            stopAlarmSound();
+            let t = timersList.find(x => x.id === id);
+            if (!t) return;
+            
+            t.tRunning = false;
+            t.tAcc = 0;
+            t.tRef = 0;
+            saveTimersState();
+            updateTimersDisplayValues();
+        }
+
         function resetTimer(id) {
             stopAlarmSound();
             let t = timersList.find(x => x.id === id);
@@ -1215,6 +1277,7 @@
         }
 
         function recordGoal(success) {
+            stopAlarmSound();
             timerStats.push({
                 date: new Date().toISOString(),
                 timerName: activeTimerForGoal || 'General',
@@ -1430,6 +1493,10 @@
         function openGeneralModal() { 
             document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-general').style.display = 'block'; 
+            
+            document.getElementById('theme-week-color').value = localStorage.getItem('wkWeekColor') || 'green';
+            document.getElementById('theme-border-color').value = localStorage.getItem('wkBorderColor') || 'default';
+            
             openModal(); 
         }
 
@@ -2288,6 +2355,7 @@
             if (document.getElementById('qbar-fill')) updateQuarterBar();
         }
 
+        applyThemeColors();
         restoreBars(); drawCalendar(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();
         renderTimersUI();
         setInterval(update, 1000); update();

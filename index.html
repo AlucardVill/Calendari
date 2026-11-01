@@ -112,12 +112,10 @@
             cursor: grabbing;
         }
 
-        /* Borde izquierdo de color por temporizador */
         .timer-widget.extra-timer {
             border-left: 3px solid var(--timer-color, var(--border));
         }
 
-        /* Puntito de color dentro del título */
         .timer-color-dot {
             display: inline-block; width: 8px; height: 8px; border-radius: 50%;
             margin-right: 5px; cursor: pointer; vertical-align: middle;
@@ -127,29 +125,73 @@
         }
         .timer-color-dot:hover { transform: scale(1.35); }
 
-        /* Barra de temporizadores ocultos */
         .hidden-timers-bar {
-            display: none; flex-wrap: wrap; gap: 6px;
-            margin: 0 4px 10px 4px; padding: 8px 10px;
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 12px; box-shadow: var(--card-shadow);
-            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: none;
+            align-items: center;
+            gap: 6px;
+            margin: 0 4px 10px 4px;
+            padding: 5px 10px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: padding 0.2s ease;
+            min-height: 28px;
         }
         .hidden-timers-bar.active { display: flex; }
+        .hidden-timers-bar.expanded { padding: 8px 10px; }
+
+        .hidden-bar-toggle {
+            background: transparent; border: none; color: var(--muted);
+            font-size: 0.65rem; cursor: pointer; line-height: 1;
+            flex-shrink: 0; width: 14px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+            transition: color 0.2s, transform 0.25s;
+        }
+        .hidden-bar-toggle:hover { color: var(--accent); }
+
+        .hidden-bar-dots {
+            display: flex; align-items: center; gap: 7px;
+            flex: 1; min-width: 0;
+            overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+            padding: 2px 0;
+        }
+        .hidden-bar-dots::-webkit-scrollbar { display: none; }
+
+        .hidden-dot {
+            width: 9px; height: 9px; border-radius: 50%;
+            background: var(--dot-color);
+            box-shadow: 0 0 4px var(--dot-color);
+            cursor: pointer; flex-shrink: 0; border: none; padding: 0;
+            transition: transform 0.15s;
+        }
+        .hidden-dot:hover { transform: scale(1.4); }
+        .hidden-dot:active { transform: scale(0.9); }
+        .hidden-dot.is-running { animation: dotPulse 1.8s ease-in-out infinite; }
+
+        @keyframes dotPulse {
+            0%,100% { box-shadow: 0 0 4px var(--dot-color); }
+            50%     { box-shadow: 0 0 10px var(--dot-color), 0 0 18px var(--dot-color); }
+        }
+
+        .hidden-bar-pills { display: none; flex-wrap: wrap; gap: 6px; flex: 1; }
+        .hidden-timers-bar.expanded .hidden-bar-dots  { display: none; }
+        .hidden-timers-bar.expanded .hidden-bar-pills { display: flex; }
 
         .hidden-timer-pill {
             display: flex; align-items: center; gap: 6px;
-            padding: 5px 11px 5px 9px; border-radius: 999px;
+            padding: 4px 10px 4px 8px; border-radius: 999px;
             background: var(--item-bg); border: 1px solid var(--border-input);
             cursor: pointer; user-select: none; white-space: nowrap;
-            font-size: 0.68rem; font-weight: 700; color: var(--text);
+            font-size: 0.65rem; font-weight: 700; color: var(--text);
             transition: all 0.18s;
         }
         .hidden-timer-pill:hover { transform: translateY(-1px); border-color: var(--pill-color); box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
         .hidden-timer-pill:active { transform: scale(0.95); }
 
         .hidden-timer-pill .pill-dot {
-            width: 8px; height: 8px; border-radius: 50%;
+            width: 7px; height: 7px; border-radius: 50%;
             background: var(--pill-color); box-shadow: 0 0 6px var(--pill-color);
             flex-shrink: 0;
         }
@@ -158,11 +200,7 @@
             font-variant-numeric: tabular-nums; color: var(--pill-color);
             font-weight: 800; letter-spacing: -0.01em;
         }
-        .hidden-timer-pill.is-running .pill-dot { animation: pillPulse 1.6s ease-in-out infinite; }
-        @keyframes pillPulse {
-            0%,100% { box-shadow: 0 0 6px var(--pill-color); }
-            50%     { box-shadow: 0 0 14px var(--pill-color), 0 0 22px var(--pill-color); }
-        }
+        .hidden-timer-pill.is-running .pill-dot { animation: dotPulse 1.8s ease-in-out infinite; }
 
         .timer-title { position: absolute; top: 4px; left: 16px; font-size: 0.55rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .timer-input-group { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
@@ -1199,6 +1237,18 @@
         if (_migrated) localStorage.setItem('wkTimersList', JSON.stringify(timersList));
 
         let extraTimersFolded = localStorage.getItem('wkExtraTimersFolded') === 'true';
+        let hiddenBarExpanded = localStorage.getItem('wkHiddenBarExpanded') === 'true';
+
+        function toggleHiddenBar() {
+            hiddenBarExpanded = !hiddenBarExpanded;
+            localStorage.setItem('wkHiddenBarExpanded', hiddenBarExpanded);
+            const bar = document.getElementById('hidden-timers-bar');
+            if (!bar) return;
+            bar.classList.toggle('expanded', hiddenBarExpanded);
+            const tgl = bar.querySelector('.hidden-bar-toggle');
+            if (tgl) tgl.textContent = hiddenBarExpanded ? '▾' : '▸';
+        }
+
         let timerStats = JSON.parse(localStorage.getItem('wkTimerStats')) || [];
         let activeTimerForGoal = null; 
         
@@ -1337,9 +1387,19 @@
             });
             container.innerHTML = html;
 
+            // Barra colapsable de timers ocultos
             if (hiddenList.length > 0) {
                 hiddenBar.classList.add('active');
-                hiddenBar.innerHTML = hiddenList.map(t => `
+                hiddenBar.classList.toggle('expanded', hiddenBarExpanded);
+
+                const dotsHtml = hiddenList.map(t => `
+                    <button class="hidden-dot ${t.tRunning ? 'is-running' : ''}"
+                            style="--dot-color:${t.color}"
+                            onclick="toggleTimerHidden('${t.id}')"
+                            title="${t.name}${t.tRunning ? ' · corriendo' : ''} — clic para mostrar"></button>
+                `).join('');
+
+                const pillsHtml = hiddenList.map(t => `
                     <div class="hidden-timer-pill ${t.tRunning ? 'is-running' : ''}"
                          style="--pill-color:${t.color}"
                          onclick="toggleTimerHidden('${t.id}')"
@@ -1347,9 +1407,19 @@
                         <span class="pill-dot"></span>
                         <span class="pill-name">${t.name}</span>
                         <span class="pill-time" id="pill-time-${t.id}">00:00</span>
-                    </div>`).join('');
+                    </div>
+                `).join('');
+
+                hiddenBar.innerHTML = `
+                    <button class="hidden-bar-toggle"
+                            onclick="toggleHiddenBar()"
+                            title="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}">${hiddenBarExpanded ? '▾' : '▸'}</button>
+                    <div class="hidden-bar-dots">${dotsHtml}</div>
+                    <div class="hidden-bar-pills">${pillsHtml}</div>
+                `;
             } else {
                 hiddenBar.classList.remove('active');
+                hiddenBar.classList.remove('expanded');
                 hiddenBar.innerHTML = '';
             }
 

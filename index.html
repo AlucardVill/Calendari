@@ -24,7 +24,7 @@
         :root {
             --bg: #0a0a0a; --card: #141414; --text: #f3f4f6;
             --border: #262626; --border-input: #333333;
-            --track-bg: #262626; /* Separamos el fondo de las barras del borde general */
+            --track-bg: #262626; 
             --muted: #737373; --subtext: #a3a3a3;
             --item-bg: #1a1a1a; --input-bg: #0a0a0a;
             --past: #1f1f22; --today: #ffffff; --future: #10b981;
@@ -385,10 +385,32 @@
         .qbar-widget[data-mode="y"] .qbar-pct { color: var(--year-bar); }
         .qbar-widget[data-mode="b"] .qbar-pct { color: var(--bi-bar); }
 
-        .modal-overlay { display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 16px; }
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; background: var(--modal-bg); z-index: 1000; 
+            align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 16px; 
+            flex-direction: column; /* Permite apilar modales en modo dual */
+        }
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 22px; width: 300px; max-width: 90vw; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        .modal-card { 
+            background: var(--card); border: 1px solid var(--border); border-radius: 20px; 
+            padding: 22px; width: 300px; max-width: 90vw; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+            animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        
+        /* Reglas CSS dinámicas para cuando se abre el modo dual (pulsación larga en un día) */
+        .modal-overlay.dual-mode-active .modal-card {
+            height: 42vh;
+            max-height: 400px;
+            width: 320px;
+            overflow-y: auto;
+        }
+        .modal-overlay.dual-mode-active #dual-notes-card {
+            display: flex !important;
+        }
+
         .modal-card h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
         
         .modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -487,7 +509,11 @@
         .day:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: var(--item-bg); }
         
         .block-label { position: absolute; top: -10px; left: 0; font-size: 0.42rem; color: var(--block-id); font-weight: 800; z-index: 10; }
+        
         .task-dot { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 3px var(--accent); pointer-events: none; }
+        
+        /* Nuevo indicador visual para notas guardadas */
+        .note-dot { position: absolute; top: 2px; right: 2px; width: 3px; height: 3px; border-radius: 50%; background: var(--work); box-shadow: 0 0 3px var(--work); pointer-events: none; }
 
         .current-week-glow .day:not(.today) { 
             background-color: var(--current-week-bg); 
@@ -690,7 +716,6 @@
         </button>
     </div>
 
-    <!-- BARRA DE PLEGADO DISCRETA PARA TEMPORIZADORES ADICIONALES -->
     <div class="timers-header-bar" id="timers-header-bar" style="display: none;">
         <span id="timers-count-label">Temporizadores adicionales</span>
         <button class="timers-toggle-btn" id="timers-toggle-btn" onclick="toggleExtraTimersFold()">
@@ -698,7 +723,6 @@
         </button>
     </div>
 
-    <!-- CONTENEDOR DE TEMPORIZADORES -->
     <div class="timers-container" id="timers-container"></div>
 
     <div class="section-label">
@@ -817,8 +841,17 @@
         </div>
     </div>
 
+    <!-- Modales gestionados aquí -->
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
-        <div class="modal-card" onclick="event.stopPropagation()">
+        
+        <!-- Modal Secundario de Notas (Solo visible en Modo Dual al mantener presionado un día) -->
+        <div class="modal-card" id="dual-notes-card" style="display:none; margin-bottom: 12px; flex-direction:column;" onclick="event.stopPropagation()">
+            <h3 id="dual-notes-title" style="color: var(--accent); margin-top:0; margin-bottom: 10px;">Notas</h3>
+            <textarea id="dual-notes-text" style="flex:1; width:100%; box-sizing:border-box; resize:none; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:10px; font-family:inherit; font-size:0.85rem;" oninput="saveDualNotes()"></textarea>
+        </div>
+
+        <!-- Modal Principal -->
+        <div class="modal-card" id="main-modal-card" onclick="event.stopPropagation()">
             
             <div id="modal-content-goal" style="display:none; text-align: center;">
                 <h3 style="color: var(--accent); margin-bottom: 10px;">¡Tiempo Finalizado!</h3>
@@ -990,6 +1023,25 @@
                 <div class="input-group"><label>Color:</label><input type="color" id="inp-marker-color"></div>
                 <div class="modal-actions" style="flex-wrap: wrap;"><button class="btn btn-delete" onclick="deleteActiveMarker()" style="flex-basis: 100%; margin-bottom: 5px;">Eliminar Marcador</button><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveMarkerSettings()">Guardar</button></div>
             </div>
+
+            <!-- Nuevo contenido del modal de Notas -->
+            <div id="modal-content-notes" style="display:none; flex-direction:column; height:100%;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="color:var(--accent); margin:0;">Notas</h3>
+                    <select id="notes-mode" onchange="toggleNotesMode()" style="background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); border-radius:6px; padding:4px 8px; font-size:0.75rem; outline:none;">
+                        <option value="general">Generales</option>
+                        <option value="date">Por Fecha</option>
+                    </select>
+                </div>
+                <input type="date" id="notes-date-picker" style="display:none; margin-bottom:12px; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:8px; border-radius:8px; outline:none; font-family:inherit;" onchange="loadNoteForPicker()">
+                
+                <textarea id="notes-main-textarea" style="flex:1; min-height: 250px; width:100%; box-sizing:border-box; resize:none; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:10px; font-family:inherit; font-size:0.85rem;" oninput="saveMainNote()"></textarea>
+            
+                <div class="modal-actions" style="margin-top:15px;">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
+                </div>
+            </div>
+            
         </div>
     </div>
 
@@ -1040,6 +1092,8 @@
         let extraTimersFolded = localStorage.getItem('wkExtraTimersFolded') === 'true';
         let timerStats = JSON.parse(localStorage.getItem('wkTimerStats')) || [];
         let activeTimerForGoal = null; 
+        
+        let notesData = JSON.parse(localStorage.getItem('wkNotes')) || { general: '' };
 
         let audioCtx = null;
         let alarmInterval = null;
@@ -1146,7 +1200,7 @@
         }
 
         function openAddTimerModal() {
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-addtimer').style.display = 'block';
             document.getElementById('inp-newt-name').value = '';
             document.getElementById('inp-newt-h').value = '';
@@ -1273,7 +1327,7 @@
         }
 
         function openGoalModal() {
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('goal-modal-title').innerText = `¿Objetivo logrado para "${activeTimerForGoal || 'Temporizador'}"?`;
             document.getElementById('modal-content-goal').style.display = 'block';
             openModal();
@@ -1494,7 +1548,19 @@
         }
 
         function exportData() {
-            let backup = { tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, day: dayConfig, markers: markersData, collapsed: collapsedMonths, trackedYears: trackedYears, timerStats: timerStats, timersList: timersList };
+            let backup = { 
+                tasks: tasksData, 
+                entornos: entornosData, 
+                work: workConfig, 
+                block: blockConfig, 
+                day: dayConfig, 
+                markers: markersData, 
+                collapsed: collapsedMonths, 
+                trackedYears: trackedYears, 
+                timerStats: timerStats, 
+                timersList: timersList,
+                notes: notesData
+            };
             const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
             const url = URL.createObjectURL(blob); const a = document.createElement("a");
             a.href = url; a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
@@ -1508,7 +1574,7 @@
         }
 
         function openGeneralModal() { 
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-general').style.display = 'block'; 
             
             document.getElementById('theme-week-color').value = localStorage.getItem('wkWeekColor') || 'green';
@@ -1516,9 +1582,125 @@
             
             openModal(); 
         }
+        
+        /* -------------- LÓGICA DE NOTAS -------------- */
+        
+        function openNotesModal() {
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            
+            const content = document.getElementById('modal-content-notes');
+            content.style.display = 'flex';
+            document.getElementById('notes-mode').value = 'general';
+            toggleNotesMode();
+            openModal();
+        }
+
+        function toggleNotesMode() {
+            const mode = document.getElementById('notes-mode').value;
+            const picker = document.getElementById('notes-date-picker');
+            const ta = document.getElementById('notes-main-textarea');
+            
+            if (mode === 'general') {
+                picker.style.display = 'none';
+                ta.value = notesData.general || '';
+            } else {
+                picker.style.display = 'block';
+                if (!picker.value) {
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    picker.value = `${yyyy}-${mm}-${dd}`;
+                }
+                loadNoteForPicker();
+            }
+        }
+
+        function loadNoteForPicker() {
+            const date = document.getElementById('notes-date-picker').value;
+            const ta = document.getElementById('notes-main-textarea');
+            ta.value = notesData[date] || '';
+        }
+
+        function saveMainNote() {
+            const mode = document.getElementById('notes-mode').value;
+            const ta = document.getElementById('notes-main-textarea');
+            if (mode === 'general') {
+                notesData.general = ta.value;
+            } else {
+                const date = document.getElementById('notes-date-picker').value;
+                if (date) {
+                    notesData[date] = ta.value;
+                }
+            }
+            localStorage.setItem('wkNotes', JSON.stringify(notesData));
+            renderDayTaskMarks(); // Por si hay que actualizar puntos del calendario
+        }
+        
+        function saveDualNotes() {
+            const ta = document.getElementById('dual-notes-text');
+            const date = ta.dataset.date;
+            if (date) {
+                notesData[date] = ta.value;
+                localStorage.setItem('wkNotes', JSON.stringify(notesData));
+                renderQuarterDetailBody(); // Actualiza el punto indicador visual en tiempo real
+            }
+        }
+        
+        /* -------------- LÓGICA DE PULSACIÓN CORTA Y LARGA -------------- */
+        let pressTimer = null;
+        let isPressing = false;
+        let pressStartPos = {x:0, y:0};
+
+        function handleDayPointerDown(e, year, mI, localW, dI, dtStr) {
+            if (e.button !== 0 && e.pointerType === 'mouse') return;
+            isPressing = true;
+            pressStartPos = { x: e.clientX, y: e.clientY };
+            pressTimer = setTimeout(() => {
+                if (isPressing) {
+                    isPressing = false;
+                    handleLongPress(year, mI, localW, dI, dtStr);
+                }
+            }, 500); // 500ms para disparar pulsación larga (Dual Modal)
+        }
+
+        function handleDayPointerUp(e, year, mI, localW, dI, dtStr) {
+            if (isPressing) {
+                clearTimeout(pressTimer);
+                isPressing = false;
+                let dist = Math.hypot(e.clientX - pressStartPos.x, e.clientY - pressStartPos.y);
+                if (dist < 15) { // Tolerancia para que no se considere scroll
+                    handleShortPress(year, mI, localW, dI, dtStr);
+                }
+            }
+        }
+
+        function handleDayPointerCancel(e) {
+            isPressing = false;
+            clearTimeout(pressTimer);
+        }
+
+        function handleShortPress(year, mI, localW, dI, dtStr) {
+            // Un solo toque: ordena automáticamente los tabs para mostrar los registros correspondientes
+            setActiveTabM(mI % 3);
+            setActiveTabW(localW);
+        }
+
+        function handleLongPress(year, mI, localW, dI, dtStr) {
+            // Pulsación larga: Abre el modo Dual con Notas y Tareas
+            document.getElementById('modal-overlay').classList.add('dual-mode-active');
+            
+            document.getElementById('dual-notes-card').style.display = 'flex';
+            document.getElementById('dual-notes-title').innerText = `Notas del ${dtStr}`;
+            document.getElementById('dual-notes-text').value = notesData[dtStr] || '';
+            document.getElementById('dual-notes-text').dataset.date = dtStr;
+            
+            openTaskCreateModal(mI, localW, dI);
+        }
+
 
         function showDayStats(dateStr, wNum, dI, mI) {
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-daystats').style.display = 'block';
             document.getElementById('ds-title').innerText = `Día: ${dateStr}`;
             
@@ -1655,7 +1837,7 @@
             document.getElementById('inp-tc-hourEnd').value = '';
             document.getElementById('inp-tc-color').value = '#3b82f6';
             
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-taskcreate').style.display = 'block';
             openModal();
         }
@@ -1905,7 +2087,6 @@
             
             document.getElementById('qt-list-container').innerHTML = tasksHtml;
 
-            // ESTE ES EL CONTENEDOR ESPECÍFICO DEL BOTÓN PARA QUE QUEDE FIJO
             const toggleIcon = listDisplayMode === 'acciones' ? 'E' : 'A';
             const toggleTitle = listDisplayMode === 'acciones' ? 'Ver Entornos' : 'Ver Acciones';
             document.getElementById('toggle-btn-container').innerHTML = `<div class="mode-toggle-corner" onclick="toggleListDisplayMode()" title="${toggleTitle}">${toggleIcon}</div>`;
@@ -1953,7 +2134,11 @@
 
         function renderQuartersView() {
             const now = new Date(); const currentY = now.getFullYear(); const currentQ = Math.floor(now.getMonth() / 3); const isCurrentYear = selectedYear === currentY;
-            let html = `<div class="quarters-header"><button class="back-btn" onclick="goBackToYears()">← Años</button><div class="quarters-title">${selectedYear}</div><div style="width:76px"></div></div><div class="quarters-grid">`;
+            let html = `<div class="quarters-header">
+                <button class="back-btn" onclick="goBackToYears()">← Años</button>
+                <div class="quarters-title">${selectedYear}</div>
+                <button class="icon-btn" onclick="openNotesModal()" style="font-size:0.75rem; padding:6px 12px; height:32px;">Notas</button>
+            </div><div class="quarters-grid">`;
             for (let q = 0; q < 4; q++) {
                 const stats = getQuarterStats(selectedYear, q); const isCurrentQ = isCurrentYear && q === currentQ;
                 html += `<div class="quarter-compact ${isCurrentQ ? 'current' : ''}" onclick="openQuarterDetail(${q})">
@@ -2023,7 +2208,7 @@
         }
 
         function openMetricsModal() { 
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; 
             renderMetricsModalBody(selectedQuarter); 
             document.getElementById('modal-content-metrics').style.display = 'block'; 
@@ -2096,13 +2281,17 @@
                             
                             const hasEntornos = entornosData.some(e => e.year === year && e.q === Math.floor(mI/3) && e.months.includes(mI % 3) && e.weeks.includes(localW) && e.days.includes(dI));
                             const hasTasks = weekTasks.some(t => getTaskDay(t) === dI);
+                            let hasNotesDay = notesData[dtStr] && notesData[dtStr].trim().length > 0;
+                            
                             const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
+                            const noteDot = hasNotesDay ? '<span class="note-dot"></span>' : '';
                             
-                            const clickHandler = `openTaskCreateModal(${mI}, ${localW}, ${dI})`;
+                            // Eventos Pointer para distinguir toque corto vs largo
+                            const pressHandlers = `onpointerdown="handleDayPointerDown(event, ${year}, ${mI}, ${localW}, ${dI}, '${dtStr}')" onpointerup="handleDayPointerUp(event, ${year}, ${mI}, ${localW}, ${dI}, '${dtStr}')" onpointercancel="handleDayPointerCancel(event)" onpointerleave="handleDayPointerCancel(event)" oncontextmenu="event.preventDefault();"`;
                             
-                            if (w.isMain && dI === fR) html += `<div class="${cl} block-start" onclick="${clickHandler}"><span class="block-label">W${localW}</span>${d}${taskDot}</div>`;
-                            else if (w.isMain && dI === lR) html += `<div class="${cl} block-end" onclick="${clickHandler}">${d}${taskDot}</div>`;
-                            else html += `<div class="${cl}" onclick="${clickHandler}">${d}${taskDot}</div>`;
+                            if (w.isMain && dI === fR) html += `<div class="${cl} block-start" ${pressHandlers}><span class="block-label">W${localW}</span>${d}${taskDot}${noteDot}</div>`;
+                            else if (w.isMain && dI === lR) html += `<div class="${cl} block-end" ${pressHandlers}>${d}${taskDot}${noteDot}</div>`;
+                            else html += `<div class="${cl}" ${pressHandlers}>${d}${taskDot}${noteDot}</div>`;
                         }
                     });
                     html += `</div>`;
@@ -2123,7 +2312,12 @@
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
             document.getElementById('modal-overlay').classList.remove('active');
-            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer'].forEach(id => {
+            
+            // Restablecer estilos de modo dual
+            document.getElementById('modal-overlay').classList.remove('dual-mode-active');
+            document.getElementById('dual-notes-card').style.display = 'none';
+            
+            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
@@ -2131,7 +2325,7 @@
         }
 
         function openBlockModal() { 
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-block').style.display = 'block'; 
             document.getElementById('inp-block-start').value = blockConfig.startYear; 
             document.getElementById('inp-block-years').value = blockConfig.years; 
@@ -2149,7 +2343,7 @@
         }
 
         function openWorkModal() { 
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-work').style.display = 'block'; 
             document.getElementById('inp-work-start').value = workConfig.start; 
             document.getElementById('inp-work-end').value = workConfig.end; 
@@ -2171,7 +2365,7 @@
         }
 
         function openDayModal() { 
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-day').style.display = 'block'; 
             document.getElementById('inp-day-format').value = dayConfig.format; 
             openModal(); 
@@ -2231,7 +2425,7 @@
         }
         function openMarkerModal(barId, markerObj) {
             activeMarker = { barId, obj: markerObj }; 
-            document.querySelectorAll('.modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-marker').style.display = 'block';
             document.getElementById('inp-marker-color').value = markerObj.color; openModal();
         }

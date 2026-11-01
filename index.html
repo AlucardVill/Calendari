@@ -1903,11 +1903,12 @@
                 }
             }
             
+            document.getElementById('qt-list-container').innerHTML = tasksHtml;
+
+            // ESTE ES EL CONTENEDOR ESPECÍFICO DEL BOTÓN PARA QUE QUEDE FIJO
             const toggleIcon = listDisplayMode === 'acciones' ? 'E' : 'A';
             const toggleTitle = listDisplayMode === 'acciones' ? 'Ver Entornos' : 'Ver Acciones';
-            tasksHtml += `<div class="mode-toggle-corner" onclick="toggleListDisplayMode()" title="${toggleTitle}">${toggleIcon}</div>`;
-
-            document.getElementById('qt-list-container').innerHTML = tasksHtml;
+            document.getElementById('toggle-btn-container').innerHTML = `<div class="mode-toggle-corner" onclick="toggleListDisplayMode()" title="${toggleTitle}">${toggleIcon}</div>`;
         }
 
         function getQuarterStats(year, q) {
@@ -2108,7 +2109,7 @@
                 });
                 html += `</div></div>`;
             }
-            html += `<div class="quarter-tasks-wrapper"><div class="quarter-tasks-panel"><div id="qt-tabs-container"></div><div class="qt-list" id="qt-list-container"></div></div></div></div>`;
+            html += `<div class="quarter-tasks-wrapper"><div class="quarter-tasks-panel"><div id="qt-tabs-container"></div><div class="qt-list" id="qt-list-container"></div><div id="toggle-btn-container"></div></div></div></div>`;
             document.getElementById('calendar-detail-body').innerHTML = html; 
             updateQuarterBar();
             updateMasterTaskList();

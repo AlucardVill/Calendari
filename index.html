@@ -111,6 +111,59 @@
         .extra-timer:active {
             cursor: grabbing;
         }
+
+        /* Borde izquierdo de color por temporizador */
+        .timer-widget.extra-timer {
+            border-left: 3px solid var(--timer-color, var(--border));
+        }
+
+        /* Puntito de color dentro del título */
+        .timer-color-dot {
+            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+            margin-right: 5px; cursor: pointer; vertical-align: middle;
+            background: var(--timer-color);
+            box-shadow: 0 0 5px var(--timer-color);
+            transition: transform 0.2s;
+        }
+        .timer-color-dot:hover { transform: scale(1.35); }
+
+        /* Barra de temporizadores ocultos */
+        .hidden-timers-bar {
+            display: none; flex-wrap: wrap; gap: 6px;
+            margin: 0 4px 10px 4px; padding: 8px 10px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; box-shadow: var(--card-shadow);
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hidden-timers-bar.active { display: flex; }
+
+        .hidden-timer-pill {
+            display: flex; align-items: center; gap: 6px;
+            padding: 5px 11px 5px 9px; border-radius: 999px;
+            background: var(--item-bg); border: 1px solid var(--border-input);
+            cursor: pointer; user-select: none; white-space: nowrap;
+            font-size: 0.68rem; font-weight: 700; color: var(--text);
+            transition: all 0.18s;
+        }
+        .hidden-timer-pill:hover { transform: translateY(-1px); border-color: var(--pill-color); box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
+        .hidden-timer-pill:active { transform: scale(0.95); }
+
+        .hidden-timer-pill .pill-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--pill-color); box-shadow: 0 0 6px var(--pill-color);
+            flex-shrink: 0;
+        }
+        .hidden-timer-pill .pill-name { opacity: 0.85; }
+        .hidden-timer-pill .pill-time {
+            font-variant-numeric: tabular-nums; color: var(--pill-color);
+            font-weight: 800; letter-spacing: -0.01em;
+        }
+        .hidden-timer-pill.is-running .pill-dot { animation: pillPulse 1.6s ease-in-out infinite; }
+        @keyframes pillPulse {
+            0%,100% { box-shadow: 0 0 6px var(--pill-color); }
+            50%     { box-shadow: 0 0 14px var(--pill-color), 0 0 22px var(--pill-color); }
+        }
+
         .timer-title { position: absolute; top: 4px; left: 16px; font-size: 0.55rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .timer-input-group { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
         .timer-input-group input { 
@@ -418,13 +471,11 @@
             width: 550px; max-width: 95vw;
         }
         
-        /* ------------- TAMAÑOS EXACTOS Y FIJOS (ACCIÓN A LA MITAD DE ALTURA) ------------- */
         .modal-overlay.dual-mode-active {
             padding: 8px;
             gap: 8px;
         }
         
-        /* Tarjeta superior: NOTAS (Grande y fija) */
         .modal-overlay.dual-mode-active #dual-notes-card {
             display: flex !important;
             flex-direction: column;
@@ -437,19 +488,17 @@
             box-sizing: border-box;
         }
         
-        /* Tarjeta inferior: NUEVA ACCIÓN (Reducida a la mitad de tamaño, fija, con scroll interno) */
         .modal-overlay.dual-mode-active #main-modal-card {
             width: 340px;
             max-width: 95vw;
-            height: 175px; /* Altura compacta equivalente a la mitad */
+            height: 175px;
             min-height: 175px;
             max-height: 175px;
-            overflow-y: auto; /* Permite desplazarse internamente por los campos de acción */
+            overflow-y: auto;
             box-sizing: border-box;
             padding: 10px 16px;
         }
 
-        /* Cuadro de texto de notas llenando exactamente su tarjeta grande */
         .modal-overlay.dual-mode-active #dual-notes-text {
             flex: 1;
             width: 100%;
@@ -465,7 +514,6 @@
             font-size: 0.85rem;
             outline: none;
         }
-        /* ---------------------------------------------------------------------------------- */
 
         .modal-card h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
         
@@ -778,6 +826,7 @@
         </button>
     </div>
 
+    <div class="hidden-timers-bar" id="hidden-timers-bar"></div>
     <div class="timers-container" id="timers-container"></div>
 
     <div class="section-label">
@@ -896,16 +945,13 @@
         </div>
     </div>
 
-    <!-- Modales gestionados aquí -->
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         
-        <!-- Modal Secundario de Notas (Solo visible en Modo Dual al mantener presionado un día) -->
         <div class="modal-card" id="dual-notes-card" style="display:none;" onclick="event.stopPropagation()">
             <h3 id="dual-notes-title" style="color: var(--accent); margin-top:0; margin-bottom: 8px;">Notas</h3>
             <textarea id="dual-notes-text" oninput="saveDualNotes()"></textarea>
         </div>
 
-        <!-- Modal Principal -->
         <div class="modal-card" id="main-modal-card" onclick="event.stopPropagation()">
             
             <div id="modal-content-goal" style="display:none; text-align: center;">
@@ -1079,7 +1125,6 @@
                 <div class="modal-actions" style="flex-wrap: wrap;"><button class="btn btn-delete" onclick="deleteActiveMarker()" style="flex-basis: 100%; margin-bottom: 5px;">Eliminar Marcador</button><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveMarkerSettings()">Guardar</button></div>
             </div>
 
-            <!-- Modal de Notas independiente -->
             <div id="modal-content-notes" style="display:none; flex-direction:column; height:100%;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="color:var(--accent); margin:0;">Notas</h3>
@@ -1140,9 +1185,18 @@
 
         let globalLastHourEnd = localStorage.getItem('wkLastHourEnd') || '';
         
+        const TIMER_PALETTE = ['#10b981','#3b82f6','#f59e0b','#ec4899','#8b5cf6','#06b6d4','#ef4444','#84cc16'];
+
         let timersList = JSON.parse(localStorage.getItem('wkTimersList')) || [
-            { id: 'general', name: 'General', tMode: 'up', tRunning: false, tRef: 0, tAcc: 0 }
+            { id:'general', name:'General', tMode:'up', tRunning:false, tRef:0, tAcc:0, color:'#10b981' }
         ];
+
+        let _migrated = false;
+        timersList.forEach((t, i) => {
+            if (!t.color) { t.color = TIMER_PALETTE[i % TIMER_PALETTE.length]; _migrated = true; }
+            if (t.minimized && t.id !== 'general') { t.hidden = true; delete t.minimized; _migrated = true; }
+        });
+        if (_migrated) localStorage.setItem('wkTimersList', JSON.stringify(timersList));
 
         let extraTimersFolded = localStorage.getItem('wkExtraTimersFolded') === 'true';
         let timerStats = JSON.parse(localStorage.getItem('wkTimerStats')) || [];
@@ -1191,33 +1245,62 @@
             }
         }
 
+        function toggleTimerHidden(id) {
+            const t = timersList.find(x => x.id === id);
+            if (!t || t.id === 'general') return;
+            t.hidden = !t.hidden;
+            saveTimersState();
+            renderTimersUI();
+        }
+
+        function cycleTimerColor(id) {
+            const t = timersList.find(x => x.id === id);
+            if (!t) return;
+            const i = TIMER_PALETTE.indexOf(t.color);
+            t.color = TIMER_PALETTE[(i + 1) % TIMER_PALETTE.length];
+            saveTimersState();
+            renderTimersUI();
+        }
+
         function renderTimersUI() {
             const container = document.getElementById('timers-container');
             const headerBar = document.getElementById('timers-header-bar');
-            let html = '';
-            
-            let extraCount = timersList.filter(t => t.id !== 'general').length;
-            
-            if (extraCount > 0) {
+            const hiddenBar = document.getElementById('hidden-timers-bar');
+
+            const visibleExtras = timersList.filter(t => t.id !== 'general' && !t.hidden).length;
+            const hiddenList    = timersList.filter(t => t.id !== 'general' && t.hidden);
+            const totalExtras   = visibleExtras + hiddenList.length;
+
+            if (totalExtras > 0) {
                 headerBar.style.display = 'flex';
-                document.getElementById('timers-count-label').innerText = `Adicionales (${extraCount})`;
-                document.getElementById('timers-toggle-txt').innerText = extraTimersFolded ? 'Mostrar' : 'Ocultar';
-                document.getElementById('timers-toggle-icon').innerText = extraTimersFolded ? '▼' : '▲';
-                if (extraTimersFolded) {
-                    container.classList.add('collapsed');
-                } else {
-                    container.classList.remove('collapsed');
-                }
+                const label = hiddenList.length
+                    ? `Adicionales (${visibleExtras}) · ${hiddenList.length} oculto${hiddenList.length>1?'s':''}`
+                    : `Adicionales (${visibleExtras})`;
+                document.getElementById('timers-count-label').innerText = label;
+                document.getElementById('timers-toggle-txt').innerText =
+                    extraTimersFolded ? 'Mostrar' : 'Ocultar';
+                document.getElementById('timers-toggle-icon').innerText =
+                    extraTimersFolded ? '▼' : '▲';
+                container.classList.toggle('collapsed', extraTimersFolded);
             } else {
                 headerBar.style.display = 'none';
                 container.classList.remove('collapsed');
             }
 
+            let html = '';
             timersList.forEach((t, index) => {
+                if (t.hidden) return;
                 const isGeneral = t.id === 'general';
-                const cardClass = isGeneral ? 'timer-widget' : 'timer-widget extra-timer';
-                const deleteBtnHtml = !isGeneral ? `<button class="t-btn-delete" onclick="deleteTimer('${t.id}')" title="Eliminar">×</button>` : '';
-                const addBtnHtml = isGeneral ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
+                const cardClass = isGeneral
+                    ? 'timer-widget'
+                    : 'timer-widget extra-timer';
+                const styleAttr = t.color ? `style="--timer-color:${t.color}"` : '';
+                const deleteBtn = !isGeneral
+                    ? `<button class="t-btn-delete" onclick="deleteTimer('${t.id}')" title="Eliminar">×</button>` : '';
+                const addBtn = isGeneral
+                    ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
+                const hideBtn = !isGeneral
+                    ? `<button class="t-btn" onclick="toggleTimerHidden('${t.id}')" title="Ocultar" style="width:28px; height:28px; border-radius:8px; background:var(--item-bg); border:1px solid var(--border-input); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer;">▲</button>` : '';
 
                 let dragAttrs = '';
                 if (!isGeneral) {
@@ -1225,8 +1308,10 @@
                 }
 
                 html += `
-                <div class="${cardClass}" id="widget-${t.id}" data-index="${index}" ${dragAttrs}>
-                    <span class="timer-title">${t.name}</span>
+                <div class="${cardClass}" id="widget-${t.id}" data-index="${index}" ${styleAttr} ${dragAttrs}>
+                    <span class="timer-title">
+                        <span class="timer-color-dot" onclick="event.stopPropagation();cycleTimerColor('${t.id}')" title="Cambiar color"></span>${t.name}
+                    </span>
                     <div class="timer-input-group">
                         <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" onchange="syncTimerInputs('${t.id}')">
                         <span>h</span>
@@ -1244,12 +1329,30 @@
                         <button class="t-btn" onclick="resetTimer('${t.id}')" title="Reiniciar">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                         </button>
-                        ${deleteBtnHtml}
-                        ${addBtnHtml}
+                        ${hideBtn}
+                        ${deleteBtn}
+                        ${addBtn}
                     </div>
                 </div>`;
             });
             container.innerHTML = html;
+
+            if (hiddenList.length > 0) {
+                hiddenBar.classList.add('active');
+                hiddenBar.innerHTML = hiddenList.map(t => `
+                    <div class="hidden-timer-pill ${t.tRunning ? 'is-running' : ''}"
+                         style="--pill-color:${t.color}"
+                         onclick="toggleTimerHidden('${t.id}')"
+                         title="Mostrar ${t.name}">
+                        <span class="pill-dot"></span>
+                        <span class="pill-name">${t.name}</span>
+                        <span class="pill-time" id="pill-time-${t.id}">00:00</span>
+                    </div>`).join('');
+            } else {
+                hiddenBar.classList.remove('active');
+                hiddenBar.innerHTML = '';
+            }
+
             updateTimersDisplayValues();
         }
 
@@ -1261,11 +1364,9 @@
             saveTimersState();
         }
 
-        /* --- LÓGICA DE DRAG & DROP (ESCRITORIO Y TÁCTIL) PARA TEMPORIZADORES SECUNDARIOS --- */
         let draggedIndex = null;
         let touchDragEl = null;
         let touchStartY = 0;
-        let originalY = 0;
 
         function onDragStart(e, index) {
             if (timersList[index].id === 'general') return;
@@ -1282,7 +1383,7 @@
         function onDrop(e, targetIndex) {
             e.preventDefault();
             if (draggedIndex === null || draggedIndex === targetIndex) return;
-            if (timersList[targetIndex].id === 'general') return; // No mover sobre el general
+            if (timersList[targetIndex].id === 'general') return;
 
             let movedItem = timersList.splice(draggedIndex, 1)[0];
             timersList.splice(targetIndex, 0, movedItem);
@@ -1296,11 +1397,9 @@
             draggedIndex = null;
         }
 
-        // Soporte táctil avanzado para reordenar
         function onTouchStart(e, index) {
             if (timersList[index].id === 'general') return;
-            // Evitar arrastre si se toca un botón o input
-            if (['INPUT', 'BUTTON', 'SVG', 'PATH', 'RECT', 'CIRCLE'].includes(e.target.tagName)) return;
+            if (['INPUT', 'BUTTON', 'SVG', 'PATH', 'RECT', 'CIRCLE', 'SPAN'].includes(e.target.tagName)) return;
             
             draggedIndex = index;
             touchDragEl = e.currentTarget;
@@ -1311,13 +1410,12 @@
 
         function onTouchMove(e) {
             if (draggedIndex === null || !touchDragEl) return;
-            e.preventDefault(); // Prevenir scroll mientras se reordena
+            e.preventDefault();
             
             let currentY = e.touches[0].clientY;
             let diffY = currentY - touchStartY;
             touchDragEl.style.transform = `translateY(${diffY}px)`;
 
-            // Encontrar elemento bajo el toque
             let touch = e.touches[0];
             let elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             let targetWidget = elementBelow ? elementBelow.closest('.extra-timer') : null;
@@ -1328,10 +1426,9 @@
                     let movedItem = timersList.splice(draggedIndex, 1)[0];
                     timersList.splice(targetIndex, 0, movedItem);
                     draggedIndex = targetIndex;
-                    touchStartY = currentY; // Resetear base
+                    touchStartY = currentY;
                     saveTimersState();
                     renderTimersUI();
-                    // Reasignar el elemento arrastrado tras el re-render
                     touchDragEl = document.querySelector(`[data-index='${draggedIndex}']`);
                     if (touchDragEl) touchDragEl.classList.add('dragging');
                 }
@@ -1347,7 +1444,6 @@
             touchDragEl = null;
             renderTimersUI();
         }
-        /* -------------------------------------------------------------------------------- */
 
         function toggleExtraTimersFold() {
             extraTimersFolded = !extraTimersFolded;
@@ -1380,15 +1476,15 @@
                 initialAcc = totalMs;
             }
 
+            const usedColors = timersList.map(t => t.color);
+            const nextColor = TIMER_PALETTE.find(c => !usedColors.includes(c))
+                || TIMER_PALETTE[timersList.length % TIMER_PALETTE.length];
+
             timersList.push({
-                id: newId,
-                name: name,
-                tMode: initialMode,
-                tRunning: false,
-                tRef: 0,
-                tAcc: initialAcc,
-                inputH: h > 0 ? h : '',
-                inputM: m > 0 ? m : ''
+                id: newId, name: name,
+                tMode: initialMode, tRunning: false, tRef: 0, tAcc: initialAcc,
+                inputH: h > 0 ? h : '', inputM: m > 0 ? m : '',
+                color: nextColor, hidden: false
             });
 
             extraTimersFolded = false;
@@ -1420,8 +1516,8 @@
                 }
                 t.tRunning = false;
                 
-                let inputH = parseInt(document.getElementById(`t-input-h-${id}`).value) || 0;
-                let inputM = parseInt(document.getElementById(`t-input-m-${id}`).value) || 0;
+                let inputH = parseInt(document.getElementById(`t-input-h-${id}`)?.value) || 0;
+                let inputM = parseInt(document.getElementById(`t-input-m-${id}`)?.value) || 0;
                 let initialTotalMs = (inputH * 3600 + inputM * 60) * 1000;
 
                 if (t.tMode === 'down' && initialTotalMs > 0 && t.tAcc < initialTotalMs) {
@@ -1430,8 +1526,8 @@
                 }
             } else {
                 if (t.tAcc === 0) {
-                    let h = parseInt(document.getElementById(`t-input-h-${id}`).value) || 0;
-                    let m = parseInt(document.getElementById(`t-input-m-${id}`).value) || 0;
+                    let h = parseInt(document.getElementById(`t-input-h-${id}`)?.value) || 0;
+                    let m = parseInt(document.getElementById(`t-input-m-${id}`)?.value) || 0;
                     let totalMs = (h * 3600 + m * 60) * 1000;
                     
                     if (totalMs > 0) {
@@ -1466,8 +1562,8 @@
             let t = timersList.find(x => x.id === id);
             if (!t) return;
 
-            let inputH = parseInt(document.getElementById(`t-input-h-${id}`).value) || 0;
-            let inputM = parseInt(document.getElementById(`t-input-m-${id}`).value) || 0;
+            let inputH = parseInt(document.getElementById(`t-input-h-${id}`)?.value) || 0;
+            let inputM = parseInt(document.getElementById(`t-input-m-${id}`)?.value) || 0;
             let initialTotalMs = (inputH * 3600 + inputM * 60) * 1000;
 
             if (t.tRunning && t.tMode === 'down' && initialTotalMs > 0) {
@@ -1528,6 +1624,9 @@
 
                 const displayEl = document.getElementById(`t-display-${t.id}`);
                 if (displayEl) displayEl.innerText = disp;
+
+                const pillEl = document.getElementById(`pill-time-${t.id}`);
+                if (pillEl) pillEl.innerText = disp;
 
                 if (t.tRunning || (current > 0 && !activeTimerInfo)) {
                     if (!activeTimerInfo || t.tRunning) {
@@ -1739,8 +1838,6 @@
             openModal(); 
         }
         
-        /* -------------- LÓGICA DE NOTAS -------------- */
-        
         function openNotesModal() {
             document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             
@@ -1805,7 +1902,6 @@
             }
         }
         
-        /* -------------- LÓGICA DE PULSACIÓN CORTA Y LARGA -------------- */
         let pressTimer = null;
         let isPressing = false;
         let pressStartPos = {x:0, y:0};
@@ -1853,7 +1949,6 @@
             
             openTaskCreateModal(mI, localW, dI);
         }
-
 
         function showDayStats(dateStr, wNum, dI, mI) {
             document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');

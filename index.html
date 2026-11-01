@@ -404,29 +404,51 @@
             width: 550px; max-width: 95vw;
         }
         
-        /* ------------- NUEVAS REGLAS MODO DUAL (NOTAS GRANDES, ACCIÓN PEQUEÑA) ------------- */
+        /* ------------- TAMAÑOS FIJOS Y EXACTOS PARA EL MODO DUAL ------------- */
         .modal-overlay.dual-mode-active {
-            padding: 20px;
+            padding: 10px;
+            gap: 10px; /* Separación fija entre las dos tarjetas */
         }
-        .modal-overlay.dual-mode-active .modal-card {
-            width: 340px;
-            max-width: 95vw;
-            overflow-y: auto; /* Permite scroll interno si es necesario */
-        }
+        
+        /* Tarjeta superior: NOTAS (Grande y fija) */
         .modal-overlay.dual-mode-active #dual-notes-card {
             display: flex !important;
-            flex: 1.2; /* Permite que la tarjeta de notas crezca más */
-            max-height: 55vh; /* Expande la nota hasta un 55% de la pantalla */
-            min-height: 200px;
-            margin-bottom: 12px;
+            flex-direction: column;
+            width: 340px;
+            max-width: 95vw;
+            height: 220px; /* Tamaño fijo superior */
+            min-height: 220px;
+            max-height: 220px;
+            margin-bottom: 0;
+            box-sizing: border-box;
         }
+        
+        /* Tarjeta inferior: NUEVA ACCIÓN (Más pequeña y fija con scroll interno si hace falta) */
         .modal-overlay.dual-mode-active #main-modal-card {
-            flex: 0.8; /* Mantiene la tarjeta de acción más contenida */
-            max-height: 35vh; /* Restringe la altura máxima de la creación de tarea */
+            width: 340px;
+            max-width: 95vw;
+            height: 290px; /* Tamaño fijo inferior compacto */
+            min-height: 290px;
+            max-height: 290px;
+            overflow-y: auto; /* Permite desplazarse dentro de la acción si el contenido es largo */
+            box-sizing: border-box;
         }
+
+        /* Cuadro de texto de notas llenando exactamente su tarjeta grande */
         .modal-overlay.dual-mode-active #dual-notes-text {
-            height: 100%; /* Obliga al cuadro de texto a llenar su tarjeta grande */
-            resize: none; /* Deshabilita el redimensionamiento manual porque ya ocupa todo el espacio */
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            resize: none;
+            background: var(--input-bg);
+            border: 1px solid var(--border-input);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
         }
         /* ---------------------------------------------------------------------------------- */
 
@@ -863,10 +885,9 @@
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         
         <!-- Modal Secundario de Notas (Solo visible en Modo Dual al mantener presionado un día) -->
-        <div class="modal-card" id="dual-notes-card" style="display:none; flex-direction:column;" onclick="event.stopPropagation()">
-            <h3 id="dual-notes-title" style="color: var(--accent); margin-top:0; margin-bottom: 10px;">Notas</h3>
-            <!-- Se quitan estilos inline que limitaban la altura, ahora el CSS se encarga de que llene todo el espacio flex -->
-            <textarea id="dual-notes-text" style="width:100%; box-sizing:border-box; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:10px; font-family:inherit; font-size:0.85rem;" oninput="saveDualNotes()"></textarea>
+        <div class="modal-card" id="dual-notes-card" style="display:none;" onclick="event.stopPropagation()">
+            <h3 id="dual-notes-title" style="color: var(--accent); margin-top:0; margin-bottom: 8px;">Notas</h3>
+            <textarea id="dual-notes-text" oninput="saveDualNotes()"></textarea>
         </div>
 
         <!-- Modal Principal -->
@@ -1043,7 +1064,7 @@
                 <div class="modal-actions" style="flex-wrap: wrap;"><button class="btn btn-delete" onclick="deleteActiveMarker()" style="flex-basis: 100%; margin-bottom: 5px;">Eliminar Marcador</button><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveMarkerSettings()">Guardar</button></div>
             </div>
 
-            <!-- Nuevo contenido del modal de Notas -->
+            <!-- Modal de Notas independiente -->
             <div id="modal-content-notes" style="display:none; flex-direction:column; height:100%;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="color:var(--accent); margin:0;">Notas</h3>

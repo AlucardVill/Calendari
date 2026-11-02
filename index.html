@@ -880,6 +880,43 @@
             50% { box-shadow: 0 0 0 2px var(--card), 0 0 16px var(--accent), 0 0 26px var(--accent); }
         }
         @media (prefers-reduced-motion: reduce) { .now-marker::before { animation: none; } .now-marker { transition: none; } }
+
+        /* Estilos Historial de Temporizadores */
+        #history-list {
+            overflow-y: auto;
+            max-height: 55vh;
+            padding-right: 4px;
+        }
+        .history-date-group { margin-bottom: 16px; }
+        .history-date-label {
+            font-size: 0.7rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--muted); margin-bottom: 8px; padding: 0 4px;
+        }
+        .history-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; background: var(--item-bg);
+            border: 1px solid var(--border); border-radius: 10px;
+            margin-bottom: 6px; transition: border-color 0.2s;
+        }
+        .history-item:hover { border-color: var(--border-input); }
+        .history-info { flex: 1; min-width: 0; }
+        .history-name {
+            font-size: 0.85rem; font-weight: 700; color: var(--text);
+            margin-bottom: 3px; word-break: break-word;
+        }
+        .history-meta {
+            font-size: 0.7rem; color: var(--muted); font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        .history-check { font-size: 0.75rem; flex-shrink: 0; }
+        .history-del {
+            background: transparent; border: none; color: var(--muted);
+            font-size: 1rem; cursor: pointer; padding: 2px 6px;
+            border-radius: 4px; transition: all 0.2s; flex-shrink: 0;
+            line-height: 1;
+        }
+        .history-del:hover { color: var(--sunday); background: rgba(251,113,133,0.15); }
     </style>
 </head>
 <body>
@@ -1024,7 +1061,6 @@
         </div>
     </div>
 
-    <!-- Overlay independiente para "¿Objetivo logrado?" (no cierra el modal del usuario) -->
     <div id="goal-overlay" class="modal-overlay" style="z-index: 2000;">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h3 style="color: var(--accent); margin-bottom: 10px; text-align: center;">¡Tiempo Finalizado!</h3>
@@ -1260,6 +1296,20 @@
                     <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
                 </div>
             </div>
+
+            <div id="modal-content-history" style="display:none; flex-direction:column; height:100%;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="color:var(--accent); margin:0;">Historial</h3>
+                    <button class="btn btn-save" onclick="exportHistoryExcel()"
+                            style="padding:7px 14px; font-size:0.75rem; width:auto; flex:0 0 auto;">
+                        📥 Excel
+                    </button>
+                </div>
+                <div id="history-list"></div>
+                <div class="modal-actions" style="margin-top:15px;">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
+                </div>
+            </div>
             
         </div>
     </div>
@@ -1331,6 +1381,14 @@
         }
 
         let timerStats = JSON.parse(localStorage.getItem('wkTimerStats')) || [];
+        let _needSaveStats = false;
+        timerStats.forEach((s, i) => {
+            if (!s.id) { s.id = Date.now() - i * 1000; _needSaveStats = true; }
+            if (typeof s.durationMs !== 'number') s.durationMs = 0;
+            if (typeof s.elapsedMs !== 'number')  s.elapsedMs  = 0;
+        });
+        if (_needSaveStats) localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
+
         let activeTimerForGoal = null; 
         
         let notesData = JSON.parse(localStorage.getItem('wkNotes')) || { general: '' };
@@ -1661,40 +1719,46 @@
             }
         }
 
+        function getTimerSetMs(t) {
+            if (t.setMs && t.setMs > 0) return t.setMs;
+            const h = parseInt(document.getElementById(`t-input-h-${t.id}`)?.value) || 0;
+            const m = parseInt(document.getElementById(`t-input-m-${t.id}`)?.value) || 0;
+            return (h * 3600 + m * 60) * 1000;
+        }
+
         function toggleTimer(id) {
             stopAlarmSound();
             let t = timersList.find(x => x.id === id);
             if (!t) return;
 
             if (t.tRunning) {
-                if (t.tMode === 'up') {
-                    t.tAcc += Date.now() - t.tRef;
-                } else {
-                    t.tAcc -= Date.now() - t.tRef;
-                }
+                if (t.tMode === 'up') t.tAcc += Date.now() - t.tRef;
+                else                  t.tAcc -= Date.now() - t.tRef;
                 t.tRunning = false;
-                
-                let inputH = parseInt(document.getElementById(`t-input-h-${id}`)?.value) || 0;
-                let inputM = parseInt(document.getElementById(`t-input-m-${id}`)?.value) || 0;
-                let initialTotalMs = (inputH * 3600 + inputM * 60) * 1000;
 
-                if (t.tMode === 'down' && initialTotalMs > 0 && t.tAcc < initialTotalMs) {
-                    activeTimerForGoal = t.name;
+                const setMs = getTimerSetMs(t);
+                if (t.tMode === 'down' && setMs > 0 && t.tAcc < setMs && !activeTimerForGoal) {
+                    activeTimerForGoal = {
+                        name: t.name,
+                        durationMs: setMs,
+                        elapsedMs: Math.max(0, setMs - t.tAcc),
+                        color: t.color
+                    };
                     openGoalModal();
                 }
             } else {
                 if (t.tAcc === 0) {
-                    let h = parseInt(document.getElementById(`t-input-h-${id}`)?.value) || 0;
-                    let m = parseInt(document.getElementById(`t-input-m-${id}`)?.value) || 0;
-                    let totalMs = (h * 3600 + m * 60) * 1000;
-                    
-                    if (totalMs > 0) {
+                    const setMs = getTimerSetMs(t);
+                    if (setMs > 0) {
                         t.tMode = 'down';
-                        t.tAcc = totalMs;
+                        t.tAcc = setMs;
+                        t.setMs = setMs;
                     } else {
                         t.tMode = 'up';
                         t.tAcc = 0;
+                        t.setMs = 0;
                     }
+                    t.tCompleted = false;
                 }
                 t.tRef = Date.now();
                 t.tRunning = true;
@@ -1707,10 +1771,10 @@
             stopAlarmSound();
             let t = timersList.find(x => x.id === id);
             if (!t) return;
-            
             t.tRunning = false;
             t.tAcc = 0;
             t.tRef = 0;
+            t.tCompleted = false;
             saveTimersState();
             updateTimersDisplayValues();
         }
@@ -1720,37 +1784,58 @@
             let t = timersList.find(x => x.id === id);
             if (!t) return;
 
-            let inputH = parseInt(document.getElementById(`t-input-h-${id}`)?.value) || 0;
-            let inputM = parseInt(document.getElementById(`t-input-m-${id}`)?.value) || 0;
-            let initialTotalMs = (inputH * 3600 + inputM * 60) * 1000;
+            const setMs = getTimerSetMs(t);
+            const currentRemaining = (t.tRunning && t.tMode === 'down')
+                ? Math.max(0, t.tAcc - (Date.now() - t.tRef))
+                : t.tAcc;
 
-            if (t.tRunning && t.tMode === 'down' && initialTotalMs > 0) {
-                activeTimerForGoal = t.name;
+            if (t.tMode === 'down' && setMs > 0 && currentRemaining < setMs && !activeTimerForGoal) {
+                activeTimerForGoal = {
+                    name: t.name,
+                    durationMs: setMs,
+                    elapsedMs: Math.max(0, setMs - currentRemaining),
+                    color: t.color
+                };
                 openGoalModal();
             }
 
             t.tRunning = false;
             t.tAcc = 0;
             t.tRef = 0;
+            t.tCompleted = false;
             saveTimersState();
             updateTimersDisplayValues();
         }
 
         function openGoalModal() {
-            document.getElementById('goal-overlay-title').innerText = `¿Objetivo logrado para "${activeTimerForGoal || 'Temporizador'}"?`;
+            const name = activeTimerForGoal?.name || 'Temporizador';
+            document.getElementById('goal-modal-title').innerText =
+                `¿Objetivo logrado para "${name}"?`;
             document.getElementById('goal-overlay').classList.add('active');
+            if (!document.getElementById('modal-overlay').classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         function recordGoal(success) {
             stopAlarmSound();
             timerStats.push({
+                id: Date.now() + Math.random(),
                 date: new Date().toISOString(),
-                timerName: activeTimerForGoal || 'General',
+                timerName: activeTimerForGoal?.name || 'Temporizador',
+                durationMs: activeTimerForGoal?.durationMs || 0,
+                elapsedMs: activeTimerForGoal?.elapsedMs || 0,
+                color: activeTimerForGoal?.color || '#10b981',
                 success: success
             });
             localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
             activeTimerForGoal = null;
             document.getElementById('goal-overlay').classList.remove('active');
+            if (!document.getElementById('modal-overlay').classList.contains('active')) {
+                document.body.style.overflow = '';
+            }
+            const histEl = document.getElementById('modal-content-history');
+            if (histEl && histEl.style.display === 'flex') renderHistoryModal();
         }
 
         function updateTimersDisplayValues() {
@@ -1760,15 +1845,24 @@
                 let current = t.tAcc;
                 if (t.tRunning) {
                     if (t.tMode === 'up') current += Date.now() - t.tRef;
-                    else current -= Date.now() - t.tRef;
+                    else                  current -= Date.now() - t.tRef;
 
-                    if (t.tMode === 'down' && current <= 0) {
+                    if (t.tMode === 'down' && current <= 0 && !t.tCompleted) {
                         current = 0;
                         t.tRunning = false;
                         t.tAcc = 0;
-                        startAlarmSound();
-                        activeTimerForGoal = t.name;
-                        openGoalModal();
+                        t.tCompleted = true;
+                        const setMs = getTimerSetMs(t);
+                        if (!activeTimerForGoal && setMs > 0) {
+                            startAlarmSound();
+                            activeTimerForGoal = {
+                                name: t.name,
+                                durationMs: setMs,
+                                elapsedMs: setMs,
+                                color: t.color
+                            };
+                            openGoalModal();
+                        }
                     }
                 }
 
@@ -2284,7 +2378,6 @@
             if (prevVal && Array.from(weekSel.options).some(o => o.value === prevVal)) weekSel.value = prevVal;
         }
 
-        // === Pulsación larga sobre un entorno en la lista ===
         let entornoPressTimer = null;
         let entornoPressState = null;
 
@@ -2666,8 +2759,9 @@
                         <div class="qc-bar"><div class="fill" style="width:${stats.pct}%;"></div></div><div class="qc-pct">${stats.pct.toFixed(0)}%</div></div>`;
             }
             html += `</div>`;
-            html += `<div style="display: flex; justify-content: flex-end; margin-top: 10px; padding-right: 2px;">
+            html += `<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-top: 10px; padding-right: 2px;">
                 <button class="timecalc-btn" onclick="openTimeCalcModal()" title="Calculadora de Tiempo">C.T</button>
+                <button class="timecalc-btn" onclick="openHistoryModal()" title="Historial de Temporizadores">H.T</button>
             </div>`;
             return html;
         }
@@ -2842,7 +2936,7 @@
             
             editingEntornoId = null;
             
-            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes', 'timecalc'].forEach(id => {
+            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes', 'timecalc', 'history'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
@@ -3154,10 +3248,6 @@
             if (document.getElementById('qbar-fill')) updateQuarterBar();
         }
 
-        // ==========================================
-        // SISTEMA DE SINCRONIZACIÓN (HÍBRIDO PC/ANDROID)
-        // ==========================================
-
         async function syncExport() {
             let backup = { 
                 tasks: tasksData, 
@@ -3245,6 +3335,133 @@
                 event.target.value = '';
             };
             reader.readAsText(file);
+        }
+
+        function formatDuration(ms) {
+            if (!ms || ms <= 0) return '—';
+            const totalSec = Math.floor(ms / 1000);
+            const h = Math.floor(totalSec / 3600);
+            const m = Math.floor((totalSec % 3600) / 60);
+            const s = totalSec % 60;
+            if (h > 0) return `${h}h ${String(m).padStart(2,'0')}m`;
+            if (m > 0) return `${m}m ${String(s).padStart(2,'0')}s`;
+            return `${s}s`;
+        }
+
+        function openHistoryModal() {
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-history').style.display = 'flex';
+            document.getElementById('main-modal-card').classList.add('wide');
+            renderHistoryModal();
+            openModal();
+        }
+
+        function renderHistoryModal() {
+            const container = document.getElementById('history-list');
+            if (!container) return;
+
+            if (timerStats.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--muted); font-size:0.85rem;">Aún no hay temporizadores registrados.<br>Detén o completa un temporizador de cuenta atrás para verlo aquí.</div>';
+                return;
+            }
+
+            const sorted = [...timerStats].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const groups = {};
+            sorted.forEach(s => {
+                const d = new Date(s.date);
+                const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(s);
+            });
+
+            const today = new Date();
+            const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+            const yest = new Date(today); yest.setDate(today.getDate() - 1);
+            const yestKey = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
+            const nombresDias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+            let html = '';
+            Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(key => {
+                let label;
+                if (key === todayKey) label = 'Hoy';
+                else if (key === yestKey) label = 'Ayer';
+                else {
+                    const [y, m, d] = key.split('-').map(Number);
+                    const dt = new Date(y, m - 1, d);
+                    label = `${nombresDias[dt.getDay()]}, ${d} de ${meses[m - 1]}`;
+                }
+                const totalHoy = groups[key].length;
+                const okHoy = groups[key].filter(x => x.success).length;
+
+                html += `<div class="history-date-group">
+                    <div class="history-date-label">${label} · ${okHoy}/${totalHoy} cumplidos</div>`;
+
+                groups[key].forEach(item => {
+                    const t = new Date(item.date);
+                    const hh = String(t.getHours()).padStart(2, '0');
+                    const mm = String(t.getMinutes()).padStart(2, '0');
+                    const dur = formatDuration(item.elapsedMs || item.durationMs || 0);
+                    const check = item.success
+                        ? '<span style="color:var(--accent); font-weight:800;">✓ Sí</span>'
+                        : '<span style="color:var(--sunday); font-weight:800;">✗ No</span>';
+
+                    html += `<div class="history-item">
+                        <div class="history-info">
+                            <div class="history-name">${item.timerName || 'Temporizador'}</div>
+                            <div class="history-meta">${hh}:${mm} · ${dur}</div>
+                        </div>
+                        <div class="history-check">${check}</div>
+                        <button class="history-del" onclick="deleteHistoryItem('${item.id}')" title="Eliminar">×</button>
+                    </div>`;
+                });
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function deleteHistoryItem(id) {
+            timerStats = timerStats.filter(s => String(s.id) !== String(id));
+            localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
+            renderHistoryModal();
+        }
+
+        function exportHistoryExcel() {
+            if (timerStats.length === 0) {
+                alert('No hay historial para exportar.');
+                return;
+            }
+            const sorted = [...timerStats].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">'
+                + '<head><meta charset="UTF-8">'
+                + '<style>body{font-family:Arial,sans-serif;} th{background:#10b981;color:#fff;padding:8px;text-align:left;} td{padding:6px 8px;border:1px solid #ccc;}</style>'
+                + '</head><body>'
+                + '<table><thead><tr><th>Fecha</th><th>Hora</th><th>Nombre</th><th>Duración</th><th>Cumplimiento</th></tr></thead><tbody>';
+
+            sorted.forEach(s => {
+                const d = new Date(s.date);
+                const date = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+                const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                const dur  = formatDuration(s.elapsedMs || s.durationMs || 0);
+                const comp = s.success ? 'Sí' : 'No';
+                const name = String(s.timerName || '')
+                    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                html += `<tr><td>${date}</td><td>${time}</td><td>${name}</td><td>${dur}</td><td>${comp}</td></tr>`;
+            });
+
+            html += '</tbody></table></body></html>';
+
+            const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Historial_Temporizadores_${new Date().toISOString().slice(0,10)}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         applyThemeColors();

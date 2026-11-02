@@ -1024,6 +1024,17 @@
         </div>
     </div>
 
+    <!-- Overlay independiente para "¿Objetivo logrado?" (no cierra el modal del usuario) -->
+    <div id="goal-overlay" class="modal-overlay" style="z-index: 2000;">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <h3 style="color: var(--accent); margin-bottom: 10px; text-align: center;">¡Tiempo Finalizado!</h3>
+            <p id="goal-overlay-title" style="font-size: 0.85rem; color: var(--subtext); margin-bottom: 20px; text-align: center;">¿Objetivo logrado?</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-cancel" onclick="recordGoal(false)" style="background: var(--sunday); color: #fff;">No</button>
+                <button class="btn btn-save" onclick="recordGoal(true)">Sí</button>
+            </div>
+        </div>
+    </div>
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         
         <div class="modal-card" id="dual-notes-card" style="display:none;" onclick="event.stopPropagation()">
@@ -1726,10 +1737,8 @@
         }
 
         function openGoalModal() {
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
-            document.getElementById('goal-modal-title').innerText = `¿Objetivo logrado para "${activeTimerForGoal || 'Temporizador'}"?`;
-            document.getElementById('modal-content-goal').style.display = 'block';
-            openModal();
+            document.getElementById('goal-overlay-title').innerText = `¿Objetivo logrado para "${activeTimerForGoal || 'Temporizador'}"?`;
+            document.getElementById('goal-overlay').classList.add('active');
         }
 
         function recordGoal(success) {
@@ -1741,7 +1750,7 @@
             });
             localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
             activeTimerForGoal = null;
-            closeModal();
+            document.getElementById('goal-overlay').classList.remove('active');
         }
 
         function updateTimersDisplayValues() {
@@ -1901,6 +1910,7 @@
 
         let quarterBarMode = parseInt(localStorage.getItem('wkQBarMode')) || 0;
         let tcMode = 'tarea'; 
+        let editingEntornoId = null;
 
         let activeTabM = 0;
         let activeTabW = 1;
@@ -2186,18 +2196,26 @@
             pct = Math.max(0, Math.min(100, pct)); fill.style.width = pct.toFixed(2) + '%'; pctEl.textContent = pct.toFixed(1) + '%';
         }
 
-        function toggleTcMode() {
-            tcMode = tcMode === 'tarea' ? 'entorno' : 'tarea';
-            document.getElementById('tc-main-title').innerText = tcMode === 'tarea' ? 'Nueva Acción' : 'Nuevo Entorno';
+        function updateTcUI() {
+            const isEditing = editingEntornoId !== null && tcMode === 'entorno';
+            document.getElementById('tc-main-title').innerText =
+                isEditing ? 'Editar Entorno' : (tcMode === 'tarea' ? 'Nueva Acción' : 'Nuevo Entorno');
             document.getElementById('btn-toggle-tc').innerText = tcMode === 'tarea' ? '⟲ Crear Entorno' : '⟲ Crear Acción';
-            
+            document.getElementById('btn-save-tc').innerText = isEditing ? 'Guardar Cambios' : 'Guardar';
             document.getElementById('tc-tarea-fields').style.display = tcMode === 'tarea' ? 'block' : 'none';
             document.getElementById('tc-entorno-fields').style.display = tcMode === 'entorno' ? 'block' : 'none';
         }
 
+        function toggleTcMode() {
+            tcMode = tcMode === 'tarea' ? 'entorno' : 'tarea';
+            if (tcMode === 'tarea') editingEntornoId = null; 
+            updateTcUI();
+        }
+
         function openTaskCreateModal(prefillM, prefillW, prefillD) {
+            editingEntornoId = null;
             tcMode = 'entorno'; 
-            toggleTcMode();
+            toggleTcMode(); 
 
             const q = selectedQuarter;
             const nowMonth = new Date().getMonth();
@@ -2228,12 +2246,26 @@
                 const mI = q * 3 + i;
                 chkMonths.innerHTML += `<div class="chk-btn" onclick="this.classList.toggle('active')" data-val="${i}">${meses[mI].slice(0,3)}</div>`;
             }
-            document.querySelectorAll('.chk-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.querySelectorAll('#chk-months .chk-btn, #chk-weeks .chk-btn, #chk-days .chk-btn')
+                .forEach(btn => btn.classList.remove('active'));
+
+            if (prefillM !== undefined && prefillW !== undefined && prefillD !== undefined) {
+                const localM = prefillM % 3;
+                const mBtn = document.querySelector(`#chk-months .chk-btn[data-val="${localM}"]`);
+                if (mBtn) mBtn.classList.add('active');
+                const wBtn = document.querySelector(`#chk-weeks .chk-btn[data-val="${prefillW}"]`);
+                if (wBtn) wBtn.classList.add('active');
+                const dBtn = document.querySelector(`#chk-days .chk-btn[data-val="${prefillD}"]`);
+                if (dBtn) dBtn.classList.add('active');
+            }
 
             document.getElementById('inp-tc-title').value = '';
             document.getElementById('inp-tc-hour').value = globalLastHourEnd;
             document.getElementById('inp-tc-hourEnd').value = '';
             document.getElementById('inp-tc-color').value = '#3b82f6';
+            
+            updateTcUI();
             
             document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-taskcreate').style.display = 'block';
@@ -2250,6 +2282,78 @@
             });
             weekSel.innerHTML = wHtml;
             if (prevVal && Array.from(weekSel.options).some(o => o.value === prevVal)) weekSel.value = prevVal;
+        }
+
+        // === Pulsación larga sobre un entorno en la lista ===
+        let entornoPressTimer = null;
+        let entornoPressState = null;
+
+        function handleEntornoPressDown(e, id) {
+            if (e.target.closest('.qt-delete')) return; 
+            if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
+
+            entornoPressState = { id, startX: e.clientX, startY: e.clientY };
+            if (entornoPressTimer) clearTimeout(entornoPressTimer);
+
+            entornoPressTimer = setTimeout(() => {
+                if (entornoPressState) {
+                    openEntornoEditModal(id);
+                    entornoPressState = null;
+                }
+            }, 500);
+        }
+
+        function handleEntornoPressUp(e) {
+            if (entornoPressTimer) { clearTimeout(entornoPressTimer); entornoPressTimer = null; }
+            entornoPressState = null;
+        }
+
+        function handleEntornoPressCancel(e) {
+            if (entornoPressTimer) { clearTimeout(entornoPressTimer); entornoPressTimer = null; }
+            entornoPressState = null;
+        }
+
+        function openEntornoEditModal(id) {
+            const ent = entornosData.find(e => e.id === id);
+            if (!ent) return;
+
+            editingEntornoId = id;
+            tcMode = 'tarea';
+            toggleTcMode(); 
+
+            document.getElementById('inp-tc-title').value = ent.text;
+            document.getElementById('inp-tc-hour').value = ent.hour || '';
+            document.getElementById('inp-tc-hourEnd').value = ent.hourEnd || '';
+            document.getElementById('inp-tc-color').value = ent.color || '#3b82f6';
+
+            const q = ent.q;
+            const monthSel = document.getElementById('inp-tc-month');
+            let mHtml = '';
+            for (let i = 0; i < 3; i++) {
+                const mI = q * 3 + i;
+                mHtml += `<option value="${mI}">${meses[mI]}</option>`;
+            }
+            monthSel.innerHTML = mHtml;
+            updateWeekDropdown();
+
+            const chkMonths = document.getElementById('chk-months');
+            chkMonths.innerHTML = '';
+            for(let i=0; i<3; i++) {
+                const mI = q * 3 + i;
+                const active = ent.months.includes(i) ? 'active' : '';
+                chkMonths.innerHTML += `<div class="chk-btn ${active}" onclick="this.classList.toggle('active')" data-val="${i}">${meses[mI].slice(0,3)}</div>`;
+            }
+
+            document.querySelectorAll('#chk-weeks .chk-btn').forEach(btn => {
+                btn.classList.toggle('active', ent.weeks.includes(parseInt(btn.dataset.val)));
+            });
+            document.querySelectorAll('#chk-days .chk-btn').forEach(btn => {
+                btn.classList.toggle('active', ent.days.includes(parseInt(btn.dataset.val)));
+            });
+
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-taskcreate').style.display = 'block';
+            openModal();
         }
 
         function saveTcRecord() {
@@ -2292,11 +2396,10 @@
             document.getElementById('inp-tc-title').focus();
             
             const btn = document.getElementById('btn-save-tc');
-            const oldText = btn.innerText;
             btn.innerText = '¡Guardado!';
             btn.style.backgroundColor = '#10b981';
             setTimeout(() => {
-                btn.innerText = oldText;
+                updateTcUI();
                 btn.style.backgroundColor = '';
             }, 1000);
         }
@@ -2310,17 +2413,31 @@
             if (!title) { alert("Escribe una descripción para el entorno"); return; }
 
             const selMonths = Array.from(document.getElementById('chk-months').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
-            const selWeeks = Array.from(document.getElementById('chk-weeks').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
-            const selDays = Array.from(document.getElementById('chk-days').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
+            const selWeeks  = Array.from(document.getElementById('chk-weeks').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
+            const selDays   = Array.from(document.getElementById('chk-days').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
 
             if (selMonths.length === 0 || selWeeks.length === 0 || selDays.length === 0) {
                 alert("Debes seleccionar al menos un mes, una semana y un día."); return;
             }
 
-            entornosData.push({
-                id: Date.now(), text: title, color: color, hour: hour || null, hourEnd: hourEnd || null,
-                year: selectedYear, q: selectedQuarter, months: selMonths, weeks: selWeeks, days: selDays
-            });
+            if (editingEntornoId !== null) {
+                const ent = entornosData.find(e => e.id === editingEntornoId);
+                if (ent) {
+                    ent.text = title;
+                    ent.color = color;
+                    ent.hour = hour || null;
+                    ent.hourEnd = hourEnd || null;
+                    ent.months = selMonths;
+                    ent.weeks = selWeeks;
+                    ent.days = selDays;
+                }
+                editingEntornoId = null;
+            } else {
+                entornosData.push({
+                    id: Date.now(), text: title, color: color, hour: hour || null, hourEnd: hourEnd || null,
+                    year: selectedYear, q: selectedQuarter, months: selMonths, weeks: selWeeks, days: selDays
+                });
+            }
             localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
             
             renderQuarterDetailBody(); 
@@ -2340,11 +2457,10 @@
             document.getElementById('inp-tc-title').focus();
             
             const btn = document.getElementById('btn-save-tc');
-            const oldText = btn.innerText;
             btn.innerText = '¡Guardado!';
             btn.style.backgroundColor = '#10b981';
             setTimeout(() => {
-                btn.innerText = oldText;
+                updateTcUI();
                 btn.style.backgroundColor = '';
             }, 1000);
         }
@@ -2429,7 +2545,13 @@
                     qEntornos.forEach(e => {
                         const timeDisp = e.hour ? (e.hourEnd ? `${e.hour}-${e.hourEnd}` : e.hour) : 'Todo el día';
                         tasksHtml += `
-                        <div class="qt-item">
+                        <div class="qt-item"
+                             onpointerdown="handleEntornoPressDown(event, ${e.id})"
+                             onpointerup="handleEntornoPressUp(event)"
+                             onpointercancel="handleEntornoPressCancel(event)"
+                             onpointerleave="handleEntornoPressCancel(event)"
+                             oncontextmenu="event.preventDefault();"
+                             title="Mantén pulsado para editar">
                             <div class="qt-info">
                                 <div class="qt-text"><span class="entorno-tag" style="background:${e.color}20; color:${e.color};">ENTORNO</span> ${e.text}</div>
                                 <div class="qt-meta">Días: ${e.days.map(d=>diasL[d]).join(',')} · ${timeDisp}</div>
@@ -2717,6 +2839,8 @@
             document.getElementById('modal-overlay').classList.remove('dual-mode-active');
             document.getElementById('main-modal-card').classList.remove('wide');
             document.getElementById('dual-notes-card').style.display = 'none';
+            
+            editingEntornoId = null;
             
             ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes', 'timecalc'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);

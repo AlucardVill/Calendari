@@ -913,7 +913,7 @@
         .history-del {
             background: transparent; border: none; color: var(--muted);
             font-size: 1rem; cursor: pointer; padding: 2px 6px;
-            border-radius: 4px; transition: all 0.2s; flex-shrink: 0;
+            border-radius: 4px; transition: all 0.2s flex-shrink: 0;
             line-height: 1;
         }
         .history-del:hover { color: var(--sunday); background: rgba(251,113,133,0.15); }
@@ -1748,23 +1748,14 @@
             if (!t) return;
 
             if (t.tRunning) {
+                // Pausa simple — NO pregunta nada
                 if (t.tMode === 'up') t.tAcc += Date.now() - t.tRef;
                 else                  t.tAcc -= Date.now() - t.tRef;
                 t.tRunning = false;
-
-                const setMs = getTimerSetMs(t);
-                if (t.tMode === 'down' && setMs > 0 && t.tAcc < setMs && !activeTimerForGoal) {
-                    activeTimerForGoal = {
-                        name: t.name,
-                        durationMs: setMs,
-                        elapsedMs: Math.max(0, setMs - t.tAcc),
-                        color: t.color
-                    };
-                    openGoalModal();
-                }
             } else {
+                // Iniciar o reanudar
                 if (t.tAcc === 0) {
-                    syncTimerInputs(id);          
+                    syncTimerInputs(id);
                     const setMs = getTimerSetMs(t);
                     if (setMs > 0) {
                         t.tMode = 'down';
@@ -1788,9 +1779,41 @@
             stopAlarmSound();
             let t = timersList.find(x => x.id === id);
             if (!t) return;
-            t.tRunning = false;
-            t.tAcc = 0;
-            t.tRef = 0;
+
+            // Calcular tiempo consumido real (cuenta atrás → consumido ; cuenta arriba → transcurrido)
+            let remaining = t.tAcc;
+            if (t.tRunning) {
+                if (t.tMode === 'up') remaining = t.tAcc + (Date.now() - t.tRef);
+                else                  remaining = t.tAcc - (Date.now() - t.tRef);
+            }
+
+            const setMs = getTimerSetMs(t);
+            let elapsedMs, durationMs;
+
+            if (t.tMode === 'down' && setMs > 0) {
+                remaining  = Math.max(0, remaining);
+                elapsedMs  = Math.max(0, setMs - remaining);
+                durationMs = setMs;
+            } else {
+                elapsedMs  = Math.max(0, remaining);
+                durationMs = elapsedMs;
+            }
+
+            // Solo preguntar si hubo tiempo real consumido (evita prompt por toques accidentales)
+            if (elapsedMs > 1000 && !activeTimerForGoal) {
+                activeTimerForGoal = {
+                    name: t.name,
+                    durationMs: durationMs,
+                    elapsedMs: elapsedMs,
+                    color: t.color
+                };
+                openGoalModal();
+            }
+
+            // Limpiar todo
+            t.tRunning   = false;
+            t.tAcc       = 0;
+            t.tRef       = 0;
             t.tCompleted = false;
             saveTimersState();
             updateTimersDisplayValues();
@@ -1801,25 +1824,33 @@
             let t = timersList.find(x => x.id === id);
             if (!t) return;
 
-            const setMs = getTimerSetMs(t);
-            const currentRemaining = (t.tRunning && t.tMode === 'down')
-                ? Math.max(0, t.tAcc - (Date.now() - t.tRef))
-                : t.tAcc;
-
-            if (t.tMode === 'down' && setMs > 0 && currentRemaining < setMs && !activeTimerForGoal) {
-                activeTimerForGoal = {
-                    name: t.name,
-                    durationMs: setMs,
-                    elapsedMs: Math.max(0, setMs - currentRemaining),
-                    color: t.color
-                };
-                openGoalModal();
+            // Leer inputs actuales directamente (por si cambió los minutos y no hizo blur)
+            const hEl = document.getElementById(`t-input-h-${id}`);
+            const mEl = document.getElementById(`t-input-m-${id}`);
+            let h = 0, m = 0;
+            if (hEl && mEl) {
+                h = parseInt(hEl.value) || 0;
+                m = parseInt(mEl.value) || 0;
+                t.inputH = h || '';
+                t.inputM = m || '';
             }
 
-            t.tRunning = false;
-            t.tAcc = 0;
-            t.tRef = 0;
+            const setMs = (h * 3600 + m * 60) * 1000;
+
+            t.tRunning   = false;
+            t.tRef       = 0;
             t.tCompleted = false;
+
+            if (setMs > 0) {
+                t.tMode = 'down';
+                t.tAcc = setMs;   // ← vuelve al tiempo "determinado"
+                t.setMs = setMs;
+            } else {
+                t.tMode = 'up';
+                t.tAcc = 0;
+                t.setMs = 0;
+            }
+
             saveTimersState();
             updateTimersDisplayValues();
         }

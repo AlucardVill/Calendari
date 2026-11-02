@@ -1575,8 +1575,18 @@
         function syncTimerInputs(id) {
             let t = timersList.find(x => x.id === id);
             if (!t) return;
-            t.inputH = parseInt(document.getElementById(`t-input-h-${id}`).value) || '';
-            t.inputM = parseInt(document.getElementById(`t-input-m-${id}`).value) || '';
+            const hEl = document.getElementById(`t-input-h-${id}`);
+            const mEl = document.getElementById(`t-input-m-${id}`);
+            if (!hEl || !mEl) return;                    
+
+            const h = parseInt(hEl.value) || 0;
+            const m = parseInt(mEl.value) || 0;
+            t.inputH = h || '';
+            t.inputM = m || '';
+
+            if (!t.tRunning && t.tAcc === 0) {
+                t.setMs = (h * 3600 + m * 60) * 1000;
+            }
             saveTimersState();
         }
 
@@ -1586,6 +1596,12 @@
 
         function onDragStart(e, index) {
             if (timersList[index].id === 'general') return;
+            
+            if (e.target.tagName === 'INPUT' || e.target.closest('button')) {
+                e.preventDefault();
+                return;
+            }
+            
             draggedIndex = index;
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
@@ -1748,6 +1764,7 @@
                 }
             } else {
                 if (t.tAcc === 0) {
+                    syncTimerInputs(id);          
                     const setMs = getTimerSetMs(t);
                     if (setMs > 0) {
                         t.tMode = 'down';

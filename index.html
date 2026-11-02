@@ -466,6 +466,24 @@
             display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-weight: 700;
         }
         .close-btn:hover { color: var(--sunday); border-color: var(--sunday); }
+        
+        .timecalc-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--card-shadow);
+            font-family: inherit;
+        }
+        .timecalc-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+        .timecalc-btn:active { transform: scale(0.96); }
+
         .add-task-btn {
             background: var(--accent); color: var(--btn-text); border: none;
             width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer;
@@ -1205,6 +1223,29 @@
                 <textarea id="notes-main-textarea" style="flex:1; min-height: 50vh; width:100%; box-sizing:border-box; resize:vertical; background:var(--input-bg); border:1px solid var(--border-input); color:var(--text); border-radius:8px; padding:12px; font-family:inherit; font-size:0.9rem;" oninput="saveMainNote()"></textarea>
             
                 <div class="modal-actions" style="margin-top:15px;">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
+                </div>
+            </div>
+
+            <div id="modal-content-timecalc" style="display:none;">
+                <h3 style="color: var(--accent); margin-bottom: 15px;">Calculadora de Intervalos</h3>
+
+                <div class="tc-row" style="gap: 10px; margin-bottom: 8px;">
+                    <div class="tc-field">
+                        <label>Hora Inicio</label>
+                        <input type="time" id="inp-calc-start" oninput="calculateInterval()" onchange="calculateInterval()">
+                    </div>
+                    <div class="tc-field">
+                        <label>Hora Fin</label>
+                        <input type="time" id="inp-calc-end" oninput="calculateInterval()" onchange="calculateInterval()">
+                    </div>
+                </div>
+
+                <div id="calc-result" style="margin: 10px 0 0; padding: 16px; background: var(--item-bg); border-radius: 12px; text-align: center; min-height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <span style="color: var(--muted); font-size: 0.8rem;">Ingresa ambas horas</span>
+                </div>
+
+                <div class="modal-actions">
                     <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
                 </div>
             </div>
@@ -2502,7 +2543,11 @@
                         ${isCurrentQ ? '<div class="qc-badge">Actual</div>' : ''}<div class="qc-num">T${q + 1}</div>
                         <div class="qc-bar"><div class="fill" style="width:${stats.pct}%;"></div></div><div class="qc-pct">${stats.pct.toFixed(0)}%</div></div>`;
             }
-            return html + '</div>';
+            html += `</div>`;
+            html += `<div style="display: flex; justify-content: flex-end; margin-top: 10px; padding-right: 2px;">
+                <button class="timecalc-btn" onclick="openTimeCalcModal()" title="Calculadora de Tiempo">C.T</button>
+            </div>`;
+            return html;
         }
 
         function drawCalendar() { document.getElementById('calendar-container').innerHTML = calendarView === 'quarters' ? renderQuartersView() : renderYearsView(); }
@@ -2673,11 +2718,73 @@
             document.getElementById('main-modal-card').classList.remove('wide');
             document.getElementById('dual-notes-card').style.display = 'none';
             
-            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes'].forEach(id => {
+            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes', 'timecalc'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
             updateTimersDisplayValues();
+        }
+
+        function openTimeCalcModal() {
+            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-timecalc').style.display = 'block';
+
+            const now = new Date();
+            const startH = String(now.getHours()).padStart(2, '0') + ':00';
+            const endH = String((now.getHours() + 1) % 24).padStart(2, '0') + ':00';
+
+            document.getElementById('inp-calc-start').value = startH;
+            document.getElementById('inp-calc-end').value = endH;
+
+            calculateInterval();
+            openModal();
+            document.getElementById('inp-calc-start').focus();
+        }
+
+        function calculateInterval() {
+            const startVal = document.getElementById('inp-calc-start').value;
+            const endVal = document.getElementById('inp-calc-end').value;
+            const resultEl = document.getElementById('calc-result');
+            if (!resultEl) return;
+
+            if (!startVal || !endVal) {
+                resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.8rem;">Ingresa ambas horas</span>';
+                return;
+            }
+
+            const [sh, sm] = startVal.split(':').map(Number);
+            const [eh, em] = endVal.split(':').map(Number);
+
+            let startSec = sh * 3600 + sm * 60;
+            let endSec = eh * 3600 + em * 60;
+            let diff = endSec - startSec;
+            let crossed = false;
+            if (diff < 0) { diff += 24 * 3600; crossed = true; }
+
+            if (diff === 0) {
+                resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.8rem;">Misma hora — sin intervalo</span>';
+                return;
+            }
+
+            const h = Math.floor(diff / 3600);
+            const m = Math.floor((diff % 3600) / 60);
+            const s = diff % 60;
+
+            const parts = [];
+            if (h > 0) parts.push(`${h}h`);
+            if (m > 0) parts.push(`${m}m`);
+            if (s > 0) parts.push(`${s}s`);
+
+            resultEl.innerHTML = `
+                <div style="font-size: 1.9rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.02em;">
+                    ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}
+                </div>
+                <div style="font-size: 0.8rem; color: var(--subtext); margin-top: 4px; font-weight: 600;">
+                    ${parts.join(' ')}
+                </div>
+                ${crossed ? '<div style="font-size: 0.7rem; color: var(--work); margin-top: 6px; font-weight: 600;">⚠ Cruza medianoche (+24h)</div>' : ''}
+                <div style="font-size: 0.65rem; color: var(--muted); margin-top: 6px;">Total: ${Math.floor(diff/60)} minutos · ${diff} segundos</div>
+            `;
         }
 
         function openBlockModal() { 

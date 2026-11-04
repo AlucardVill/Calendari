@@ -143,12 +143,110 @@
 
         .hidden-bar-toggle {
             background: transparent; border: none; color: var(--muted);
-            font-size: 0.65rem; cursor: pointer; line-height: 1;
-            flex-shrink: 0; width: 14px; height: 20px;
+            cursor: pointer; flex-shrink: 0;
+            width: 16px; height: 20px; padding: 0;
             display: flex; align-items: center; justify-content: center;
             transition: color 0.2s, transform 0.25s;
         }
         .hidden-bar-toggle:hover { color: var(--accent); }
+        .hidden-bar-toggle svg { width: 11px; height: 11px; display: block; }
+        .hidden-bar-toggle .chev-right { display: block; }
+        .hidden-bar-toggle .chev-down  { display: none; }
+        .hidden-timers-bar.expanded .hidden-bar-toggle .chev-right { display: none; }
+        .hidden-timers-bar.expanded .hidden-bar-toggle .chev-down  { display: block; }
+
+        .hidden-bar-search-btn {
+            background: transparent; border: none; color: var(--muted);
+            width: 22px; height: 22px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; padding: 0; border-radius: 5px;
+            transition: color 0.2s, background 0.2s, transform 0.15s;
+        }
+        .hidden-bar-search-btn:hover { color: var(--accent); background: var(--item-bg); }
+        .hidden-bar-search-btn:active { transform: scale(0.9); }
+        .hidden-bar-search-btn svg { width: 13px; height: 13px; display: block; }
+
+        .hidden-bar-search-wrap {
+            display: none; align-items: center; gap: 2px;
+            flex-shrink: 0; flex-basis: 120px; max-width: 120px; min-width: 0;
+        }
+        .hidden-timers-bar.searching .hidden-bar-search-wrap,
+        .hidden-timers-bar.expanded .hidden-bar-search-wrap { display: flex; }
+
+        .hidden-bar-search-input {
+            flex: 1; min-width: 0; width: 100%;
+            background: var(--input-bg); border: 1px solid var(--border-input);
+            color: var(--text); padding: 3px 7px; border-radius: 6px;
+            font-family: inherit; font-size: 0.68rem; outline: none;
+            height: 22px; box-sizing: border-box;
+            transition: border-color 0.2s, opacity 0.2s;
+        }
+        .hidden-bar-search-input::placeholder { color: var(--muted); }
+        .hidden-bar-search-input:focus { border-color: var(--accent); }
+
+        .hidden-bar-search-clear {
+            background: transparent; border: none; color: var(--muted);
+            width: 18px; height: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; padding: 0; border-radius: 4px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .hidden-bar-search-clear:hover { color: var(--sunday); background: var(--item-bg); }
+        .hidden-bar-search-clear svg { width: 10px; height: 10px; display: block; }
+
+        .hidden-timers-bar.expanded .hidden-bar-search-wrap {
+            flex-basis: 95px; max-width: 95px;
+            opacity: 0.65; transition: opacity 0.25s;
+        }
+        .hidden-timers-bar.expanded .hidden-bar-search-wrap:focus-within { opacity: 1; }
+        .hidden-timers-bar.expanded .hidden-bar-search-input {
+            font-size: 0.64rem; height: 20px; padding: 2px 6px;
+            background: var(--item-bg);
+        }
+
+        .hidden-bar-results {
+            display: none; align-items: center; gap: 6px;
+            flex: 1; min-width: 0;
+            overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+            padding: 2px 0;
+        }
+        .hidden-bar-results::-webkit-scrollbar { display: none; }
+        .hidden-timers-bar.searching .hidden-bar-results { display: flex; }
+
+        .hidden-bar-result-item {
+            display: flex; align-items: center; gap: 5px;
+            padding: 3px 8px 3px 7px; border-radius: 999px;
+            background: var(--item-bg); border: 1px solid var(--border-input);
+            cursor: pointer; user-select: none; white-space: nowrap;
+            flex-shrink: 0; font-size: 0.65rem; font-weight: 700;
+            color: var(--text); transition: all 0.18s;
+            max-width: 150px; min-height: 20px;
+        }
+        .hidden-bar-result-item:hover {
+            border-color: var(--result-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .hidden-bar-result-item:active { transform: scale(0.95); }
+        .hidden-bar-result-item .result-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--result-color);
+            box-shadow: 0 0 6px var(--result-color);
+            flex-shrink: 0;
+        }
+        .hidden-bar-result-item .result-name {
+            overflow: hidden; text-overflow: ellipsis; opacity: 0.9;
+        }
+
+        .hidden-bar-result-empty,
+        .hidden-bar-pill-empty {
+            display: none;
+            font-size: 0.65rem; color: var(--muted); font-style: italic;
+            padding: 0 6px; white-space: nowrap; flex-shrink: 0;
+        }
+
+        .hidden-timers-bar.searching .hidden-bar-dots { display: none; }
+        .hidden-timers-bar.searching .hidden-bar-search-btn,
+        .hidden-timers-bar.expanded .hidden-bar-search-btn { display: none; }
 
         .hidden-bar-dots {
             display: flex; align-items: center; gap: 7px;
@@ -1369,15 +1467,83 @@
 
         let extraTimersFolded = localStorage.getItem('wkExtraTimersFolded') === 'true';
         let hiddenBarExpanded = localStorage.getItem('wkHiddenBarExpanded') === 'true';
+        let hiddenSearchOpen = false;
+        let hiddenSearchQuery = '';
 
         function toggleHiddenBar() {
             hiddenBarExpanded = !hiddenBarExpanded;
             localStorage.setItem('wkHiddenBarExpanded', hiddenBarExpanded);
+            hiddenSearchOpen = false;
+            hiddenSearchQuery = '';
+            renderTimersUI();
+        }
+
+        function openHiddenSearch() {
+            hiddenSearchOpen = true;
             const bar = document.getElementById('hidden-timers-bar');
             if (!bar) return;
-            bar.classList.toggle('expanded', hiddenBarExpanded);
-            const tgl = bar.querySelector('.hidden-bar-toggle');
-            if (tgl) tgl.textContent = hiddenBarExpanded ? '▾' : '▸';
+            bar.classList.add('searching');
+
+            const input = document.getElementById('hidden-search-input');
+            if (input) {
+                input.value = hiddenSearchQuery;
+                applyHiddenSearchFilter();
+                setTimeout(() => {
+                    try { input.focus({ preventScroll: true }); }
+                    catch(e) { input.focus(); }
+                }, 30);
+            }
+        }
+
+        function closeHiddenSearch() {
+            const input = document.getElementById('hidden-search-input');
+
+            if (hiddenSearchQuery.length > 0) {
+                hiddenSearchQuery = '';
+                if (input) input.value = '';
+                applyHiddenSearchFilter();
+                if (input && hiddenSearchOpen) {
+                    try { input.focus({ preventScroll: true }); }
+                    catch(e) { input.focus(); }
+                }
+                return;
+            }
+
+            if (!hiddenBarExpanded) {
+                hiddenSearchOpen = false;
+                const bar = document.getElementById('hidden-timers-bar');
+                if (bar) bar.classList.remove('searching');
+                if (input) input.blur();
+            }
+        }
+
+        function onHiddenSearchInput(value) {
+            hiddenSearchQuery = value;
+            applyHiddenSearchFilter();
+        }
+
+        function applyHiddenSearchFilter() {
+            const bar = document.getElementById('hidden-timers-bar');
+            if (!bar) return;
+            const q = (hiddenSearchQuery || '').trim().toLowerCase();
+
+            let anyResult = false;
+            bar.querySelectorAll('.hidden-bar-result-item').forEach(el => {
+                const match = !q || (el.dataset.name || '').includes(q);
+                el.style.display = match ? '' : 'none';
+                if (match) anyResult = true;
+            });
+            const emptyRes = bar.querySelector('.hidden-bar-result-empty');
+            if (emptyRes) emptyRes.style.display = (q && !anyResult) ? 'block' : 'none';
+
+            let anyPill = false;
+            bar.querySelectorAll('.hidden-timer-pill').forEach(el => {
+                const match = !q || (el.dataset.name || '').includes(q);
+                el.style.display = match ? '' : 'none';
+                if (match) anyPill = true;
+            });
+            const emptyPill = bar.querySelector('.hidden-bar-pill-empty');
+            if (emptyPill) emptyPill.style.display = (q && !anyPill) ? 'block' : 'none';
         }
 
         let timerStats = JSON.parse(localStorage.getItem('wkTimerStats')) || [];
@@ -1491,23 +1657,78 @@
                             title="${t.name}${t.tRunning ? ' · corriendo' : ''} — clic para mostrar"></button>`
                 ).join('');
 
+                const safeQuery = hiddenSearchQuery.replace(/"/g, '&quot;');
+
                 const pillsHtml = hiddenList.map(t => `
                     <div class="hidden-timer-pill ${t.tRunning ? 'is-running' : ''}"
                          style="--pill-color:${t.color}"
+                         data-name="${(t.name||'').toLowerCase().replace(/"/g, '&quot;')}"
                          onclick="toggleTimerHidden('${t.id}')"
                          title="Mostrar ${t.name}">
                         <span class="pill-dot"></span>
                         <span class="pill-name">${t.name}</span>
                         <span class="pill-time" id="pill-time-${t.id}">00:00</span>
                     </div>`
-                ).join('');
+                ).join('') + '<div class="hidden-bar-pill-empty">No hay coincidencias</div>';
+
+                const resultsHtml = hiddenList.map(t => `
+                    <div class="hidden-bar-result-item"
+                         style="--result-color:${t.color}"
+                         data-name="${(t.name||'').toLowerCase().replace(/"/g, '&quot;')}"
+                         onclick="toggleTimerHidden('${t.id}')"
+                         title="Mostrar ${t.name}">
+                        <span class="result-dot"></span>
+                        <span class="result-name">${t.name}</span>
+                    </div>`
+                ).join('') + '<div class="hidden-bar-result-empty">No hay coincidencias</div>';
 
                 html += `
-                    <div class="hidden-timers-bar active ${hiddenBarExpanded ? 'expanded' : ''}" id="hidden-timers-bar">
+                    <div class="hidden-timers-bar active ${hiddenBarExpanded ? 'expanded' : ''} ${hiddenSearchOpen ? 'searching' : ''}" id="hidden-timers-bar">
+
                         <button class="hidden-bar-toggle"
                                 onclick="toggleHiddenBar()"
-                                title="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}">${hiddenBarExpanded ? '▾' : '▸'}</button>
+                                title="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}"
+                                aria-label="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}">
+                            <svg class="chev-right" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 6l6 6-6 6"/>
+                            </svg>
+                            <svg class="chev-down" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </button>
+
+                        <button class="hidden-bar-search-btn"
+                                onclick="openHiddenSearch()"
+                                title="Buscar temporizador"
+                                aria-label="Buscar temporizador">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="7"/>
+                                <path d="M21 21l-4.3-4.3"/>
+                            </svg>
+                        </button>
+
+                        <div class="hidden-bar-search-wrap">
+                            <input type="text" class="hidden-bar-search-input" id="hidden-search-input"
+                                   placeholder="Buscar..." value="${safeQuery}"
+                                   autocomplete="off" spellcheck="false"
+                                   oninput="onHiddenSearchInput(this.value)"
+                                   onkeydown="if(event.key==='Escape'){closeHiddenSearch();}">
+                            <button class="hidden-bar-search-clear"
+                                    onclick="closeHiddenSearch()"
+                                    title="Limpiar / Cerrar"
+                                    aria-label="Limpiar / Cerrar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2.6" stroke-linecap="round">
+                                    <path d="M6 6l12 12M18 6l-12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
                         <div class="hidden-bar-dots">${dotsHtml}</div>
+                        <div class="hidden-bar-results" id="hidden-bar-results">${resultsHtml}</div>
                         <div class="hidden-bar-pills">${pillsHtml}</div>
                     </div>`;
             }

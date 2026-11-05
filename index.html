@@ -741,6 +741,16 @@
         [data-theme="light"] .tc-field input[type="time"] { color-scheme: light; }
         .tc-field input[type="color"] { padding: 1px; height: 26px; width: 100%; cursor: pointer; border-radius: 6px; }
 
+        .calc-mode-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+        .calc-mode-btn {
+            flex: 1; background: var(--item-bg); border: 1px solid var(--border-input);
+            color: var(--subtext); padding: 8px 6px; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 800; cursor: pointer;
+            font-family: inherit; transition: all 0.2s; letter-spacing: 0.02em;
+        }
+        .calc-mode-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .calc-mode-btn.active { background: var(--accent); color: var(--btn-text); border-color: var(--accent); }
+
         .checkbox-group { display: flex; gap: 3px; flex-wrap: wrap; }
         .chk-btn {
             background: var(--input-bg); border: 1px solid var(--border-input);
@@ -1162,17 +1172,14 @@
     <div id="goal-overlay" class="modal-overlay" style="z-index: 2000;">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h3 style="color: var(--accent); margin-bottom: 6px; text-align: center;">¡Tiempo Finalizado!</h3>
-            <p id="goal-overlay-title" style="font-size: 0.9rem; color: var(--text); margin-bottom: 10px; text-align: center; font-weight: 600;">
-                ¿Objetivo logrado?
-            </p>
-            <div id="goal-overlay-info" style="text-align: center; margin-bottom: 18px; padding: 12px; background: var(--item-bg); border-radius: 10px;"></div>
+            <p id="goal-overlay-title" style="font-size: 0.9rem; color: var(--text); font-weight: 700; margin: 0 0 14px; text-align: center;">¿Objetivo logrado?</p>
+            <div id="goal-overlay-stats" style="background: var(--item-bg); border-radius: 12px; padding: 14px 12px; margin-bottom: 16px; text-align: center;"></div>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-cancel" onclick="recordGoal(false)" style="background: var(--sunday); color: #fff;">No</button>
                 <button class="btn btn-save" onclick="recordGoal(true)">Sí</button>
             </div>
         </div>
     </div>
-
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
         
         <div class="modal-card" id="dual-notes-card" style="display:none;" onclick="event.stopPropagation()">
@@ -1377,16 +1384,14 @@
             </div>
 
             <div id="modal-content-timecalc" style="display:none;">
-                <h3 style="color: var(--accent); margin-bottom: 15px;">Calculadora de Tiempos</h3>
+                <h3 style="color: var(--accent); margin-bottom: 12px;">Calculadora</h3>
 
-                <div style="display:flex; gap:6px; margin-bottom:14px;">
-                    <button class="btn btn-cancel" id="tc-mode-interval" onclick="setTimeCalcMode('interval')"
-                            style="padding:7px 10px; font-size:0.75rem; transition: all 0.2s;">Intervalo</button>
-                    <button class="btn btn-cancel" id="tc-mode-add" onclick="setTimeCalcMode('add')"
-                            style="padding:7px 10px; font-size:0.75rem; transition: all 0.2s;">Sumar Minutos</button>
+                <div class="calc-mode-tabs">
+                    <button class="calc-mode-btn active" id="calc-mode-btn-interval" onclick="setCalcMode('interval')">Intervalo</button>
+                    <button class="calc-mode-btn" id="calc-mode-btn-add" onclick="setCalcMode('add')">Sumar Tiempo</button>
                 </div>
 
-                <div id="tc-view-interval">
+                <div id="calc-interval-fields">
                     <div class="tc-row" style="gap: 10px; margin-bottom: 8px;">
                         <div class="tc-field">
                             <label>Hora Inicio</label>
@@ -1402,19 +1407,25 @@
                     </div>
                 </div>
 
-                <div id="tc-view-add" style="display:none;">
+                <div id="calc-add-fields" style="display:none;">
                     <div class="tc-row" style="gap: 10px; margin-bottom: 8px;">
                         <div class="tc-field">
                             <label>Hora Base</label>
-                            <input type="time" id="inp-add-base" oninput="calculateAddition()" onchange="calculateAddition()">
+                            <input type="time" id="inp-add-base" oninput="calculateAdd()" onchange="calculateAdd()">
                         </div>
                         <div class="tc-field">
-                            <label>Minutos a Sumar</label>
-                            <input type="number" id="inp-add-min" min="0" placeholder="0" oninput="calculateAddition()" onchange="calculateAddition()">
+                            <label>Horas a sumar</label>
+                            <input type="number" id="inp-add-h" placeholder="0" min="0" max="999" oninput="calculateAdd()">
+                        </div>
+                    </div>
+                    <div class="tc-row" style="gap: 10px; margin-bottom: 8px;">
+                        <div class="tc-field" style="grid-column: span 2;">
+                            <label>Minutos a sumar</label>
+                            <input type="number" id="inp-add-m" placeholder="0" min="0" max="999" oninput="calculateAdd()">
                         </div>
                     </div>
                     <div id="calc-add-result" style="margin: 10px 0 0; padding: 16px; background: var(--item-bg); border-radius: 12px; text-align: center; min-height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <span style="color: var(--muted); font-size: 0.8rem;">Ingresa la hora base</span>
+                        <span style="color: var(--muted); font-size: 0.8rem;">Ingresa una hora base</span>
                     </div>
                 </div>
 
@@ -1580,10 +1591,13 @@
             if (!s.id) { s.id = Date.now() - i * 1000; _needSaveStats = true; }
             if (typeof s.durationMs !== 'number') s.durationMs = 0;
             if (typeof s.elapsedMs !== 'number')  s.elapsedMs  = 0;
+            if (typeof s.extraMs !== 'number')    s.extraMs    = 0;
         });
         if (_needSaveStats) localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
 
         let activeTimerForGoal = null; 
+        let goalOverlayInterval = null;
+        let goalCompletedAt = 0;
         
         let notesData = JSON.parse(localStorage.getItem('wkNotes')) || { general: '' };
 
@@ -1965,8 +1979,8 @@
                 id: newId, name: name,
                 tMode: initialMode, tRunning: false, tRef: 0, tAcc: initialAcc,
                 inputH: h > 0 ? h : '', inputM: m > 0 ? m : '',
-                color: nextColor, hidden: false,
-                setMs: totalMs
+                setMs: totalMs,
+                color: nextColor, hidden: false
             });
 
             extraTimersFolded = false;
@@ -1997,55 +2011,55 @@
             let t = timersList.find(x => x.id === id);
             if (!t) return;
 
+            const hEl = document.getElementById(`t-input-h-${id}`);
+            const mEl = document.getElementById(`t-input-m-${id}`);
+            let h = 0, m = 0;
+            if (hEl && mEl) {
+                h = parseInt(hEl.value) || 0;
+                m = parseInt(mEl.value) || 0;
+                t.inputH = h || '';
+                t.inputM = m || '';
+            }
+            const inputMs = (h * 3600 + m * 60) * 1000;
+            const prevSetMs = t.setMs || 0;
+
             if (t.tRunning) {
-                // ─── PAUSA ───
-                if (t.tMode === 'up') t.tAcc += Date.now() - t.tRef;
-                else                  t.tAcc -= Date.now() - t.tRef;
-                t.tRunning = false;
-            } else {
-                // ─── INICIAR / REANUDAR ───
-                const hEl = document.getElementById(`t-input-h-${id}`);
-                const mEl = document.getElementById(`t-input-m-${id}`);
-                let hVal, mVal;
-                if (hEl && mEl) {
-                    hVal = parseInt(hEl.value) || 0;
-                    mVal = parseInt(mEl.value) || 0;
-                } else {
-                    hVal = parseInt(t.inputH) || 0;
-                    mVal = parseInt(t.inputM) || 0;
-                }
-                const currentMs = (hVal * 3600 + mVal * 60) * 1000;
-
-                const hasApplied = (t.appliedH !== undefined || t.appliedM !== undefined);
-                const appliedMs  = hasApplied
-                    ? ((parseInt(t.appliedH) || 0) * 3600 + (parseInt(t.appliedM) || 0) * 60) * 1000
-                    : currentMs;
-                const inputsChanged = hasApplied && currentMs !== appliedMs;
-                const neverStarted  = (t.tRef === 0);
-                const isFresh       = (t.tAcc === 0);
-
-                if (neverStarted || isFresh || inputsChanged) {
-                    // Aplicar los inputs actuales como nuevo tiempo
-                    t.inputH = hVal || '';
-                    t.inputM = mVal || '';
-                    if (currentMs > 0) {
-                        t.tMode = 'down';
-                        t.tAcc  = currentMs;
-                        t.setMs = currentMs;
-                    } else {
-                        t.tMode = 'up';
-                        t.tAcc  = 0;
-                        t.setMs = 0;
-                    }
+                // Si el usuario cambió el tiempo mientras corría → reiniciar con el nuevo tiempo
+                if (inputMs > 0 && inputMs !== prevSetMs) {
+                    t.tMode = 'down';
+                    t.tAcc = inputMs;
+                    t.setMs = inputMs;
                     t.tCompleted = false;
+                    t.tRef = Date.now();
+                } else {
+                    // Pausa normal
+                    if (t.tMode === 'up') t.tAcc += Date.now() - t.tRef;
+                    else                  t.tAcc -= Date.now() - t.tRef;
+                    t.tRunning = false;
                 }
-
-                t.appliedH = hVal;
-                t.appliedM = mVal;
+            } else {
+                const isPaused = t.tAcc > 0 && !t.tCompleted;
+                if (inputMs > 0) {
+                    // Cuenta atrás: reiniciar si los inputs cambiaron o no estaba pausado
+                    if (!isPaused || inputMs !== prevSetMs) {
+                        t.tMode = 'down';
+                        t.tAcc = inputMs;
+                        t.setMs = inputMs;
+                        t.tCompleted = false;
+                    }
+                } else {
+                    // Cuenta arriba
+                    const wasDown = prevSetMs > 0;
+                    if (!isPaused || wasDown) {
+                        t.tMode = 'up';
+                        t.tAcc = 0;
+                        t.setMs = 0;
+                        t.tCompleted = false;
+                    }
+                }
                 t.tRef = Date.now();
                 t.tRunning = true;
             }
-
             saveTimersState();
             updateTimersDisplayValues();
         }
@@ -2055,7 +2069,6 @@
             let t = timersList.find(x => x.id === id);
             if (!t) return;
 
-            // Calcular tiempo consumido real (cuenta atrás → consumido ; cuenta arriba → transcurrido)
             let remaining = t.tAcc;
             if (t.tRunning) {
                 if (t.tMode === 'up') remaining = t.tAcc + (Date.now() - t.tRef);
@@ -2074,7 +2087,6 @@
                 durationMs = elapsedMs;
             }
 
-            // Solo preguntar si hubo tiempo real consumido (evita prompt por toques accidentales)
             if (elapsedMs > 1000 && !activeTimerForGoal) {
                 activeTimerForGoal = {
                     name: t.name,
@@ -2085,7 +2097,6 @@
                 openGoalModal();
             }
 
-            // Limpiar todo
             t.tRunning   = false;
             t.tAcc       = 0;
             t.tRef       = 0;
@@ -2099,7 +2110,6 @@
             let t = timersList.find(x => x.id === id);
             if (!t) return;
 
-            // Leer inputs actuales directamente (por si cambió los minutos y no hizo blur)
             const hEl = document.getElementById(`t-input-h-${id}`);
             const mEl = document.getElementById(`t-input-m-${id}`);
             let h = 0, m = 0;
@@ -2118,7 +2128,7 @@
 
             if (setMs > 0) {
                 t.tMode = 'down';
-                t.tAcc = setMs;   // ← vuelve al tiempo "determinado"
+                t.tAcc = setMs;
                 t.setMs = setMs;
             } else {
                 t.tMode = 'up';
@@ -2126,60 +2136,79 @@
                 t.setMs = 0;
             }
 
-            t.appliedH = h;
-            t.appliedM = m;
             saveTimersState();
             updateTimersDisplayValues();
         }
 
         function openGoalModal() {
-            const name     = activeTimerForGoal?.name || 'Temporizador';
-            const elapsed  = activeTimerForGoal?.elapsedMs || 0;
-            const duration = activeTimerForGoal?.durationMs || 0;
+            const name = activeTimerForGoal?.name || 'Temporizador';
+            const safeName = String(name).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+            document.getElementById('goal-overlay-title').innerHTML =
+                `¿Objetivo logrado para "<span style="color: var(--accent);">${safeName}</span>"?`;
 
-            const titleEl = document.getElementById('goal-overlay-title');
-            if (titleEl) {
-                titleEl.innerHTML = `¿Objetivo logrado para "<span style="color:var(--accent);">${name}</span>"?`;
-            }
-
-            const infoEl = document.getElementById('goal-overlay-info');
-            if (infoEl) {
-                let infoHtml = `
-                    <div style="font-size:1.5rem; font-weight:800; color:var(--accent); font-variant-numeric:tabular-nums; letter-spacing:-0.02em; line-height:1.1;">
-                        ${elapsed > 0 ? formatDuration(elapsed) : '—'}
-                    </div>
-                    <div style="font-size:0.65rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-top:6px;">
-                        Tiempo transcurrido
-                    </div>`;
-                if (duration > 0 && Math.abs(duration - elapsed) > 1000) {
-                    infoHtml += `<div style="font-size:0.72rem; color:var(--subtext); margin-top:10px; font-weight:600;">
-                        Objetivo: <span style="color:var(--work);">${formatDuration(duration)}</span>
-                    </div>`;
-                }
-                infoEl.innerHTML = infoHtml;
-            }
+            goalCompletedAt = Date.now();
+            renderGoalOverlayStats();
+            if (goalOverlayInterval) clearInterval(goalOverlayInterval);
+            goalOverlayInterval = setInterval(renderGoalOverlayStats, 500);
 
             document.getElementById('goal-overlay').classList.add('active');
-            if (!document.getElementById('modal-overlay').classList.contains('active')) {
+            if (!document.getElementById('modal-overlay').classList.contains('active')
+                && !document.getElementById('calendar-overlay').classList.contains('active')) {
                 document.body.style.overflow = 'hidden';
             }
         }
 
+        function renderGoalOverlayStats() {
+            const el = document.getElementById('goal-overlay-stats');
+            if (!el) return;
+            if (!activeTimerForGoal) { el.innerHTML = ''; return; }
+
+            const durMs = activeTimerForGoal.durationMs || 0;
+            const eSec = Math.max(0, Math.floor((Date.now() - goalCompletedAt) / 1000));
+            const eh = Math.floor(eSec / 3600);
+            const em = Math.floor((eSec % 3600) / 60);
+            const es = eSec % 60;
+            const eStr = eh > 0
+                ? `${eh}:${String(em).padStart(2,'0')}:${String(es).padStart(2,'0')}`
+                : `${String(em).padStart(2,'0')}:${String(es).padStart(2,'0')}`;
+
+            const dSec = Math.floor(durMs / 1000);
+            const dh = Math.floor(dSec / 3600);
+            const dm = Math.floor((dSec % 3600) / 60);
+            const ds = dSec % 60;
+            const dStr = dh > 0
+                ? `${dh}:${String(dm).padStart(2,'0')}:${String(ds).padStart(2,'0')}`
+                : `${String(dm).padStart(2,'0')}:${String(ds).padStart(2,'0')}`;
+
+            el.innerHTML = `
+                <div style="font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; margin-bottom: 3px;">Tiempo del timer</div>
+                <div style="font-size: 1.35rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; margin-bottom: 12px;">${dStr}</div>
+                <div style="font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; margin-bottom: 3px;">Transcurrido desde que finalizó</div>
+                <div style="font-size: 1.35rem; font-weight: 800; color: var(--work); font-variant-numeric: tabular-nums;">${eStr}</div>
+            `;
+        }
+
         function recordGoal(success) {
             stopAlarmSound();
+            const extraMs = goalCompletedAt ? (Date.now() - goalCompletedAt) : 0;
+            if (goalOverlayInterval) { clearInterval(goalOverlayInterval); goalOverlayInterval = null; }
+
             timerStats.push({
                 id: Date.now() + Math.random(),
                 date: new Date().toISOString(),
                 timerName: activeTimerForGoal?.name || 'Temporizador',
                 durationMs: activeTimerForGoal?.durationMs || 0,
                 elapsedMs: activeTimerForGoal?.elapsedMs || 0,
+                extraMs: extraMs,
                 color: activeTimerForGoal?.color || '#10b981',
                 success: success
             });
             localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
             activeTimerForGoal = null;
+            goalCompletedAt = 0;
             document.getElementById('goal-overlay').classList.remove('active');
-            if (!document.getElementById('modal-overlay').classList.contains('active')) {
+            if (!document.getElementById('modal-overlay').classList.contains('active')
+                && !document.getElementById('calendar-overlay').classList.contains('active')) {
                 document.body.style.overflow = '';
             }
             const histEl = document.getElementById('modal-content-history');
@@ -2187,10 +2216,8 @@
         }
 
         function updateTimersDisplayValues() {
-            let visibleRunning = null;
-            let visibleIdle    = null;
-            let hiddenRunning  = null;
-            let hiddenIdle     = null;
+            let firstRunningInfo = null;
+            let firstWithTimeInfo = null;
 
             timersList.forEach(t => {
                 let current = t.tAcc;
@@ -2221,9 +2248,7 @@
                 let h = Math.floor(totalSec / 3600);
                 let m = Math.floor((totalSec % 3600) / 60);
                 let s = totalSec % 60;
-                let disp = h > 0
-                    ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-                    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                let disp = h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
                 const displayEl = document.getElementById(`t-display-${t.id}`);
                 if (displayEl) displayEl.innerText = disp;
@@ -2231,14 +2256,12 @@
                 const pillEl = document.getElementById(`pill-time-${t.id}`);
                 if (pillEl) pillEl.innerText = disp;
 
-                // Prioridad: visible general → visible extras → hidden running → hidden idle
-                const isHidden = !!t.hidden;
+                // Prioridad: primero el primer timer corriendo en orden de posición,
+                // si no hay ninguno corriendo, el primero con tiempo > 0.
                 if (t.tRunning) {
-                    if (!isHidden && !visibleRunning)      visibleRunning = { id: t.id, disp, isRunning: true };
-                    else if (isHidden && !hiddenRunning)   hiddenRunning  = { id: t.id, disp, isRunning: true };
+                    if (!firstRunningInfo) firstRunningInfo = { id: t.id, disp: disp, isRunning: true };
                 } else if (current > 0) {
-                    if (!isHidden && !visibleIdle)         visibleIdle = { id: t.id, disp, isRunning: false };
-                    else if (isHidden && !hiddenIdle)      hiddenIdle  = { id: t.id, disp, isRunning: false };
+                    if (!firstWithTimeInfo) firstWithTimeInfo = { id: t.id, disp: disp, isRunning: false };
                 }
 
                 const btnToggle = document.getElementById(`t-btn-toggle-${t.id}`);
@@ -2255,7 +2278,7 @@
                 }
             });
 
-            const activeTimerInfo = visibleRunning || visibleIdle || hiddenRunning || hiddenIdle;
+            const activeTimerInfo = firstRunningInfo || firstWithTimeInfo;
 
             const isNotMainScreen = document.getElementById('calendar-overlay').classList.contains('active') || document.getElementById('modal-overlay').classList.contains('active');
             const floatEl = document.getElementById('floating-timer');
@@ -2363,6 +2386,7 @@
 
         let quarterBarMode = parseInt(localStorage.getItem('wkQBarMode')) || 0;
         let tcMode = 'tarea'; 
+        let calcMode = 'interval';
         let editingEntornoId = null;
 
         let activeTabM = 0;
@@ -3302,7 +3326,19 @@
             updateTimersDisplayValues();
         }
 
-        let timeCalcMode = 'interval';
+        function setCalcMode(mode) {
+            calcMode = mode;
+            const bI = document.getElementById('calc-mode-btn-interval');
+            const bA = document.getElementById('calc-mode-btn-add');
+            if (bI) bI.classList.toggle('active', mode === 'interval');
+            if (bA) bA.classList.toggle('active', mode === 'add');
+            const fI = document.getElementById('calc-interval-fields');
+            const fA = document.getElementById('calc-add-fields');
+            if (fI) fI.style.display = mode === 'interval' ? 'block' : 'none';
+            if (fA) fA.style.display = mode === 'add' ? 'block' : 'none';
+            if (mode === 'interval') calculateInterval();
+            else calculateAdd();
+        }
 
         function openTimeCalcModal() {
             document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
@@ -3310,49 +3346,23 @@
 
             const now = new Date();
             const startH = String(now.getHours()).padStart(2, '0') + ':00';
-            const endH   = String((now.getHours() + 1) % 24).padStart(2, '0') + ':00';
+            const endH = String((now.getHours() + 1) % 24).padStart(2, '0') + ':00';
 
             document.getElementById('inp-calc-start').value = startH;
-            document.getElementById('inp-calc-end').value   = endH;
+            document.getElementById('inp-calc-end').value = endH;
 
-            if (!document.getElementById('inp-add-base').value) {
-                const hh = String(now.getHours()).padStart(2, '0');
-                const mm = String(now.getMinutes()).padStart(2, '0');
-                document.getElementById('inp-add-base').value = `${hh}:${mm}`;
-            }
-            if (!document.getElementById('inp-add-min').value) {
-                document.getElementById('inp-add-min').value = '30';
-            }
+            document.getElementById('inp-add-base').value = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('inp-add-h').value = '';
+            document.getElementById('inp-add-m').value = '';
 
-            setTimeCalcMode('interval');
+            setCalcMode('interval');
             openModal();
-        }
-
-        function setTimeCalcMode(mode) {
-            timeCalcMode = mode;
-            const isI = (mode === 'interval');
-
-            document.getElementById('tc-view-interval').style.display = isI ? 'block' : 'none';
-            document.getElementById('tc-view-add').style.display      = isI ? 'none'  : 'block';
-
-            const btnI = document.getElementById('tc-mode-interval');
-            const btnA = document.getElementById('tc-mode-add');
-
-            btnI.style.background  = isI ? 'var(--accent)' : '';
-            btnI.style.color       = isI ? 'var(--btn-text)' : '';
-            btnI.style.borderColor = isI ? 'var(--accent)' : '';
-
-            btnA.style.background  = !isI ? 'var(--accent)' : '';
-            btnA.style.color       = !isI ? 'var(--btn-text)' : '';
-            btnA.style.borderColor = !isI ? 'var(--accent)' : '';
-
-            if (isI) calculateInterval();
-            else     calculateAddition();
+            document.getElementById('inp-calc-start').focus();
         }
 
         function calculateInterval() {
             const startVal = document.getElementById('inp-calc-start').value;
-            const endVal   = document.getElementById('inp-calc-end').value;
+            const endVal = document.getElementById('inp-calc-end').value;
             const resultEl = document.getElementById('calc-result');
             if (!resultEl) return;
 
@@ -3365,9 +3375,9 @@
             const [eh, em] = endVal.split(':').map(Number);
 
             let startSec = sh * 3600 + sm * 60;
-            let endSec   = eh * 3600 + em * 60;
-            let diff     = endSec - startSec;
-            let crossed  = false;
+            let endSec = eh * 3600 + em * 60;
+            let diff = endSec - startSec;
+            let crossed = false;
             if (diff < 0) { diff += 24 * 3600; crossed = true; }
 
             if (diff === 0) {
@@ -3396,41 +3406,40 @@
             `;
         }
 
-        function calculateAddition() {
+        function calculateAdd() {
             const baseVal = document.getElementById('inp-add-base').value;
-            const minVal  = parseInt(document.getElementById('inp-add-min').value) || 0;
+            const h = parseInt(document.getElementById('inp-add-h').value) || 0;
+            const m = parseInt(document.getElementById('inp-add-m').value) || 0;
             const resultEl = document.getElementById('calc-add-result');
             if (!resultEl) return;
 
             if (!baseVal) {
-                resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.8rem;">Ingresa la hora base</span>';
+                resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.8rem;">Ingresa una hora base</span>';
                 return;
             }
 
-            const [h, m] = baseVal.split(':').map(Number);
-            const baseMin  = h * 60 + m;
-            const totalMin = baseMin + minVal;
+            const [bh, bm] = baseVal.split(':').map(Number);
+            const totalMin = bh * 60 + bm + h * 60 + m;
+            const daysCrossed = Math.floor(totalMin / (24 * 60));
+            const modMin = ((totalMin % (24 * 60)) + 24 * 60) % (24 * 60);
+            const rh = Math.floor(modMin / 60);
+            const rm = modMin % 60;
+            const resStr = `${String(rh).padStart(2,'0')}:${String(rm).padStart(2,'0')}`;
 
-            const days   = Math.floor(totalMin / (24 * 60));
-            const remMin = ((totalMin % (24 * 60)) + 24 * 60) % (24 * 60);
-            const newH   = Math.floor(remMin / 60);
-            const newM   = remMin % 60;
-
-            const display = `${String(newH).padStart(2,'0')}:${String(newM).padStart(2,'0')}`;
-            const ampm    = newH >= 12 ? 'PM' : 'AM';
-            const h12     = newH % 12 || 12;
+            const parts = [];
+            if (h > 0) parts.push(`${h}h`);
+            if (m > 0) parts.push(`${m}m`);
+            if (parts.length === 0) parts.push('0m');
 
             resultEl.innerHTML = `
+                <div style="font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; margin-bottom: 2px;">Resultado</div>
                 <div style="font-size: 1.9rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.02em;">
-                    ${display}
+                    ${resStr}
                 </div>
                 <div style="font-size: 0.8rem; color: var(--subtext); margin-top: 4px; font-weight: 600;">
-                    ${h12}:${String(newM).padStart(2,'0')} ${ampm}
+                    ${baseVal} + ${parts.join(' ')}
                 </div>
-                ${days > 0 ? `<div style="font-size: 0.7rem; color: var(--work); margin-top: 6px; font-weight: 600;">⚠ +${days} día${days>1?'s':''}</div>` : ''}
-                <div style="font-size: 0.65rem; color: var(--muted); margin-top: 6px;">
-                    ${baseVal} + ${minVal} min = ${display}
-                </div>
+                ${daysCrossed > 0 ? `<div style="font-size: 0.7rem; color: var(--work); margin-top: 6px; font-weight: 600;">⚠ Cruza ${daysCrossed} día${daysCrossed > 1 ? 's' : ''}</div>` : ''}
             `;
         }
 
@@ -3777,6 +3786,17 @@
             return `${s}s`;
         }
 
+        function formatClock(ms) {
+            if (!ms || ms < 0) return '00:00';
+            const totalSec = Math.floor(ms / 1000);
+            const h = Math.floor(totalSec / 3600);
+            const m = Math.floor((totalSec % 3600) / 60);
+            const s = totalSec % 60;
+            return h > 0
+                ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+                : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
         function openHistoryModal() {
             document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-history').style.display = 'flex';
@@ -3830,14 +3850,8 @@
                     const t = new Date(item.date);
                     const hh = String(t.getHours()).padStart(2, '0');
                     const mm = String(t.getMinutes()).padStart(2, '0');
-                    const elapsed = item.elapsedMs || 0;
-                    const target  = item.durationMs || 0;
-                    let dur;
-                    if (target > 0 && elapsed > 0 && Math.abs(target - elapsed) > 1000) {
-                        dur = `${formatDuration(elapsed)} / ${formatDuration(target)}`;
-                    } else {
-                        dur = formatDuration(elapsed || target);
-                    }
+                    const dur = formatClock(item.elapsedMs || item.durationMs || 0);
+                    const extra = item.extraMs ? ` · +${formatClock(item.extraMs)}` : '';
                     const check = item.success
                         ? '<span style="color:var(--accent); font-weight:800;">✓ Sí</span>'
                         : '<span style="color:var(--sunday); font-weight:800;">✗ No</span>';
@@ -3845,7 +3859,7 @@
                     html += `<div class="history-item">
                         <div class="history-info">
                             <div class="history-name">${item.timerName || 'Temporizador'}</div>
-                            <div class="history-meta">${hh}:${mm} · ${dur}</div>
+                            <div class="history-meta">${hh}:${mm} · ${dur}${extra}</div>
                         </div>
                         <div class="history-check">${check}</div>
                         <button class="history-del" onclick="deleteHistoryItem('${item.id}')" title="Eliminar">×</button>
@@ -3874,18 +3888,18 @@
                 + '<head><meta charset="UTF-8">'
                 + '<style>body{font-family:Arial,sans-serif;} th{background:#10b981;color:#fff;padding:8px;text-align:left;} td{padding:6px 8px;border:1px solid #ccc;}</style>'
                 + '</head><body>'
-                + '<table><thead><tr><th>Fecha</th><th>Hora</th><th>Nombre</th><th>Objetivo</th><th>Transcurrido</th><th>Cumplimiento</th></tr></thead><tbody>';
+                + '<table><thead><tr><th>Fecha</th><th>Hora</th><th>Nombre</th><th>Duración</th><th>Tiempo extra</th><th>Cumplimiento</th></tr></thead><tbody>';
 
             sorted.forEach(s => {
                 const d = new Date(s.date);
                 const date = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
                 const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-                const objetivo     = s.durationMs > 0 ? formatDuration(s.durationMs) : '—';
-                const transcurrido = s.elapsedMs  > 0 ? formatDuration(s.elapsedMs)  : '—';
+                const dur  = formatClock(s.elapsedMs || s.durationMs || 0);
+                const extra = s.extraMs ? formatClock(s.extraMs) : '—';
                 const comp = s.success ? 'Sí' : 'No';
                 const name = String(s.timerName || '')
                     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                html += `<tr><td>${date}</td><td>${time}</td><td>${name}</td><td>${objetivo}</td><td>${transcurrido}</td><td>${comp}</td></tr>`;
+                html += `<tr><td>${date}</td><td>${time}</td><td>${name}</td><td>${dur}</td><td>${extra}</td><td>${comp}</td></tr>`;
             });
 
             html += '</tbody></table></body></html>';

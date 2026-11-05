@@ -1813,9 +1813,9 @@
                 </span>
                 ${hideBtn}
                 <div class="timer-input-group">
-                    <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" onchange="syncTimerInputs('${t.id}')">
+                    <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" oninput="syncTimerInputs('${t.id}')" onchange="syncTimerInputs('${t.id}')">
                     <span>h</span>
-                    <input type="number" id="t-input-m-${t.id}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos" onchange="syncTimerInputs('${t.id}')">
+                    <input type="number" id="t-input-m-${t.id}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos" oninput="syncTimerInputs('${t.id}')" onchange="syncTimerInputs('${t.id}')">
                     <span>min</span>
                 </div>
                 <div class="timer-display" id="t-display-${t.id}">00:00</div>
@@ -1843,10 +1843,9 @@
             if (!hEl || !mEl) return;
             const h = parseInt(hEl.value) || 0;
             const m = parseInt(mEl.value) || 0;
-            t.inputH = h || '';
-            t.inputM = m || '';
+            t.inputH = h > 0 ? h : '';
+            t.inputM = m > 0 ? m : '';
             saveTimersState();
-            // NADA más. No tocamos setMs ni reiniciamos nada.
         }
 
         let draggedIndex = null;
@@ -2051,25 +2050,41 @@
             let t = timersList.find(x => x.id === id);
             if (!t) return;
 
+            // 1) Leer SIEMPRE del DOM (por si onchange no se disparó)
+            const hEl = document.getElementById(`t-input-h-${id}`);
+            const mEl = document.getElementById(`t-input-m-${id}`);
+            if (hEl && mEl) {
+                const h = parseInt(hEl.value) || 0;
+                const m = parseInt(mEl.value) || 0;
+                t.inputH = h || '';
+                t.inputM = m || '';
+            }
+
+            // 2) Guardar estado previo ANTES de modificar
+            const wasRunning = t.tRunning;
+            const hadProgress = wasRunning || (t.tAcc > 0);
+
             let remaining = t.tAcc;
             if (t.tRunning) {
                 if (t.tMode === 'up') remaining = t.tAcc + (Date.now() - t.tRef);
                 else                  remaining = t.tAcc - (Date.now() - t.tRef);
             }
 
-            const setMs = getTimerSetMs(t);
+            // 3) Para estadísticas: usar el setMs con el que ESTABA CORRIENDO
+            const runningSetMs = t.setMs || 0;
             let elapsedMs, durationMs;
 
-            if (t.tMode === 'down' && setMs > 0) {
+            if (t.tMode === 'down' && runningSetMs > 0) {
                 remaining  = Math.max(0, remaining);
-                elapsedMs  = Math.max(0, setMs - remaining);
-                durationMs = setMs;
+                elapsedMs  = Math.max(0, runningSetMs - remaining);
+                durationMs = runningSetMs;
             } else {
                 elapsedMs  = Math.max(0, remaining);
                 durationMs = elapsedMs;
             }
 
-            if (elapsedMs > 1000 && !activeTimerForGoal) {
+            // 4) Solo abrir modal si hubo progreso real
+            if (elapsedMs > 1000 && hadProgress && !activeTimerForGoal) {
                 activeTimerForGoal = {
                     name: t.name,
                     durationMs: durationMs,
@@ -2079,10 +2094,18 @@
                 openGoalModal();
             }
 
+            // 5) Resetear estado
             t.tRunning   = false;
             t.tAcc       = 0;
             t.tRef       = 0;
             t.tCompleted = false;
+
+            // 6) CLAVE: sincronizar setMs con el valor actual del input.
+            //    Así, al pulsar PLAY después de STOP, arranca con el nuevo valor.
+            const hNow = parseInt(t.inputH) || 0;
+            const mNow = parseInt(t.inputM) || 0;
+            t.setMs = (hNow * 3600 + mNow * 60) * 1000;
+
             saveTimersState();
             updateTimersDisplayValues();
         }

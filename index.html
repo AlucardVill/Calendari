@@ -1836,21 +1836,17 @@
         }
 
         function syncTimerInputs(id) {
-            let t = timersList.find(x => x.id === id);
+            const t = timersList.find(x => x.id === id);
             if (!t) return;
             const hEl = document.getElementById(`t-input-h-${id}`);
             const mEl = document.getElementById(`t-input-m-${id}`);
-            if (!hEl || !mEl) return;                    
-
+            if (!hEl || !mEl) return;
             const h = parseInt(hEl.value) || 0;
             const m = parseInt(mEl.value) || 0;
             t.inputH = h || '';
             t.inputM = m || '';
-
-            if (!t.tRunning && t.tAcc === 0) {
-                t.setMs = (h * 3600 + m * 60) * 1000;
-            }
             saveTimersState();
+            // NADA más. No tocamos setMs ni reiniciamos nada.
         }
 
         let draggedIndex = null;
@@ -2008,57 +2004,43 @@
 
         function toggleTimer(id) {
             stopAlarmSound();
-            let t = timersList.find(x => x.id === id);
+            const t = timersList.find(x => x.id === id);
             if (!t) return;
 
+            // Leer SIEMPRE el valor actual del DOM (no del modelo), así
+            // no importa si onchange aún no disparó.
             const hEl = document.getElementById(`t-input-h-${id}`);
             const mEl = document.getElementById(`t-input-m-${id}`);
-            let h = 0, m = 0;
-            if (hEl && mEl) {
-                h = parseInt(hEl.value) || 0;
-                m = parseInt(mEl.value) || 0;
-                t.inputH = h || '';
-                t.inputM = m || '';
-            }
+            const h = hEl ? (parseInt(hEl.value) || 0) : 0;
+            const m = mEl ? (parseInt(mEl.value) || 0) : 0;
+            t.inputH = h || '';
+            t.inputM = m || '';
             const inputMs = (h * 3600 + m * 60) * 1000;
-            const prevSetMs = t.setMs || 0;
+            const committedMs = t.setMs || 0;
+            const inputChanged = inputMs !== committedMs;
 
             if (t.tRunning) {
-                // Si el usuario cambió el tiempo mientras corría → reiniciar con el nuevo tiempo
-                if (inputMs > 0 && inputMs !== prevSetMs) {
-                    t.tMode = 'down';
-                    t.tAcc = inputMs;
-                    t.setMs = inputMs;
-                    t.tCompleted = false;
-                    t.tRef = Date.now();
-                } else {
-                    // Pausa normal
-                    if (t.tMode === 'up') t.tAcc += Date.now() - t.tRef;
-                    else                  t.tAcc -= Date.now() - t.tRef;
-                    t.tRunning = false;
-                }
+                // Corriendo → pausar
+                if (t.tMode === 'up') t.tAcc += Date.now() - t.tRef;
+                else                  t.tAcc -= Date.now() - t.tRef;
+                t.tRunning = false;
             } else {
                 const isPaused = t.tAcc > 0 && !t.tCompleted;
-                if (inputMs > 0) {
-                    // Cuenta atrás: reiniciar si los inputs cambiaron o no estaba pausado
-                    if (!isPaused || inputMs !== prevSetMs) {
-                        t.tMode = 'down';
-                        t.tAcc = inputMs;
-                        t.setMs = inputMs;
-                        t.tCompleted = false;
-                    }
+
+                if (isPaused && !inputChanged) {
+                    // Pausado SIN cambiar el tiempo → reanudar
+                    t.tRef = Date.now();
+                    t.tRunning = true;
                 } else {
-                    // Cuenta arriba
-                    const wasDown = prevSetMs > 0;
-                    if (!isPaused || wasDown) {
-                        t.tMode = 'up';
-                        t.tAcc = 0;
-                        t.setMs = 0;
-                        t.tCompleted = false;
-                    }
+                    // Pausado CON cambio, o idle, o completado → reiniciar
+                    // con el tiempo nuevo del input
+                    t.tMode = inputMs > 0 ? 'down' : 'up';
+                    t.tAcc = inputMs;
+                    t.setMs = inputMs;
+                    t.tRef = Date.now();
+                    t.tCompleted = false;
+                    t.tRunning = true;
                 }
-                t.tRef = Date.now();
-                t.tRunning = true;
             }
             saveTimersState();
             updateTimersDisplayValues();

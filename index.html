@@ -406,7 +406,7 @@
             font-size: 0.66rem; height: 22px; padding: 3px 7px; background: var(--item-bg);
         }
 
-        /* === MODIFICADO: scrollbar OCULTA en resultados (sigue desplazándose) === */
+        /* === scrollbar OCULTA en resultados (sigue desplazándose) === */
         .hidden-bar-results {
             display: none; align-items: center; gap: 6px;
             flex: 1; min-width: 0;
@@ -445,7 +445,7 @@
         .hidden-timers-bar.searching .hidden-bar-search-btn,
         .hidden-timers-bar.expanded .hidden-bar-search-btn { display: none; }
 
-        /* === MODIFICADO: scrollbar OCULTA en dots (sigue desplazándose) === */
+        /* === scrollbar OCULTA en dots (sigue desplazándose) === */
         .hidden-bar-dots {
             display: flex; align-items: center; gap: 8px;
             flex: 1; min-width: 0;
@@ -1380,7 +1380,7 @@
             
             <div id="modal-content-goal" style="display:none; text-align: center;">
                 <h3 style="color: var(--accent); margin-bottom: 12px;">¡Tiempo Finalizado!</h3>
-                <p id="goal-modal-title" style="font-size: 0.88px; color: var(--subtext); margin-bottom: 22px;">¿Objetivo logrado?</p>
+                <p id="goal-modal-title" style="font-size: 0.88rem; color: var(--subtext); margin-bottom: 22px;">¿Objetivo logrado?</p>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-cancel" onclick="recordGoal(false)" style="background: var(--sunday); color: #fff; border-color: var(--sunday);">No</button>
                     <button class="btn btn-save" onclick="recordGoal(true)">Sí</button>
@@ -2223,7 +2223,7 @@
         }
 
         function openAddTimerModal() {
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-addtimer').style.display = 'block';
             document.getElementById('inp-newt-name').value = '';
             document.getElementById('inp-newt-h').value = '';
@@ -2734,7 +2734,7 @@
         }
 
         function openGeneralModal() { 
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-general').style.display = 'block'; 
             
             document.getElementById('theme-week-color').value = localStorage.getItem('wkWeekColor') || 'green';
@@ -2796,7 +2796,7 @@
         let notesIndexRefreshTimer = null;
 
         function openNotesModal() {
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
 
             const content = document.getElementById('modal-content-notes');
             content.style.display = 'flex';
@@ -2932,7 +2932,7 @@
         }
 
         function showDayStats(dateStr, wNum, dI, mI) {
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-daystats').style.display = 'block';
             document.getElementById('ds-title').innerText = `Día: ${dateStr}`;
             
@@ -3097,7 +3097,7 @@
             
             updateTcUI();
             
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-taskcreate').style.display = 'block';
             openModal();
         }
@@ -3180,7 +3180,7 @@
                 btn.classList.toggle('active', ent.days.includes(parseInt(btn.dataset.val)));
             });
 
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-taskcreate').style.display = 'block';
             openModal();
         }
@@ -3562,7 +3562,7 @@
         }
 
         function openMetricsModal() { 
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; 
             renderMetricsModalBody(selectedQuarter); 
             document.getElementById('modal-content-metrics').style.display = 'block'; 
@@ -3694,7 +3694,7 @@
         }
 
         function openTimeCalcModal() {
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-timecalc').style.display = 'block';
 
             const now = new Date();
@@ -3801,7 +3801,7 @@
         }
 
         function openBlockModal() { 
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-block').style.display = 'block'; 
             document.getElementById('inp-block-start').value = blockConfig.startYear; 
             document.getElementById('inp-block-years').value = blockConfig.years; 
@@ -3819,7 +3819,7 @@
         }
 
         function openWorkModal() { 
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-work').style.display = 'block'; 
             document.getElementById('inp-work-start').value = workConfig.start; 
             document.getElementById('inp-work-end').value = workConfig.end; 
@@ -3841,7 +3841,7 @@
         }
 
         function openDayModal() { 
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-day').style.display = 'block'; 
             document.getElementById('inp-day-format').value = dayConfig.format; 
             openModal(); 
@@ -3901,7 +3901,7 @@
         }
         function openMarkerModal(barId, markerObj) {
             activeMarker = { barId, obj: markerObj }; 
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-marker').style.display = 'block';
             document.getElementById('inp-marker-color').value = markerObj.color; openModal();
         }
@@ -4155,7 +4155,7 @@
         }
 
         function openHistoryModal() {
-            document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-history').style.display = 'flex';
             document.getElementById('main-modal-card').classList.add('wide');
             renderHistoryModal();
@@ -4298,7 +4298,6 @@
             const resizeHandle = document.createElement('div');
             resizeHandle.className = 'modal-resize-handle';
             resizeHandle.title = 'Redimensionar';
-            /* === MODIFICADO: SVG discreto de 3 puntitos === */
             resizeHandle.innerHTML = '<svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="2.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="2.5" r="0.9"/></svg>';
             modalEl.appendChild(resizeHandle);
 

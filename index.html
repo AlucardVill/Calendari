@@ -54,7 +54,7 @@
             --week-box-concluded: #2b2f3a;
             --current-week-bg: rgba(52, 211, 153, 0.10);
             --block-id: #fcd34d;
-            --modal-bg: rgba(6, 9, 14, 0.55);
+            --modal-bg: rgba(6, 9, 14, 0.32);
             --btn-text: #06251a;
             --today-text: #0a0d12;
             --badge-meta-bg: rgba(255, 255, 255, 0.08);
@@ -98,7 +98,7 @@
             --week-box-concluded: #cbd1dc;
             --current-week-bg: rgba(16, 185, 129, 0.09);
             --block-id: #b45309;
-            --modal-bg: rgba(20, 25, 35, 0.30);
+            --modal-bg: rgba(20, 25, 35, 0.15);
             --btn-text: #ffffff;
             --today-text: #ffffff;
             --badge-meta-bg: rgba(20, 23, 30, 0.07);
@@ -197,30 +197,82 @@
         .section-label svg { width: 14px; height: 14px; display: block; color: var(--accent); opacity: 0.9; flex-shrink: 0; }
 
         /* ============================================
-           PROGRESS BUTTONS (iOS Segmented)
+           PROGRESS BUTTONS (iOS Segmented - Rediseñado)
            ============================================ */
-        .progress-buttons { display: flex; gap: 8px; margin-bottom: 4px; }
-        .progress-btn {
-            flex: 1; padding: 16px 4px; border-radius: 16px;
-            border: 1px solid var(--border); 
-            background: var(--card); 
+        .progress-buttons {
+            display: flex; gap: 6px; margin-bottom: 4px;
+            padding: 7px;
+            background: var(--card);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            font-family: inherit; font-size: 0.82rem; font-weight: 700;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--card-shadow); color: var(--text);
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            letter-spacing: -0.01em;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--card-shadow);
         }
-        .progress-btn:hover { transform: translateY(-2px); border-color: currentColor; }
-        .progress-btn:active { transform: translateY(0) scale(0.97); }
-        .progress-btn.active { 
-            border-color: currentColor; 
-            background: var(--card-solid);
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 24px -8px currentColor, var(--card-shadow); 
+        .progress-btn {
+            flex: 1;
+            padding: 18px 3px 11px;
+            border-radius: 15px;
+            border: 1px solid transparent;
+            background: transparent;
+            font-family: inherit; font-size: 0.82rem; font-weight: 800;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            letter-spacing: 0.01em;
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
-        .progress-btn .pb-arrow { font-size: 0.55rem; opacity: 0.5; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-        .progress-btn.active .pb-arrow { transform: rotate(180deg); opacity: 1; }
+        .progress-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: currentColor;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        .progress-btn::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+            background: currentColor;
+            opacity: 0.4;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        .progress-btn:hover { transform: translateY(-2px); }
+        .progress-btn:hover::before { opacity: 0.08; }
+        .progress-btn:hover::after  { opacity: 0.75; width: 26px; }
+        .progress-btn:active { transform: translateY(0) scale(0.96); }
+        .progress-btn.active {
+            border-color: currentColor;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px -10px currentColor;
+        }
+        .progress-btn.active::before { opacity: 0.16; }
+        .progress-btn.active::after {
+            opacity: 1;
+            width: 30px;
+            box-shadow: 0 0 10px currentColor;
+        }
+        .progress-btn .pb-arrow {
+            font-size: 0.5rem;
+            opacity: 0.4;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+            line-height: 1;
+        }
+        .progress-btn.active .pb-arrow {
+            transform: rotate(180deg);
+            opacity: 0.9;
+        }
 
         /* ============================================
            TIMERS
@@ -361,7 +413,12 @@
             transition: padding 0.25s ease; min-height: 34px;
         }
         .hidden-timers-bar.active { display: flex; }
-        .hidden-timers-bar.expanded { padding: 10px 12px; }
+        .hidden-timers-bar.expanded {
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 10px 12px;
+            row-gap: 6px;
+        }
 
         .hidden-bar-toggle {
             background: transparent; border: none; color: var(--muted);
@@ -417,8 +474,11 @@
         .hidden-bar-search-clear svg { width: 10px; height: 10px; display: block; }
 
         .hidden-timers-bar.expanded .hidden-bar-search-wrap {
-            flex-basis: 100px; max-width: 100px;
-            opacity: 0.7; transition: opacity 0.25s;
+            flex: 1;
+            flex-basis: auto;
+            max-width: none;
+            min-width: 0;
+            opacity: 0.85; transition: opacity 0.25s;
         }
         .hidden-timers-bar.expanded .hidden-bar-search-wrap:focus-within { opacity: 1; }
         .hidden-timers-bar.expanded .hidden-bar-search-input {
@@ -496,7 +556,14 @@
 
         .hidden-bar-pills { display: none; flex-wrap: wrap; gap: 6px; flex: 1; }
         .hidden-timers-bar.expanded .hidden-bar-dots  { display: none; }
-        .hidden-timers-bar.expanded .hidden-bar-pills { display: flex; }
+        .hidden-timers-bar.expanded .hidden-bar-pills {
+            display: flex;
+            flex: 1 1 100%;
+            flex-basis: 100%;
+            width: 100%;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
 
         .hidden-timer-pill {
             display: flex; align-items: center; gap: 6px;
@@ -750,7 +817,7 @@
         .qc-pct { font-size: 0.88rem; font-weight: 800; color: var(--text); }
 
         /* ============================================
-           CALENDAR MODAL (Quarter Detail)
+           CALENDAR MODAL (Quarter Detail) — Cristal
            ============================================ */
         .calendar-overlay {
             display: none; position: fixed; inset: 0;
@@ -763,14 +830,20 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .calendar-detail {
-            background: var(--bg-elevated); border-radius: 24px;
+            background: rgba(30, 34, 44, 0.42);
+            backdrop-filter: blur(50px) saturate(180%);
+            -webkit-backdrop-filter: blur(50px) saturate(180%);
+            border-radius: 24px;
             width: 100%; max-width: 720px; max-height: 92vh;
-            display: flex; flex-direction: column; border: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.10);
             animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden; 
-            box-shadow: 0 32px 64px -12px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
+            box-shadow: 0 32px 64px -12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
         }
         [data-theme="light"] .calendar-detail {
+            background: rgba(255, 255, 255, 0.52);
+            border-color: rgba(255, 255, 255, 0.7);
             box-shadow: 0 32px 64px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04);
         }
         @keyframes modalIn {
@@ -782,7 +855,12 @@
             padding: 16px 18px; display: grid;
             grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px;
             border-bottom: 1px solid var(--border); flex-shrink: 0;
-            background: var(--card-solid);
+            background: rgba(30, 34, 44, 0.35);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        [data-theme="light"] .calendar-detail-header {
+            background: rgba(255, 255, 255, 0.30);
         }
         
         .calendar-detail-title { display: flex; align-items: center; justify-content: center; gap: 4px; justify-self: center; }
@@ -1040,7 +1118,7 @@
         .mode-toggle-corner:active { transform: scale(0.94); }
 
         /* ============================================
-           MODAL — iOS Sheet Style
+           MODAL — iOS Sheet Style (Cristal)
            ============================================ */
         .modal-overlay { 
             display: none; position: fixed; inset: 0; 
@@ -1052,14 +1130,18 @@
         .modal-overlay.active { display: flex; animation: fadeIn 0.25s; }
         
         .modal-card { 
-            background: var(--bg-elevated); 
-            border: 1px solid var(--border); 
+            background: rgba(30, 34, 44, 0.42);
+            backdrop-filter: blur(50px) saturate(180%);
+            -webkit-backdrop-filter: blur(50px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.10); 
             border-radius: 24px; 
             padding: 20px 22px; width: 320px; max-width: 92vw; 
-            box-shadow: 0 32px 64px -12px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04); 
+            box-shadow: 0 32px 64px -12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04); 
             animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); 
         }
         [data-theme="light"] .modal-card {
+            background: rgba(255, 255, 255, 0.52);
+            border-color: rgba(255, 255, 255, 0.7);
             box-shadow: 0 32px 64px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04);
         }
 

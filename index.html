@@ -1206,6 +1206,7 @@
             font-size: 0.72rem; font-weight: 600; cursor: pointer; 
             padding: 4px 6px; text-decoration: none; 
             border-radius: 6px; transition: all 0.2s;
+            display: inline-flex; align-items: center;
         }
         .toggle-mode-btn:hover { background: rgba(48, 209, 88, 0.1); }
 
@@ -1282,6 +1283,387 @@
             line-height: 1;
         }
         .history-del:hover { color: var(--sunday); background: rgba(255, 69, 58, 0.12); }
+
+        /* ============================================
+           GLASS RELIEF — PROGRESS BARS + TIMER WIDGETS
+           ============================================ */
+
+        /* Barras de progreso con relieve y brillo */
+        .bar-wrapper {
+            position: relative;
+            width: 100%;
+            height: 14px;
+            border-radius: 7px;
+            background:
+                linear-gradient(180deg,
+                    rgba(0,0,0,0.45) 0%,
+                    rgba(0,0,0,0.2) 35%,
+                    rgba(255,255,255,0.04) 100%),
+                var(--item-bg);
+            box-shadow:
+                inset 0 2px 6px rgba(0,0,0,0.55),
+                inset 0 -1px 1px rgba(255,255,255,0.08),
+                0 1px 0 rgba(255,255,255,0.06),
+                0 2px 4px rgba(0,0,0,0.25);
+            border: 1px solid rgba(0,0,0,0.35);
+        }
+
+        .bar-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(180deg,
+                rgba(255,255,255,0.12) 0%,
+                transparent 45%,
+                transparent 60%,
+                rgba(0,0,0,0.06) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .tall-bar { height: 48px !important; border-radius: 13px !important; }
+
+        [data-theme="light"] .bar-wrapper {
+            background:
+                linear-gradient(180deg,
+                    rgba(0,0,0,0.14) 0%,
+                    rgba(0,0,0,0.05) 35%,
+                    rgba(255,255,255,0.5) 100%),
+                var(--item-bg);
+            box-shadow:
+                inset 0 2px 5px rgba(0,0,0,0.15),
+                inset 0 -1px 1px rgba(255,255,255,0.85),
+                0 1px 0 rgba(255,255,255,0.7),
+                0 2px 4px rgba(0,0,0,0.06);
+            border-color: rgba(0,0,0,0.08);
+        }
+
+        .progress-bar {
+            box-shadow: none;
+        }
+
+        .fill {
+            height: 100%;
+            border-radius: inherit;
+            position: relative;
+            overflow: hidden;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.55),
+                inset 0 -3px 6px rgba(0,0,0,0.2),
+                inset 2px 0 4px rgba(255,255,255,0.08);
+        }
+
+        .fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 50%;
+            background: linear-gradient(180deg,
+                rgba(255,255,255,0.55) 0%,
+                rgba(255,255,255,0.15) 60%,
+                transparent 100%);
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        .fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 55%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255,255,255,0.7) 50%,
+                transparent 100%);
+            animation: barShine 4s ease-in-out infinite;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+            transform: translateX(-200%);
+            z-index: 1;
+        }
+
+        @keyframes barShine {
+            0%, 15%   { transform: translateX(-200%); }
+            85%, 100% { transform: translateX(400%); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .fill::before { animation: none; opacity: 0.2; }
+        }
+
+        #day-fill {
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.65),
+                inset 0 -3px 8px rgba(0,0,0,0.3),
+                inset 3px 0 8px rgba(255,255,255,0.15);
+        }
+
+        /* Temporizadores de cristal con relieve */
+        .timer-widget {
+            padding: 16px 20px;
+            position: relative;
+            overflow: hidden;
+            background:
+                linear-gradient(135deg,
+                    rgba(255,255,255,0.14) 0%,
+                    rgba(255,255,255,0.02) 25%,
+                    transparent 50%,
+                    transparent 75%,
+                    rgba(0,0,0,0.08) 100%),
+                linear-gradient(150deg,
+                    rgba(255,255,255,0.09) 0%,
+                    rgba(255,255,255,0.02) 40%,
+                    rgba(0,0,0,0.05) 70%,
+                    rgba(0,0,0,0.12) 100%),
+                var(--card);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 22px;
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.18) inset,
+                0 -2px 3px rgba(0,0,0,0.35) inset,
+                0 0 24px rgba(255,255,255,0.03) inset,
+                0 1px 2px rgba(0,0,0,0.4),
+                0 8px 20px -6px rgba(0,0,0,0.5),
+                0 20px 48px -20px rgba(0,0,0,0.65);
+            transition:
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s ease;
+        }
+
+        .timer-widget:hover {
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.22) inset,
+                0 -2px 3px rgba(0,0,0,0.4) inset,
+                0 0 32px rgba(255,255,255,0.05) inset,
+                0 2px 4px rgba(0,0,0,0.45),
+                0 12px 28px -6px rgba(0,0,0,0.55),
+                0 24px 56px -20px rgba(0,0,0,0.7);
+        }
+
+        [data-theme="light"] .timer-widget {
+            background:
+                linear-gradient(135deg,
+                    rgba(255,255,255,0.9) 0%,
+                    rgba(255,255,255,0.5) 25%,
+                    transparent 50%,
+                    transparent 75%,
+                    rgba(0,0,0,0.03) 100%),
+                linear-gradient(150deg,
+                    rgba(255,255,255,0.9) 0%,
+                    rgba(255,255,255,0.5) 40%,
+                    rgba(0,0,0,0.02) 70%,
+                    rgba(0,0,0,0.04) 100%),
+                var(--card);
+            border-color: rgba(255,255,255,0.9);
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.95) inset,
+                0 -2px 3px rgba(0,0,0,0.08) inset,
+                0 0 24px rgba(255,255,255,0.5) inset,
+                0 1px 2px rgba(0,0,0,0.06),
+                0 8px 20px -6px rgba(0,0,0,0.12),
+                0 20px 48px -20px rgba(0,0,0,0.18);
+        }
+
+        .timer-widget.extra-timer {
+            border-left: 3px solid var(--timer-color, var(--border));
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.18) inset,
+                0 -2px 3px rgba(0,0,0,0.35) inset,
+                -4px 0 12px -4px var(--timer-color, transparent),
+                0 1px 2px rgba(0,0,0,0.4),
+                0 8px 20px -6px rgba(0,0,0,0.5),
+                0 20px 48px -20px rgba(0,0,0,0.65);
+        }
+
+        .timer-widget.dragging {
+            opacity: 0.92;
+            transform: scale(1.02);
+            border-color: var(--accent);
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.2) inset,
+                0 -2px 3px rgba(0,0,0,0.4) inset,
+                0 0 32px rgba(48, 209, 88, 0.25),
+                0 4px 8px rgba(0,0,0,0.5),
+                0 20px 48px -10px rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+
+        .timer-display {
+            font-size: 1.6rem;
+            text-shadow:
+                0 1px 0 rgba(0,0,0,0.4),
+                0 -1px 0 rgba(255,255,255,0.08),
+                0 0 20px rgba(255,255,255,0.05);
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        [data-theme="light"] .timer-display {
+            text-shadow:
+                0 1px 0 rgba(255,255,255,0.8),
+                0 -1px 0 rgba(0,0,0,0.04);
+        }
+
+        .timer-display.running {
+            text-shadow:
+                0 0 12px rgba(48, 209, 88, 0.55),
+                0 0 28px rgba(48, 209, 88, 0.35),
+                0 1px 0 rgba(0,0,0,0.4);
+            animation: timerGlowPulse 2.6s ease-in-out infinite;
+        }
+
+        @keyframes timerGlowPulse {
+            0%, 100% {
+                text-shadow:
+                    0 0 12px rgba(48, 209, 88, 0.55),
+                    0 0 28px rgba(48, 209, 88, 0.3),
+                    0 1px 0 rgba(0,0,0,0.4);
+            }
+            50% {
+                text-shadow:
+                    0 0 18px rgba(48, 209, 88, 0.8),
+                    0 0 40px rgba(48, 209, 88, 0.5),
+                    0 1px 0 rgba(0,0,0,0.4);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .timer-display.running { animation: none; }
+        }
+
+        .timer-input-group input {
+            width: 42px;
+            border-radius: 9px;
+            font-weight: 700;
+            background:
+                linear-gradient(180deg,
+                    rgba(0,0,0,0.15) 0%,
+                    rgba(255,255,255,0.02) 100%),
+                var(--input-bg);
+            border: 1px solid rgba(0,0,0,0.25);
+            box-shadow:
+                inset 0 1px 3px rgba(0,0,0,0.35),
+                0 1px 0 rgba(255,255,255,0.06);
+        }
+
+        .timer-input-group input:focus {
+            border-color: var(--accent);
+            box-shadow:
+                inset 0 1px 3px rgba(0,0,0,0.3),
+                0 0 0 3px rgba(48, 209, 88, 0.18),
+                0 0 10px rgba(48, 209, 88, 0.25);
+        }
+
+        [data-theme="light"] .timer-input-group input {
+            background:
+                linear-gradient(180deg,
+                    rgba(0,0,0,0.05) 0%,
+                    rgba(255,255,255,0.6) 100%),
+                var(--input-bg);
+            border-color: rgba(0,0,0,0.12);
+            box-shadow:
+                inset 0 1px 2px rgba(0,0,0,0.12),
+                0 1px 0 rgba(255,255,255,0.9);
+        }
+
+        .t-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 11px;
+            background:
+                linear-gradient(180deg,
+                    rgba(255,255,255,0.12) 0%,
+                    rgba(255,255,255,0.02) 45%,
+                    rgba(0,0,0,0.08) 100%),
+                var(--item-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.15) inset,
+                0 -1px 2px rgba(0,0,0,0.3) inset,
+                0 1px 2px rgba(0,0,0,0.3),
+                0 3px 8px -2px rgba(0,0,0,0.4);
+        }
+
+        .t-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.2) inset,
+                0 -1px 2px rgba(0,0,0,0.3) inset,
+                0 2px 4px rgba(0,0,0,0.35),
+                0 6px 14px -3px rgba(48, 209, 88, 0.35);
+        }
+
+        .t-btn:active {
+            transform: translateY(0) scale(0.94);
+            box-shadow:
+                0 2px 3px rgba(0,0,0,0.4) inset,
+                0 -1px 0 rgba(255,255,255,0.1) inset;
+        }
+
+        .t-btn.active {
+            background:
+                linear-gradient(180deg,
+                    rgba(255,255,255,0.15) 0%,
+                    rgba(255,255,255,0.05) 50%,
+                    rgba(0,0,0,0.15) 100%),
+                var(--sunday);
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.25) inset,
+                0 -1px 2px rgba(0,0,0,0.3) inset,
+                0 0 16px rgba(255, 69, 58, 0.4),
+                0 2px 6px rgba(0,0,0,0.35);
+        }
+
+        .t-btn.active:hover {
+            background:
+                linear-gradient(180deg,
+                    rgba(255,255,255,0.18) 0%,
+                    rgba(255,255,255,0.06) 50%,
+                    rgba(0,0,0,0.15) 100%),
+                #ff3b30;
+            border-color: #ff3b30;
+            color: #fff;
+        }
+
+        [data-theme="light"] .t-btn {
+            background:
+                linear-gradient(180deg,
+                    rgba(255,255,255,0.95) 0%,
+                    rgba(255,255,255,0.6) 50%,
+                    rgba(0,0,0,0.03) 100%),
+                var(--item-bg);
+            border-color: rgba(0,0,0,0.06);
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.95) inset,
+                0 -1px 2px rgba(0,0,0,0.06) inset,
+                0 1px 2px rgba(0,0,0,0.06),
+                0 3px 8px -2px rgba(0,0,0,0.1);
+        }
+
+        .dock-panel {
+            padding: 22px;
+            border-radius: 22px;
+            background:
+                linear-gradient(150deg,
+                    rgba(255,255,255,0.04) 0%,
+                    transparent 40%,
+                    rgba(0,0,0,0.04) 100%),
+                var(--card);
+            border: 1px solid rgba(255,255,255,0.09);
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.1) inset,
+                0 -1px 2px rgba(0,0,0,0.2) inset,
+                0 4px 12px rgba(0,0,0,0.2),
+                0 16px 40px -16px rgba(0,0,0,0.4);
+        }
 
         /* ============================================
            RESPONSIVE
@@ -1517,9 +1899,13 @@
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 28px;">
                     <button class="btn btn-cancel" onclick="toggleTheme()">Alternar Tema Oscuro / Claro</button>
                     
-                    <button class="btn btn-save" onclick="syncExport()" style="background: var(--accent); color: #000;">📥 Guardar Copia de Seguridad</button>
-                    <label class="btn btn-cancel" style="text-align: center; cursor: pointer; display: flex; justify-content: center; align-items: center;">
-                        📤 Cargar Copia de Seguridad
+                    <button class="btn btn-save" onclick="syncExport()" style="background: var(--accent); color: #000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;flex-shrink:0;" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Guardar Copia de Seguridad
+                    </button>
+                    <label class="btn btn-cancel" style="text-align: center; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;flex-shrink:0;" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Cargar Copia de Seguridad
                         <input type="file" id="import-file-input" accept=".json" onchange="syncImport(event)" style="display: none;">
                     </label>
                     
@@ -1530,7 +1916,10 @@
             <div id="modal-content-taskcreate" style="display:none;">
                 <div class="modal-header-flex">
                     <h3 id="tc-main-title">Nueva Acción</h3>
-                    <button class="toggle-mode-btn" id="btn-toggle-tc" onclick="toggleTcMode()">⟲ Crear Entorno</button>
+                    <button class="toggle-mode-btn" id="btn-toggle-tc" onclick="toggleTcMode()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;margin-right:4px;" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                        Crear Entorno
+                    </button>
                 </div>
                 
                 <div class="tc-desc">
@@ -1721,8 +2110,9 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
                     <h3 style="color:var(--accent); margin:0;">Historial</h3>
                     <button class="btn btn-save" onclick="exportHistoryExcel()"
-                            style="padding:9px 16px; font-size:0.78rem; width:auto; flex:0 0 auto;">
-                        📥 Excel
+                            style="padding:9px 16px; font-size:0.78rem; width:auto; flex:0 0 auto; display: inline-flex; align-items: center; gap: 6px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0;" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Excel
                     </button>
                 </div>
                 <div id="history-list"></div>
@@ -2970,7 +3360,11 @@
                 html += tasks.map(t => {
                     const timeDisp = t.hour ? (t.hourEnd ? `${t.hour} - ${t.hourEnd}` : t.hour) : '';
                     return `<div style="font-size:0.88rem; padding:10px 0; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:10px;">
-                        <span style="color:${t.done ? 'var(--muted)' : 'var(--accent)'}; font-weight:700; flex-shrink:0; font-size:1rem;">${t.done ? '✓' : '○'}</span>
+                        <span style="flex-shrink:0; margin-top:2px; display:inline-flex;">${
+                            t.done
+                                ? '<svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"/></svg>'
+                                : '<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" style="width:14px;height:14px;"><circle cx="12" cy="12" r="9"/></svg>'
+                        }</span>
                         <span style="${t.done ? 'text-decoration: line-through; color: var(--muted);' : 'color: var(--text);'}">${t.text}${timeDisp ? `<span style="color:var(--muted); font-size:0.75rem; display:block; margin-top:2px;">${timeDisp}</span>` : ''}</span>
                     </div>`;
                 }).join('');
@@ -3025,7 +3419,9 @@
             const isEditing = editingEntornoId !== null && tcMode === 'entorno';
             document.getElementById('tc-main-title').innerText =
                 isEditing ? 'Editar Entorno' : (tcMode === 'tarea' ? 'Nueva Acción' : 'Nuevo Entorno');
-            document.getElementById('btn-toggle-tc').innerText = tcMode === 'tarea' ? '⟲ Crear Entorno' : '⟲ Crear Acción';
+            const refreshSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;margin-right:4px;" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>';
+            document.getElementById('btn-toggle-tc').innerHTML =
+                refreshSvg + (tcMode === 'tarea' ? ' Crear Entorno' : ' Crear Acción');
             document.getElementById('btn-save-tc').innerText = isEditing ? 'Guardar Cambios' : 'Guardar';
             document.getElementById('tc-tarea-fields').style.display = tcMode === 'tarea' ? 'block' : 'none';
             document.getElementById('tc-entorno-fields').style.display = tcMode === 'entorno' ? 'block' : 'none';
@@ -3742,6 +4138,8 @@
             if (m > 0) parts.push(`${m}m`);
             if (s > 0) parts.push(`${s}s`);
 
+            const warnSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0;vertical-align:-1px;margin-right:4px;" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
             resultEl.innerHTML = `
                 <div style="font-size: 2rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.03em;">
                     ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}
@@ -3749,7 +4147,7 @@
                 <div style="font-size: 0.82rem; color: var(--subtext); margin-top: 6px; font-weight: 500;">
                     ${parts.join(' ')}
                 </div>
-                ${crossed ? '<div style="font-size: 0.72rem; color: var(--work); margin-top: 8px; font-weight: 600;">⚠ Cruza medianoche (+24h)</div>' : ''}
+                ${crossed ? `<div style="font-size: 0.72rem; color: var(--work); margin-top: 8px; font-weight: 600; display:inline-flex; align-items:center;">${warnSvg}Cruza medianoche (+24h)</div>` : ''}
                 <div style="font-size: 0.68rem; color: var(--muted); margin-top: 6px;">Total: ${Math.floor(diff/60)} minutos · ${diff} segundos</div>
             `;
         }
@@ -3779,6 +4177,8 @@
             if (m > 0) parts.push(`${m}m`);
             if (parts.length === 0) parts.push('0m');
 
+            const warnSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0;vertical-align:-1px;margin-right:4px;" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
             resultEl.innerHTML = `
                 <div style="font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px;">Resultado</div>
                 <div style="font-size: 2rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.03em;">
@@ -3787,7 +4187,7 @@
                 <div style="font-size: 0.82rem; color: var(--subtext); margin-top: 6px; font-weight: 500;">
                     ${baseVal} + ${parts.join(' ')}
                 </div>
-                ${daysCrossed > 0 ? `<div style="font-size: 0.72rem; color: var(--work); margin-top: 8px; font-weight: 600;">⚠ Cruza ${daysCrossed} día${daysCrossed > 1 ? 's' : ''}</div>` : ''}
+                ${daysCrossed > 0 ? `<div style="font-size: 0.72rem; color: var(--work); margin-top: 8px; font-weight: 600; display:inline-flex; align-items:center;">${warnSvg}Cruza ${daysCrossed} día${daysCrossed > 1 ? 's' : ''}</div>` : ''}
             `;
         }
 
@@ -4062,7 +4462,7 @@
                     const writable = await fileHandle.createWritable();
                     await writable.write(jsonStr);
                     await writable.close();
-                    alert("✅ Copia guardada exitosamente en la carpeta elegida.");
+                    alert("Copia guardada exitosamente en la carpeta elegida.");
                 } catch (err) {
                     if (err.name !== 'AbortError') {
                         console.error("Error al guardar:", err);
@@ -4080,7 +4480,7 @@
                 document.body.removeChild(a); 
                 URL.revokeObjectURL(url);
                 
-                alert("✅ Copia guardada en tu carpeta de Descargas. Si usas Google Drive, se sincronizará automáticamente.");
+                alert("Copia guardada en tu carpeta de Descargas. Si usas Google Drive, se sincronizará automáticamente.");
             }
         }
 
@@ -4094,11 +4494,11 @@
                     const data = JSON.parse(e.target.result);
                     
                     if (!data.tasks || !data.timersList) {
-                        alert("⚠️ El archivo no parece ser una copia de seguridad válida de Tiempo.");
+                        alert("El archivo no parece ser una copia de seguridad válida de Tiempo.");
                         return;
                     }
 
-                    if(confirm("⚠️ ¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.")) {
+                    if(confirm("¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.")) {
                         if (data.tasks) localStorage.setItem('wkTasks', JSON.stringify(data.tasks));
                         if (data.entornos) localStorage.setItem('wkEntornos', JSON.stringify(data.entornos));
                         if (data.work) localStorage.setItem('wkWorkCfg', JSON.stringify(data.work));
@@ -4111,11 +4511,11 @@
                         if (data.timersList) localStorage.setItem('wkTimersList', JSON.stringify(data.timersList));
                         if (data.notes) localStorage.setItem('wkNotes', JSON.stringify(data.notes));
 
-                        alert("✅ Datos restaurados correctamente. La página se reiniciará para aplicar los cambios.");
+                        alert("Datos restaurados correctamente. La página se reiniciará para aplicar los cambios.");
                         location.reload(); 
                     }
                 } catch (err) {
-                    alert("❌ Error al leer el archivo. Asegúrate de que sea un JSON válido.");
+                    alert("Error al leer el archivo. Asegúrate de que sea un JSON válido.");
                     console.error(err);
                 }
                 event.target.value = '';
@@ -4178,6 +4578,9 @@
             const yestKey = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
             const nombresDias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
+            const checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px;margin-right:3px;" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>';
+            const xSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="width:12px;height:12px;vertical-align:-2px;margin-right:3px;" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+
             let html = '';
             Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(key => {
                 let label;
@@ -4201,8 +4604,8 @@
                     const dur = formatClock(item.elapsedMs || item.durationMs || 0);
                     const extra = item.extraMs ? ` · +${formatClock(item.extraMs)}` : '';
                     const check = item.success
-                        ? '<span style="color:var(--accent); font-weight:800;">✓ Sí</span>'
-                        : '<span style="color:var(--sunday); font-weight:800;">✗ No</span>';
+                        ? `<span style="color:var(--accent); font-weight:800;">${checkSvg}Sí</span>`
+                        : `<span style="color:var(--sunday); font-weight:800;">${xSvg}No</span>`;
 
                     html += `<div class="history-item">
                         <div class="history-info">

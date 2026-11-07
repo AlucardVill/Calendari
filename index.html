@@ -406,32 +406,38 @@
             font-size: 0.66rem; height: 22px; padding: 3px 7px; background: var(--item-bg);
         }
 
-        /* === MODIFICADO: scrollbar visible en resultados === */
+        /* Lista de resultados de búsqueda de ocultos (vertical con scroll) */
         .hidden-bar-results {
-            display: none; align-items: center; gap: 6px;
-            flex: 1; min-width: 0;
-            overflow-x: auto; overflow-y: hidden;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
+            max-height: 140px;
+            overflow-y: auto;
+            overflow-x: hidden;
             scrollbar-width: thin;
             scrollbar-color: var(--border-input) transparent;
-            padding: 2px 0 8px 0;
+            padding: 2px 4px 2px 0;
         }
-        .hidden-bar-results::-webkit-scrollbar { height: 4px; display: block; }
-        .hidden-bar-results::-webkit-scrollbar-track { background: transparent; border-radius: 2px; }
+        .hidden-bar-results::-webkit-scrollbar { width: 4px; }
+        .hidden-bar-results::-webkit-scrollbar-track { background: transparent; }
         .hidden-bar-results::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 2px; }
         .hidden-bar-results::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
         .hidden-timers-bar.searching .hidden-bar-results { display: flex; }
 
         .hidden-bar-result-item {
             display: flex; align-items: center; gap: 6px;
-            padding: 5px 10px 5px 9px; border-radius: 999px;
+            padding: 6px 10px 6px 9px; border-radius: 10px;
             background: var(--item-bg); border: 1px solid var(--border-input);
-            cursor: pointer; user-select: none; white-space: nowrap;
-            flex-shrink: 0; font-size: 0.68rem; font-weight: 600;
+            cursor: pointer; user-select: none;
+            font-size: 0.68rem; font-weight: 600;
             color: var(--text); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 150px; min-height: 24px;
+            width: 100%; min-height: 26px;
         }
         .hidden-bar-result-item:hover { border-color: var(--result-color); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .hidden-bar-result-item:active { transform: scale(0.95); }
+        .hidden-bar-result-item:active { transform: scale(0.98); }
         .hidden-bar-result-item .result-dot {
             width: 8px; height: 8px; border-radius: 50%;
             background: var(--result-color); box-shadow: 0 0 6px var(--result-color); flex-shrink: 0;
@@ -448,19 +454,15 @@
         .hidden-timers-bar.searching .hidden-bar-search-btn,
         .hidden-timers-bar.expanded .hidden-bar-search-btn { display: none; }
 
-        /* === MODIFICADO: scrollbar visible en dots === */
+        /* Puntos indicadores (fila horizontal, sin scrollbar visible) */
         .hidden-bar-dots {
             display: flex; align-items: center; gap: 8px;
             flex: 1; min-width: 0;
             overflow-x: auto; overflow-y: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-input) transparent;
-            padding: 2px 0 8px 0;
+            scrollbar-width: none; -ms-overflow-style: none;
+            padding: 2px 0;
         }
-        .hidden-bar-dots::-webkit-scrollbar { height: 4px; display: block; }
-        .hidden-bar-dots::-webkit-scrollbar-track { background: transparent; border-radius: 2px; }
-        .hidden-bar-dots::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 2px; }
-        .hidden-bar-dots::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+        .hidden-bar-dots::-webkit-scrollbar { display: none; }
 
         .hidden-dot {
             width: 10px; height: 10px; border-radius: 50%;
@@ -477,29 +479,45 @@
             50%     { box-shadow: 0 0 12px var(--dot-color), 0 0 20px var(--dot-color); }
         }
 
+        /* Pastillas expandidas (lista vertical con scroll) */
         .hidden-bar-pills { display: none; flex-wrap: wrap; gap: 6px; flex: 1; }
         .hidden-timers-bar.expanded .hidden-bar-dots  { display: none; }
         .hidden-timers-bar.expanded .hidden-bar-pills {
-            display: flex; flex: 1 1 100%; flex-basis: 100%; width: 100%;
-            padding-top: 8px; border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 100%;
+            flex-basis: 100%;
+            width: 100%;
+            max-height: 180px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 8px 4px 0 0;
+            border-top: 1px solid var(--border);
+            gap: 6px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-input) transparent;
         }
+        .hidden-timers-bar.expanded .hidden-bar-pills::-webkit-scrollbar { width: 4px; }
+        .hidden-timers-bar.expanded .hidden-bar-pills::-webkit-scrollbar-track { background: transparent; }
+        .hidden-timers-bar.expanded .hidden-bar-pills::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 2px; }
 
         .hidden-timer-pill {
             display: flex; align-items: center; gap: 6px;
-            padding: 5px 11px 5px 9px; border-radius: 999px;
+            padding: 7px 11px 7px 9px; border-radius: 10px;
             background: var(--item-bg); border: 1px solid var(--border-input);
-            cursor: pointer; user-select: none; white-space: nowrap;
+            cursor: pointer; user-select: none;
             font-size: 0.68rem; font-weight: 600; color: var(--text);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
         }
-        .hidden-timer-pill:hover { transform: translateY(-1px); border-color: var(--pill-color); box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
-        .hidden-timer-pill:active { transform: scale(0.95); }
+        .hidden-timer-pill:hover { border-color: var(--pill-color); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .hidden-timer-pill:active { transform: scale(0.98); }
 
         .hidden-timer-pill .pill-dot {
             width: 8px; height: 8px; border-radius: 50%;
             background: var(--pill-color); box-shadow: 0 0 6px var(--pill-color); flex-shrink: 0;
         }
-        .hidden-timer-pill .pill-name { opacity: 0.85; }
+        .hidden-timer-pill .pill-name { opacity: 0.85; flex: 1; }
         .hidden-timer-pill .pill-time { font-variant-numeric: tabular-nums; color: var(--pill-color); font-weight: 700; letter-spacing: -0.01em; }
         .hidden-timer-pill.is-running .pill-dot { animation: dotPulse 1.8s ease-in-out infinite; }
 
@@ -1172,14 +1190,16 @@
         .modal-card, .calendar-detail { position: relative; }
 
         .modal-drag-handle {
-            position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
-            width: 46px; height: 14px; display: flex; align-items: center; justify-content: center;
-            cursor: grab; z-index: 60; opacity: 0.4; transition: opacity 0.2s;
+            position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+            width: 34px; height: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: grab; z-index: 60; opacity: 0.28; transition: opacity 0.2s;
             touch-action: none; user-select: none; -webkit-user-select: none;
         }
         .modal-drag-handle .grip {
-            width: 22px; height: 2px; border-radius: 1px; background: currentColor;
-            box-shadow: 0 5px 0 currentColor, 0 -5px 0 currentColor;
+            width: 15px; height: 1px; border-radius: 1px;
+            background: currentColor;
+            box-shadow: 0 3px 0 currentColor, 0 -3px 0 currentColor;
             color: var(--muted); pointer-events: none;
         }
         .modal-drag-handle:hover { opacity: 1; }
@@ -1204,9 +1224,9 @@
             z-index: 1500;
         }
 
-        #main-modal-card { padding-top: 22px; }
-        #dual-notes-card { padding-top: 20px; }
-        .calendar-detail .calendar-detail-header { padding-top: 20px; }
+        #main-modal-card { padding-top: 18px; }
+        #dual-notes-card { padding-top: 16px; }
+        .calendar-detail .calendar-detail-header { padding-top: 16px; }
 
         @media (max-width: 380px) {
             body { padding: 12px; padding-top: calc(12px + env(safe-area-inset-top)); }
@@ -4295,126 +4315,136 @@
             if (!modalEl || modalEl.dataset.dragResizeInit === '1') return;
             modalEl.dataset.dragResizeInit = '1';
 
+            // Asa de arrastre
             const dragHandle = document.createElement('div');
             dragHandle.className = 'modal-drag-handle';
             dragHandle.title = 'Mover ventana';
             dragHandle.innerHTML = '<span class="grip"></span>';
             modalEl.appendChild(dragHandle);
 
+            // Asa de redimensionado
             const resizeHandle = document.createElement('div');
             resizeHandle.className = 'modal-resize-handle';
             resizeHandle.title = 'Redimensionar';
             resizeHandle.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 13L13 3M8 13L13 8"/></svg>';
             modalEl.appendChild(resizeHandle);
 
+            // Estado guardado
             const storageKey = `wkModalState-${key}`;
             const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
             if (saved) applyModalState(modalEl, saved);
 
+            // Fija la posición una sola vez (escapa del flex del overlay)
+            function lockPosition() {
+                if (modalEl.style.position === 'fixed') return;
+                const rect = modalEl.getBoundingClientRect();
+                modalEl.style.position = 'fixed';
+                modalEl.style.margin = '0';
+                modalEl.style.top = rect.top + 'px';
+                modalEl.style.left = rect.left + 'px';
+            }
+
+            // ---------- DRAG ----------
             let dragging = false;
             let dragStartX = 0, dragStartY = 0, dragStartLeft = 0, dragStartTop = 0;
 
-            const onDragStart = (e) => {
-                if (e.button !== undefined && e.button !== 0) return;
-                e.preventDefault();
-                e.stopPropagation();
-
-                const rect = modalEl.getBoundingClientRect();
-                if (modalEl.style.position !== 'fixed') {
-                    modalEl.style.position = 'fixed';
-                    modalEl.style.margin = '0';
-                    modalEl.style.top = rect.top + 'px';
-                    modalEl.style.left = rect.left + 'px';
-                }
-
-                dragStartX = e.clientX;
-                dragStartY = e.clientY;
-                dragStartLeft = parseFloat(modalEl.style.left) || rect.left;
-                dragStartTop  = parseFloat(modalEl.style.top) || rect.top;
-
-                dragging = true;
-                modalEl.classList.add('dragging');
-                try { dragHandle.setPointerCapture(e.pointerId); } catch(err) {}
-            };
-
-            const onDragMove = (e) => {
+            function onDragMove(e) {
                 if (!dragging) return;
-                const dx = e.clientX - dragStartX;
-                const dy = e.clientY - dragStartY;
+                e.preventDefault();
+                const pt = e.touches ? e.touches[0] : e;
+                const dx = pt.clientX - dragStartX;
+                const dy = pt.clientY - dragStartY;
                 const mw = modalEl.offsetWidth;
-                let newTop = dragStartTop + dy;
-                let newLeft = dragStartLeft + dx;
-                newTop = Math.max(0, Math.min(window.innerHeight - 40, newTop));
-                newLeft = Math.max(-(mw - 40), Math.min(window.innerWidth - 40, newLeft));
+                const mh = modalEl.offsetHeight;
+                let newTop = Math.max(0, Math.min(window.innerHeight - Math.min(mh, 60), dragStartTop + dy));
+                let newLeft = Math.max(-(mw - 60), Math.min(window.innerWidth - 60, dragStartLeft + dx));
                 modalEl.style.top = newTop + 'px';
                 modalEl.style.left = newLeft + 'px';
-            };
+            }
 
-            const onDragEnd = (e) => {
+            function onDragEnd() {
                 if (!dragging) return;
                 dragging = false;
                 modalEl.classList.remove('dragging');
-                try { dragHandle.releasePointerCapture(e.pointerId); } catch(err) {}
+                document.removeEventListener('mousemove', onDragMove);
+                document.removeEventListener('mouseup', onDragEnd);
+                document.removeEventListener('touchmove', onDragMove);
+                document.removeEventListener('touchend', onDragEnd);
                 saveModalState(modalEl, storageKey);
-            };
+            }
 
-            dragHandle.addEventListener('pointerdown', onDragStart);
-            dragHandle.addEventListener('pointermove', onDragMove);
-            dragHandle.addEventListener('pointerup', onDragEnd);
-            dragHandle.addEventListener('pointercancel', onDragEnd);
+            function onDragStart(e) {
+                if (e.button !== undefined && e.button !== 0) return;
+                e.preventDefault();
+                e.stopPropagation();
+                lockPosition();
+                const rect = modalEl.getBoundingClientRect();
+                dragStartX = e.touches ? e.touches[0].clientX : e.clientX;
+                dragStartY = e.touches ? e.touches[0].clientY : e.clientY;
+                dragStartLeft = rect.left;
+                dragStartTop = rect.top;
+                dragging = true;
+                modalEl.classList.add('dragging');
+                document.addEventListener('mousemove', onDragMove);
+                document.addEventListener('mouseup', onDragEnd);
+                document.addEventListener('touchmove', onDragMove, { passive: false });
+                document.addEventListener('touchend', onDragEnd);
+            }
 
+            dragHandle.addEventListener('mousedown', onDragStart);
+            dragHandle.addEventListener('touchstart', onDragStart, { passive: false });
+
+            // ---------- RESIZE ----------
             let resizing = false;
             let resizeStartX = 0, resizeStartY = 0, resizeStartW = 0, resizeStartH = 0;
             const isCalendar = modalEl.classList.contains('calendar-detail');
 
-            const onResizeStart = (e) => {
-                if (e.button !== undefined && e.button !== 0) return;
-                e.preventDefault();
-                e.stopPropagation();
-
-                const rect = modalEl.getBoundingClientRect();
-                if (modalEl.style.position !== 'fixed') {
-                    modalEl.style.position = 'fixed';
-                    modalEl.style.margin = '0';
-                    modalEl.style.top = rect.top + 'px';
-                    modalEl.style.left = rect.left + 'px';
-                }
-
-                resizeStartX = e.clientX;
-                resizeStartY = e.clientY;
-                resizeStartW = rect.width;
-                resizeStartH = rect.height;
-
-                resizing = true;
-                modalEl.classList.add('resizing');
-                if (!isCalendar) modalEl.style.overflowY = 'auto';
-                try { resizeHandle.setPointerCapture(e.pointerId); } catch(err) {}
-            };
-
-            const onResizeMove = (e) => {
+            function onResizeMove(e) {
                 if (!resizing) return;
-                const dx = e.clientX - resizeStartX;
-                const dy = e.clientY - resizeStartY;
-                const newW = Math.max(240, resizeStartW + dx);
-                const newH = Math.max(100, resizeStartH + dy);
+                e.preventDefault();
+                const pt = e.touches ? e.touches[0] : e;
+                const dx = pt.clientX - resizeStartX;
+                const dy = pt.clientY - resizeStartY;
+                const newW = Math.max(260, resizeStartW + dx);
+                const newH = Math.max(120, resizeStartH + dy);
                 modalEl.style.width = newW + 'px';
                 modalEl.style.height = newH + 'px';
                 modalEl.style.maxWidth = 'none';
                 modalEl.style.maxHeight = 'none';
-            };
+            }
 
-            const onResizeEnd = (e) => {
+            function onResizeEnd() {
                 if (!resizing) return;
                 resizing = false;
                 modalEl.classList.remove('resizing');
-                try { resizeHandle.releasePointerCapture(e.pointerId); } catch(err) {}
+                document.removeEventListener('mousemove', onResizeMove);
+                document.removeEventListener('mouseup', onResizeEnd);
+                document.removeEventListener('touchmove', onResizeMove);
+                document.removeEventListener('touchend', onResizeEnd);
                 saveModalState(modalEl, storageKey);
-            };
+            }
 
-            resizeHandle.addEventListener('pointerdown', onResizeStart);
-            resizeHandle.addEventListener('pointermove', onResizeMove);
-            resizeHandle.addEventListener('pointerup', onResizeEnd);
-            resizeHandle.addEventListener('pointercancel', onResizeEnd);
+            function onResizeStart(e) {
+                if (e.button !== undefined && e.button !== 0) return;
+                e.preventDefault();
+                e.stopPropagation();
+                lockPosition();
+                const rect = modalEl.getBoundingClientRect();
+                resizeStartX = e.touches ? e.touches[0].clientX : e.clientX;
+                resizeStartY = e.touches ? e.touches[0].clientY : e.clientY;
+                resizeStartW = rect.width;
+                resizeStartH = rect.height;
+                resizing = true;
+                modalEl.classList.add('resizing');
+                if (!isCalendar) modalEl.style.overflow = 'auto';
+                document.addEventListener('mousemove', onResizeMove);
+                document.addEventListener('mouseup', onResizeEnd);
+                document.addEventListener('touchmove', onResizeMove, { passive: false });
+                document.addEventListener('touchend', onResizeEnd);
+            }
+
+            resizeHandle.addEventListener('mousedown', onResizeStart);
+            resizeHandle.addEventListener('touchstart', onResizeStart, { passive: false });
         }
 
         function applyModalState(modalEl, saved) {

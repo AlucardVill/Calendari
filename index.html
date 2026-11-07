@@ -2016,8 +2016,6 @@
             const t = timersList.find(x => x.id === id);
             if (!t) return;
 
-            // Leer SIEMPRE el valor actual del DOM (no del modelo), así
-            // no importa si onchange aún no disparó.
             const hEl = document.getElementById(`t-input-h-${id}`);
             const mEl = document.getElementById(`t-input-m-${id}`);
             const h = hEl ? (parseInt(hEl.value) || 0) : 0;
@@ -2029,7 +2027,6 @@
             const inputChanged = inputMs !== committedMs;
 
             if (t.tRunning) {
-                // Corriendo → pausar
                 if (t.tMode === 'up') t.tAcc += Date.now() - t.tRef;
                 else                  t.tAcc -= Date.now() - t.tRef;
                 t.tRunning = false;
@@ -2037,12 +2034,9 @@
                 const isPaused = t.tAcc > 0 && !t.tCompleted;
 
                 if (isPaused && !inputChanged) {
-                    // Pausado SIN cambiar el tiempo → reanudar
                     t.tRef = Date.now();
                     t.tRunning = true;
                 } else {
-                    // Pausado CON cambio, o idle, o completado → reiniciar
-                    // con el tiempo nuevo del input
                     t.tMode = inputMs > 0 ? 'down' : 'up';
                     t.tAcc = inputMs;
                     t.setMs = inputMs;
@@ -2060,7 +2054,6 @@
             let t = timersList.find(x => x.id === id);
             if (!t) return;
 
-            // 1) Leer SIEMPRE del DOM (por si onchange no se disparó)
             const hEl = document.getElementById(`t-input-h-${id}`);
             const mEl = document.getElementById(`t-input-m-${id}`);
             if (hEl && mEl) {
@@ -2070,7 +2063,6 @@
                 t.inputM = m || '';
             }
 
-            // 2) Guardar estado previo ANTES de modificar
             const wasRunning = t.tRunning;
             const hadProgress = wasRunning || (t.tAcc > 0);
 
@@ -2080,7 +2072,6 @@
                 else                  remaining = t.tAcc - (Date.now() - t.tRef);
             }
 
-            // 3) Para estadísticas: usar el setMs con el que ESTABA CORRIENDO
             const runningSetMs = t.setMs || 0;
             let elapsedMs, durationMs;
 
@@ -2093,7 +2084,6 @@
                 durationMs = elapsedMs;
             }
 
-            // 4) Solo abrir modal si hubo progreso real
             if (elapsedMs > 1000 && hadProgress && !activeTimerForGoal) {
                 activeTimerForGoal = {
                     name: t.name,
@@ -2104,14 +2094,11 @@
                 openGoalModal();
             }
 
-            // 5) Resetear estado
             t.tRunning   = false;
             t.tAcc       = 0;
             t.tRef       = 0;
             t.tCompleted = false;
 
-            // 6) CLAVE: sincronizar setMs con el valor actual del input.
-            //    Así, al pulsar PLAY después de STOP, arranca con el nuevo valor.
             const hNow = parseInt(t.inputH) || 0;
             const mNow = parseInt(t.inputM) || 0;
             t.setMs = (hNow * 3600 + mNow * 60) * 1000;
@@ -2271,8 +2258,6 @@
                 const pillEl = document.getElementById(`pill-time-${t.id}`);
                 if (pillEl) pillEl.innerText = disp;
 
-                // Prioridad: primero el primer timer corriendo en orden de posición,
-                // si no hay ninguno corriendo, el primero con tiempo > 0.
                 if (t.tRunning) {
                     if (!firstRunningInfo) firstRunningInfo = { id: t.id, disp: disp, isRunning: true };
                 } else if (current > 0) {
@@ -2544,10 +2529,19 @@
 
             const content = document.getElementById('modal-content-notes');
             content.style.display = 'flex';
-            document.getElementById('notes-mode').value = 'general';
+
+            // ← Restaurar estado previo (modo + fecha)
+            const savedMode = localStorage.getItem('wkNotesLastMode') || 'general';
+            const savedDate = localStorage.getItem('wkNotesLastDate') || '';
+
+            document.getElementById('notes-mode').value = savedMode;
+            if (savedMode === 'date' && savedDate) {
+                document.getElementById('notes-date-picker').value = savedDate;
+            }
+
             toggleNotesMode();
 
-            populateNotesIndex('');   // ← NUEVO
+            populateNotesIndex(savedMode === 'date' ? savedDate : '');
 
             document.getElementById('main-modal-card').classList.add('wide');
             openModal();
@@ -2555,6 +2549,8 @@
 
         function toggleNotesMode() {
             const mode = document.getElementById('notes-mode').value;
+            localStorage.setItem('wkNotesLastMode', mode);
+
             const picker = document.getElementById('notes-date-picker');
             const ta = document.getElementById('notes-main-textarea');
             
@@ -2570,6 +2566,7 @@
                     const dd = String(today.getDate()).padStart(2, '0');
                     picker.value = `${yyyy}-${mm}-${dd}`;
                 }
+                localStorage.setItem('wkNotesLastDate', picker.value);
                 loadNoteForPicker();
             }
         }
@@ -2578,6 +2575,8 @@
             const date = document.getElementById('notes-date-picker').value;
             const ta = document.getElementById('notes-main-textarea');
             ta.value = notesData[date] || '';
+
+            if (date) localStorage.setItem('wkNotesLastDate', date);
 
             // Sincroniza el índice sin reconstruirlo (evita re-entrancia)
             const sel = document.getElementById('notes-index-select');

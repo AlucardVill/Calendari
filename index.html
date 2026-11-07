@@ -406,19 +406,16 @@
             font-size: 0.66rem; height: 22px; padding: 3px 7px; background: var(--item-bg);
         }
 
-        /* === MODIFICADO: scrollbar visible en resultados === */
+        /* === MODIFICADO: scrollbar OCULTA en resultados (sigue desplazándose) === */
         .hidden-bar-results {
             display: none; align-items: center; gap: 6px;
             flex: 1; min-width: 0;
             overflow-x: auto; overflow-y: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-input) transparent;
-            padding: 2px 0 8px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 2px 0;
         }
-        .hidden-bar-results::-webkit-scrollbar { height: 4px; display: block; }
-        .hidden-bar-results::-webkit-scrollbar-track { background: transparent; border-radius: 2px; }
-        .hidden-bar-results::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 2px; }
-        .hidden-bar-results::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+        .hidden-bar-results::-webkit-scrollbar { display: none; }
         .hidden-timers-bar.searching .hidden-bar-results { display: flex; }
 
         .hidden-bar-result-item {
@@ -448,19 +445,16 @@
         .hidden-timers-bar.searching .hidden-bar-search-btn,
         .hidden-timers-bar.expanded .hidden-bar-search-btn { display: none; }
 
-        /* === MODIFICADO: scrollbar visible en dots === */
+        /* === MODIFICADO: scrollbar OCULTA en dots (sigue desplazándose) === */
         .hidden-bar-dots {
             display: flex; align-items: center; gap: 8px;
             flex: 1; min-width: 0;
             overflow-x: auto; overflow-y: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-input) transparent;
-            padding: 2px 0 8px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 2px 0;
         }
-        .hidden-bar-dots::-webkit-scrollbar { height: 4px; display: block; }
-        .hidden-bar-dots::-webkit-scrollbar-track { background: transparent; border-radius: 2px; }
-        .hidden-bar-dots::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 2px; }
-        .hidden-bar-dots::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+        .hidden-bar-dots::-webkit-scrollbar { display: none; }
 
         .hidden-dot {
             width: 10px; height: 10px; border-radius: 50%;
@@ -1168,34 +1162,34 @@
 
         /* ============================================
            MODALES ARRASTRABLES Y REDIMENSIONABLES
+           (indicadores discretos)
            ============================================ */
         .modal-card, .calendar-detail { position: relative; }
 
         .modal-drag-handle {
-            position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
-            width: 46px; height: 14px; display: flex; align-items: center; justify-content: center;
-            cursor: grab; z-index: 60; opacity: 0.4; transition: opacity 0.2s;
+            position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
+            width: 36px; height: 10px; display: flex; align-items: center; justify-content: center;
+            cursor: grab; z-index: 60; opacity: 0.28; transition: opacity 0.2s;
             touch-action: none; user-select: none; -webkit-user-select: none;
         }
         .modal-drag-handle .grip {
-            width: 22px; height: 2px; border-radius: 1px; background: currentColor;
-            box-shadow: 0 5px 0 currentColor, 0 -5px 0 currentColor;
+            width: 22px; height: 3px; border-radius: 2px; background: currentColor;
             color: var(--muted); pointer-events: none;
         }
-        .modal-drag-handle:hover { opacity: 1; }
+        .modal-drag-handle:hover { opacity: 0.85; }
         .modal-drag-handle:hover .grip { color: var(--accent); }
         .modal-drag-handle:active { cursor: grabbing; }
 
         .modal-resize-handle {
-            position: absolute; bottom: 3px; right: 3px;
-            width: 20px; height: 20px;
+            position: absolute; bottom: 2px; right: 2px;
+            width: 12px; height: 12px;
             display: flex; align-items: flex-end; justify-content: flex-end;
-            padding: 2px; cursor: nwse-resize; z-index: 60;
-            opacity: 0.35; transition: opacity 0.2s, color 0.2s;
+            padding: 0; cursor: nwse-resize; z-index: 60;
+            opacity: 0.22; transition: opacity 0.2s, color 0.2s;
             touch-action: none; color: var(--muted); box-sizing: border-box;
         }
-        .modal-resize-handle svg { width: 14px; height: 14px; display: block; pointer-events: none; }
-        .modal-resize-handle:hover, .modal-resize-handle:active { opacity: 1; color: var(--accent); }
+        .modal-resize-handle svg { width: 10px; height: 10px; display: block; pointer-events: none; }
+        .modal-resize-handle:hover, .modal-resize-handle:active { opacity: 0.9; color: var(--accent); }
 
         .modal-card.dragging, .calendar-detail.dragging,
         .modal-card.resizing, .calendar-detail.resizing {
@@ -1386,7 +1380,7 @@
             
             <div id="modal-content-goal" style="display:none; text-align: center;">
                 <h3 style="color: var(--accent); margin-bottom: 12px;">¡Tiempo Finalizado!</h3>
-                <p id="goal-modal-title" style="font-size: 0.88rem; color: var(--subtext); margin-bottom: 22px;">¿Objetivo logrado?</p>
+                <p id="goal-modal-title" style="font-size: 0.88px; color: var(--subtext); margin-bottom: 22px;">¿Objetivo logrado?</p>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-cancel" onclick="recordGoal(false)" style="background: var(--sunday); color: #fff; border-color: var(--sunday);">No</button>
                     <button class="btn btn-save" onclick="recordGoal(true)">Sí</button>
@@ -4304,7 +4298,8 @@
             const resizeHandle = document.createElement('div');
             resizeHandle.className = 'modal-resize-handle';
             resizeHandle.title = 'Redimensionar';
-            resizeHandle.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 13L13 3M8 13L13 8"/></svg>';
+            /* === MODIFICADO: SVG discreto de 3 puntitos === */
+            resizeHandle.innerHTML = '<svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="2.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="2.5" r="0.9"/></svg>';
             modalEl.appendChild(resizeHandle);
 
             const storageKey = `wkModalState-${key}`;

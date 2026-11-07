@@ -45,7 +45,7 @@
             --year-bar: #60a5fa;
             --week-bar: #34d399;
             --bi-bar: #fb7185;
-            --week-box-active: #34d399;
+            --week-box-active: #6ee7b7;
             --week-box-concluded: #2b2f3a;
             --current-week-bg: rgba(52, 211, 153, 0.10);
             --block-id: #fcd34d;
@@ -858,9 +858,22 @@
         
         .day.sat-future { color: var(--saturday); } .day.sun-future { color: var(--sunday); }
         
-        .highlight-week-active .day { border-top-color: var(--week-box-active); border-bottom-color: var(--week-box-active); border-radius: 0; } 
-        .highlight-week-active .block-start { border-left-color: var(--week-box-active); border-top-left-radius: 7px; border-bottom-left-radius: 7px; } 
-        .highlight-week-active .block-end { border-right-color: var(--week-box-active); border-top-right-radius: 7px; border-bottom-right-radius: 7px; }
+        /* === BORDES DE SEMANA ACTIVA (65% de opacidad — más suaves) === */
+        .highlight-week-active .day { 
+            border-top-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
+            border-bottom-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
+            border-radius: 0; 
+        } 
+        .highlight-week-active .block-start { 
+            border-left-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
+            border-top-left-radius: 7px; 
+            border-bottom-left-radius: 7px; 
+        } 
+        .highlight-week-active .block-end { 
+            border-right-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
+            border-top-right-radius: 7px; 
+            border-bottom-right-radius: 7px; 
+        }
 
         .quarter-tasks-wrapper { position: relative; height: 100%; min-height: 220px; }
         .quarter-tasks-panel {
@@ -1688,10 +1701,11 @@
     </script>
 
     <script>
+        /* === PALETA MODERNA (índigo por defecto) === */
         const themeColors = {
-            green: '#30d158',
-            blue: '#0a84ff',
-            orange: '#ff9f0a'
+            green: '#6ee7b7',
+            blue: '#818cf8',
+            orange: '#fb923c'
         };
 
         function changeThemeColors() {
@@ -1703,10 +1717,10 @@
         }
 
         function applyThemeColors() {
-            const weekC = localStorage.getItem('wkWeekColor') || 'green';
+            const weekC = localStorage.getItem('wkWeekColor') || 'blue';
             const borderC = localStorage.getItem('wkBorderColor') || 'default';
             
-            document.documentElement.style.setProperty('--week-box-active', themeColors[weekC] || themeColors.green);
+            document.documentElement.style.setProperty('--week-box-active', themeColors[weekC] || themeColors.blue);
             
             if (borderC === 'default') {
                 document.documentElement.style.removeProperty('--border');
@@ -2737,7 +2751,7 @@
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-general').style.display = 'block'; 
             
-            document.getElementById('theme-week-color').value = localStorage.getItem('wkWeekColor') || 'green';
+            document.getElementById('theme-week-color').value = localStorage.getItem('wkWeekColor') || 'blue';
             document.getElementById('theme-border-color').value = localStorage.getItem('wkBorderColor') || 'default';
             
             syncModalSliders();

@@ -1367,9 +1367,19 @@
             </div>
 
             <div id="modal-content-notes" style="display:none; flex-direction:column; height:100%;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h3 style="color:var(--accent); margin:0;">Notas</h3>
-                    <select id="notes-mode" onchange="toggleNotesMode()" style="background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); border-radius:6px; padding:4px 8px; font-size:0.75rem; outline:none;">
+                <div style="display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; margin-bottom:15px;">
+                    <h3 style="color:var(--accent); margin:0; font-size:1rem;">Notas</h3>
+
+                    <select id="notes-index-select" onchange="onNotesIndexChange(this.value)"
+                            style="width:100%; min-width:0; background:var(--input-bg); color:var(--text);
+                                   border:1px solid var(--border-input); border-radius:6px; padding:4px 8px;
+                                   font-family:inherit; font-size:0.72rem; outline:none; cursor:pointer;">
+                        <option value="">Ir a nota…</option>
+                    </select>
+
+                    <select id="notes-mode" onchange="toggleNotesMode()"
+                            style="background:var(--input-bg); color:var(--text); border:1px solid var(--border-input);
+                                   border-radius:6px; padding:4px 8px; font-size:0.75rem; outline:none; cursor:pointer;">
                         <option value="general">Generales</option>
                         <option value="date">Por Fecha</option>
                     </select>
@@ -2477,14 +2487,68 @@
             openModal(); 
         }
         
+        function populateNotesIndex(currentDate) {
+            const sel = document.getElementById('notes-index-select');
+            if (!sel) return;
+
+            const dates = Object.keys(notesData).filter(k =>
+                k !== 'general' && typeof notesData[k] === 'string' && notesData[k].trim()
+            );
+            dates.sort((a, b) => b.localeCompare(a));
+
+            if (dates.length === 0) {
+                sel.innerHTML = '<option value="">Sin notas</option>';
+                sel.disabled = true;
+                return;
+            }
+            sel.disabled = false;
+
+            const groups = {};
+            dates.forEach(d => {
+                const key = d.slice(0, 7);
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(d);
+            });
+
+            let html = '<option value="">Ir a nota…</option>';
+            Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(key => {
+                const [y, m] = key.split('-').map(Number);
+                html += `<optgroup label="${meses[m-1]} ${y}">`;
+                groups[key].forEach(d => {
+                    const day = parseInt(d.split('-')[2], 10);
+                    const raw = notesData[d].replace(/\s+/g, ' ').trim();
+                    const preview = raw.length > 28 ? raw.slice(0, 28) + '…' : raw;
+                    const selected = d === currentDate ? ' selected' : '';
+                    html += `<option value="${d}"${selected}>${day} ${meses[m-1].slice(0,3)} · ${preview}</option>`;
+                });
+                html += `</optgroup>`;
+            });
+
+            sel.innerHTML = html;
+        }
+
+        function onNotesIndexChange(date) {
+            if (!date) return;
+
+            document.getElementById('notes-mode').value = 'date';
+            document.getElementById('notes-date-picker').value = date;
+
+            // Mostrar picker + cargar nota (picker ya tiene valor, no se sobreescribe)
+            toggleNotesMode();
+        }
+
+        let notesIndexRefreshTimer = null;
+
         function openNotesModal() {
             document.querySelectorAll('#main-modal-card > div').forEach(el => el.style.display = 'none');
-            
+
             const content = document.getElementById('modal-content-notes');
             content.style.display = 'flex';
             document.getElementById('notes-mode').value = 'general';
             toggleNotesMode();
-            
+
+            populateNotesIndex('');   // ← NUEVO
+
             document.getElementById('main-modal-card').classList.add('wide');
             openModal();
         }
@@ -2514,21 +2578,32 @@
             const date = document.getElementById('notes-date-picker').value;
             const ta = document.getElementById('notes-main-textarea');
             ta.value = notesData[date] || '';
+
+            // Sincroniza el índice sin reconstruirlo (evita re-entrancia)
+            const sel = document.getElementById('notes-index-select');
+            if (sel && !sel.disabled) sel.value = date;
         }
 
         function saveMainNote() {
             const mode = document.getElementById('notes-mode').value;
             const ta = document.getElementById('notes-main-textarea');
+
             if (mode === 'general') {
                 notesData.general = ta.value;
             } else {
                 const date = document.getElementById('notes-date-picker').value;
-                if (date) {
-                    notesData[date] = ta.value;
-                }
+                if (date) notesData[date] = ta.value;
             }
             localStorage.setItem('wkNotes', JSON.stringify(notesData));
-            renderDayTaskMarks(); 
+            renderDayTaskMarks();
+
+            // Refrescar índice con debounce
+            if (mode === 'date') {
+                clearTimeout(notesIndexRefreshTimer);
+                notesIndexRefreshTimer = setTimeout(() => {
+                    populateNotesIndex(document.getElementById('notes-date-picker').value);
+                }, 800);
+            }
         }
         
         function saveDualNotes() {

@@ -681,10 +681,7 @@
         .qc-bar .fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--accent); }
         .qc-pct { font-size: 0.88rem; font-weight: 800; color: var(--text); }
 
-        /* ============================================
-           MULTI-VENTANA: overlays transparentes a clics
-           Cada tarjeta recibe los eventos, el fondo no.
-           ============================================ */
+        /* Multi-ventana: overlays transparentes a clics */
         .calendar-overlay {
             display: none; position: fixed; inset: 0;
             z-index: 900;
@@ -697,13 +694,9 @@
         .calendar-overlay.active { display: flex; }
         .calendar-overlay .calendar-detail { pointer-events: auto; }
 
-        #modal-overlay {
-            pointer-events: none;
-        }
+        #modal-overlay { pointer-events: none; }
         #modal-overlay.active { pointer-events: none; }
         #modal-overlay .modal-card { pointer-events: auto; }
-
-        /* El goal-overlay debe seguir bloqueando (sí/no) */
         #goal-overlay.modal-overlay { pointer-events: auto; }
         #goal-overlay.modal-overlay.active { pointer-events: auto; }
 
@@ -762,6 +755,70 @@
         .close-btn:hover { color: var(--sunday); border-color: var(--sunday); }
         .close-btn:active { transform: scale(0.94); }
         .close-btn svg { width: 16px; height: 16px; display: block; }
+
+        .minimize-btn {
+            background: var(--item-bg); border: 1px solid var(--border-input); color: var(--text);
+            width: 34px; height: 34px; border-radius: 10px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0;
+        }
+        .minimize-btn:hover { color: var(--accent); border-color: var(--accent); }
+        .minimize-btn:active { transform: scale(0.94); }
+        .minimize-btn svg { width: 14px; height: 14px; display: block; }
+
+        .modal-minimize-btn {
+            position: absolute;
+            top: 4px; right: 8px;
+            width: 22px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border-radius: 5px;
+            color: var(--muted); opacity: 0.45;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 60;
+        }
+        .modal-minimize-btn:hover { opacity: 1; color: var(--accent); background: var(--item-bg); }
+        .modal-minimize-btn:active { transform: scale(0.9); }
+        .modal-minimize-btn svg { width: 13px; height: 13px; display: block; }
+
+        #minimized-bar {
+            position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+            display: none; gap: 8px; padding: 7px 8px;
+            background: var(--card);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border); border-radius: 14px;
+            box-shadow: var(--card-shadow);
+            z-index: 5500;
+            max-width: calc(100vw - 32px);
+            overflow-x: auto; scrollbar-width: none;
+            align-items: center; flex-wrap: nowrap;
+        }
+        #minimized-bar::-webkit-scrollbar { display: none; }
+        #minimized-bar.active { display: flex; }
+
+        .minimized-pill {
+            display: flex; align-items: center; gap: 6px;
+            padding: 7px 10px 7px 12px; border-radius: 10px;
+            background: var(--item-bg); border: 1px solid var(--border-input);
+            color: var(--text); font-size: 0.74rem; font-weight: 700;
+            cursor: pointer; white-space: nowrap;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0; letter-spacing: 0.02em; user-select: none;
+        }
+        .minimized-pill:hover {
+            border-color: var(--accent); color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+        .minimized-pill:active { transform: scale(0.97); }
+        .minimized-pill .pill-close {
+            background: transparent; border: none; color: var(--muted);
+            width: 16px; height: 16px; padding: 0;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            border-radius: 4px; font-size: 0.9rem; line-height: 1;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .minimized-pill .pill-close:hover { color: var(--sunday); background: rgba(255, 69, 58, 0.15); }
 
         .timecalc-btn {
             background: var(--card);
@@ -1350,9 +1407,6 @@
 
     <div id="calendar-container"></div>
 
-    <!-- Los overlays de trimestres ahora se crean dinámicamente en JS -->
-    <!-- El antiguo #calendar-overlay estático fue eliminado -->
-
     <div id="goal-overlay" class="modal-overlay" style="z-index: 2000;">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h3 style="color: var(--accent); margin-bottom: 8px; text-align: center;">¡Tiempo Finalizado!</h3>
@@ -1373,6 +1427,12 @@
 
         <div class="modal-card" id="main-modal-card" onclick="event.stopPropagation()">
             
+            <div class="modal-minimize-btn" onclick="event.stopPropagation(); minimizeMainModal()" title="Minimizar" aria-label="Minimizar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <path d="M5 12h14"/>
+                </svg>
+            </div>
+
             <div id="modal-content-goal" style="display:none; text-align: center;">
                 <h3 style="color: var(--accent); margin-bottom: 12px;">¡Tiempo Finalizado!</h3>
                 <p id="goal-modal-title" style="font-size: 0.88rem; color: var(--subtext); margin-bottom: 22px;">¿Objetivo logrado?</p>
@@ -1673,6 +1733,8 @@
             
         </div>
     </div>
+
+    <div id="minimized-bar"></div>
 
     <script>
         if ('serviceWorker' in navigator) {
@@ -2421,10 +2483,7 @@
             goalOverlayInterval = setInterval(renderGoalOverlayStats, 500);
 
             document.getElementById('goal-overlay').classList.add('active');
-            if (!document.getElementById('modal-overlay').classList.contains('active')
-                && quarterWindows.size === 0) {
-                document.body.style.overflow = 'hidden';
-            }
+            updateBodyOverflow();
         }
 
         function renderGoalOverlayStats() {
@@ -2476,10 +2535,7 @@
             activeTimerForGoal = null;
             goalCompletedAt = 0;
             document.getElementById('goal-overlay').classList.remove('active');
-            if (!document.getElementById('modal-overlay').classList.contains('active')
-                && quarterWindows.size === 0) {
-                document.body.style.overflow = '';
-            }
+            updateBodyOverflow();
             const histEl = document.getElementById('modal-content-history');
             if (histEl && histEl.style.display === 'flex') renderHistoryModal();
         }
@@ -2548,7 +2604,7 @@
             const activeTimerInfo = firstRunningInfo || firstWithTimeInfo;
 
             const isNotMainScreen = document.getElementById('modal-overlay').classList.contains('active')
-                || quarterWindows.size > 0;
+                || hasVisibleQuarterWindow();
             const floatEl = document.getElementById('floating-timer');
             
             if (activeTimerInfo) {
@@ -2712,13 +2768,183 @@
         let activeQuarterKey = null;
         let winZCounter = 2000;
 
-        function getActiveWin() {
-            return activeQuarterKey ? quarterWindows.get(activeQuarterKey) : null;
+        // === VENTANAS MINIMIZADAS ===
+        const minimizedWindows = new Map(); // id -> { title, restoreFn, closeFn, persistData }
+
+        function hasVisibleQuarterWindow() {
+            return Array.from(quarterWindows.values()).some(w => w.overlay.style.display !== 'none');
         }
 
-        function getActiveWinBody() {
-            const win = getActiveWin();
-            return win ? win.bodyEl : null;
+        function updateBodyOverflow() {
+            const hasActiveModal = document.getElementById('modal-overlay').classList.contains('active');
+            const hasGoal = document.getElementById('goal-overlay').classList.contains('active');
+            if (hasActiveModal || hasVisibleQuarterWindow() || hasGoal) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function persistMinimized() {
+            const arr = Array.from(minimizedWindows.values())
+                .map(w => w.persistData)
+                .filter(Boolean);
+            if (arr.length === 0) localStorage.removeItem('wkMinimizedWindows');
+            else localStorage.setItem('wkMinimizedWindows', JSON.stringify(arr));
+        }
+
+        function minimizeWindow(id, title, restoreFn, closeFn, persistData) {
+            minimizedWindows.set(id, { title, restoreFn, closeFn, persistData });
+            renderMinimizedBar();
+            persistMinimized();
+            updateBodyOverflow();
+        }
+
+        function restoreWindow(id) {
+            const w = minimizedWindows.get(id);
+            if (!w) return;
+            minimizedWindows.delete(id);
+            renderMinimizedBar();
+            persistMinimized();
+            if (w.restoreFn) w.restoreFn();
+            updateBodyOverflow();
+        }
+
+        function closeMinimizedWindow(id) {
+            const w = minimizedWindows.get(id);
+            if (!w) return;
+            minimizedWindows.delete(id);
+            renderMinimizedBar();
+            persistMinimized();
+            if (w.closeFn) w.closeFn();
+            updateBodyOverflow();
+        }
+
+        function renderMinimizedBar() {
+            const bar = document.getElementById('minimized-bar');
+            if (!bar) return;
+            if (minimizedWindows.size === 0) {
+                bar.classList.remove('active');
+                bar.innerHTML = '';
+                return;
+            }
+            bar.classList.add('active');
+            bar.innerHTML = Array.from(minimizedWindows.entries()).map(([id, w]) => {
+                const safe = String(w.title).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+                return `<div class="minimized-pill" onclick="restoreWindow('${id}')" title="Restaurar ${safe}">
+                    <span>${safe}</span>
+                    <button class="pill-close" onclick="event.stopPropagation(); closeMinimizedWindow('${id}')" title="Cerrar" aria-label="Cerrar">×</button>
+                </div>`;
+            }).join('');
+        }
+
+        function minimizeMainModal() {
+            const modal = document.getElementById('main-modal-card');
+            const dualNotes = document.getElementById('dual-notes-card');
+            const overlay = document.getElementById('modal-overlay');
+            
+            const panelMap = {
+                'modal-content-goal': 'Objetivo',
+                'modal-content-addtimer': 'Nuevo Timer',
+                'modal-content-general': 'Configuración',
+                'modal-content-taskcreate': 'Nueva Acción',
+                'modal-content-metrics': 'Métricas',
+                'modal-content-daystats': 'Día',
+                'modal-content-block': 'Bloque',
+                'modal-content-work': 'Jornada',
+                'modal-content-day': 'Día',
+                'modal-content-marker': 'Marcador',
+                'modal-content-notes': 'Notas',
+                'modal-content-timecalc': 'Calculadora',
+                'modal-content-history': 'Historial'
+            };
+            let title = 'Modal';
+            const activePanel = Array.from(modal.querySelectorAll(':scope > div[id^="modal-content-"]'))
+                .find(el => el.style.display === 'block' || el.style.display === 'flex');
+            if (activePanel) title = panelMap[activePanel.id] || 'Modal';
+            
+            try { saveModalState(modal, 'wkModalState-main'); } catch(_) {}
+            try { saveModalState(dualNotes, 'wkModalState-dual-notes'); } catch(_) {}
+            
+            overlay.classList.remove('active');
+            
+            const PERSISTIBLE_MAIN_PANELS = [
+                'modal-content-notes',
+                'modal-content-history',
+                'modal-content-general',
+                'modal-content-timecalc'
+            ];
+            let persistData = null;
+            if (activePanel && PERSISTIBLE_MAIN_PANELS.includes(activePanel.id)) {
+                persistData = { type: 'main', panelId: activePanel.id };
+            }
+            
+            minimizeWindow('main-modal', title,
+                () => {
+                    overlay.classList.add('active');
+                    updateTimersDisplayValues();
+                },
+                () => { closeModal(); },
+                persistData
+            );
+        }
+
+        function minimizeQuarterWindow(key) {
+            const win = quarterWindows.get(key);
+            if (!win) return;
+            const title = `T${win.q+1} · ${win.year}`;
+            try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
+            win.overlay.style.display = 'none';
+            minimizeWindow(`cal-${key}`, title,
+                () => {
+                    win.overlay.style.display = 'flex';
+                    focusQuarterWindow(key);
+                },
+                () => { closeQuarterWindow(key); },
+                { type: 'quarter', year: win.year, q: win.q }
+            );
+        }
+
+        function restoreMinimizedFromStorage() {
+            const saved = JSON.parse(localStorage.getItem('wkMinimizedWindows') || '[]');
+            if (!Array.isArray(saved) || saved.length === 0) return;
+
+            const prevYear = selectedYear;
+            const prevQ = selectedQuarter;
+
+            // Restaurar primero los trimestres
+            saved.filter(s => s.type === 'quarter').forEach(s => {
+                try {
+                    selectedYear = s.year;
+                    selectedQuarter = s.q;
+                    openQuarterDetail(s.q);
+                    const key = `${s.year}-q${s.q}`;
+                    if (quarterWindows.has(key)) minimizeQuarterWindow(key);
+                } catch(e) { console.warn('Error restoring quarter', e); }
+            });
+
+            // Restaurar el modal principal al final
+            const main = saved.find(s => s.type === 'main');
+            if (main) {
+                try {
+                    const opener = {
+                        'modal-content-notes': openNotesModal,
+                        'modal-content-history': openHistoryModal,
+                        'modal-content-general': openGeneralModal,
+                        'modal-content-timecalc': openTimeCalcModal
+                    }[main.panelId];
+                    if (opener) opener();
+                    else openGeneralModal();
+                    minimizeMainModal();
+                } catch(e) { console.warn('Error restoring main', e); }
+            }
+
+            selectedYear = prevYear;
+            selectedQuarter = prevQ;
+        }
+
+        function getActiveWin() {
+            return activeQuarterKey ? quarterWindows.get(activeQuarterKey) : null;
         }
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
@@ -3035,7 +3261,7 @@
             });
         }
 
-        // === RENDER: qbar widget (usa data-* en lugar de ids) ===
+        // === RENDER: qbar widget ===
         function renderQuarterBarWidgetHTML(win) {
             const modes = ['q', 'y', 'b']; const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' };
             const mode = modes[win.quarterBarMode] || 'q';
@@ -3388,7 +3614,7 @@
 
         function setActiveTabM(m) {
             const win = getActiveWin();
-            if (!win) { activeTabM = m; return; }
+            if (!win) return;
             win.activeTabM = m;
             const activeMonthAbs = win.q * 3 + m;
             const weeks = getWeeksForMonth(win.year, activeMonthAbs);
@@ -3400,7 +3626,7 @@
 
         function setActiveTabW(w) {
             const win = getActiveWin();
-            if (!win) { activeTabW = w; return; }
+            if (!win) return;
             win.activeTabW = w;
             renderActiveWindow();
         }
@@ -3517,7 +3743,6 @@
             if (toggleEl) toggleEl.innerHTML = `<div class="mode-toggle-corner" onclick="toggleListDisplayMode()" title="${toggleTitle}">${toggleIcon}</div>`;
         }
 
-        // Wrappers no-arg que operan sobre la ventana activa
         function updateMasterTaskList() {
             const win = getActiveWin();
             if (!win) return;
@@ -3670,6 +3895,11 @@
                                     <rect x="16" y="4" width="3" height="15" rx="0.6"/>
                                 </svg>
                             </button>
+                            <button class="minimize-btn" data-act="minimize" title="Minimizar" aria-label="Minimizar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                                    <path d="M5 12h14"/>
+                                </svg>
+                            </button>
                             <button class="close-btn" data-act="close" aria-label="Cerrar">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
                                     <path d="M6 6l12 12M18 6l-12 12"/>
@@ -3715,6 +3945,10 @@
                 focusQuarterWindow(key);
                 openMetricsModal();
             };
+            overlay.querySelector('[data-act="minimize"]').onclick = (e) => {
+                e.stopPropagation();
+                minimizeQuarterWindow(key);
+            };
             overlay.querySelector('[data-act="close"]').onclick = (e) => {
                 e.stopPropagation();
                 closeQuarterWindow(key);
@@ -3733,13 +3967,25 @@
         function focusQuarterWindow(key) {
             const win = quarterWindows.get(key);
             if (!win) return;
+            let restoredFromMin = false;
+            if (win.overlay.style.display === 'none') {
+                win.overlay.style.display = 'flex';
+                restoredFromMin = true;
+            }
+            if (minimizedWindows.has(`cal-${key}`)) {
+                minimizedWindows.delete(`cal-${key}`);
+                renderMinimizedBar();
+                restoredFromMin = true;
+            }
+            if (restoredFromMin) persistMinimized();
+
             activeQuarterKey = key;
             selectedYear = win.year;
             selectedQuarter = win.q;
             activeTabM = win.activeTabM;
             activeTabW = win.activeTabW;
             win.overlay.style.zIndex = ++winZCounter;
-            document.body.style.overflow = 'hidden';
+            updateBodyOverflow();
         }
 
         function closeQuarterWindow(key) {
@@ -3748,12 +3994,26 @@
             try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
             win.overlay.remove();
             quarterWindows.delete(key);
+
+            if (minimizedWindows.has(`cal-${key}`)) {
+                minimizedWindows.delete(`cal-${key}`);
+                renderMinimizedBar();
+                persistMinimized();
+            }
+            
             if (activeQuarterKey === key) {
-                activeQuarterKey = quarterWindows.size > 0 ? Array.from(quarterWindows.keys()).pop() : null;
+                const remainingVisible = Array.from(quarterWindows.keys()).filter(k => {
+                    const w = quarterWindows.get(k);
+                    return w && w.overlay.style.display !== 'none';
+                });
+                if (remainingVisible.length > 0) {
+                    activeQuarterKey = remainingVisible[remainingVisible.length - 1];
+                    focusQuarterWindow(activeQuarterKey);
+                } else {
+                    activeQuarterKey = null;
+                }
             }
-            if (quarterWindows.size === 0 && !document.getElementById('modal-overlay').classList.contains('active')) {
-                document.body.style.overflow = '';
-            }
+            updateBodyOverflow();
             updateTimersDisplayValues();
         }
 
@@ -3775,7 +4035,6 @@
                 return;
             }
 
-            // Guardar estado de la ventana actual y reconstruirla con nueva clave
             try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
 
             selectedYear = newYear;
@@ -3783,14 +4042,12 @@
             localStorage.setItem('wkSelYear', newYear);
             localStorage.setItem('wkSelQtr', newQ);
 
-            // Reemplazar la clave interna
             quarterWindows.delete(key);
             if (activeQuarterKey === key) activeQuarterKey = null;
 
             win.q = newQ;
             win.year = newYear;
 
-            // Recalcular tabs por defecto
             const now = new Date();
             if (newYear === now.getFullYear() && Math.floor(now.getMonth() / 3) === newQ) {
                 win.activeTabM = now.getMonth() % 3;
@@ -3807,6 +4064,16 @@
 
             const titleEl = win.overlay.querySelector('[data-title]');
             if (titleEl) titleEl.textContent = `T${newQ+1} · ${newYear}`;
+
+            // Reasignar handlers por si acaso
+            win.overlay.querySelector('[data-act="minimize"]').onclick = (e) => {
+                e.stopPropagation();
+                minimizeQuarterWindow(newKey);
+            };
+            win.overlay.querySelector('[data-act="close"]').onclick = (e) => {
+                e.stopPropagation();
+                closeQuarterWindow(newKey);
+            };
 
             focusQuarterWindow(newKey);
             renderQuarterDetailBodyInto(win.bodyEl, win);
@@ -3918,15 +4185,19 @@
         }
 
         function openModal() { 
+            if (minimizedWindows.has('main-modal')) {
+                minimizedWindows.delete('main-modal');
+                renderMinimizedBar();
+                persistMinimized();
+            }
             document.getElementById('modal-overlay').classList.add('active'); 
-            document.body.style.overflow = 'hidden';
+            updateBodyOverflow();
             updateTimersDisplayValues();
         }
         
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
             
-            // Persistir estado antes de cerrar
             try {
                 saveModalState(document.getElementById('main-modal-card'), 'wkModalState-main');
                 saveModalState(document.getElementById('dual-notes-card'),  'wkModalState-dual-notes');
@@ -3943,10 +4214,14 @@
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
-            
-            if (quarterWindows.size === 0) {
-                document.body.style.overflow = '';
+
+            if (minimizedWindows.has('main-modal')) {
+                minimizedWindows.delete('main-modal');
+                renderMinimizedBar();
+                persistMinimized();
             }
+            
+            updateBodyOverflow();
             updateTimersDisplayValues();
         }
 
@@ -4312,7 +4587,6 @@
             renderDayTaskMarks();
             renderNowMarker();
 
-            // Refrescar qbars de todas las ventanas de trimestre abiertas
             quarterWindows.forEach((win) => {
                 updateQuarterBarInto(win.bodyEl, win);
             });
@@ -4543,7 +4817,6 @@
         function initModalDragResize() {
             initDraggableModal(document.getElementById('main-modal-card'), 'main');
             initDraggableModal(document.getElementById('dual-notes-card'), 'dual-notes');
-            // Las ventanas de trimestre se inicializan al crearse.
         }
 
         function initDraggableModal(modalEl, key) {
@@ -4757,6 +5030,7 @@
         renderTimersUI();
         initModalDragResize();
         initFloatingTimerDrag();
+        restoreMinimizedFromStorage();
         setInterval(update, 1000);
         update();
     </script>

@@ -406,7 +406,6 @@
             font-size: 0.66rem; height: 22px; padding: 3px 7px; background: var(--item-bg);
         }
 
-        /* === scrollbar OCULTA en resultados (sigue desplazándose) === */
         .hidden-bar-results {
             display: none; align-items: center; gap: 6px;
             flex: 1; min-width: 0;
@@ -445,7 +444,6 @@
         .hidden-timers-bar.searching .hidden-bar-search-btn,
         .hidden-timers-bar.expanded .hidden-bar-search-btn { display: none; }
 
-        /* === scrollbar OCULTA en dots (sigue desplazándose) === */
         .hidden-bar-dots {
             display: flex; align-items: center; gap: 8px;
             flex: 1; min-width: 0;
@@ -506,8 +504,12 @@
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border); border-radius: 12px;
             box-shadow: var(--card-shadow);
+            cursor: grab;
+            touch-action: none;
+            user-select: none; -webkit-user-select: none;
         }
-        #floating-time { color: var(--block-id); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.03em; font-variant-numeric: tabular-nums; text-shadow: 0 1px 4px rgba(0,0,0,0.85); }
+        #floating-timer:active { cursor: grabbing; }
+        #floating-time { color: var(--block-id); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.03em; font-variant-numeric: tabular-nums; text-shadow: 0 1px 4px rgba(0,0,0,0.85); pointer-events: none; }
         .floating-stop-btn {
             background: transparent; border: none; color: var(--muted); border-radius: 5px;
             width: 20px; height: 20px; cursor: pointer;
@@ -679,16 +681,31 @@
         .qc-bar .fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--accent); }
         .qc-pct { font-size: 0.88rem; font-weight: 800; color: var(--text); }
 
+        /* ============================================
+           MULTI-VENTANA: overlays transparentes a clics
+           Cada tarjeta recibe los eventos, el fondo no.
+           ============================================ */
         .calendar-overlay {
             display: none; position: fixed; inset: 0;
-            background: rgba(var(--modal-overlay-rgb), var(--modal-overlay-alpha));
             z-index: 900;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
-            padding: 16px;
+            align-items: flex-start; justify-content: flex-start;
+            padding: 0;
+            pointer-events: none;
+            background: transparent;
+            backdrop-filter: none; -webkit-backdrop-filter: none;
         }
-        .calendar-overlay.active { display: flex; animation: fadeIn 0.25s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .calendar-overlay.active { display: flex; }
+        .calendar-overlay .calendar-detail { pointer-events: auto; }
+
+        #modal-overlay {
+            pointer-events: none;
+        }
+        #modal-overlay.active { pointer-events: none; }
+        #modal-overlay .modal-card { pointer-events: auto; }
+
+        /* El goal-overlay debe seguir bloqueando (sí/no) */
+        #goal-overlay.modal-overlay { pointer-events: auto; }
+        #goal-overlay.modal-overlay.active { pointer-events: auto; }
 
         .calendar-detail {
             background: rgba(var(--modal-bg-rgb), var(--modal-bg-alpha));
@@ -701,6 +718,7 @@
             animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden; 
             box-shadow: 0 32px 64px -12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+            position: relative;
         }
         [data-theme="light"] .calendar-detail {
             box-shadow: 0 32px 64px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04);
@@ -717,6 +735,7 @@
             background: rgba(var(--modal-bg-rgb), calc(var(--modal-bg-alpha) * 0.85));
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
+            padding-top: 20px;
         }
         
         .calendar-detail-title { display: flex; align-items: center; justify-content: center; gap: 4px; justify-self: center; }
@@ -858,7 +877,6 @@
         
         .day.sat-future { color: var(--saturday); } .day.sun-future { color: var(--sunday); }
         
-        /* === BORDES DE SEMANA ACTIVA (65% de opacidad — más suaves) === */
         .highlight-week-active .day { 
             border-top-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
             border-bottom-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
@@ -933,6 +951,8 @@
             padding: 16px; flex-direction: column;
         }
         .modal-overlay.active { display: flex; animation: fadeIn 0.25s; }
+        #modal-overlay.active { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
         .modal-card { 
             background: rgba(var(--modal-bg-rgb), var(--modal-bg-alpha));
@@ -1173,10 +1193,7 @@
         #notes-main-textarea, #dual-notes-text { background: rgba(255, 255, 255, 0.035) !important; }
         [data-theme="light"] #notes-main-textarea, [data-theme="light"] #dual-notes-text { background: rgba(255, 255, 255, 0.60) !important; }
 
-        /* ============================================
-           MODALES ARRASTRABLES Y REDIMENSIONABLES
-           (indicadores discretos)
-           ============================================ */
+        /* Modales arrastrables / redimensionables */
         .modal-card, .calendar-detail { position: relative; }
 
         .modal-drag-handle {
@@ -1213,7 +1230,6 @@
 
         #main-modal-card { padding-top: 22px; }
         #dual-notes-card { padding-top: 20px; }
-        .calendar-detail .calendar-detail-header { padding-top: 20px; }
 
         @media (max-width: 380px) {
             body { padding: 12px; padding-top: calc(12px + env(safe-area-inset-top)); }
@@ -1334,42 +1350,8 @@
 
     <div id="calendar-container"></div>
 
-    <div id="calendar-overlay" class="calendar-overlay" onclick="closeQuarterDetail(event)">
-        <div class="calendar-detail" onclick="event.stopPropagation()">
-            <div class="calendar-detail-header">
-                <div class="header-btns left">
-                    <button class="add-task-btn" onclick="openTaskCreateModal()" title="Añadir" aria-label="Añadir">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true">
-                            <path d="M12 5v14M5 12h14"/>
-                        </svg>
-                    </button>
-                </div>
-                
-                <div class="calendar-detail-title">
-                    <button class="nav-btn" onclick="prevQuarter()">‹</button>
-                    <span id="calendar-detail-title-text" class="calendar-title-text">T1</span>
-                    <button class="nav-btn" onclick="nextQuarter()">›</button>
-                </div>
-
-                <div class="header-btns right">
-                    <button class="metrics-btn" onclick="openMetricsModal()" title="Ver cumplimiento" aria-label="Ver cumplimiento">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M3 20h18"/>
-                            <rect x="5" y="13" width="3" height="6" rx="0.6"/>
-                            <rect x="10.5" y="9" width="3" height="10" rx="0.6"/>
-                            <rect x="16" y="4" width="3" height="15" rx="0.6"/>
-                        </svg>
-                    </button>
-                    <button class="close-btn" onclick="closeQuarterDetail()" aria-label="Cerrar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-                            <path d="M6 6l12 12M18 6l-12 12"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div class="calendar-detail-body" id="calendar-detail-body"></div>
-        </div>
-    </div>
+    <!-- Los overlays de trimestres ahora se crean dinámicamente en JS -->
+    <!-- El antiguo #calendar-overlay estático fue eliminado -->
 
     <div id="goal-overlay" class="modal-overlay" style="z-index: 2000;">
         <div class="modal-card" onclick="event.stopPropagation()">
@@ -1701,7 +1683,7 @@
     </script>
 
     <script>
-        /* === PALETA MODERNA (índigo por defecto) === */
+        /* === PALETA MODERNA === */
         const themeColors = {
             green: '#6ee7b7',
             blue: '#818cf8',
@@ -2440,7 +2422,7 @@
 
             document.getElementById('goal-overlay').classList.add('active');
             if (!document.getElementById('modal-overlay').classList.contains('active')
-                && !document.getElementById('calendar-overlay').classList.contains('active')) {
+                && quarterWindows.size === 0) {
                 document.body.style.overflow = 'hidden';
             }
         }
@@ -2495,7 +2477,7 @@
             goalCompletedAt = 0;
             document.getElementById('goal-overlay').classList.remove('active');
             if (!document.getElementById('modal-overlay').classList.contains('active')
-                && !document.getElementById('calendar-overlay').classList.contains('active')) {
+                && quarterWindows.size === 0) {
                 document.body.style.overflow = '';
             }
             const histEl = document.getElementById('modal-content-history');
@@ -2565,7 +2547,8 @@
 
             const activeTimerInfo = firstRunningInfo || firstWithTimeInfo;
 
-            const isNotMainScreen = document.getElementById('calendar-overlay').classList.contains('active') || document.getElementById('modal-overlay').classList.contains('active');
+            const isNotMainScreen = document.getElementById('modal-overlay').classList.contains('active')
+                || quarterWindows.size > 0;
             const floatEl = document.getElementById('floating-timer');
             
             if (activeTimerInfo) {
@@ -2587,6 +2570,57 @@
             } else {
                 floatEl.style.display = 'none';
             }
+        }
+
+        /* === FLOATING TIMER DRAG === */
+        function initFloatingTimerDrag() {
+            const el = document.getElementById('floating-timer');
+            if (!el || el.dataset.dragInit) return;
+            el.dataset.dragInit = '1';
+
+            const saved = JSON.parse(localStorage.getItem('wkFloatTimerPos') || 'null');
+            if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
+                el.style.left = saved.left + 'px';
+                el.style.top = saved.top + 'px';
+            }
+
+            let dragging = false, moved = false;
+            let sx = 0, sy = 0, sl = 0, st = 0;
+
+            el.addEventListener('pointerdown', (e) => {
+                if (e.target.closest('button')) return;
+                if (e.button !== undefined && e.button !== 0) return;
+                const r = el.getBoundingClientRect();
+                sx = e.clientX; sy = e.clientY;
+                sl = r.left; st = r.top;
+                dragging = true; moved = false;
+                try { el.setPointerCapture(e.pointerId); } catch(_) {}
+            });
+
+            el.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                const dx = e.clientX - sx;
+                const dy = e.clientY - sy;
+                if (!moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+                moved = true;
+                const w = el.offsetWidth, h = el.offsetHeight;
+                const nl = Math.max(2, Math.min(window.innerWidth - w - 2, sl + dx));
+                const nt = Math.max(2, Math.min(window.innerHeight - h - 2, st + dy));
+                el.style.left = nl + 'px';
+                el.style.top = nt + 'px';
+            });
+
+            const endDrag = (e) => {
+                if (!dragging) return;
+                dragging = false;
+                try { el.releasePointerCapture(e.pointerId); } catch(_) {}
+                if (moved) {
+                    const r = el.getBoundingClientRect();
+                    localStorage.setItem('wkFloatTimerPos', JSON.stringify({ left: r.left, top: r.top }));
+                }
+            };
+            el.addEventListener('pointerup', endDrag);
+            el.addEventListener('pointercancel', endDrag);
         }
 
         function saveTimersState() {
@@ -2669,14 +2703,23 @@
         if (isNaN(selectedYear) || selectedYear < 2000 || selectedYear > 2100) selectedYear = currentYear;
         if (isNaN(selectedQuarter) || selectedQuarter < 0 || selectedQuarter > 3) selectedQuarter = 0;
 
-        let quarterBarMode = parseInt(localStorage.getItem('wkQBarMode')) || 0;
         let tcMode = 'tarea'; 
         let calcMode = 'interval';
         let editingEntornoId = null;
 
-        let activeTabM = 0;
-        let activeTabW = 1;
-        let listDisplayMode = 'acciones';
+        // === MULTI-VENTANA ===
+        const quarterWindows = new Map(); // key -> { overlay, card, bodyEl, q, year, activeTabM, activeTabW, listDisplayMode, quarterBarMode }
+        let activeQuarterKey = null;
+        let winZCounter = 2000;
+
+        function getActiveWin() {
+            return activeQuarterKey ? quarterWindows.get(activeQuarterKey) : null;
+        }
+
+        function getActiveWinBody() {
+            const win = getActiveWin();
+            return win ? win.bodyEl : null;
+        }
 
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
@@ -2719,26 +2762,6 @@
                 if (dayIdx !== -1) return { localW: weeks[i].localW, weekIdx: i, dayIdx, isMain: weeks[i].isMain };
             }
             return null;
-        }
-
-        function exportData() {
-            let backup = { 
-                tasks: tasksData, 
-                entornos: entornosData, 
-                work: workConfig, 
-                block: blockConfig, 
-                day: dayConfig, 
-                markers: markersData, 
-                collapsed: collapsedMonths, 
-                trackedYears: trackedYears, 
-                timerStats: timerStats, 
-                timersList: timersList,
-                notes: notesData
-            };
-            const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
-            const url = URL.createObjectURL(blob); const a = document.createElement("a");
-            a.href = url; a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
         function toggleTheme() {
@@ -2893,7 +2916,7 @@
             if (date) {
                 notesData[date] = ta.value;
                 localStorage.setItem('wkNotes', JSON.stringify(notesData));
-                renderQuarterDetailBody(); 
+                renderActiveWindow();
             }
         }
         
@@ -3012,30 +3035,51 @@
             });
         }
 
-        function renderQuarterBarWidgetHTML() {
-            const modes = ['q', 'y', 'b']; const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' }; const mode = modes[quarterBarMode];
-            return `<div class="qbar-widget" data-mode="${mode}" onclick="cycleQuarterBar()" title="Toca para cambiar"><span class="qbar-badge" id="qbar-label">${labels[mode]}</span><div class="qbar-track"><div class="qbar-fill" id="qbar-fill" style="width:0%"></div></div><span class="qbar-pct" id="qbar-pct">0%</span></div>`;
+        // === RENDER: qbar widget (usa data-* en lugar de ids) ===
+        function renderQuarterBarWidgetHTML(win) {
+            const modes = ['q', 'y', 'b']; const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' };
+            const mode = modes[win.quarterBarMode] || 'q';
+            return `<div class="qbar-widget" data-mode="${mode}" onclick="cycleQuarterBar()" title="Toca para cambiar">
+                <span class="qbar-badge" data-qbar-label>${labels[mode]}</span>
+                <div class="qbar-track"><div class="qbar-fill" data-qbar-fill style="width:0%"></div></div>
+                <span class="qbar-pct" data-qbar-pct>0%</span>
+            </div>`;
         }
 
         function cycleQuarterBar() {
-            const widget = document.querySelector('.qbar-widget'); if (!widget) return;
-            const modes = ['q', 'y', 'b']; const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' };
-            const nextIdx = (modes.indexOf(widget.dataset.mode) + 1) % 3; quarterBarMode = nextIdx;
-            localStorage.setItem('wkQBarMode', nextIdx); widget.dataset.mode = modes[nextIdx];
-            document.getElementById('qbar-label').textContent = labels[modes[nextIdx]]; updateQuarterBar();
+            const win = getActiveWin();
+            if (!win) return;
+            win.quarterBarMode = (win.quarterBarMode + 1) % 3;
+            updateQuarterBarInto(win.bodyEl, win);
         }
 
-        function updateQuarterBar() {
-            const widget = document.querySelector('.qbar-widget'); const fill = document.getElementById('qbar-fill'); const pctEl = document.getElementById('qbar-pct');
+        function updateQuarterBarInto(bodyEl, win) {
+            if (!bodyEl) return;
+            const widget = bodyEl.querySelector('.qbar-widget');
+            const fill = bodyEl.querySelector('[data-qbar-fill]');
+            const pctEl = bodyEl.querySelector('[data-qbar-pct]');
+            const labelEl = bodyEl.querySelector('[data-qbar-label]');
             if (!widget || !fill || !pctEl) return;
-            const mode = widget.dataset.mode; const now = new Date(); const q = selectedQuarter; const year = selectedYear;
-            const qStart = new Date(year, q * 3, 1); const qEnd = new Date(year, q * 3 + 3, 1);
+            
+            const modes = ['q', 'y', 'b'];
+            const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' };
+            const mode = modes[win.quarterBarMode || 0];
+            widget.dataset.mode = mode;
+            if (labelEl) labelEl.textContent = labels[mode];
+            
+            const now = new Date();
+            const q = win.q;
+            const year = win.year;
+            const qStart = new Date(year, q * 3, 1);
+            const qEnd = new Date(year, q * 3 + 3, 1);
             let refDate = now >= qEnd ? qEnd : (now <= qStart ? qStart : now);
             let pct;
             if (mode === 'q') pct = ((refDate - qStart) / (qEnd - qStart)) * 100;
             else if (mode === 'y') pct = ((refDate - new Date(year, 0, 1)) / (new Date(year + 1, 0, 1) - new Date(year, 0, 1))) * 100;
             else pct = ((refDate - new Date(blockConfig.startYear, 0, 1)) / (new Date(blockConfig.startYear + blockConfig.years, 0, 1) - new Date(blockConfig.startYear, 0, 1))) * 100;
-            pct = Math.max(0, Math.min(100, pct)); fill.style.width = pct.toFixed(2) + '%'; pctEl.textContent = pct.toFixed(1) + '%';
+            pct = Math.max(0, Math.min(100, pct));
+            fill.style.width = pct.toFixed(2) + '%';
+            pctEl.textContent = pct.toFixed(1) + '%';
         }
 
         function updateTcUI() {
@@ -3221,7 +3265,7 @@
             tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: dayVal === '' ? null : parseInt(dayVal), hour: hour || null, hourEnd: hourEnd || null, color: color });
             localStorage.setItem('wkTasks', JSON.stringify(tasksData));
             
-            renderQuarterDetailBody(); 
+            renderActiveWindow();
             renderDayTaskMarks();
 
             if (hourEnd) {
@@ -3283,7 +3327,7 @@
             }
             localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
             
-            renderQuarterDetailBody(); 
+            renderActiveWindow();
             renderDayTaskMarks();
 
             if (hourEnd) {
@@ -3310,11 +3354,15 @@
 
         function toggleManagedTask(week, taskId) {
             const tKey = `${selectedYear}-${week}`; const t = (tasksData[tKey] || []).find(x => x.id === taskId);
-            if (t) t.done = !t.done; localStorage.setItem('wkTasks', JSON.stringify(tasksData)); updateMasterTaskList(); renderDayTaskMarks();
+            if (t) t.done = !t.done; localStorage.setItem('wkTasks', JSON.stringify(tasksData));
+            renderActiveWindow();
+            renderDayTaskMarks();
         }
         function deleteManagedTask(week, taskId) {
             const tKey = `${selectedYear}-${week}`; tasksData[tKey] = (tasksData[tKey] || []).filter(x => x.id !== taskId);
-            localStorage.setItem('wkTasks', JSON.stringify(tasksData)); updateMasterTaskList(); renderDayTaskMarks();
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData));
+            renderActiveWindow();
+            renderDayTaskMarks();
         }
         
         function removeEntornoDay(entornoId, monthIdx, weekVal, dayIdx) {
@@ -3325,7 +3373,7 @@
                 entornosData = entornosData.filter(e => e.id !== entornoId);
             }
             localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
-            updateMasterTaskList();
+            renderActiveWindow();
             renderDayTaskMarks();
         }
 
@@ -3333,33 +3381,44 @@
             if (confirm("¿Estás seguro de eliminar este entorno por completo?")) {
                 entornosData = entornosData.filter(e => e.id !== id);
                 localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); 
-                updateMasterTaskList(); 
+                renderActiveWindow();
                 renderDayTaskMarks();
             }
         }
 
         function setActiveTabM(m) {
-            activeTabM = m;
-            const activeMonthAbs = selectedQuarter * 3 + m;
-            const weeks = getWeeksForMonth(selectedYear, activeMonthAbs);
-            if (!weeks.some(w => w.localW === activeTabW)) {
-                activeTabW = weeks.find(w => w.localW === 1) ? 1 : weeks[0].localW;
+            const win = getActiveWin();
+            if (!win) { activeTabM = m; return; }
+            win.activeTabM = m;
+            const activeMonthAbs = win.q * 3 + m;
+            const weeks = getWeeksForMonth(win.year, activeMonthAbs);
+            if (!weeks.some(w => w.localW === win.activeTabW)) {
+                win.activeTabW = weeks.find(w => w.localW === 1) ? 1 : weeks[0].localW;
             }
-            updateMasterTaskList();
+            renderActiveWindow();
         }
 
         function setActiveTabW(w) {
-            activeTabW = w;
-            updateMasterTaskList();
+            const win = getActiveWin();
+            if (!win) { activeTabW = w; return; }
+            win.activeTabW = w;
+            renderActiveWindow();
         }
 
         function toggleListDisplayMode() {
-            listDisplayMode = listDisplayMode === 'acciones' ? 'entornos' : 'acciones';
-            updateMasterTaskList();
+            const win = getActiveWin();
+            if (!win) return;
+            win.listDisplayMode = win.listDisplayMode === 'acciones' ? 'entornos' : 'acciones';
+            updateMasterTaskListInto(win.bodyEl, win);
         }
 
-        function updateMasterTaskList() {
-            const q = selectedQuarter; const year = selectedYear;
+        function updateMasterTaskListInto(bodyEl, win) {
+            if (!bodyEl) return;
+            const q = win.q;
+            const year = win.year;
+            const activeTabM = win.activeTabM;
+            const activeTabW = win.activeTabW;
+            const listDisplayMode = win.listDisplayMode || 'acciones';
             
             let tabsHtml = '<div class="list-tabs"><div class="tab-row">';
             for(let i = 0; i < 3; i++) {
@@ -3376,7 +3435,8 @@
             });
             tabsHtml += '</div></div>';
             
-            document.getElementById('qt-tabs-container').innerHTML = tabsHtml;
+            const tabsEl = bodyEl.querySelector('[data-tabs]');
+            if (tabsEl) tabsEl.innerHTML = tabsHtml;
 
             let tasksHtml = '';
             
@@ -3408,9 +3468,9 @@
                 const weekTasks = tasksData[`${year}-${wNum}`] || [];
                 
                 const today = new Date();
-                const currentYear = today.getFullYear();
+                const currentYr = today.getFullYear();
                 const currentMonth = today.getMonth();
-                const todayWeekInfo = getWeekForDay(currentYear, currentMonth, today.getDate());
+                const todayWeekInfo = getWeekForDay(currentYr, currentMonth, today.getDate());
 
                 if (weekTasks.length === 0) {
                     tasksHtml += `<div class="qt-empty">Sin acciones en esta semana.</div>`;
@@ -3424,7 +3484,7 @@
                         let dayTagHtml = '';
                         if (tDay !== null) {
                             let isHoy = false;
-                            if (year === currentYear && activeMonthAbs === currentMonth && todayWeekInfo && todayWeekInfo.localW === activeTabW && tDay === todayWeekInfo.dayIdx) {
+                            if (year === currentYr && activeMonthAbs === currentMonth && todayWeekInfo && todayWeekInfo.localW === activeTabW && tDay === todayWeekInfo.dayIdx) {
                                 isHoy = true;
                             }
 
@@ -3448,11 +3508,32 @@
                 }
             }
             
-            document.getElementById('qt-list-container').innerHTML = tasksHtml;
+            const listEl = bodyEl.querySelector('[data-list]');
+            if (listEl) listEl.innerHTML = tasksHtml;
 
             const toggleIcon = listDisplayMode === 'acciones' ? 'E' : 'A';
             const toggleTitle = listDisplayMode === 'acciones' ? 'Ver Entornos' : 'Ver Acciones';
-            document.getElementById('toggle-btn-container').innerHTML = `<div class="mode-toggle-corner" onclick="toggleListDisplayMode()" title="${toggleTitle}">${toggleIcon}</div>`;
+            const toggleEl = bodyEl.querySelector('[data-toggle]');
+            if (toggleEl) toggleEl.innerHTML = `<div class="mode-toggle-corner" onclick="toggleListDisplayMode()" title="${toggleTitle}">${toggleIcon}</div>`;
+        }
+
+        // Wrappers no-arg que operan sobre la ventana activa
+        function updateMasterTaskList() {
+            const win = getActiveWin();
+            if (!win) return;
+            updateMasterTaskListInto(win.bodyEl, win);
+        }
+
+        function updateQuarterBar() {
+            const win = getActiveWin();
+            if (!win) return;
+            updateQuarterBarInto(win.bodyEl, win);
+        }
+
+        function renderActiveWindow() {
+            const win = getActiveWin();
+            if (!win) return;
+            renderQuarterDetailBodyInto(win.bodyEl, win);
         }
 
         function getQuarterStats(year, q) {
@@ -3474,11 +3555,21 @@
 
         function selectYear(year) { selectedYear = year; localStorage.setItem('wkSelYear', year); calendarView = 'quarters'; localStorage.setItem('wkCalView', calendarView); drawCalendar(); }
         function goBackToYears() { calendarView = 'years'; localStorage.setItem('wkCalView', calendarView); drawCalendar(); }
+        
         function toggleMonth(mI) {
-            const yKey = `${selectedYear}-${mI}`; collapsedMonths[yKey] = !collapsedMonths[yKey]; localStorage.setItem('wkCollapsedMonths', JSON.stringify(collapsedMonths));
-            const wrap = document.getElementById(`month-wrap-${mI}`);
-            if(collapsedMonths[yKey]) { wrap.classList.add('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '+'; } 
-            else { wrap.classList.remove('collapsed'); document.getElementById(`toggle-m-${mI}`).innerText = '−'; }
+            const win = getActiveWin();
+            if (!win) return;
+            const container = win.bodyEl;
+            const yKey = `${win.year}-${mI}`;
+            collapsedMonths[yKey] = !collapsedMonths[yKey];
+            localStorage.setItem('wkCollapsedMonths', JSON.stringify(collapsedMonths));
+            const wrap = container.querySelector(`[data-month-wrap="${mI}"]`);
+            if (wrap) {
+                if (collapsedMonths[yKey]) wrap.classList.add('collapsed');
+                else wrap.classList.remove('collapsed');
+            }
+            const tog = container.querySelector(`[data-month-toggle="${mI}"]`);
+            if (tog) tog.innerText = collapsedMonths[yKey] ? '+' : '−';
         }
 
         function renderYearsView() {
@@ -3518,105 +3609,224 @@
 
         function drawCalendar() { document.getElementById('calendar-container').innerHTML = calendarView === 'quarters' ? renderQuartersView() : renderYearsView(); }
 
-        function prevQuarter() {
-            if (selectedQuarter > 0) {
-                selectedQuarter--;
-            } else {
-                if (selectedYear <= 2000) return; 
-                selectedQuarter = 3;
-                selectedYear--;
-                ensureYearTracked(selectedYear);
-            }
-            localStorage.setItem('wkSelYear', selectedYear);
-            if (calendarView === 'quarters') drawCalendar(); 
-            openQuarterDetail(selectedQuarter);
-        }
-
-        function nextQuarter() {
-            if (selectedQuarter < 3) {
-                selectedQuarter++;
-            } else {
-                if (selectedYear >= 2100) return; 
-                selectedQuarter = 0;
-                selectedYear++;
-                ensureYearTracked(selectedYear);
-            }
-            localStorage.setItem('wkSelYear', selectedYear);
-            if (calendarView === 'quarters') drawCalendar(); 
-            openQuarterDetail(selectedQuarter);
-        }
-
+        // === VENTANAS MÚLTIPLES DE TRIMESTRE ===
         function openQuarterDetail(q) {
-            selectedQuarter = q; localStorage.setItem('wkSelQtr', q);
-            document.getElementById('calendar-detail-title-text').innerText = `T${q + 1} · ${selectedYear}`;
-            
+            if (typeof q !== 'number') q = selectedQuarter;
+            selectedQuarter = q;
+            localStorage.setItem('wkSelQtr', q);
+
+            const year = selectedYear;
+            const key = `${year}-q${q}`;
+
+            if (quarterWindows.has(key)) {
+                focusQuarterWindow(key);
+                return;
+            }
+
             const now = new Date();
-            const currentM = now.getMonth();
-            if (selectedYear === now.getFullYear() && Math.floor(currentM / 3) === q) {
-                activeTabM = currentM % 3;
-                const wInfo = getWeekForDay(now.getFullYear(), currentM, now.getDate());
-                activeTabW = wInfo ? wInfo.localW : 1;
+            let startM = 0, startW = 1;
+            if (year === now.getFullYear() && Math.floor(now.getMonth() / 3) === q) {
+                startM = now.getMonth() % 3;
+                const wInfo = getWeekForDay(year, now.getMonth(), now.getDate());
+                startW = wInfo ? wInfo.localW : 1;
             } else {
-                activeTabM = 0; 
-                const defaultWeeks = getWeeksForMonth(selectedYear, q * 3);
-                activeTabW = defaultWeeks.find(w => w.localW === 1) ? 1 : defaultWeeks[0].localW;
+                const weeks = getWeeksForMonth(year, q * 3);
+                startW = weeks.find(w => w.localW === 1) ? 1 : weeks[0].localW;
             }
 
-            renderQuarterDetailBody(); 
-            document.getElementById('calendar-overlay').classList.add('active'); 
+            const cascade = quarterWindows.size;
+            const cardW = Math.min(window.innerWidth - 40, 720);
+            const startLeft = Math.max(20, (window.innerWidth - cardW) / 2 + cascade * 28);
+            const startTop = Math.max(20, 70 + cascade * 28);
+
+            const overlay = document.createElement('div');
+            overlay.className = 'calendar-overlay active';
+            overlay.dataset.quarterKey = key;
+            overlay.style.zIndex = ++winZCounter;
+            overlay.style.alignItems = 'flex-start';
+            overlay.style.justifyContent = 'flex-start';
+
+            overlay.innerHTML = `
+                <div class="calendar-detail" data-quarter-card style="position: fixed; top: ${startTop}px; left: ${startLeft}px; margin: 0;">
+                    <div class="calendar-detail-header">
+                        <div class="header-btns left">
+                            <button class="add-task-btn" data-act="add" title="Añadir" aria-label="Añadir">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true">
+                                    <path d="M12 5v14M5 12h14"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="calendar-detail-title">
+                            <button class="nav-btn" data-act="prev" aria-label="Anterior">‹</button>
+                            <span class="calendar-title-text" data-title>T${q+1} · ${year}</span>
+                            <button class="nav-btn" data-act="next" aria-label="Siguiente">›</button>
+                        </div>
+                        <div class="header-btns right">
+                            <button class="metrics-btn" data-act="metrics" title="Ver cumplimiento" aria-label="Ver cumplimiento">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M3 20h18"/>
+                                    <rect x="5" y="13" width="3" height="6" rx="0.6"/>
+                                    <rect x="10.5" y="9" width="3" height="10" rx="0.6"/>
+                                    <rect x="16" y="4" width="3" height="15" rx="0.6"/>
+                                </svg>
+                            </button>
+                            <button class="close-btn" data-act="close" aria-label="Cerrar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                                    <path d="M6 6l12 12M18 6l-12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="calendar-detail-body" data-body></div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            const win = {
+                overlay,
+                card: overlay.querySelector('.calendar-detail'),
+                bodyEl: overlay.querySelector('[data-body]'),
+                q, year,
+                activeTabM: startM,
+                activeTabW: startW,
+                listDisplayMode: 'acciones',
+                quarterBarMode: 0
+            };
+            quarterWindows.set(key, win);
+
+            overlay.querySelector('[data-act="add"]').onclick = (e) => {
+                e.stopPropagation();
+                focusQuarterWindow(key);
+                openTaskCreateModal();
+            };
+            overlay.querySelector('[data-act="prev"]').onclick = (e) => {
+                e.stopPropagation();
+                focusQuarterWindow(key);
+                navigateQuarterWindow(key, -1);
+            };
+            overlay.querySelector('[data-act="next"]').onclick = (e) => {
+                e.stopPropagation();
+                focusQuarterWindow(key);
+                navigateQuarterWindow(key, 1);
+            };
+            overlay.querySelector('[data-act="metrics"]').onclick = (e) => {
+                e.stopPropagation();
+                focusQuarterWindow(key);
+                openMetricsModal();
+            };
+            overlay.querySelector('[data-act="close"]').onclick = (e) => {
+                e.stopPropagation();
+                closeQuarterWindow(key);
+            };
+
+            win.card.addEventListener('pointerdown', () => {
+                if (activeQuarterKey !== key) focusQuarterWindow(key);
+            }, true);
+
+            initDraggableModal(win.card, `cal-${key}`);
+
+            focusQuarterWindow(key);
+            renderQuarterDetailBodyInto(win.bodyEl, win);
+        }
+
+        function focusQuarterWindow(key) {
+            const win = quarterWindows.get(key);
+            if (!win) return;
+            activeQuarterKey = key;
+            selectedYear = win.year;
+            selectedQuarter = win.q;
+            activeTabM = win.activeTabM;
+            activeTabW = win.activeTabW;
+            win.overlay.style.zIndex = ++winZCounter;
             document.body.style.overflow = 'hidden';
-            updateTimersDisplayValues();
-        }
-        
-        function closeQuarterDetail(e) {
-            if (e && e.target.id !== 'calendar-overlay') return;
-            document.getElementById('calendar-overlay').classList.remove('active'); document.body.style.overflow = '';
-            if (calendarView === 'quarters') drawCalendar();
-            updateTimersDisplayValues();
         }
 
-        function openMetricsModal() { 
-            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
-            document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; 
-            renderMetricsModalBody(selectedQuarter); 
-            document.getElementById('modal-content-metrics').style.display = 'block'; 
-            openModal(); 
-        }
-        
-        function renderMetricsModalBody(q) {
-            let html = ''; let qTotal = 0, qDone = 0;
-            for (let m = 0; m < 3; m++) {
-                const mI = q * 3 + m; let mTotal = 0, mDone = 0;
-                for (let w = 0; w <= 5; w++) { 
-                    const tasks = tasksData[`${selectedYear}-${mI * 10 + w}`] || [];
-                    mTotal += tasks.length; mDone += tasks.filter(t => t.done).length;
-                }
-                const mPct = mTotal === 0 ? 0 : (mDone / mTotal) * 100;
-                html += `<div class="m-bar-row"><div class="m-label">${meses[mI]}</div><div class="m-progress"><div class="m-fill" style="width:${mPct}%"></div></div><div class="m-pct">${Math.round(mPct)}%</div></div>`;
-                qTotal += mTotal; qDone += mDone;
+        function closeQuarterWindow(key) {
+            const win = quarterWindows.get(key);
+            if (!win) return;
+            try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
+            win.overlay.remove();
+            quarterWindows.delete(key);
+            if (activeQuarterKey === key) {
+                activeQuarterKey = quarterWindows.size > 0 ? Array.from(quarterWindows.keys()).pop() : null;
             }
-            const qPct = qTotal === 0 ? 0 : (qDone / qTotal) * 100;
-            html += `<div class="m-bar-row" style="margin-top:18px; padding-top:18px; border-top:1px solid var(--border);"><div class="m-label" style="color:var(--text);font-weight:700;">T${q + 1}</div><div class="m-progress"><div class="m-fill" style="width:${qPct}%;background:var(--year-bar);"></div></div><div class="m-pct">${Math.round(qPct)}%</div></div>`;
-            
-            let totalTimers = timerStats.length;
-            let successTimers = timerStats.filter(t => t.success).length;
-            let timerPct = totalTimers === 0 ? 0 : (successTimers / totalTimers) * 100;
-            html += `<div class="m-bar-row" style="margin-top:18px; padding-top:18px; border-top:1px solid var(--border);"><div class="m-label" style="color:var(--text);font-weight:700;">Temporizador</div><div class="m-progress"><div class="m-fill" style="width:${timerPct}%;background:var(--accent);"></div></div><div class="m-pct">${Math.round(timerPct)}% (${successTimers}/${totalTimers})</div></div>`;
-
-            document.getElementById('ms-body').innerHTML = html;
+            if (quarterWindows.size === 0 && !document.getElementById('modal-overlay').classList.contains('active')) {
+                document.body.style.overflow = '';
+            }
+            updateTimersDisplayValues();
         }
 
-        function renderQuarterDetailBody() {
-            const q = selectedQuarter; const year = selectedYear; const now = new Date(); now.setHours(0, 0, 0, 0);
-            let html = renderQuarterBarWidgetHTML() + '<div class="months-container">';
+        function navigateQuarterWindow(key, delta) {
+            const win = quarterWindows.get(key);
+            if (!win) return;
+            let newQ = win.q + delta;
+            let newYear = win.year;
+            if (newQ < 0)  { newQ = 3; newYear--; }
+            if (newQ > 3)  { newQ = 0; newYear++; }
+            if (newYear < 2000 || newYear > 2100) return;
+
+            ensureYearTracked(newYear);
+
+            const newKey = `${newYear}-q${newQ}`;
+            if (quarterWindows.has(newKey)) {
+                closeQuarterWindow(key);
+                focusQuarterWindow(newKey);
+                return;
+            }
+
+            // Guardar estado de la ventana actual y reconstruirla con nueva clave
+            try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
+
+            selectedYear = newYear;
+            selectedQuarter = newQ;
+            localStorage.setItem('wkSelYear', newYear);
+            localStorage.setItem('wkSelQtr', newQ);
+
+            // Reemplazar la clave interna
+            quarterWindows.delete(key);
+            if (activeQuarterKey === key) activeQuarterKey = null;
+
+            win.q = newQ;
+            win.year = newYear;
+
+            // Recalcular tabs por defecto
+            const now = new Date();
+            if (newYear === now.getFullYear() && Math.floor(now.getMonth() / 3) === newQ) {
+                win.activeTabM = now.getMonth() % 3;
+                const wInfo = getWeekForDay(newYear, now.getMonth(), now.getDate());
+                win.activeTabW = wInfo ? wInfo.localW : 1;
+            } else {
+                win.activeTabM = 0;
+                const weeks = getWeeksForMonth(newYear, newQ * 3);
+                win.activeTabW = weeks.find(w => w.localW === 1) ? 1 : weeks[0].localW;
+            }
+
+            win.overlay.dataset.quarterKey = newKey;
+            quarterWindows.set(newKey, win);
+
+            const titleEl = win.overlay.querySelector('[data-title]');
+            if (titleEl) titleEl.textContent = `T${newQ+1} · ${newYear}`;
+
+            focusQuarterWindow(newKey);
+            renderQuarterDetailBodyInto(win.bodyEl, win);
+        }
+
+        function renderQuarterDetailBodyInto(bodyEl, win) {
+            if (!bodyEl) return;
+            const q = win.q;
+            const year = win.year;
+            const now = new Date(); now.setHours(0, 0, 0, 0);
+
+            let html = renderQuarterBarWidgetHTML(win) + '<div class="months-container">';
             
             for (let m = 0; m < 3; m++) {
                 const mI = q * 3 + m; const weeks = getWeeksForMonth(year, mI);
                 const yKey = `${year}-${mI}`; const isCol = collapsedMonths[yKey];
                 
-                html += `<div class="month${isCol ? " collapsed" : ""}" id="month-wrap-${mI}">
-                    <div class="month-name" onclick="toggleMonth(${mI})">${meses[mI]} <span id="toggle-m-${mI}" class="month-toggle">${isCol ? '+' : '−'}</span></div>
-                    <div class="days-grid" id="grid-m-${mI}">`;
+                html += `<div class="month${isCol ? " collapsed" : ""}" data-month-wrap="${mI}">
+                    <div class="month-name" onclick="toggleMonth(${mI})">${meses[mI]} <span data-month-toggle="${mI}" class="month-toggle">${isCol ? '+' : '−'}</span></div>
+                    <div class="days-grid">`;
                 diasL.forEach(d => html += `<div class="week-day">${d}</div>`);
                 
                 weeks.forEach((w, i) => {
@@ -3665,21 +3875,64 @@
                 });
                 html += `</div></div>`;
             }
-            html += `<div class="quarter-tasks-wrapper"><div class="quarter-tasks-panel"><div id="qt-tabs-container"></div><div class="qt-list" id="qt-list-container"></div><div id="toggle-btn-container"></div></div></div></div>`;
-            document.getElementById('calendar-detail-body').innerHTML = html; 
-            updateQuarterBar();
-            updateMasterTaskList();
+            html += `<div class="quarter-tasks-wrapper"><div class="quarter-tasks-panel">
+                <div data-tabs></div>
+                <div class="qt-list" data-list></div>
+                <div data-toggle></div>
+            </div></div></div>`;
+            bodyEl.innerHTML = html;
+            
+            updateMasterTaskListInto(bodyEl, win);
+            updateQuarterBarInto(bodyEl, win);
+        }
+
+        function openMetricsModal() { 
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
+            document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; 
+            renderMetricsModalBody(selectedQuarter); 
+            document.getElementById('modal-content-metrics').style.display = 'block'; 
+            openModal(); 
+        }
+        
+        function renderMetricsModalBody(q) {
+            let html = ''; let qTotal = 0, qDone = 0;
+            for (let m = 0; m < 3; m++) {
+                const mI = q * 3 + m; let mTotal = 0, mDone = 0;
+                for (let w = 0; w <= 5; w++) { 
+                    const tasks = tasksData[`${selectedYear}-${mI * 10 + w}`] || [];
+                    mTotal += tasks.length; mDone += tasks.filter(t => t.done).length;
+                }
+                const mPct = mTotal === 0 ? 0 : (mDone / mTotal) * 100;
+                html += `<div class="m-bar-row"><div class="m-label">${meses[mI]}</div><div class="m-progress"><div class="m-fill" style="width:${mPct}%"></div></div><div class="m-pct">${Math.round(mPct)}%</div></div>`;
+                qTotal += mTotal; qDone += mDone;
+            }
+            const qPct = qTotal === 0 ? 0 : (qDone / qTotal) * 100;
+            html += `<div class="m-bar-row" style="margin-top:18px; padding-top:18px; border-top:1px solid var(--border);"><div class="m-label" style="color:var(--text);font-weight:700;">T${q + 1}</div><div class="m-progress"><div class="m-fill" style="width:${qPct}%;background:var(--year-bar);"></div></div><div class="m-pct">${Math.round(qPct)}%</div></div>`;
+            
+            let totalTimers = timerStats.length;
+            let successTimers = timerStats.filter(t => t.success).length;
+            let timerPct = totalTimers === 0 ? 0 : (successTimers / totalTimers) * 100;
+            html += `<div class="m-bar-row" style="margin-top:18px; padding-top:18px; border-top:1px solid var(--border);"><div class="m-label" style="color:var(--text);font-weight:700;">Temporizador</div><div class="m-progress"><div class="m-fill" style="width:${timerPct}%;background:var(--accent);"></div></div><div class="m-pct">${Math.round(timerPct)}% (${successTimers}/${totalTimers})</div></div>`;
+
+            document.getElementById('ms-body').innerHTML = html;
         }
 
         function openModal() { 
             document.getElementById('modal-overlay').classList.add('active'); 
+            document.body.style.overflow = 'hidden';
             updateTimersDisplayValues();
         }
         
         function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
-            document.getElementById('modal-overlay').classList.remove('active');
             
+            // Persistir estado antes de cerrar
+            try {
+                saveModalState(document.getElementById('main-modal-card'), 'wkModalState-main');
+                saveModalState(document.getElementById('dual-notes-card'),  'wkModalState-dual-notes');
+            } catch(_) {}
+            
+            document.getElementById('modal-overlay').classList.remove('active');
             document.getElementById('modal-overlay').classList.remove('dual-mode-active');
             document.getElementById('main-modal-card').classList.remove('wide');
             document.getElementById('dual-notes-card').style.display = 'none';
@@ -3690,6 +3943,10 @@
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
+            
+            if (quarterWindows.size === 0) {
+                document.body.style.overflow = '';
+            }
             updateTimersDisplayValues();
         }
 
@@ -4054,7 +4311,11 @@
 
             renderDayTaskMarks();
             renderNowMarker();
-            if (document.getElementById('qbar-fill')) updateQuarterBar();
+
+            // Refrescar qbars de todas las ventanas de trimestre abiertas
+            quarterWindows.forEach((win) => {
+                updateQuarterBarInto(win.bodyEl, win);
+            });
         }
 
         async function syncExport() {
@@ -4144,17 +4405,6 @@
                 event.target.value = '';
             };
             reader.readAsText(file);
-        }
-
-        function formatDuration(ms) {
-            if (!ms || ms <= 0) return '—';
-            const totalSec = Math.floor(ms / 1000);
-            const h = Math.floor(totalSec / 3600);
-            const m = Math.floor((totalSec % 3600) / 60);
-            const s = totalSec % 60;
-            if (h > 0) return `${h}h ${String(m).padStart(2,'0')}m`;
-            if (m > 0) return `${m}m ${String(s).padStart(2,'0')}s`;
-            return `${s}s`;
         }
 
         function formatClock(ms) {
@@ -4289,14 +4539,11 @@
             URL.revokeObjectURL(url);
         }
 
-        /* ============================================
-           MODALES ARRASTRABLES Y REDIMENSIONABLES
-           ============================================ */
+        /* === MODALES ARRASTRABLES Y REDIMENSIONABLES === */
         function initModalDragResize() {
             initDraggableModal(document.getElementById('main-modal-card'), 'main');
             initDraggableModal(document.getElementById('dual-notes-card'), 'dual-notes');
-            const cal = document.querySelector('.calendar-detail');
-            if (cal) initDraggableModal(cal, 'calendar');
+            // Las ventanas de trimestre se inicializan al crearse.
         }
 
         function initDraggableModal(modalEl, key) {
@@ -4447,6 +4694,7 @@
         }
 
         function saveModalState(modalEl, storageKey) {
+            if (!modalEl) return;
             const state = {
                 top: parseFloat(modalEl.style.top),
                 left: parseFloat(modalEl.style.left),
@@ -4463,13 +4711,24 @@
         }
 
         function resetModalPositions() {
-            ['main', 'dual-notes', 'calendar'].forEach(key => {
+            ['main', 'dual-notes'].forEach(key => {
                 localStorage.removeItem(`wkModalState-${key}`);
+            });
+            quarterWindows.forEach((win, key) => {
+                localStorage.removeItem(`wkModalState-cal-${key}`);
+                win.card.style.position = '';
+                win.card.style.margin = '';
+                win.card.style.top = '';
+                win.card.style.left = '';
+                win.card.style.width = '';
+                win.card.style.height = '';
+                win.card.style.maxWidth = '';
+                win.card.style.maxHeight = '';
+                win.card.style.overflowY = '';
             });
             const els = [
                 document.getElementById('main-modal-card'),
-                document.getElementById('dual-notes-card'),
-                document.querySelector('.calendar-detail')
+                document.getElementById('dual-notes-card')
             ];
             els.forEach(el => {
                 if (!el) return;
@@ -4486,15 +4745,20 @@
             alert('Posición y tamaño de ventanas restablecidos.');
         }
 
-        /* ============================================
-           INICIALIZACIÓN
-           ============================================ */
+        /* === INICIALIZACIÓN === */
         applyModalAlphaSettings();
         applyThemeColors();
-        restoreBars(); drawCalendar(); renderBlockTicks(); renderWorkTicks(); renderDayTicks(); renderAllMarkers();
+        restoreBars();
+        drawCalendar();
+        renderBlockTicks();
+        renderWorkTicks();
+        renderDayTicks();
+        renderAllMarkers();
         renderTimersUI();
         initModalDragResize();
-        setInterval(update, 1000); update();
+        initFloatingTimerDrag();
+        setInterval(update, 1000);
+        update();
     </script>
 </body>
 </html>

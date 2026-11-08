@@ -2,8 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Timer</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1249,6 +1250,7 @@
         #notes-main-textarea, #dual-notes-text { background: rgba(255, 255, 255, 0.035) !important; }
         [data-theme="light"] #notes-main-textarea, [data-theme="light"] #dual-notes-text { background: rgba(255, 255, 255, 0.60) !important; }
 
+        /* Modales arrastrables / redimensionables */
         .modal-card, .calendar-detail { position: relative; }
 
         .modal-drag-handle {
@@ -1743,48 +1745,27 @@
     </script>
 
     <script>
-        /* === HELPERS DE SEGURIDAD (FIX #1, #6) === */
-        function escapeHtml(s) {
-            return String(s ?? '').replace(/[&<>"']/g, c => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            }[c]));
-        }
-
-        let _storageQuotaWarned = false;
-        function safeSetItem(key, value) {
-            try {
-                localStorage.setItem(key, value);
-                return true;
-            } catch (e) {
-                const isQuota = e && (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014);
-                if (isQuota) {
-                    if (!_storageQuotaWarned) {
-                        _storageQuotaWarned = true;
-                        setTimeout(() => { _storageQuotaWarned = false; }, 60000);
-                        alert('⚠️ Almacenamiento lleno.\n\nHaz una copia de seguridad (Configuración → Guardar Copia de Seguridad) y elimina datos que no necesites.');
-                    }
-                } else {
-                    console.error('Error guardando en localStorage:', key, e);
-                }
-                return false;
-            }
-        }
-
         /* === PALETA MODERNA === */
-        const themeColors = { green: '#6ee7b7', blue: '#818cf8', orange: '#fb923c' };
+        const themeColors = {
+            green: '#6ee7b7',
+            blue: '#818cf8',
+            orange: '#fb923c'
+        };
 
         function changeThemeColors() {
             const weekC = document.getElementById('theme-week-color').value;
             const borderC = document.getElementById('theme-border-color').value;
-            safeSetItem('wkWeekColor', weekC);
-            safeSetItem('wkBorderColor', borderC);
+            localStorage.setItem('wkWeekColor', weekC);
+            localStorage.setItem('wkBorderColor', borderC);
             applyThemeColors();
         }
 
         function applyThemeColors() {
             const weekC = localStorage.getItem('wkWeekColor') || 'blue';
             const borderC = localStorage.getItem('wkBorderColor') || 'default';
+            
             document.documentElement.style.setProperty('--week-box-active', themeColors[weekC] || themeColors.blue);
+            
             if (borderC === 'default') {
                 document.documentElement.style.removeProperty('--border');
                 document.documentElement.style.removeProperty('--border-input');
@@ -1797,8 +1778,12 @@
         function applyModalAlphaSettings() {
             const bgAlpha = localStorage.getItem('wkModalBgAlpha');
             const borderAlpha = localStorage.getItem('wkModalBorderAlpha');
-            if (bgAlpha !== null) document.documentElement.style.setProperty('--modal-bg-alpha', (parseInt(bgAlpha) / 100).toString());
-            if (borderAlpha !== null) document.documentElement.style.setProperty('--modal-border-alpha', (parseInt(borderAlpha) / 100).toString());
+            if (bgAlpha !== null) {
+                document.documentElement.style.setProperty('--modal-bg-alpha', (parseInt(bgAlpha) / 100).toString());
+            }
+            if (borderAlpha !== null) {
+                document.documentElement.style.setProperty('--modal-border-alpha', (parseInt(borderAlpha) / 100).toString());
+            }
         }
 
         function onModalAlphaChange() {
@@ -1806,7 +1791,7 @@
             const lbl = document.getElementById('lbl-modal-alpha');
             if (lbl) lbl.innerText = v + '%';
             document.documentElement.style.setProperty('--modal-bg-alpha', (v / 100).toString());
-            safeSetItem('wkModalBgAlpha', v);
+            localStorage.setItem('wkModalBgAlpha', v);
         }
 
         function onModalBorderAlphaChange() {
@@ -1814,7 +1799,7 @@
             const lbl = document.getElementById('lbl-modal-border-alpha');
             if (lbl) lbl.innerText = v + '%';
             document.documentElement.style.setProperty('--modal-border-alpha', (v / 100).toString());
-            safeSetItem('wkModalBorderAlpha', v);
+            localStorage.setItem('wkModalBorderAlpha', v);
         }
 
         function resetModalTransparency() {
@@ -1831,10 +1816,12 @@
             const borderAlpha = parseFloat(cs.getPropertyValue('--modal-border-alpha')) || 0.10;
             const bgPct = Math.round(bgAlpha * 100);
             const borderPct = Math.round(borderAlpha * 100);
+
             const bgEl = document.getElementById('inp-modal-alpha');
             const borderEl = document.getElementById('inp-modal-border-alpha');
             const bgLbl = document.getElementById('lbl-modal-alpha');
             const borderLbl = document.getElementById('lbl-modal-border-alpha');
+
             if (bgEl) bgEl.value = bgPct;
             if (bgLbl) bgLbl.innerText = bgPct + '%';
             if (borderEl) borderEl.value = borderPct;
@@ -1842,6 +1829,7 @@
         }
 
         let globalLastHourEnd = localStorage.getItem('wkLastHourEnd') || '';
+        
         const TIMER_PALETTE = ['#34d399','#60a5fa','#fbbf24','#fb7185','#c084fc','#38bdf8','#f472b6','#a3e635'];
 
         let timersList = JSON.parse(localStorage.getItem('wkTimersList')) || [
@@ -1853,7 +1841,7 @@
             if (!t.color) { t.color = TIMER_PALETTE[i % TIMER_PALETTE.length]; _migrated = true; }
             if (t.minimized && t.id !== 'general') { t.hidden = true; delete t.minimized; _migrated = true; }
         });
-        if (_migrated) safeSetItem('wkTimersList', JSON.stringify(timersList));
+        if (_migrated) localStorage.setItem('wkTimersList', JSON.stringify(timersList));
 
         let extraTimersFolded = localStorage.getItem('wkExtraTimersFolded') === 'true';
         let hiddenBarExpanded = localStorage.getItem('wkHiddenBarExpanded') === 'true';
@@ -1862,7 +1850,7 @@
 
         function toggleHiddenBar() {
             hiddenBarExpanded = !hiddenBarExpanded;
-            safeSetItem('wkHiddenBarExpanded', hiddenBarExpanded);
+            localStorage.setItem('wkHiddenBarExpanded', hiddenBarExpanded);
             hiddenSearchOpen = false;
             hiddenSearchQuery = '';
             renderTimersUI();
@@ -1873,23 +1861,32 @@
             const bar = document.getElementById('hidden-timers-bar');
             if (!bar) return;
             bar.classList.add('searching');
+
             const input = document.getElementById('hidden-search-input');
             if (input) {
                 input.value = hiddenSearchQuery;
                 applyHiddenSearchFilter();
-                setTimeout(() => { try { input.focus({ preventScroll: true }); } catch(e) { input.focus(); } }, 30);
+                setTimeout(() => {
+                    try { input.focus({ preventScroll: true }); }
+                    catch(e) { input.focus(); }
+                }, 30);
             }
         }
 
         function closeHiddenSearch() {
             const input = document.getElementById('hidden-search-input');
+
             if (hiddenSearchQuery.length > 0) {
                 hiddenSearchQuery = '';
                 if (input) input.value = '';
                 applyHiddenSearchFilter();
-                if (input && hiddenSearchOpen) { try { input.focus({ preventScroll: true }); } catch(e) { input.focus(); } }
+                if (input && hiddenSearchOpen) {
+                    try { input.focus({ preventScroll: true }); }
+                    catch(e) { input.focus(); }
+                }
                 return;
             }
+
             if (!hiddenBarExpanded) {
                 hiddenSearchOpen = false;
                 const bar = document.getElementById('hidden-timers-bar');
@@ -1898,12 +1895,16 @@
             }
         }
 
-        function onHiddenSearchInput(value) { hiddenSearchQuery = value; applyHiddenSearchFilter(); }
+        function onHiddenSearchInput(value) {
+            hiddenSearchQuery = value;
+            applyHiddenSearchFilter();
+        }
 
         function applyHiddenSearchFilter() {
             const bar = document.getElementById('hidden-timers-bar');
             if (!bar) return;
             const q = (hiddenSearchQuery || '').trim().toLowerCase();
+
             let anyResult = false;
             bar.querySelectorAll('.hidden-bar-result-item').forEach(el => {
                 const match = !q || (el.dataset.name || '').includes(q);
@@ -1912,6 +1913,7 @@
             });
             const emptyRes = bar.querySelector('.hidden-bar-result-empty');
             if (emptyRes) emptyRes.style.display = (q && !anyResult) ? 'block' : 'none';
+
             let anyPill = false;
             bar.querySelectorAll('.hidden-timer-pill').forEach(el => {
                 const match = !q || (el.dataset.name || '').includes(q);
@@ -1930,13 +1932,12 @@
             if (typeof s.elapsedMs !== 'number')  s.elapsedMs  = 0;
             if (typeof s.extraMs !== 'number')    s.extraMs    = 0;
         });
-        if (_needSaveStats) safeSetItem('wkTimerStats', JSON.stringify(timerStats));
+        if (_needSaveStats) localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
 
-        let activeTimerForGoal = null;
+        let activeTimerForGoal = null; 
         let goalOverlayInterval = null;
         let goalCompletedAt = 0;
-        let goalQueue = [];   // FIX #7: cola de goals
-
+        
         let notesData = JSON.parse(localStorage.getItem('wkNotes')) || { general: '' };
 
         let audioCtx = null;
@@ -1945,35 +1946,49 @@
         function startAlarmSound() {
             if (alarmInterval) return;
             try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
                 const playBeep = () => {
                     if (!audioCtx) return;
                     let osc = audioCtx.createOscillator();
                     let gain = audioCtx.createGain();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
                     gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-                    osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
                 };
+
                 playBeep();
-                alarmInterval = setInterval(playBeep, 800);
-            } catch(e) { console.log("Audio not allowed or supported yet", e); }
+                alarmInterval = setInterval(playBeep, 800); 
+            } catch(e) {
+                console.log("Audio not allowed or supported yet", e);
+            }
         }
 
         function stopAlarmSound() {
-            if (alarmInterval) { clearInterval(alarmInterval); alarmInterval = null; }
+            if (alarmInterval) {
+                clearInterval(alarmInterval);
+                alarmInterval = null;
+            }
         }
 
         function toggleTimerHidden(id) {
             const t = timersList.find(x => x.id === id);
             if (!t || t.id === 'general') return;
             t.hidden = !t.hidden;
+
             if (!t.hidden && extraTimersFolded) {
                 extraTimersFolded = false;
-                safeSetItem('wkExtraTimersFolded', extraTimersFolded);
+                localStorage.setItem('wkExtraTimersFolded', extraTimersFolded);
             }
             saveTimersState();
             renderTimersUI();
@@ -2011,57 +2026,88 @@
             }
 
             let html = '';
+
             const generalIdx = timersList.findIndex(t => t.id === 'general');
             if (generalIdx !== -1) html += renderTimerCard(timersList[generalIdx], generalIdx);
 
             if (hiddenList.length > 0) {
                 const dotsHtml = hiddenList.map(t => `
                     <button class="hidden-dot ${t.tRunning ? 'is-running' : ''}"
-                            style="--dot-color:${escapeHtml(t.color)}"
-                            onclick="toggleTimerHidden('${escapeHtml(t.id)}')"
-                            title="${escapeHtml(t.name)}${t.tRunning ? ' · corriendo' : ''} — clic para mostrar"></button>`
+                            style="--dot-color:${t.color}"
+                            onclick="toggleTimerHidden('${t.id}')"
+                            title="${t.name}${t.tRunning ? ' · corriendo' : ''} — clic para mostrar"></button>`
                 ).join('');
 
-                const safeQuery = escapeHtml(hiddenSearchQuery);
+                const safeQuery = hiddenSearchQuery.replace(/"/g, '&quot;');
 
                 const pillsHtml = hiddenList.map(t => `
                     <div class="hidden-timer-pill ${t.tRunning ? 'is-running' : ''}"
-                         style="--pill-color:${escapeHtml(t.color)}"
-                         data-name="${escapeHtml((t.name||'').toLowerCase())}"
-                         onclick="toggleTimerHidden('${escapeHtml(t.id)}')"
-                         title="Mostrar ${escapeHtml(t.name)}">
+                         style="--pill-color:${t.color}"
+                         data-name="${(t.name||'').toLowerCase().replace(/"/g, '&quot;')}"
+                         onclick="toggleTimerHidden('${t.id}')"
+                         title="Mostrar ${t.name}">
                         <span class="pill-dot"></span>
-                        <span class="pill-name">${escapeHtml(t.name)}</span>
-                        <span class="pill-time" id="pill-time-${escapeHtml(t.id)}">00:00</span>
+                        <span class="pill-name">${t.name}</span>
+                        <span class="pill-time" id="pill-time-${t.id}">00:00</span>
                     </div>`
                 ).join('') + '<div class="hidden-bar-pill-empty">No hay coincidencias</div>';
 
                 const resultsHtml = hiddenList.map(t => `
                     <div class="hidden-bar-result-item"
-                         style="--result-color:${escapeHtml(t.color)}"
-                         data-name="${escapeHtml((t.name||'').toLowerCase())}"
-                         onclick="toggleTimerHidden('${escapeHtml(t.id)}')"
-                         title="Mostrar ${escapeHtml(t.name)}">
+                         style="--result-color:${t.color}"
+                         data-name="${(t.name||'').toLowerCase().replace(/"/g, '&quot;')}"
+                         onclick="toggleTimerHidden('${t.id}')"
+                         title="Mostrar ${t.name}">
                         <span class="result-dot"></span>
-                        <span class="result-name">${escapeHtml(t.name)}</span>
+                        <span class="result-name">${t.name}</span>
                     </div>`
                 ).join('') + '<div class="hidden-bar-result-empty">No hay coincidencias</div>';
 
                 html += `
                     <div class="hidden-timers-bar active ${hiddenBarExpanded ? 'expanded' : ''} ${hiddenSearchOpen ? 'searching' : ''}" id="hidden-timers-bar">
-                        <button class="hidden-bar-toggle" onclick="toggleHiddenBar()" title="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}" aria-label="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}">
-                            <svg class="chev-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-                            <svg class="chev-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+
+                        <button class="hidden-bar-toggle"
+                                onclick="toggleHiddenBar()"
+                                title="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}"
+                                aria-label="${hiddenBarExpanded ? 'Colapsar' : 'Expandir'}">
+                            <svg class="chev-right" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 6l6 6-6 6"/>
+                            </svg>
+                            <svg class="chev-down" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
                         </button>
-                        <button class="hidden-bar-search-btn" onclick="openHiddenSearch()" title="Buscar temporizador" aria-label="Buscar temporizador">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+
+                        <button class="hidden-bar-search-btn"
+                                onclick="openHiddenSearch()"
+                                title="Buscar temporizador"
+                                aria-label="Buscar temporizador">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="7"/>
+                                <path d="M21 21l-4.3-4.3"/>
+                            </svg>
                         </button>
+
                         <div class="hidden-bar-search-wrap">
-                            <input type="text" class="hidden-bar-search-input" id="hidden-search-input" placeholder="Buscar..." value="${safeQuery}" autocomplete="off" spellcheck="false" oninput="onHiddenSearchInput(this.value)" onkeydown="if(event.key==='Escape'){closeHiddenSearch();}">
-                            <button class="hidden-bar-search-clear" onclick="closeHiddenSearch()" title="Limpiar / Cerrar" aria-label="Limpiar / Cerrar">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+                            <input type="text" class="hidden-bar-search-input" id="hidden-search-input"
+                                   placeholder="Buscar..." value="${safeQuery}"
+                                   autocomplete="off" spellcheck="false"
+                                   oninput="onHiddenSearchInput(this.value)"
+                                   onkeydown="if(event.key==='Escape'){closeHiddenSearch();}">
+                            <button class="hidden-bar-search-clear"
+                                    onclick="closeHiddenSearch()"
+                                    title="Limpiar / Cerrar"
+                                    aria-label="Limpiar / Cerrar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2.6" stroke-linecap="round">
+                                    <path d="M6 6l12 12M18 6l-12 12"/>
+                                </svg>
                             </button>
                         </div>
+
                         <div class="hidden-bar-dots">${dotsHtml}</div>
                         <div class="hidden-bar-results" id="hidden-bar-results">${resultsHtml}</div>
                         <div class="hidden-bar-pills">${pillsHtml}</div>
@@ -2080,15 +2126,18 @@
         function renderTimerCard(t, index) {
             const isGeneral = t.id === 'general';
             const cardClass = isGeneral ? 'timer-widget' : 'timer-widget extra-timer';
-            const styleAttr = t.color ? `style="--timer-color:${escapeHtml(t.color)}"` : '';
+            const styleAttr = t.color ? `style="--timer-color:${t.color}"` : '';
 
             const deleteBtn = !isGeneral
-                ? `<button class="t-btn-delete" onclick="deleteTimer('${escapeHtml(t.id)}')" title="Eliminar">×</button>` : '';
+                ? `<button class="t-btn-delete" onclick="deleteTimer('${t.id}')" title="Eliminar">×</button>` : '';
             const addBtn = isGeneral
                 ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
             const hideBtn = !isGeneral
-                ? `<button class="t-btn-hide" onclick="toggleTimerHidden('${escapeHtml(t.id)}')" title="Ocultar" aria-label="Ocultar">
-                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+                ? `<button class="t-btn-hide" onclick="toggleTimerHidden('${t.id}')" title="Ocultar" aria-label="Ocultar">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+                            stroke-linecap="round" stroke-linejoin="round">
+                           <path d="M18 15l-6-6-6 6"/>
+                       </svg>
                    </button>` : '';
 
             let dragAttrs = '';
@@ -2097,26 +2146,26 @@
             }
 
             return `
-            <div class="${cardClass}" id="widget-${escapeHtml(t.id)}" data-index="${index}" ${styleAttr} ${dragAttrs}>
+            <div class="${cardClass}" id="widget-${t.id}" data-index="${index}" ${styleAttr} ${dragAttrs}>
                 <span class="timer-title">
-                    <span class="timer-color-dot" onclick="event.stopPropagation();cycleTimerColor('${escapeHtml(t.id)}')" title="Cambiar color"></span>${escapeHtml(t.name)}
+                    <span class="timer-color-dot" onclick="event.stopPropagation();cycleTimerColor('${t.id}')" title="Cambiar color"></span>${t.name}
                 </span>
                 ${hideBtn}
                 <div class="timer-input-group">
-                    <input type="number" id="t-input-h-${escapeHtml(t.id)}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" oninput="syncTimerInputs('${escapeHtml(t.id)}')" onchange="syncTimerInputs('${escapeHtml(t.id)}')">
+                    <input type="number" id="t-input-h-${t.id}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" oninput="syncTimerInputs('${t.id}')" onchange="syncTimerInputs('${t.id}')">
                     <span>h</span>
-                    <input type="number" id="t-input-m-${escapeHtml(t.id)}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos" oninput="syncTimerInputs('${escapeHtml(t.id)}')" onchange="syncTimerInputs('${escapeHtml(t.id)}')">
+                    <input type="number" id="t-input-m-${t.id}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos" oninput="syncTimerInputs('${t.id}')" onchange="syncTimerInputs('${t.id}')">
                     <span>min</span>
                 </div>
-                <div class="timer-display" id="t-display-${escapeHtml(t.id)}">00:00</div>
+                <div class="timer-display" id="t-display-${t.id}">00:00</div>
                 <div class="timer-controls">
-                    <button class="t-btn" id="t-btn-toggle-${escapeHtml(t.id)}" onclick="toggleTimer('${escapeHtml(t.id)}')" title="Iniciar / Pausar">
+                    <button class="t-btn" id="t-btn-toggle-${t.id}" onclick="toggleTimer('${t.id}')" title="Iniciar / Pausar">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     </button>
-                    <button class="t-btn" onclick="stopTimer('${escapeHtml(t.id)}')" title="Detener">
+                    <button class="t-btn" onclick="stopTimer('${t.id}')" title="Detener">
                         <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
                     </button>
-                    <button class="t-btn" onclick="resetTimer('${escapeHtml(t.id)}')" title="Reiniciar">
+                    <button class="t-btn" onclick="resetTimer('${t.id}')" title="Reiniciar">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     </button>
                     ${deleteBtn}
@@ -2144,40 +2193,62 @@
 
         function onDragStart(e, index) {
             if (timersList[index].id === 'general') return;
-            if (e.target.tagName === 'INPUT' || e.target.closest('button')) { e.preventDefault(); return; }
+            
+            if (e.target.tagName === 'INPUT' || e.target.closest('button')) {
+                e.preventDefault();
+                return;
+            }
+            
             draggedIndex = index;
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
         }
-        function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+
+        function onDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
         function onDrop(e, targetIndex) {
             e.preventDefault();
             if (draggedIndex === null || draggedIndex === targetIndex) return;
             if (timersList[targetIndex].id === 'general') return;
+
             let movedItem = timersList.splice(draggedIndex, 1)[0];
             timersList.splice(targetIndex, 0, movedItem);
+            
             saveTimersState();
             renderTimersUI();
         }
-        function onDragEnd(e) { e.target.classList.remove('dragging'); draggedIndex = null; }
+
+        function onDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedIndex = null;
+        }
 
         function onTouchStart(e, index) {
             if (timersList[index].id === 'general') return;
             if (['INPUT', 'BUTTON', 'SVG', 'PATH', 'RECT', 'CIRCLE', 'SPAN'].includes(e.target.tagName)) return;
+            
             draggedIndex = index;
             touchDragEl = e.currentTarget;
             touchStartY = e.touches[0].clientY;
+            
             touchDragEl.classList.add('dragging');
         }
+
         function onTouchMove(e) {
             if (draggedIndex === null || !touchDragEl) return;
             e.preventDefault();
+            
             let currentY = e.touches[0].clientY;
             let diffY = currentY - touchStartY;
             touchDragEl.style.transform = `translateY(${diffY}px)`;
+
             let touch = e.touches[0];
             let elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             let targetWidget = elementBelow ? elementBelow.closest('.extra-timer') : null;
+
             if (targetWidget && targetWidget !== touchDragEl) {
                 let targetIndex = parseInt(targetWidget.dataset.index);
                 if (!isNaN(targetIndex) && targetIndex !== draggedIndex) {
@@ -2192,15 +2263,20 @@
                 }
             }
         }
+
         function onTouchEnd(e) {
-            if (touchDragEl) { touchDragEl.classList.remove('dragging'); touchDragEl.style.transform = ''; }
-            draggedIndex = null; touchDragEl = null;
+            if (touchDragEl) {
+                touchDragEl.classList.remove('dragging');
+                touchDragEl.style.transform = '';
+            }
+            draggedIndex = null;
+            touchDragEl = null;
             renderTimersUI();
         }
 
         function toggleExtraTimersFold() {
             extraTimersFolded = !extraTimersFolded;
-            safeSetItem('wkExtraTimersFolded', extraTimersFolded);
+            localStorage.setItem('wkExtraTimersFolded', extraTimersFolded);
             renderTimersUI();
         }
 
@@ -2218,17 +2294,32 @@
             const name = document.getElementById('inp-newt-name').value.trim() || `Temporizador ${timersList.length}`;
             const h = parseInt(document.getElementById('inp-newt-h').value) || 0;
             const m = parseInt(document.getElementById('inp-newt-m').value) || 0;
+            
             const newId = 't_' + Date.now();
-            let initialAcc = 0, initialMode = 'up', totalMs = (h * 3600 + m * 60) * 1000;
-            if (totalMs > 0) { initialMode = 'down'; initialAcc = totalMs; }
+            let initialAcc = 0;
+            let initialMode = 'up';
+            let totalMs = (h * 3600 + m * 60) * 1000;
+            
+            if (totalMs > 0) {
+                initialMode = 'down';
+                initialAcc = totalMs;
+            }
+
             const usedColors = timersList.map(t => t.color);
-            const nextColor = TIMER_PALETTE.find(c => !usedColors.includes(c)) || TIMER_PALETTE[timersList.length % TIMER_PALETTE.length];
+            const nextColor = TIMER_PALETTE.find(c => !usedColors.includes(c))
+                || TIMER_PALETTE[timersList.length % TIMER_PALETTE.length];
+
             timersList.push({
-                id: newId, name: name, tMode: initialMode, tRunning: false, tRef: 0, tAcc: initialAcc,
-                inputH: h > 0 ? h : '', inputM: m > 0 ? m : '', setMs: totalMs, color: nextColor, hidden: false
+                id: newId, name: name,
+                tMode: initialMode, tRunning: false, tRef: 0, tAcc: initialAcc,
+                inputH: h > 0 ? h : '', inputM: m > 0 ? m : '',
+                setMs: totalMs,
+                color: nextColor, hidden: false
             });
+
             extraTimersFolded = false;
-            safeSetItem('wkExtraTimersFolded', extraTimersFolded);
+            localStorage.setItem('wkExtraTimersFolded', extraTimersFolded);
+
             saveTimersState();
             renderTimersUI();
             closeModal();
@@ -2253,6 +2344,7 @@
             stopAlarmSound();
             const t = timersList.find(x => x.id === id);
             if (!t) return;
+
             const hEl = document.getElementById(`t-input-h-${id}`);
             const mEl = document.getElementById(`t-input-m-${id}`);
             const h = hEl ? (parseInt(hEl.value) || 0) : 0;
@@ -2269,6 +2361,7 @@
                 t.tRunning = false;
             } else {
                 const isPaused = t.tAcc > 0 && !t.tCompleted;
+
                 if (isPaused && !inputChanged) {
                     t.tRef = Date.now();
                     t.tRunning = true;
@@ -2289,6 +2382,7 @@
             stopAlarmSound();
             let t = timersList.find(x => x.id === id);
             if (!t) return;
+
             const hEl = document.getElementById(`t-input-h-${id}`);
             const mEl = document.getElementById(`t-input-m-${id}`);
             if (hEl && mEl) {
@@ -2297,38 +2391,47 @@
                 t.inputH = h || '';
                 t.inputM = m || '';
             }
+
             const wasRunning = t.tRunning;
             const hadProgress = wasRunning || (t.tAcc > 0);
+
             let remaining = t.tAcc;
             if (t.tRunning) {
                 if (t.tMode === 'up') remaining = t.tAcc + (Date.now() - t.tRef);
                 else                  remaining = t.tAcc - (Date.now() - t.tRef);
             }
+
             const runningSetMs = t.setMs || 0;
             let elapsedMs, durationMs;
+
             if (t.tMode === 'down' && runningSetMs > 0) {
-                remaining = Math.max(0, remaining);
-                elapsedMs = Math.max(0, runningSetMs - remaining);
+                remaining  = Math.max(0, remaining);
+                elapsedMs  = Math.max(0, runningSetMs - remaining);
                 durationMs = runningSetMs;
             } else {
-                elapsedMs = Math.max(0, remaining);
+                elapsedMs  = Math.max(0, remaining);
                 durationMs = elapsedMs;
             }
-            if (elapsedMs > 1000 && hadProgress) {
-                enqueueGoal({
+
+            if (elapsedMs > 1000 && hadProgress && !activeTimerForGoal) {
+                activeTimerForGoal = {
                     name: t.name,
                     durationMs: durationMs,
                     elapsedMs: elapsedMs,
                     color: t.color
-                });
+                };
+                openGoalModal();
             }
-            t.tRunning = false;
-            t.tAcc = 0;
-            t.tRef = 0;
+
+            t.tRunning   = false;
+            t.tAcc       = 0;
+            t.tRef       = 0;
             t.tCompleted = false;
+
             const hNow = parseInt(t.inputH) || 0;
             const mNow = parseInt(t.inputM) || 0;
             t.setMs = (hNow * 3600 + mNow * 60) * 1000;
+
             saveTimersState();
             updateTimersDisplayValues();
         }
@@ -2337,6 +2440,7 @@
             stopAlarmSound();
             let t = timersList.find(x => x.id === id);
             if (!t) return;
+
             const hEl = document.getElementById(`t-input-h-${id}`);
             const mEl = document.getElementById(`t-input-m-${id}`);
             let h = 0, m = 0;
@@ -2346,30 +2450,38 @@
                 t.inputH = h || '';
                 t.inputM = m || '';
             }
+
             const setMs = (h * 3600 + m * 60) * 1000;
-            t.tRunning = false;
-            t.tRef = 0;
+
+            t.tRunning   = false;
+            t.tRef       = 0;
             t.tCompleted = false;
-            if (setMs > 0) { t.tMode = 'down'; t.tAcc = setMs; t.setMs = setMs; }
-            else           { t.tMode = 'up';   t.tAcc = 0;     t.setMs = 0;     }
+
+            if (setMs > 0) {
+                t.tMode = 'down';
+                t.tAcc = setMs;
+                t.setMs = setMs;
+            } else {
+                t.tMode = 'up';
+                t.tAcc = 0;
+                t.setMs = 0;
+            }
+
             saveTimersState();
             updateTimersDisplayValues();
         }
 
-        // === FIX #7: Sistema de goals con cola ===
-        function enqueueGoal(goal) {
-            if (activeTimerForGoal) {
-                goalQueue.push(goal);
-                return;
-            }
-            activeTimerForGoal = goal;
+        function openGoalModal() {
+            const name = activeTimerForGoal?.name || 'Temporizador';
+            const safeName = String(name).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+            document.getElementById('goal-overlay-title').innerHTML =
+                `¿Objetivo logrado para "<span style="color: var(--accent);">${safeName}</span>"?`;
+
             goalCompletedAt = Date.now();
-            startAlarmSound();
             renderGoalOverlayStats();
             if (goalOverlayInterval) clearInterval(goalOverlayInterval);
             goalOverlayInterval = setInterval(renderGoalOverlayStats, 500);
-            document.getElementById('goal-overlay-title').innerHTML =
-                `¿Objetivo logrado para "<span style="color: var(--accent);">${escapeHtml(goal.name)}</span>"?`;
+
             document.getElementById('goal-overlay').classList.add('active');
             updateBodyOverflow();
         }
@@ -2378,13 +2490,24 @@
             const el = document.getElementById('goal-overlay-stats');
             if (!el) return;
             if (!activeTimerForGoal) { el.innerHTML = ''; return; }
+
             const durMs = activeTimerForGoal.durationMs || 0;
             const eSec = Math.max(0, Math.floor((Date.now() - goalCompletedAt) / 1000));
-            const eh = Math.floor(eSec / 3600), em = Math.floor((eSec % 3600) / 60), es = eSec % 60;
-            const eStr = eh > 0 ? `${eh}:${String(em).padStart(2,'0')}:${String(es).padStart(2,'0')}` : `${String(em).padStart(2,'0')}:${String(es).padStart(2,'0')}`;
+            const eh = Math.floor(eSec / 3600);
+            const em = Math.floor((eSec % 3600) / 60);
+            const es = eSec % 60;
+            const eStr = eh > 0
+                ? `${eh}:${String(em).padStart(2,'0')}:${String(es).padStart(2,'0')}`
+                : `${String(em).padStart(2,'0')}:${String(es).padStart(2,'0')}`;
+
             const dSec = Math.floor(durMs / 1000);
-            const dh = Math.floor(dSec / 3600), dm = Math.floor((dSec % 3600) / 60), ds = dSec % 60;
-            const dStr = dh > 0 ? `${dh}:${String(dm).padStart(2,'0')}:${String(ds).padStart(2,'0')}` : `${String(dm).padStart(2,'0')}:${String(ds).padStart(2,'0')}`;
+            const dh = Math.floor(dSec / 3600);
+            const dm = Math.floor((dSec % 3600) / 60);
+            const ds = dSec % 60;
+            const dStr = dh > 0
+                ? `${dh}:${String(dm).padStart(2,'0')}:${String(ds).padStart(2,'0')}`
+                : `${String(dm).padStart(2,'0')}:${String(ds).padStart(2,'0')}`;
+
             el.innerHTML = `
                 <div style="font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 3px;">Tiempo del timer</div>
                 <div style="font-size: 1.4rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; margin-bottom: 14px; letter-spacing: -0.02em;">${dStr}</div>
@@ -2394,40 +2517,25 @@
         }
 
         function recordGoal(success) {
+            stopAlarmSound();
             const extraMs = goalCompletedAt ? (Date.now() - goalCompletedAt) : 0;
+            if (goalOverlayInterval) { clearInterval(goalOverlayInterval); goalOverlayInterval = null; }
 
-            if (activeTimerForGoal) {
-                timerStats.push({
-                    id: Date.now() + Math.random(),
-                    date: new Date().toISOString(),
-                    timerName: activeTimerForGoal.name,
-                    durationMs: activeTimerForGoal.durationMs || 0,
-                    elapsedMs: activeTimerForGoal.elapsedMs || 0,
-                    extraMs: extraMs,
-                    color: activeTimerForGoal.color || '#34d399',
-                    success: success
-                });
-                safeSetItem('wkTimerStats', JSON.stringify(timerStats));
-            }
-
-            if (goalQueue.length > 0) {
-                activeTimerForGoal = goalQueue.shift();
-                goalCompletedAt = Date.now();
-                startAlarmSound();
-                renderGoalOverlayStats();
-                if (goalOverlayInterval) clearInterval(goalOverlayInterval);
-                goalOverlayInterval = setInterval(renderGoalOverlayStats, 500);
-                document.getElementById('goal-overlay-title').innerHTML =
-                    `¿Objetivo logrado para "<span style="color: var(--accent);">${escapeHtml(activeTimerForGoal.name)}</span>"?`;
-            } else {
-                stopAlarmSound();
-                if (goalOverlayInterval) { clearInterval(goalOverlayInterval); goalOverlayInterval = null; }
-                activeTimerForGoal = null;
-                goalCompletedAt = 0;
-                document.getElementById('goal-overlay').classList.remove('active');
-                updateBodyOverflow();
-            }
-
+            timerStats.push({
+                id: Date.now() + Math.random(),
+                date: new Date().toISOString(),
+                timerName: activeTimerForGoal?.name || 'Temporizador',
+                durationMs: activeTimerForGoal?.durationMs || 0,
+                elapsedMs: activeTimerForGoal?.elapsedMs || 0,
+                extraMs: extraMs,
+                color: activeTimerForGoal?.color || '#34d399',
+                success: success
+            });
+            localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
+            activeTimerForGoal = null;
+            goalCompletedAt = 0;
+            document.getElementById('goal-overlay').classList.remove('active');
+            updateBodyOverflow();
             const histEl = document.getElementById('modal-content-history');
             if (histEl && histEl.style.display === 'flex') renderHistoryModal();
         }
@@ -2448,13 +2556,15 @@
                         t.tAcc = 0;
                         t.tCompleted = true;
                         const setMs = getTimerSetMs(t);
-                        if (setMs > 0) {
-                            enqueueGoal({
+                        if (!activeTimerForGoal && setMs > 0) {
+                            startAlarmSound();
+                            activeTimerForGoal = {
                                 name: t.name,
                                 durationMs: setMs,
                                 elapsedMs: setMs,
                                 color: t.color
-                            });
+                            };
+                            openGoalModal();
                         }
                     }
                 }
@@ -2467,11 +2577,15 @@
 
                 const displayEl = document.getElementById(`t-display-${t.id}`);
                 if (displayEl) displayEl.innerText = disp;
+
                 const pillEl = document.getElementById(`pill-time-${t.id}`);
                 if (pillEl) pillEl.innerText = disp;
 
-                if (t.tRunning) { if (!firstRunningInfo) firstRunningInfo = { id: t.id, disp: disp, isRunning: true }; }
-                else if (current > 0) { if (!firstWithTimeInfo) firstWithTimeInfo = { id: t.id, disp: disp, isRunning: false }; }
+                if (t.tRunning) {
+                    if (!firstRunningInfo) firstRunningInfo = { id: t.id, disp: disp, isRunning: true };
+                } else if (current > 0) {
+                    if (!firstWithTimeInfo) firstWithTimeInfo = { id: t.id, disp: disp, isRunning: false };
+                }
 
                 const btnToggle = document.getElementById(`t-btn-toggle-${t.id}`);
                 if (btnToggle) {
@@ -2488,58 +2602,77 @@
             });
 
             const activeTimerInfo = firstRunningInfo || firstWithTimeInfo;
-            const isNotMainScreen = document.getElementById('modal-overlay').classList.contains('active') || hasVisibleQuarterWindow();
-            const floatEl = document.getElementById('floating-timer');
 
+            const isNotMainScreen = document.getElementById('modal-overlay').classList.contains('active')
+                || hasVisibleQuarterWindow();
+            const floatEl = document.getElementById('floating-timer');
+            
             if (activeTimerInfo) {
                 document.getElementById('floating-time').innerText = activeTimerInfo.disp;
                 const floatBtn = document.getElementById('floating-toggle-btn');
                 floatBtn.onclick = () => toggleTimer(activeTimerInfo.id);
+                
                 if (activeTimerInfo.isRunning) {
                     floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
                 } else {
                     floatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
                 }
-                floatEl.style.display = isNotMainScreen ? 'flex' : 'none';
+
+                if (isNotMainScreen) {
+                    floatEl.style.display = 'flex';
+                } else {
+                    floatEl.style.display = 'none';
+                }
             } else {
                 floatEl.style.display = 'none';
             }
         }
 
+        /* === FLOATING TIMER DRAG === */
         function initFloatingTimerDrag() {
             const el = document.getElementById('floating-timer');
             if (!el || el.dataset.dragInit) return;
             el.dataset.dragInit = '1';
+
             const saved = JSON.parse(localStorage.getItem('wkFloatTimerPos') || 'null');
             if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
                 el.style.left = saved.left + 'px';
                 el.style.top = saved.top + 'px';
             }
-            let dragging = false, moved = false, sx = 0, sy = 0, sl = 0, st = 0;
+
+            let dragging = false, moved = false;
+            let sx = 0, sy = 0, sl = 0, st = 0;
+
             el.addEventListener('pointerdown', (e) => {
                 if (e.target.closest('button')) return;
                 if (e.button !== undefined && e.button !== 0) return;
                 const r = el.getBoundingClientRect();
-                sx = e.clientX; sy = e.clientY; sl = r.left; st = r.top;
+                sx = e.clientX; sy = e.clientY;
+                sl = r.left; st = r.top;
                 dragging = true; moved = false;
                 try { el.setPointerCapture(e.pointerId); } catch(_) {}
             });
+
             el.addEventListener('pointermove', (e) => {
                 if (!dragging) return;
-                const dx = e.clientX - sx, dy = e.clientY - sy;
+                const dx = e.clientX - sx;
+                const dy = e.clientY - sy;
                 if (!moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
                 moved = true;
                 const w = el.offsetWidth, h = el.offsetHeight;
-                el.style.left = Math.max(2, Math.min(window.innerWidth - w - 2, sl + dx)) + 'px';
-                el.style.top  = Math.max(2, Math.min(window.innerHeight - h - 2, st + dy)) + 'px';
+                const nl = Math.max(2, Math.min(window.innerWidth - w - 2, sl + dx));
+                const nt = Math.max(2, Math.min(window.innerHeight - h - 2, st + dy));
+                el.style.left = nl + 'px';
+                el.style.top = nt + 'px';
             });
+
             const endDrag = (e) => {
                 if (!dragging) return;
                 dragging = false;
                 try { el.releasePointerCapture(e.pointerId); } catch(_) {}
                 if (moved) {
                     const r = el.getBoundingClientRect();
-                    safeSetItem('wkFloatTimerPos', JSON.stringify({ left: r.left, top: r.top }));
+                    localStorage.setItem('wkFloatTimerPos', JSON.stringify({ left: r.left, top: r.top }));
                 }
             };
             el.addEventListener('pointerup', endDrag);
@@ -2547,18 +2680,18 @@
         }
 
         function saveTimersState() {
-            safeSetItem('wkTimersList', JSON.stringify(timersList));
+            localStorage.setItem('wkTimersList', JSON.stringify(timersList));
         }
 
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const diasL = ["L", "M", "M", "J", "V", "S", "D"];
         const diasFull = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
         const currentYear = new Date().getFullYear();
-
+        
         let rawTasks = JSON.parse(localStorage.getItem('wkTasks')) || {};
         let tasksData = {};
         for (let key in rawTasks) tasksData[key] = rawTasks[key];
-        safeSetItem('wkTasks', JSON.stringify(tasksData));
+        localStorage.setItem('wkTasks', JSON.stringify(tasksData));
 
         let entornosData = JSON.parse(localStorage.getItem('wkEntornos')) || [];
 
@@ -2573,14 +2706,14 @@
                 }
             }
             trackedYears = Array.from(yearsSet).sort((a, b) => a - b);
-            safeSetItem('wkYears', JSON.stringify(trackedYears));
+            localStorage.setItem('wkYears', JSON.stringify(trackedYears));
         }
 
         function ensureYearTracked(y) {
             if (!trackedYears.includes(y)) {
                 trackedYears.push(y);
                 trackedYears.sort((a, b) => a - b);
-                safeSetItem('wkYears', JSON.stringify(trackedYears));
+                localStorage.setItem('wkYears', JSON.stringify(trackedYears));
             }
         }
 
@@ -2591,7 +2724,7 @@
                 y = parseInt(y);
                 if (!isNaN(y) && y > 2000 && y < 2100) {
                     if (!trackedYears.includes(y)) {
-                        trackedYears.push(y); safeSetItem('wkYears', JSON.stringify(trackedYears)); drawCalendar();
+                        trackedYears.push(y); localStorage.setItem('wkYears', JSON.stringify(trackedYears)); drawCalendar();
                     } else alert("Ese año ya existe.");
                 } else alert("Por favor, ingresa un año válido.");
             }
@@ -2601,11 +2734,11 @@
             if (y === new Date().getFullYear()) { alert("No puedes eliminar el año actual."); return; }
             if (confirm(`¿Estás seguro de eliminar el año ${y} y TODOS sus registros?`)) {
                 trackedYears = trackedYears.filter(yr => yr !== y);
-                safeSetItem('wkYears', JSON.stringify(trackedYears));
+                localStorage.setItem('wkYears', JSON.stringify(trackedYears));
                 for(let key in tasksData) if (key.startsWith(y + '-')) delete tasksData[key];
-                safeSetItem('wkTasks', JSON.stringify(tasksData));
+                localStorage.setItem('wkTasks', JSON.stringify(tasksData));
                 entornosData = entornosData.filter(en => en.year !== y);
-                safeSetItem('wkEntornos', JSON.stringify(entornosData));
+                localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
                 if (selectedYear === y) calendarView = 'years';
                 drawCalendar();
             }
@@ -2617,7 +2750,7 @@
         let markersData = JSON.parse(localStorage.getItem('wkMarkers')) || { block:[], year:[], week:[], work:[], day:[] };
         let collapsedMonths = JSON.parse(localStorage.getItem('wkCollapsedMonths')) || {};
 
-        if(!blockConfig.startYear) { blockConfig.startYear = currentYear; safeSetItem('wkBlockCfg', JSON.stringify(blockConfig)); }
+        if(!blockConfig.startYear) { blockConfig.startYear = currentYear; localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); }
 
         let calendarView = localStorage.getItem('wkCalView') || 'years';
         if (!['years', 'quarters'].includes(calendarView)) calendarView = 'years';
@@ -2626,28 +2759,17 @@
         if (isNaN(selectedYear) || selectedYear < 2000 || selectedYear > 2100) selectedYear = currentYear;
         if (isNaN(selectedQuarter) || selectedQuarter < 0 || selectedQuarter > 3) selectedQuarter = 0;
 
-        let tcMode = 'tarea';
+        let tcMode = 'tarea'; 
         let calcMode = 'interval';
         let editingEntornoId = null;
 
-        const quarterWindows = new Map();
+        // === MULTI-VENTANA ===
+        const quarterWindows = new Map(); // key -> { overlay, card, bodyEl, q, year, activeTabM, activeTabW, listDisplayMode, quarterBarMode }
         let activeQuarterKey = null;
         let winZCounter = 2000;
-        const minimizedWindows = new Map();
 
-        // FIX #4: debounce de notas
-        let notesSaveTimer = null;
-        function flushNotesSave() {
-            if (notesSaveTimer) { clearTimeout(notesSaveTimer); notesSaveTimer = null; }
-            safeSetItem('wkNotes', JSON.stringify(notesData));
-        }
-        function scheduleNotesSave() {
-            if (notesSaveTimer) clearTimeout(notesSaveTimer);
-            notesSaveTimer = setTimeout(() => {
-                notesSaveTimer = null;
-                safeSetItem('wkNotes', JSON.stringify(notesData));
-            }, 400);
-        }
+        // === VENTANAS MINIMIZADAS ===
+        const minimizedWindows = new Map(); // id -> { title, restoreFn, closeFn, persistData }
 
         function hasVisibleQuarterWindow() {
             return Array.from(quarterWindows.values()).some(w => w.overlay.style.display !== 'none');
@@ -2656,14 +2778,19 @@
         function updateBodyOverflow() {
             const hasActiveModal = document.getElementById('modal-overlay').classList.contains('active');
             const hasGoal = document.getElementById('goal-overlay').classList.contains('active');
-            if (hasActiveModal || hasVisibleQuarterWindow() || hasGoal) document.body.style.overflow = 'hidden';
-            else document.body.style.overflow = '';
+            if (hasActiveModal || hasVisibleQuarterWindow() || hasGoal) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
         }
 
         function persistMinimized() {
-            const arr = Array.from(minimizedWindows.values()).map(w => w.persistData).filter(Boolean);
+            const arr = Array.from(minimizedWindows.values())
+                .map(w => w.persistData)
+                .filter(Boolean);
             if (arr.length === 0) localStorage.removeItem('wkMinimizedWindows');
-            else safeSetItem('wkMinimizedWindows', JSON.stringify(arr));
+            else localStorage.setItem('wkMinimizedWindows', JSON.stringify(arr));
         }
 
         function minimizeWindow(id, title, restoreFn, closeFn, persistData) {
@@ -2696,13 +2823,17 @@
         function renderMinimizedBar() {
             const bar = document.getElementById('minimized-bar');
             if (!bar) return;
-            if (minimizedWindows.size === 0) { bar.classList.remove('active'); bar.innerHTML = ''; return; }
+            if (minimizedWindows.size === 0) {
+                bar.classList.remove('active');
+                bar.innerHTML = '';
+                return;
+            }
             bar.classList.add('active');
             bar.innerHTML = Array.from(minimizedWindows.entries()).map(([id, w]) => {
-                const safe = escapeHtml(w.title);
-                return `<div class="minimized-pill" onclick="restoreWindow('${escapeHtml(id)}')" title="Restaurar ${safe}">
+                const safe = String(w.title).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+                return `<div class="minimized-pill" onclick="restoreWindow('${id}')" title="Restaurar ${safe}">
                     <span>${safe}</span>
-                    <button class="pill-close" onclick="event.stopPropagation(); closeMinimizedWindow('${escapeHtml(id)}')" title="Cerrar" aria-label="Cerrar">×</button>
+                    <button class="pill-close" onclick="event.stopPropagation(); closeMinimizedWindow('${id}')" title="Cerrar" aria-label="Cerrar">×</button>
                 </div>`;
             }).join('');
         }
@@ -2711,27 +2842,48 @@
             const modal = document.getElementById('main-modal-card');
             const dualNotes = document.getElementById('dual-notes-card');
             const overlay = document.getElementById('modal-overlay');
+            
             const panelMap = {
-                'modal-content-goal': 'Objetivo', 'modal-content-addtimer': 'Nuevo Timer',
-                'modal-content-general': 'Configuración', 'modal-content-taskcreate': 'Nueva Acción',
-                'modal-content-metrics': 'Métricas', 'modal-content-daystats': 'Día',
-                'modal-content-block': 'Bloque', 'modal-content-work': 'Jornada', 'modal-content-day': 'Día',
-                'modal-content-marker': 'Marcador', 'modal-content-notes': 'Notas',
-                'modal-content-timecalc': 'Calculadora', 'modal-content-history': 'Historial'
+                'modal-content-goal': 'Objetivo',
+                'modal-content-addtimer': 'Nuevo Timer',
+                'modal-content-general': 'Configuración',
+                'modal-content-taskcreate': 'Nueva Acción',
+                'modal-content-metrics': 'Métricas',
+                'modal-content-daystats': 'Día',
+                'modal-content-block': 'Bloque',
+                'modal-content-work': 'Jornada',
+                'modal-content-day': 'Día',
+                'modal-content-marker': 'Marcador',
+                'modal-content-notes': 'Notas',
+                'modal-content-timecalc': 'Calculadora',
+                'modal-content-history': 'Historial'
             };
             let title = 'Modal';
             const activePanel = Array.from(modal.querySelectorAll(':scope > div[id^="modal-content-"]'))
                 .find(el => el.style.display === 'block' || el.style.display === 'flex');
             if (activePanel) title = panelMap[activePanel.id] || 'Modal';
+            
             try { saveModalState(modal, 'wkModalState-main'); } catch(_) {}
             try { saveModalState(dualNotes, 'wkModalState-dual-notes'); } catch(_) {}
-            flushNotesSave();
+            
             overlay.classList.remove('active');
-            const PERSISTIBLE = ['modal-content-notes','modal-content-history','modal-content-general','modal-content-timecalc'];
+            
+            const PERSISTIBLE_MAIN_PANELS = [
+                'modal-content-notes',
+                'modal-content-history',
+                'modal-content-general',
+                'modal-content-timecalc'
+            ];
             let persistData = null;
-            if (activePanel && PERSISTIBLE.includes(activePanel.id)) persistData = { type: 'main', panelId: activePanel.id };
+            if (activePanel && PERSISTIBLE_MAIN_PANELS.includes(activePanel.id)) {
+                persistData = { type: 'main', panelId: activePanel.id };
+            }
+            
             minimizeWindow('main-modal', title,
-                () => { overlay.classList.add('active'); updateTimersDisplayValues(); },
+                () => {
+                    overlay.classList.add('active');
+                    updateTimersDisplayValues();
+                },
                 () => { closeModal(); },
                 persistData
             );
@@ -2744,7 +2896,10 @@
             try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
             win.overlay.style.display = 'none';
             minimizeWindow(`cal-${key}`, title,
-                () => { win.overlay.style.display = 'flex'; focusQuarterWindow(key); },
+                () => {
+                    win.overlay.style.display = 'flex';
+                    focusQuarterWindow(key);
+                },
                 () => { closeQuarterWindow(key); },
                 { type: 'quarter', year: win.year, q: win.q }
             );
@@ -2753,8 +2908,11 @@
         function restoreMinimizedFromStorage() {
             const saved = JSON.parse(localStorage.getItem('wkMinimizedWindows') || '[]');
             if (!Array.isArray(saved) || saved.length === 0) return;
+
             const prevYear = selectedYear;
             const prevQ = selectedQuarter;
+
+            // Restaurar primero los trimestres
             saved.filter(s => s.type === 'quarter').forEach(s => {
                 try {
                     selectedYear = s.year;
@@ -2764,6 +2922,8 @@
                     if (quarterWindows.has(key)) minimizeQuarterWindow(key);
                 } catch(e) { console.warn('Error restoring quarter', e); }
             });
+
+            // Restaurar el modal principal al final
             const main = saved.find(s => s.type === 'main');
             if (main) {
                 try {
@@ -2773,15 +2933,20 @@
                         'modal-content-general': openGeneralModal,
                         'modal-content-timecalc': openTimeCalcModal
                     }[main.panelId];
-                    if (opener) opener(); else openGeneralModal();
+                    if (opener) opener();
+                    else openGeneralModal();
                     minimizeMainModal();
                 } catch(e) { console.warn('Error restoring main', e); }
             }
+
             selectedYear = prevYear;
             selectedQuarter = prevQ;
         }
 
-        function getActiveWin() { return activeQuarterKey ? quarterWindows.get(activeQuarterKey) : null; }
+        function getActiveWin() {
+            return activeQuarterKey ? quarterWindows.get(activeQuarterKey) : null;
+        }
+
         function getTaskDay(t) { return (t.day !== null && t.day !== undefined) ? t.day : null; }
 
         function getWeeksForMonth(year, mI) {
@@ -2791,17 +2956,27 @@
             for (let i = 0; i < off; i++) slots.push(null);
             for (let d = 1; d <= dM; d++) slots.push(d);
             while (slots.length % 7 !== 0) slots.push(null);
+            
             let weeks = [];
             for (let i = 0; i < slots.length; i += 7) {
-                let dws = slots.slice(i, i + 7);
+                let dws = slots.slice(i, i + 7); 
                 weeks.push({ dws, c: dws.filter(d => d !== null).length, origIdx: i/7 });
             }
+            
             let top4 = [...weeks].sort((a, b) => b.c - a.c).slice(0, 4);
             let top4Indices = top4.map(w => w.origIdx).sort((a, b) => a - b);
+            
             weeks.forEach((w, index) => {
-                if (top4Indices.includes(index)) { w.localW = top4Indices.indexOf(index) + 1; w.isMain = true; }
-                else if (index < top4Indices[0]) { w.localW = 0; w.isMain = false; }
-                else { w.localW = 5; w.isMain = false; }
+                if (top4Indices.includes(index)) {
+                    w.localW = top4Indices.indexOf(index) + 1; 
+                    w.isMain = true; 
+                } else if (index < top4Indices[0]) {
+                    w.localW = 0; 
+                    w.isMain = false;
+                } else {
+                    w.localW = 5; 
+                    w.isMain = false;
+                }
             });
             return weeks;
         }
@@ -2821,44 +2996,63 @@
             document.getElementById('theme-color-meta').setAttribute('content', currentTheme === 'light' ? '#eef0f6' : '#0d1017'); update();
         }
 
-        function openGeneralModal() {
+        function openGeneralModal() { 
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
-            document.getElementById('modal-content-general').style.display = 'block';
+            document.getElementById('modal-content-general').style.display = 'block'; 
+            
             document.getElementById('theme-week-color').value = localStorage.getItem('wkWeekColor') || 'blue';
             document.getElementById('theme-border-color').value = localStorage.getItem('wkBorderColor') || 'default';
+            
             syncModalSliders();
-            openModal();
+            openModal(); 
         }
-
+        
         function populateNotesIndex(currentDate) {
             const sel = document.getElementById('notes-index-select');
             if (!sel) return;
-            const dates = Object.keys(notesData).filter(k => k !== 'general' && typeof notesData[k] === 'string' && notesData[k].trim());
+
+            const dates = Object.keys(notesData).filter(k =>
+                k !== 'general' && typeof notesData[k] === 'string' && notesData[k].trim()
+            );
             dates.sort((a, b) => b.localeCompare(a));
-            if (dates.length === 0) { sel.innerHTML = '<option value="">Sin notas</option>'; sel.disabled = true; return; }
+
+            if (dates.length === 0) {
+                sel.innerHTML = '<option value="">Sin notas</option>';
+                sel.disabled = true;
+                return;
+            }
             sel.disabled = false;
+
             const groups = {};
-            dates.forEach(d => { const key = d.slice(0, 7); if (!groups[key]) groups[key] = []; groups[key].push(d); });
+            dates.forEach(d => {
+                const key = d.slice(0, 7);
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(d);
+            });
+
             let html = '<option value="">Ir a nota…</option>';
             Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(key => {
                 const [y, m] = key.split('-').map(Number);
-                html += `<optgroup label="${escapeHtml(meses[m-1] + ' ' + y)}">`;
+                html += `<optgroup label="${meses[m-1]} ${y}">`;
                 groups[key].forEach(d => {
                     const day = parseInt(d.split('-')[2], 10);
                     const raw = notesData[d].replace(/\s+/g, ' ').trim();
                     const preview = raw.length > 28 ? raw.slice(0, 28) + '…' : raw;
                     const selected = d === currentDate ? ' selected' : '';
-                    html += `<option value="${escapeHtml(d)}"${selected}>${day} ${escapeHtml(meses[m-1].slice(0,3))} · ${escapeHtml(preview)}</option>`;
+                    html += `<option value="${d}"${selected}>${day} ${meses[m-1].slice(0,3)} · ${preview}</option>`;
                 });
                 html += `</optgroup>`;
             });
+
             sel.innerHTML = html;
         }
 
         function onNotesIndexChange(date) {
             if (!date) return;
+
             document.getElementById('notes-mode').value = 'date';
             document.getElementById('notes-date-picker').value = date;
+
             toggleNotesMode();
         }
 
@@ -2866,14 +3060,22 @@
 
         function openNotesModal() {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
+
             const content = document.getElementById('modal-content-notes');
             content.style.display = 'flex';
+
             const savedMode = localStorage.getItem('wkNotesLastMode') || 'general';
             const savedDate = localStorage.getItem('wkNotesLastDate') || '';
+
             document.getElementById('notes-mode').value = savedMode;
-            if (savedMode === 'date' && savedDate) document.getElementById('notes-date-picker').value = savedDate;
+            if (savedMode === 'date' && savedDate) {
+                document.getElementById('notes-date-picker').value = savedDate;
+            }
+
             toggleNotesMode();
+
             populateNotesIndex(savedMode === 'date' ? savedDate : '');
+
             document.getElementById('main-modal-card').classList.add('wide');
             openModal();
         }
@@ -2881,8 +3083,10 @@
         function toggleNotesMode() {
             const mode = document.getElementById('notes-mode').value;
             localStorage.setItem('wkNotesLastMode', mode);
+
             const picker = document.getElementById('notes-date-picker');
             const ta = document.getElementById('notes-main-textarea');
+            
             if (mode === 'general') {
                 picker.style.display = 'none';
                 ta.value = notesData.general || '';
@@ -2890,7 +3094,10 @@
                 picker.style.display = 'block';
                 if (!picker.value) {
                     const today = new Date();
-                    picker.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    picker.value = `${yyyy}-${mm}-${dd}`;
                 }
                 localStorage.setItem('wkNotesLastDate', picker.value);
                 loadNoteForPicker();
@@ -2901,7 +3108,9 @@
             const date = document.getElementById('notes-date-picker').value;
             const ta = document.getElementById('notes-main-textarea');
             ta.value = notesData[date] || '';
+
             if (date) localStorage.setItem('wkNotesLastDate', date);
+
             const sel = document.getElementById('notes-index-select');
             if (sel && !sel.disabled) sel.value = date;
         }
@@ -2909,14 +3118,16 @@
         function saveMainNote() {
             const mode = document.getElementById('notes-mode').value;
             const ta = document.getElementById('notes-main-textarea');
+
             if (mode === 'general') {
                 notesData.general = ta.value;
             } else {
                 const date = document.getElementById('notes-date-picker').value;
                 if (date) notesData[date] = ta.value;
             }
-            scheduleNotesSave();   // FIX #4: debounce
+            localStorage.setItem('wkNotes', JSON.stringify(notesData));
             renderDayTaskMarks();
+
             if (mode === 'date') {
                 clearTimeout(notesIndexRefreshTimer);
                 notesIndexRefreshTimer = setTimeout(() => {
@@ -2924,17 +3135,17 @@
                 }, 800);
             }
         }
-
+        
         function saveDualNotes() {
             const ta = document.getElementById('dual-notes-text');
             const date = ta.dataset.date;
             if (date) {
                 notesData[date] = ta.value;
-                scheduleNotesSave();   // FIX #4: debounce
+                localStorage.setItem('wkNotes', JSON.stringify(notesData));
                 renderActiveWindow();
             }
         }
-
+        
         let pressTimer = null;
         let isPressing = false;
         let pressStartPos = {x:0, y:0};
@@ -2944,24 +3155,42 @@
             isPressing = true;
             pressStartPos = { x: e.clientX, y: e.clientY };
             pressTimer = setTimeout(() => {
-                if (isPressing) { isPressing = false; handleLongPress(year, mI, localW, dI, dtStr); }
-            }, 500);
+                if (isPressing) {
+                    isPressing = false;
+                    handleLongPress(year, mI, localW, dI, dtStr);
+                }
+            }, 500); 
         }
+
         function handleDayPointerUp(e, year, mI, localW, dI, dtStr) {
             if (isPressing) {
                 clearTimeout(pressTimer);
                 isPressing = false;
-                if (Math.hypot(e.clientX - pressStartPos.x, e.clientY - pressStartPos.y) < 15) handleShortPress(year, mI, localW, dI, dtStr);
+                let dist = Math.hypot(e.clientX - pressStartPos.x, e.clientY - pressStartPos.y);
+                if (dist < 15) { 
+                    handleShortPress(year, mI, localW, dI, dtStr);
+                }
             }
         }
-        function handleDayPointerCancel(e) { isPressing = false; clearTimeout(pressTimer); }
-        function handleShortPress(year, mI, localW, dI, dtStr) { setActiveTabM(mI % 3); setActiveTabW(localW); }
+
+        function handleDayPointerCancel(e) {
+            isPressing = false;
+            clearTimeout(pressTimer);
+        }
+
+        function handleShortPress(year, mI, localW, dI, dtStr) {
+            setActiveTabM(mI % 3);
+            setActiveTabW(localW);
+        }
+
         function handleLongPress(year, mI, localW, dI, dtStr) {
             document.getElementById('modal-overlay').classList.add('dual-mode-active');
+            
             document.getElementById('dual-notes-card').style.display = 'flex';
             document.getElementById('dual-notes-title').innerText = `Notas del ${dtStr}`;
             document.getElementById('dual-notes-text').value = notesData[dtStr] || '';
             document.getElementById('dual-notes-text').dataset.date = dtStr;
+            
             openTaskCreateModal(mI, localW, dI);
         }
 
@@ -2969,43 +3198,52 @@
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-daystats').style.display = 'block';
             document.getElementById('ds-title').innerText = `Día: ${dateStr}`;
+            
             const tasksList = document.getElementById('ds-tasks-list');
             let tasks = []; let dayEntornos = [];
+            
             if (wNum !== null && wNum !== undefined && dI !== null && dI !== undefined) {
                 const weekTasks = tasksData[`${selectedYear}-${wNum}`] || [];
                 tasks = weekTasks.filter(t => getTaskDay(t) === dI);
-                const localW = wNum % 10, localM = mI % 3;
-                dayEntornos = entornosData.filter(e =>
+                
+                const localW = wNum % 10;
+                const localM = mI % 3;
+                dayEntornos = entornosData.filter(e => 
                     e.year === selectedYear && e.q === Math.floor(mI/3) &&
                     e.months.includes(localM) && e.weeks.includes(localW) && e.days.includes(dI)
                 );
             }
+            
             let html = '';
             if (dayEntornos.length > 0) {
                 dayEntornos.forEach(e => {
                     const timeDisp = e.hour ? (e.hourEnd ? `${e.hour} - ${e.hourEnd}` : e.hour) : '';
-                    html += `<div style="font-size:0.88rem; padding:10px 12px; border-radius:10px; background: ${escapeHtml(e.color)}15; border-left: 3px solid ${escapeHtml(e.color)}; display:flex; flex-direction:column; margin-bottom:10px;">
+                    html += `<div style="font-size:0.88rem; padding:10px 12px; border-radius:10px; background: ${e.color}15; border-left: 3px solid ${e.color}; display:flex; flex-direction:column; margin-bottom:10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="color:var(--text); font-weight:600;">${escapeHtml(e.text)}</span>
-                            <span class="qt-delete" style="cursor:pointer;" onclick="removeEntornoDay(${e.id}, ${mI % 3}, ${wNum % 10}, ${dI}); showDayStats('${escapeHtml(dateStr)}', ${wNum}, ${dI}, ${mI});" title="Quitar este día">×</span>
+                            <span style="color:var(--text); font-weight:600;">${e.text}</span>
+                            <span class="qt-delete" style="cursor:pointer;" onclick="removeEntornoDay(${e.id}, ${mI % 3}, ${wNum % 10}, ${dI}); showDayStats('${dateStr}', ${wNum}, ${dI}, ${mI});" title="Quitar este día">×</span>
                         </div>
-                        ${timeDisp ? `<span style="color:var(--muted); font-size:0.75rem; margin-top:2px;">${escapeHtml(timeDisp)}</span>` : ''}
+                        ${timeDisp ? `<span style="color:var(--muted); font-size:0.75rem; margin-top:2px;">${timeDisp}</span>` : ''}
                     </div>`;
                 });
             }
+
             if (tasks.length > 0) {
                 html += tasks.map(t => {
                     const timeDisp = t.hour ? (t.hourEnd ? `${t.hour} - ${t.hourEnd}` : t.hour) : '';
                     return `<div style="font-size:0.88rem; padding:10px 0; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:10px;">
-                        <span style="flex-shrink:0; margin-top:2px; display:inline-flex;">${t.done
-                            ? '<svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"/></svg>'
-                            : '<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" style="width:14px;height:14px;"><circle cx="12" cy="12" r="9"/></svg>'
+                        <span style="flex-shrink:0; margin-top:2px; display:inline-flex;">${
+                            t.done
+                                ? '<svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"/></svg>'
+                                : '<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" style="width:14px;height:14px;"><circle cx="12" cy="12" r="9"/></svg>'
                         }</span>
-                        <span style="${t.done ? 'text-decoration: line-through; color: var(--muted);' : 'color: var(--text);'}">${escapeHtml(t.text)}${timeDisp ? `<span style="color:var(--muted); font-size:0.75rem; display:block; margin-top:2px;">${escapeHtml(timeDisp)}</span>` : ''}</span>
+                        <span style="${t.done ? 'text-decoration: line-through; color: var(--muted);' : 'color: var(--text);'}">${t.text}${timeDisp ? `<span style="color:var(--muted); font-size:0.75rem; display:block; margin-top:2px;">${timeDisp}</span>` : ''}</span>
                     </div>`;
                 }).join('');
             }
+            
             if (!html) html = '<div style="font-size:0.88rem; color:var(--muted); padding:14px 0; text-align:center;">Nada registrado para este día.</div>';
+            
             tasksList.innerHTML = html;
             openModal();
         }
@@ -3013,7 +3251,7 @@
         function toggleBar(id) {
             const panel = document.getElementById('panel-' + id); const btn = document.getElementById('btn-' + id);
             panel.classList.toggle('active'); btn.classList.toggle('active');
-            safeSetItem('wkBarOpen-' + id, panel.classList.contains('active'));
+            localStorage.setItem('wkBarOpen-' + id, panel.classList.contains('active'));
         }
         function restoreBars() {
             ['block', 'year', 'week', 'work', 'day'].forEach(id => {
@@ -3023,6 +3261,7 @@
             });
         }
 
+        // === RENDER: qbar widget ===
         function renderQuarterBarWidgetHTML(win) {
             const modes = ['q', 'y', 'b']; const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' };
             const mode = modes[win.quarterBarMode] || 'q';
@@ -3037,7 +3276,6 @@
             const win = getActiveWin();
             if (!win) return;
             win.quarterBarMode = (win.quarterBarMode + 1) % 3;
-            win._lastQbarCache = null;   // FIX #5: invalidar cache
             updateQuarterBarInto(win.bodyEl, win);
         }
 
@@ -3048,13 +3286,16 @@
             const pctEl = bodyEl.querySelector('[data-qbar-pct]');
             const labelEl = bodyEl.querySelector('[data-qbar-label]');
             if (!widget || !fill || !pctEl) return;
-
+            
             const modes = ['q', 'y', 'b'];
             const labels = { q: 'Trimestre', y: 'Año', b: 'Bloque' };
             const mode = modes[win.quarterBarMode || 0];
-
+            widget.dataset.mode = mode;
+            if (labelEl) labelEl.textContent = labels[mode];
+            
             const now = new Date();
-            const q = win.q, year = win.year;
+            const q = win.q;
+            const year = win.year;
             const qStart = new Date(year, q * 3, 1);
             const qEnd = new Date(year, q * 3 + 3, 1);
             let refDate = now >= qEnd ? qEnd : (now <= qStart ? qStart : now);
@@ -3063,23 +3304,17 @@
             else if (mode === 'y') pct = ((refDate - new Date(year, 0, 1)) / (new Date(year + 1, 0, 1) - new Date(year, 0, 1))) * 100;
             else pct = ((refDate - new Date(blockConfig.startYear, 0, 1)) / (new Date(blockConfig.startYear + blockConfig.years, 0, 1) - new Date(blockConfig.startYear, 0, 1))) * 100;
             pct = Math.max(0, Math.min(100, pct));
-
-            // FIX #5: cache para no tocar el DOM si no cambia
-            const cacheKey = mode + '|' + pct.toFixed(2);
-            if (win._lastQbarCache === cacheKey && fill.isConnected) return;
-            win._lastQbarCache = cacheKey;
-
-            widget.dataset.mode = mode;
-            if (labelEl) labelEl.textContent = labels[mode];
             fill.style.width = pct.toFixed(2) + '%';
             pctEl.textContent = pct.toFixed(1) + '%';
         }
 
         function updateTcUI() {
             const isEditing = editingEntornoId !== null && tcMode === 'entorno';
-            document.getElementById('tc-main-title').innerText = isEditing ? 'Editar Entorno' : (tcMode === 'tarea' ? 'Nueva Acción' : 'Nuevo Entorno');
+            document.getElementById('tc-main-title').innerText =
+                isEditing ? 'Editar Entorno' : (tcMode === 'tarea' ? 'Nueva Acción' : 'Nuevo Entorno');
             const refreshSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;margin-right:4px;" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>';
-            document.getElementById('btn-toggle-tc').innerHTML = refreshSvg + (tcMode === 'tarea' ? ' Crear Entorno' : ' Crear Acción');
+            document.getElementById('btn-toggle-tc').innerHTML =
+                refreshSvg + (tcMode === 'tarea' ? ' Crear Entorno' : ' Crear Acción');
             document.getElementById('btn-save-tc').innerText = isEditing ? 'Guardar Cambios' : 'Guardar';
             document.getElementById('tc-tarea-fields').style.display = tcMode === 'tarea' ? 'block' : 'none';
             document.getElementById('tc-entorno-fields').style.display = tcMode === 'entorno' ? 'block' : 'none';
@@ -3087,47 +3322,65 @@
 
         function toggleTcMode() {
             tcMode = tcMode === 'tarea' ? 'entorno' : 'tarea';
-            if (tcMode === 'tarea') editingEntornoId = null;
+            if (tcMode === 'tarea') editingEntornoId = null; 
             updateTcUI();
         }
 
         function openTaskCreateModal(prefillM, prefillW, prefillD) {
             editingEntornoId = null;
-            tcMode = 'entorno';
-            toggleTcMode();
+            tcMode = 'entorno'; 
+            toggleTcMode(); 
+
             const q = selectedQuarter;
             const nowMonth = new Date().getMonth();
             let defaultM = prefillM !== undefined ? prefillM : (Math.floor(nowMonth / 3) === q ? nowMonth : q * 3);
+            
             const monthSel = document.getElementById('inp-tc-month');
             let mHtml = '';
             for (let i = 0; i < 3; i++) {
                 const mI = q * 3 + i;
-                mHtml += `<option value="${mI}" ${mI === defaultM ? 'selected' : ''}>${escapeHtml(meses[mI])}</option>`;
+                mHtml += `<option value="${mI}" ${mI === defaultM ? 'selected' : ''}>${meses[mI]}</option>`;
             }
             monthSel.innerHTML = mHtml;
             updateWeekDropdown();
-            if (prefillW !== undefined) document.getElementById('inp-tc-week').value = prefillW;
-            if (prefillD !== undefined) document.getElementById('inp-tc-day').value = prefillD;
-            else document.getElementById('inp-tc-day').value = '';
+            
+            if (prefillW !== undefined) {
+                document.getElementById('inp-tc-week').value = prefillW;
+            }
+            
+            if (prefillD !== undefined) {
+                document.getElementById('inp-tc-day').value = prefillD;
+            } else {
+                document.getElementById('inp-tc-day').value = '';
+            }
 
             const chkMonths = document.getElementById('chk-months');
             chkMonths.innerHTML = '';
             for(let i=0; i<3; i++) {
                 const mI = q * 3 + i;
-                chkMonths.innerHTML += `<div class="chk-btn" onclick="this.classList.toggle('active')" data-val="${i}">${escapeHtml(meses[mI].slice(0,3))}</div>`;
+                chkMonths.innerHTML += `<div class="chk-btn" onclick="this.classList.toggle('active')" data-val="${i}">${meses[mI].slice(0,3)}</div>`;
             }
-            document.querySelectorAll('#chk-months .chk-btn, #chk-weeks .chk-btn, #chk-days .chk-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.querySelectorAll('#chk-months .chk-btn, #chk-weeks .chk-btn, #chk-days .chk-btn')
+                .forEach(btn => btn.classList.remove('active'));
+
             if (prefillM !== undefined && prefillW !== undefined && prefillD !== undefined) {
                 const localM = prefillM % 3;
-                const mBtn = document.querySelector(`#chk-months .chk-btn[data-val="${localM}"]`); if (mBtn) mBtn.classList.add('active');
-                const wBtn = document.querySelector(`#chk-weeks .chk-btn[data-val="${prefillW}"]`); if (wBtn) wBtn.classList.add('active');
-                const dBtn = document.querySelector(`#chk-days .chk-btn[data-val="${prefillD}"]`); if (dBtn) dBtn.classList.add('active');
+                const mBtn = document.querySelector(`#chk-months .chk-btn[data-val="${localM}"]`);
+                if (mBtn) mBtn.classList.add('active');
+                const wBtn = document.querySelector(`#chk-weeks .chk-btn[data-val="${prefillW}"]`);
+                if (wBtn) wBtn.classList.add('active');
+                const dBtn = document.querySelector(`#chk-days .chk-btn[data-val="${prefillD}"]`);
+                if (dBtn) dBtn.classList.add('active');
             }
+
             document.getElementById('inp-tc-title').value = '';
             document.getElementById('inp-tc-hour').value = globalLastHourEnd;
             document.getElementById('inp-tc-hourEnd').value = '';
             document.getElementById('inp-tc-color').value = '#3b82f6';
+            
             updateTcUI();
+            
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-taskcreate').style.display = 'block';
             openModal();
@@ -3138,7 +3391,9 @@
             const weeks = getWeeksForMonth(selectedYear, mI);
             const weekSel = document.getElementById('inp-tc-week'); const prevVal = weekSel.value;
             let wHtml = '';
-            weeks.forEach(w => { wHtml += `<option value="${w.localW}">W${w.localW}</option>`; });
+            weeks.forEach(w => {
+                wHtml += `<option value="${w.localW}">W${w.localW}</option>`;
+            });
             weekSel.innerHTML = wHtml;
             if (prevVal && Array.from(weekSel.options).some(o => o.value === prevVal)) weekSel.value = prevVal;
         }
@@ -3147,18 +3402,25 @@
         let entornoPressState = null;
 
         function handleEntornoPressDown(e, id) {
-            if (e.target.closest('.qt-delete')) return;
+            if (e.target.closest('.qt-delete')) return; 
             if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
+
             entornoPressState = { id, startX: e.clientX, startY: e.clientY };
             if (entornoPressTimer) clearTimeout(entornoPressTimer);
+
             entornoPressTimer = setTimeout(() => {
-                if (entornoPressState) { openEntornoEditModal(id); entornoPressState = null; }
+                if (entornoPressState) {
+                    openEntornoEditModal(id);
+                    entornoPressState = null;
+                }
             }, 500);
         }
+
         function handleEntornoPressUp(e) {
             if (entornoPressTimer) { clearTimeout(entornoPressTimer); entornoPressTimer = null; }
             entornoPressState = null;
         }
+
         function handleEntornoPressCancel(e) {
             if (entornoPressTimer) { clearTimeout(entornoPressTimer); entornoPressTimer = null; }
             entornoPressState = null;
@@ -3167,31 +3429,41 @@
         function openEntornoEditModal(id) {
             const ent = entornosData.find(e => e.id === id);
             if (!ent) return;
+
             editingEntornoId = id;
             tcMode = 'tarea';
-            toggleTcMode();
+            toggleTcMode(); 
+
             document.getElementById('inp-tc-title').value = ent.text;
             document.getElementById('inp-tc-hour').value = ent.hour || '';
             document.getElementById('inp-tc-hourEnd').value = ent.hourEnd || '';
             document.getElementById('inp-tc-color').value = ent.color || '#3b82f6';
+
             const q = ent.q;
             const monthSel = document.getElementById('inp-tc-month');
             let mHtml = '';
             for (let i = 0; i < 3; i++) {
                 const mI = q * 3 + i;
-                mHtml += `<option value="${mI}">${escapeHtml(meses[mI])}</option>`;
+                mHtml += `<option value="${mI}">${meses[mI]}</option>`;
             }
             monthSel.innerHTML = mHtml;
             updateWeekDropdown();
+
             const chkMonths = document.getElementById('chk-months');
             chkMonths.innerHTML = '';
             for(let i=0; i<3; i++) {
                 const mI = q * 3 + i;
                 const active = ent.months.includes(i) ? 'active' : '';
-                chkMonths.innerHTML += `<div class="chk-btn ${active}" onclick="this.classList.toggle('active')" data-val="${i}">${escapeHtml(meses[mI].slice(0,3))}</div>`;
+                chkMonths.innerHTML += `<div class="chk-btn ${active}" onclick="this.classList.toggle('active')" data-val="${i}">${meses[mI].slice(0,3)}</div>`;
             }
-            document.querySelectorAll('#chk-weeks .chk-btn').forEach(btn => { btn.classList.toggle('active', ent.weeks.includes(parseInt(btn.dataset.val))); });
-            document.querySelectorAll('#chk-days .chk-btn').forEach(btn => { btn.classList.toggle('active', ent.days.includes(parseInt(btn.dataset.val))); });
+
+            document.querySelectorAll('#chk-weeks .chk-btn').forEach(btn => {
+                btn.classList.toggle('active', ent.weeks.includes(parseInt(btn.dataset.val)));
+            });
+            document.querySelectorAll('#chk-days .chk-btn').forEach(btn => {
+                btn.classList.toggle('active', ent.days.includes(parseInt(btn.dataset.val)));
+            });
+
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-taskcreate').style.display = 'block';
             openModal();
@@ -3210,23 +3482,39 @@
             const hour = document.getElementById('inp-tc-hour').value;
             const hourEnd = document.getElementById('inp-tc-hourEnd').value;
             const color = document.getElementById('inp-tc-color').value;
+            
             if (!title) { alert("Escribe una descripción"); return; }
+            
             const wNum = mI * 10 + localW;
             const tKey = `${selectedYear}-${wNum}`;
             if (!tasksData[tKey]) tasksData[tKey] = [];
             tasksData[tKey].push({ id: Date.now(), text: title, done: false, day: dayVal === '' ? null : parseInt(dayVal), hour: hour || null, hourEnd: hourEnd || null, color: color });
-            safeSetItem('wkTasks', JSON.stringify(tasksData));
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData));
+            
             renderActiveWindow();
             renderDayTaskMarks();
-            if (hourEnd) { globalLastHourEnd = hourEnd; safeSetItem('wkLastHourEnd', globalLastHourEnd); document.getElementById('inp-tc-hour').value = hourEnd; }
-            else { globalLastHourEnd = ''; safeSetItem('wkLastHourEnd', ''); document.getElementById('inp-tc-hour').value = ''; }
+
+            if (hourEnd) {
+                globalLastHourEnd = hourEnd;
+                localStorage.setItem('wkLastHourEnd', globalLastHourEnd);
+                document.getElementById('inp-tc-hour').value = hourEnd;
+            } else {
+                globalLastHourEnd = '';
+                localStorage.setItem('wkLastHourEnd', '');
+                document.getElementById('inp-tc-hour').value = '';
+            }
+            
             document.getElementById('inp-tc-hourEnd').value = '';
             document.getElementById('inp-tc-title').value = '';
             document.getElementById('inp-tc-title').focus();
+            
             const btn = document.getElementById('btn-save-tc');
             btn.innerText = '¡Guardado!';
             btn.style.backgroundColor = '#34d399';
-            setTimeout(() => { updateTcUI(); btn.style.backgroundColor = ''; }, 1000);
+            setTimeout(() => {
+                updateTcUI();
+                btn.style.backgroundColor = '';
+            }, 1000);
         }
 
         function saveNewEntorno() {
@@ -3234,18 +3522,27 @@
             const hour = document.getElementById('inp-tc-hour').value;
             const hourEnd = document.getElementById('inp-tc-hourEnd').value;
             const color = document.getElementById('inp-tc-color').value;
+
             if (!title) { alert("Escribe una descripción para el entorno"); return; }
+
             const selMonths = Array.from(document.getElementById('chk-months').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
             const selWeeks  = Array.from(document.getElementById('chk-weeks').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
             const selDays   = Array.from(document.getElementById('chk-days').querySelectorAll('.active')).map(e => parseInt(e.dataset.val));
+
             if (selMonths.length === 0 || selWeeks.length === 0 || selDays.length === 0) {
                 alert("Debes seleccionar al menos un mes, una semana y un día."); return;
             }
+
             if (editingEntornoId !== null) {
                 const ent = entornosData.find(e => e.id === editingEntornoId);
                 if (ent) {
-                    ent.text = title; ent.color = color; ent.hour = hour || null; ent.hourEnd = hourEnd || null;
-                    ent.months = selMonths; ent.weeks = selWeeks; ent.days = selDays;
+                    ent.text = title;
+                    ent.color = color;
+                    ent.hour = hour || null;
+                    ent.hourEnd = hourEnd || null;
+                    ent.months = selMonths;
+                    ent.weeks = selWeeks;
+                    ent.days = selDays;
                 }
                 editingEntornoId = null;
             } else {
@@ -3254,40 +3551,54 @@
                     year: selectedYear, q: selectedQuarter, months: selMonths, weeks: selWeeks, days: selDays
                 });
             }
-            safeSetItem('wkEntornos', JSON.stringify(entornosData));
+            localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
+            
             renderActiveWindow();
             renderDayTaskMarks();
-            if (hourEnd) { globalLastHourEnd = hourEnd; safeSetItem('wkLastHourEnd', globalLastHourEnd); document.getElementById('inp-tc-hour').value = hourEnd; }
-            else { globalLastHourEnd = ''; safeSetItem('wkLastHourEnd', ''); document.getElementById('inp-tc-hour').value = ''; }
+
+            if (hourEnd) {
+                globalLastHourEnd = hourEnd;
+                localStorage.setItem('wkLastHourEnd', globalLastHourEnd);
+                document.getElementById('inp-tc-hour').value = hourEnd;
+            } else {
+                globalLastHourEnd = '';
+                localStorage.setItem('wkLastHourEnd', '');
+                document.getElementById('inp-tc-hour').value = '';
+            }
             document.getElementById('inp-tc-hourEnd').value = '';
             document.getElementById('inp-tc-title').value = '';
             document.getElementById('inp-tc-title').focus();
+            
             const btn = document.getElementById('btn-save-tc');
             btn.innerText = '¡Guardado!';
             btn.style.backgroundColor = '#34d399';
-            setTimeout(() => { updateTcUI(); btn.style.backgroundColor = ''; }, 1000);
+            setTimeout(() => {
+                updateTcUI();
+                btn.style.backgroundColor = '';
+            }, 1000);
         }
 
         function toggleManagedTask(week, taskId) {
             const tKey = `${selectedYear}-${week}`; const t = (tasksData[tKey] || []).find(x => x.id === taskId);
-            if (t) t.done = !t.done;
-            safeSetItem('wkTasks', JSON.stringify(tasksData));
+            if (t) t.done = !t.done; localStorage.setItem('wkTasks', JSON.stringify(tasksData));
             renderActiveWindow();
             renderDayTaskMarks();
         }
         function deleteManagedTask(week, taskId) {
             const tKey = `${selectedYear}-${week}`; tasksData[tKey] = (tasksData[tKey] || []).filter(x => x.id !== taskId);
-            safeSetItem('wkTasks', JSON.stringify(tasksData));
+            localStorage.setItem('wkTasks', JSON.stringify(tasksData));
             renderActiveWindow();
             renderDayTaskMarks();
         }
-
+        
         function removeEntornoDay(entornoId, monthIdx, weekVal, dayIdx) {
             let ent = entornosData.find(e => e.id === entornoId);
             if (!ent) return;
             ent.days = ent.days.filter(d => d !== dayIdx);
-            if (ent.days.length === 0) entornosData = entornosData.filter(e => e.id !== entornoId);
-            safeSetItem('wkEntornos', JSON.stringify(entornosData));
+            if (ent.days.length === 0) {
+                entornosData = entornosData.filter(e => e.id !== entornoId);
+            }
+            localStorage.setItem('wkEntornos', JSON.stringify(entornosData));
             renderActiveWindow();
             renderDayTaskMarks();
         }
@@ -3295,7 +3606,7 @@
         function deleteEntornoCompletely(id) {
             if (confirm("¿Estás seguro de eliminar este entorno por completo?")) {
                 entornosData = entornosData.filter(e => e.id !== id);
-                safeSetItem('wkEntornos', JSON.stringify(entornosData));
+                localStorage.setItem('wkEntornos', JSON.stringify(entornosData)); 
                 renderActiveWindow();
                 renderDayTaskMarks();
             }
@@ -3312,12 +3623,14 @@
             }
             renderActiveWindow();
         }
+
         function setActiveTabW(w) {
             const win = getActiveWin();
             if (!win) return;
             win.activeTabW = w;
             renderActiveWindow();
         }
+
         function toggleListDisplayMode() {
             const win = getActiveWin();
             if (!win) return;
@@ -3327,36 +3640,50 @@
 
         function updateMasterTaskListInto(bodyEl, win) {
             if (!bodyEl) return;
-            const q = win.q, year = win.year;
-            const activeTabM = win.activeTabM, activeTabW = win.activeTabW;
+            const q = win.q;
+            const year = win.year;
+            const activeTabM = win.activeTabM;
+            const activeTabW = win.activeTabW;
             const listDisplayMode = win.listDisplayMode || 'acciones';
-
+            
             let tabsHtml = '<div class="list-tabs"><div class="tab-row">';
             for(let i = 0; i < 3; i++) {
                 const mName = meses[q * 3 + i].slice(0,3).toUpperCase();
-                tabsHtml += `<button class="tab-btn ${activeTabM === i ? 'active' : ''}" onclick="setActiveTabM(${i})">${escapeHtml(mName)}</button>`;
+                tabsHtml += `<button class="tab-btn ${activeTabM === i ? 'active' : ''}" onclick="setActiveTabM(${i})">${mName}</button>`;
             }
             tabsHtml += '</div><div class="tab-row">';
+            
             const activeMonthAbs = q * 3 + activeTabM;
             const weeks = getWeeksForMonth(year, activeMonthAbs);
+            
             weeks.forEach(w => {
                 tabsHtml += `<button class="tab-btn ${activeTabW === w.localW ? 'active' : ''}" onclick="setActiveTabW(${w.localW})">W${w.localW}</button>`;
             });
             tabsHtml += '</div></div>';
+            
             const tabsEl = bodyEl.querySelector('[data-tabs]');
             if (tabsEl) tabsEl.innerHTML = tabsHtml;
 
             let tasksHtml = '';
+            
             if (listDisplayMode === 'entornos') {
                 let qEntornos = entornosData.filter(e => e.year === year && e.q === q && e.months.includes(activeTabM) && e.weeks.includes(activeTabW));
-                if (qEntornos.length === 0) tasksHtml += `<div class="qt-empty">Sin entornos en esta semana.</div>`;
-                else {
+                if (qEntornos.length === 0) {
+                    tasksHtml += `<div class="qt-empty">Sin entornos en esta semana.</div>`;
+                } else {
                     qEntornos.forEach(e => {
                         const timeDisp = e.hour ? (e.hourEnd ? `${e.hour}-${e.hourEnd}` : e.hour) : 'Todo el día';
-                        tasksHtml += `<div class="qt-item" onpointerdown="handleEntornoPressDown(event, ${e.id})" onpointerup="handleEntornoPressUp(event)" onpointercancel="handleEntornoPressCancel(event)" onpointerleave="handleEntornoPressCancel(event)" oncontextmenu="event.preventDefault();" title="Mantén pulsado para editar">
+                        tasksHtml += `
+                        <div class="qt-item"
+                             onpointerdown="handleEntornoPressDown(event, ${e.id})"
+                             onpointerup="handleEntornoPressUp(event)"
+                             onpointercancel="handleEntornoPressCancel(event)"
+                             onpointerleave="handleEntornoPressCancel(event)"
+                             oncontextmenu="event.preventDefault();"
+                             title="Mantén pulsado para editar">
                             <div class="qt-info">
-                                <div class="qt-text"><span class="entorno-tag" style="background:${escapeHtml(e.color)}20; color:${escapeHtml(e.color)};">ENTORNO</span> ${escapeHtml(e.text)}</div>
-                                <div class="qt-meta">Días: ${e.days.map(d=>diasL[d]).join(',')} · ${escapeHtml(timeDisp)}</div>
+                                <div class="qt-text"><span class="entorno-tag" style="background:${e.color}20; color:${e.color};">ENTORNO</span> ${e.text}</div>
+                                <div class="qt-meta">Días: ${e.days.map(d=>diasL[d]).join(',')} · ${timeDisp}</div>
                             </div>
                             <span class="qt-delete" title="Eliminar entorno" onclick="deleteEntornoCompletely(${e.id})">×</span>
                         </div>`;
@@ -3365,36 +3692,51 @@
             } else {
                 const wNum = activeMonthAbs * 10 + activeTabW;
                 const weekTasks = tasksData[`${year}-${wNum}`] || [];
+                
                 const today = new Date();
                 const currentYr = today.getFullYear();
                 const currentMonth = today.getMonth();
                 const todayWeekInfo = getWeekForDay(currentYr, currentMonth, today.getDate());
-                if (weekTasks.length === 0) tasksHtml += `<div class="qt-empty">Sin acciones en esta semana.</div>`;
-                else {
+
+                if (weekTasks.length === 0) {
+                    tasksHtml += `<div class="qt-empty">Sin acciones en esta semana.</div>`;
+                } else {
                     tasksHtml += weekTasks.map(t => {
                         const tDay = getTaskDay(t);
                         let metaParts = [];
                         if (t.hour) metaParts.push(t.hourEnd ? `${t.hour}-${t.hourEnd}` : t.hour);
-                        const metaStr = metaParts.length > 0 ? `<div class="qt-meta">${escapeHtml(metaParts.join(' · '))}</div>` : '';
+                        const metaStr = metaParts.length > 0 ? `<div class="qt-meta">${metaParts.join(' · ')}</div>` : '';
+                        
                         let dayTagHtml = '';
                         if (tDay !== null) {
                             let isHoy = false;
-                            if (year === currentYr && activeMonthAbs === currentMonth && todayWeekInfo && todayWeekInfo.localW === activeTabW && tDay === todayWeekInfo.dayIdx) isHoy = true;
-                            dayTagHtml = isHoy ? `<span class="task-day-tag">HOY</span>` : `<span class="task-day-tag">${escapeHtml(diasFull[tDay].slice(0,3).toUpperCase())}</span>`;
+                            if (year === currentYr && activeMonthAbs === currentMonth && todayWeekInfo && todayWeekInfo.localW === activeTabW && tDay === todayWeekInfo.dayIdx) {
+                                isHoy = true;
+                            }
+
+                            if (isHoy) {
+                                dayTagHtml = `<span class="task-day-tag">HOY</span>`;
+                            } else {
+                                dayTagHtml = `<span class="task-day-tag">${diasFull[tDay].slice(0,3).toUpperCase()}</span>`;
+                            }
                         }
-                        return `<div class="qt-item ${t.done ? 'done' : ''}">
-                            <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${wNum}, ${t.id})">
-                            <div class="qt-info">
-                                <div class="qt-text">${escapeHtml(t.text)}${dayTagHtml}</div>
-                                ${metaStr}
-                            </div>
-                            <span class="qt-delete" onclick="deleteManagedTask(${wNum}, ${t.id})">×</span>
-                        </div>`;
+                        
+                        return `
+                            <div class="qt-item ${t.done ? 'done' : ''}">
+                                <input type="checkbox" class="custom-check" ${t.done ? 'checked' : ''} onchange="toggleManagedTask(${wNum}, ${t.id})">
+                                <div class="qt-info">
+                                    <div class="qt-text">${t.text}${dayTagHtml}</div>
+                                    ${metaStr}
+                                </div>
+                                <span class="qt-delete" onclick="deleteManagedTask(${wNum}, ${t.id})">×</span>
+                            </div>`;
                     }).join('');
                 }
             }
+            
             const listEl = bodyEl.querySelector('[data-list]');
             if (listEl) listEl.innerHTML = tasksHtml;
+
             const toggleIcon = listDisplayMode === 'acciones' ? 'E' : 'A';
             const toggleTitle = listDisplayMode === 'acciones' ? 'Ver Entornos' : 'Ver Acciones';
             const toggleEl = bodyEl.querySelector('[data-toggle]');
@@ -3406,11 +3748,13 @@
             if (!win) return;
             updateMasterTaskListInto(win.bodyEl, win);
         }
+
         function updateQuarterBar() {
             const win = getActiveWin();
             if (!win) return;
             updateQuarterBarInto(win.bodyEl, win);
         }
+
         function renderActiveWindow() {
             const win = getActiveWin();
             if (!win) return;
@@ -3427,24 +3771,28 @@
             }
             return { total, done, pct: total === 0 ? 0 : (done / total) * 100 };
         }
+
         function getYearStats(year) {
             let total = 0, done = 0;
             for (let q = 0; q < 4; q++) { const s = getQuarterStats(year, q); total += s.total; done += s.done; }
             return { total, done, pct: total === 0 ? 0 : (done / total) * 100 };
         }
 
-        function selectYear(year) { selectedYear = year; safeSetItem('wkSelYear', year); calendarView = 'quarters'; safeSetItem('wkCalView', calendarView); drawCalendar(); }
-        function goBackToYears() { calendarView = 'years'; safeSetItem('wkCalView', calendarView); drawCalendar(); }
-
+        function selectYear(year) { selectedYear = year; localStorage.setItem('wkSelYear', year); calendarView = 'quarters'; localStorage.setItem('wkCalView', calendarView); drawCalendar(); }
+        function goBackToYears() { calendarView = 'years'; localStorage.setItem('wkCalView', calendarView); drawCalendar(); }
+        
         function toggleMonth(mI) {
             const win = getActiveWin();
             if (!win) return;
             const container = win.bodyEl;
             const yKey = `${win.year}-${mI}`;
             collapsedMonths[yKey] = !collapsedMonths[yKey];
-            safeSetItem('wkCollapsedMonths', JSON.stringify(collapsedMonths));
+            localStorage.setItem('wkCollapsedMonths', JSON.stringify(collapsedMonths));
             const wrap = container.querySelector(`[data-month-wrap="${mI}"]`);
-            if (wrap) { if (collapsedMonths[yKey]) wrap.classList.add('collapsed'); else wrap.classList.remove('collapsed'); }
+            if (wrap) {
+                if (collapsedMonths[yKey]) wrap.classList.add('collapsed');
+                else wrap.classList.remove('collapsed');
+            }
             const tog = container.querySelector(`[data-month-toggle="${mI}"]`);
             if (tog) tog.innerText = collapsedMonths[yKey] ? '+' : '−';
         }
@@ -3486,13 +3834,19 @@
 
         function drawCalendar() { document.getElementById('calendar-container').innerHTML = calendarView === 'quarters' ? renderQuartersView() : renderYearsView(); }
 
+        // === VENTANAS MÚLTIPLES DE TRIMESTRE ===
         function openQuarterDetail(q) {
             if (typeof q !== 'number') q = selectedQuarter;
             selectedQuarter = q;
-            safeSetItem('wkSelQtr', q);
+            localStorage.setItem('wkSelQtr', q);
+
             const year = selectedYear;
             const key = `${year}-q${q}`;
-            if (quarterWindows.has(key)) { focusQuarterWindow(key); return; }
+
+            if (quarterWindows.has(key)) {
+                focusQuarterWindow(key);
+                return;
+            }
 
             const now = new Date();
             let startM = 0, startW = 1;
@@ -3514,13 +3868,17 @@
             overlay.className = 'calendar-overlay active';
             overlay.dataset.quarterKey = key;
             overlay.style.zIndex = ++winZCounter;
+            overlay.style.alignItems = 'flex-start';
+            overlay.style.justifyContent = 'flex-start';
 
             overlay.innerHTML = `
                 <div class="calendar-detail" data-quarter-card style="position: fixed; top: ${startTop}px; left: ${startLeft}px; margin: 0;">
                     <div class="calendar-detail-header">
                         <div class="header-btns left">
                             <button class="add-task-btn" data-act="add" title="Añadir" aria-label="Añadir">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true">
+                                    <path d="M12 5v14M5 12h14"/>
+                                </svg>
                             </button>
                         </div>
                         <div class="calendar-detail-title">
@@ -3530,38 +3888,78 @@
                         </div>
                         <div class="header-btns right">
                             <button class="metrics-btn" data-act="metrics" title="Ver cumplimiento" aria-label="Ver cumplimiento">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18"/><rect x="5" y="13" width="3" height="6" rx="0.6"/><rect x="10.5" y="9" width="3" height="10" rx="0.6"/><rect x="16" y="4" width="3" height="15" rx="0.6"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M3 20h18"/>
+                                    <rect x="5" y="13" width="3" height="6" rx="0.6"/>
+                                    <rect x="10.5" y="9" width="3" height="10" rx="0.6"/>
+                                    <rect x="16" y="4" width="3" height="15" rx="0.6"/>
+                                </svg>
                             </button>
                             <button class="minimize-btn" data-act="minimize" title="Minimizar" aria-label="Minimizar">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                                    <path d="M5 12h14"/>
+                                </svg>
                             </button>
                             <button class="close-btn" data-act="close" aria-label="Cerrar">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                                    <path d="M6 6l12 12M18 6l-12 12"/>
+                                </svg>
                             </button>
                         </div>
                     </div>
                     <div class="calendar-detail-body" data-body></div>
-                </div>`;
+                </div>
+            `;
+
             document.body.appendChild(overlay);
 
             const win = {
                 overlay,
                 card: overlay.querySelector('.calendar-detail'),
                 bodyEl: overlay.querySelector('[data-body]'),
-                q, year, activeTabM: startM, activeTabW: startW,
-                listDisplayMode: 'acciones', quarterBarMode: 0, _lastQbarCache: null
+                q, year,
+                activeTabM: startM,
+                activeTabW: startW,
+                listDisplayMode: 'acciones',
+                quarterBarMode: 0
             };
             quarterWindows.set(key, win);
 
-            overlay.querySelector('[data-act="add"]').onclick = (e) => { e.stopPropagation(); focusQuarterWindow(key); openTaskCreateModal(); };
-            overlay.querySelector('[data-act="prev"]').onclick = (e) => { e.stopPropagation(); focusQuarterWindow(key); navigateQuarterWindow(key, -1); };
-            overlay.querySelector('[data-act="next"]').onclick = (e) => { e.stopPropagation(); focusQuarterWindow(key); navigateQuarterWindow(key, 1); };
-            overlay.querySelector('[data-act="metrics"]').onclick = (e) => { e.stopPropagation(); focusQuarterWindow(key); openMetricsModal(); };
-            overlay.querySelector('[data-act="minimize"]').onclick = (e) => { e.stopPropagation(); minimizeQuarterWindow(key); };
-            overlay.querySelector('[data-act="close"]').onclick = (e) => { e.stopPropagation(); closeQuarterWindow(key); };
+            overlay.querySelector('[data-act="add"]').onclick = (e) => {
+                e.stopPropagation();
+                focusQuarterWindow(key);
+                openTaskCreateModal();
+            };
+            overlay.querySelector('[data-act="prev"]').onclick = (e) => {
+                e.stopPropagation();
+                focusQuarterWindow(key);
+                navigateQuarterWindow(key, -1);
+            };
+            overlay.querySelector('[data-act="next"]').onclick = (e) => {
+                e.stopPropagation();
+                focusQuarterWindow(key);
+                navigateQuarterWindow(key, 1);
+            };
+            overlay.querySelector('[data-act="metrics"]').onclick = (e) => {
+                e.stopPropagation();
+                focusQuarterWindow(key);
+                openMetricsModal();
+            };
+            overlay.querySelector('[data-act="minimize"]').onclick = (e) => {
+                e.stopPropagation();
+                minimizeQuarterWindow(key);
+            };
+            overlay.querySelector('[data-act="close"]').onclick = (e) => {
+                e.stopPropagation();
+                closeQuarterWindow(key);
+            };
 
-            win.card.addEventListener('pointerdown', () => { if (activeQuarterKey !== key) focusQuarterWindow(key); }, true);
+            win.card.addEventListener('pointerdown', () => {
+                if (activeQuarterKey !== key) focusQuarterWindow(key);
+            }, true);
+
             initDraggableModal(win.card, `cal-${key}`);
+
             focusQuarterWindow(key);
             renderQuarterDetailBodyInto(win.bodyEl, win);
         }
@@ -3570,9 +3968,17 @@
             const win = quarterWindows.get(key);
             if (!win) return;
             let restoredFromMin = false;
-            if (win.overlay.style.display === 'none') { win.overlay.style.display = 'flex'; restoredFromMin = true; }
-            if (minimizedWindows.has(`cal-${key}`)) { minimizedWindows.delete(`cal-${key}`); renderMinimizedBar(); restoredFromMin = true; }
+            if (win.overlay.style.display === 'none') {
+                win.overlay.style.display = 'flex';
+                restoredFromMin = true;
+            }
+            if (minimizedWindows.has(`cal-${key}`)) {
+                minimizedWindows.delete(`cal-${key}`);
+                renderMinimizedBar();
+                restoredFromMin = true;
+            }
             if (restoredFromMin) persistMinimized();
+
             activeQuarterKey = key;
             selectedYear = win.year;
             selectedQuarter = win.q;
@@ -3588,14 +3994,24 @@
             try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
             win.overlay.remove();
             quarterWindows.delete(key);
-            if (minimizedWindows.has(`cal-${key}`)) { minimizedWindows.delete(`cal-${key}`); renderMinimizedBar(); persistMinimized(); }
+
+            if (minimizedWindows.has(`cal-${key}`)) {
+                minimizedWindows.delete(`cal-${key}`);
+                renderMinimizedBar();
+                persistMinimized();
+            }
+            
             if (activeQuarterKey === key) {
                 const remainingVisible = Array.from(quarterWindows.keys()).filter(k => {
                     const w = quarterWindows.get(k);
                     return w && w.overlay.style.display !== 'none';
                 });
-                if (remainingVisible.length > 0) { activeQuarterKey = remainingVisible[remainingVisible.length - 1]; focusQuarterWindow(activeQuarterKey); }
-                else activeQuarterKey = null;
+                if (remainingVisible.length > 0) {
+                    activeQuarterKey = remainingVisible[remainingVisible.length - 1];
+                    focusQuarterWindow(activeQuarterKey);
+                } else {
+                    activeQuarterKey = null;
+                }
             }
             updateBodyOverflow();
             updateTimersDisplayValues();
@@ -3604,19 +4020,34 @@
         function navigateQuarterWindow(key, delta) {
             const win = quarterWindows.get(key);
             if (!win) return;
-            let newQ = win.q + delta, newYear = win.year;
-            if (newQ < 0) { newQ = 3; newYear--; }
-            if (newQ > 3) { newQ = 0; newYear++; }
+            let newQ = win.q + delta;
+            let newYear = win.year;
+            if (newQ < 0)  { newQ = 3; newYear--; }
+            if (newQ > 3)  { newQ = 0; newYear++; }
             if (newYear < 2000 || newYear > 2100) return;
+
             ensureYearTracked(newYear);
+
             const newKey = `${newYear}-q${newQ}`;
-            if (quarterWindows.has(newKey)) { closeQuarterWindow(key); focusQuarterWindow(newKey); return; }
+            if (quarterWindows.has(newKey)) {
+                closeQuarterWindow(key);
+                focusQuarterWindow(newKey);
+                return;
+            }
+
             try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
-            selectedYear = newYear; selectedQuarter = newQ;
-            safeSetItem('wkSelYear', newYear); safeSetItem('wkSelQtr', newQ);
+
+            selectedYear = newYear;
+            selectedQuarter = newQ;
+            localStorage.setItem('wkSelYear', newYear);
+            localStorage.setItem('wkSelQtr', newQ);
+
             quarterWindows.delete(key);
             if (activeQuarterKey === key) activeQuarterKey = null;
-            win.q = newQ; win.year = newYear;
+
+            win.q = newQ;
+            win.year = newYear;
+
             const now = new Date();
             if (newYear === now.getFullYear() && Math.floor(now.getMonth() / 3) === newQ) {
                 win.activeTabM = now.getMonth() % 3;
@@ -3627,53 +4058,81 @@
                 const weeks = getWeeksForMonth(newYear, newQ * 3);
                 win.activeTabW = weeks.find(w => w.localW === 1) ? 1 : weeks[0].localW;
             }
+
             win.overlay.dataset.quarterKey = newKey;
             quarterWindows.set(newKey, win);
+
             const titleEl = win.overlay.querySelector('[data-title]');
             if (titleEl) titleEl.textContent = `T${newQ+1} · ${newYear}`;
-            win.overlay.querySelector('[data-act="minimize"]').onclick = (e) => { e.stopPropagation(); minimizeQuarterWindow(newKey); };
-            win.overlay.querySelector('[data-act="close"]').onclick = (e) => { e.stopPropagation(); closeQuarterWindow(newKey); };
-            win._lastQbarCache = null;
+
+            // Reasignar handlers por si acaso
+            win.overlay.querySelector('[data-act="minimize"]').onclick = (e) => {
+                e.stopPropagation();
+                minimizeQuarterWindow(newKey);
+            };
+            win.overlay.querySelector('[data-act="close"]').onclick = (e) => {
+                e.stopPropagation();
+                closeQuarterWindow(newKey);
+            };
+
             focusQuarterWindow(newKey);
             renderQuarterDetailBodyInto(win.bodyEl, win);
         }
 
         function renderQuarterDetailBodyInto(bodyEl, win) {
             if (!bodyEl) return;
-            const q = win.q, year = win.year;
+            const q = win.q;
+            const year = win.year;
             const now = new Date(); now.setHours(0, 0, 0, 0);
+
             let html = renderQuarterBarWidgetHTML(win) + '<div class="months-container">';
+            
             for (let m = 0; m < 3; m++) {
                 const mI = q * 3 + m; const weeks = getWeeksForMonth(year, mI);
                 const yKey = `${year}-${mI}`; const isCol = collapsedMonths[yKey];
+                
                 html += `<div class="month${isCol ? " collapsed" : ""}" data-month-wrap="${mI}">
-                    <div class="month-name" onclick="toggleMonth(${mI})">${escapeHtml(meses[mI])} <span data-month-toggle="${mI}" class="month-toggle">${isCol ? '+' : '−'}</span></div>
+                    <div class="month-name" onclick="toggleMonth(${mI})">${meses[mI]} <span data-month-toggle="${mI}" class="month-toggle">${isCol ? '+' : '−'}</span></div>
                     <div class="days-grid">`;
                 diasL.forEach(d => html += `<div class="week-day">${d}</div>`);
+                
                 weeks.forEach((w, i) => {
                     const localW = w.localW;
-                    const wNum = mI * 10 + localW;
+                    const wNum = mI * 10 + localW; 
+                    
                     let wCl = "", fR = -1, lR = -1;
                     for (let k = 0; k < 7; k++) { if (w.dws[k] !== null) { if (fR === -1) fR = k; lR = k; } }
+                    
                     let startD = new Date(year, mI, w.dws[fR]);
                     let endD = new Date(year, mI, w.dws[lR]);
-                    if (now >= startD && now <= endD) wCl += " current-week-glow";
-                    if (w.isMain) wCl += (endD >= now) ? " highlight-week-active" : " highlight-week-concluded";
+                    
+                    if (now >= startD && now <= endD) {
+                        wCl += " current-week-glow";
+                    }
+
+                    if (w.isMain) {
+                        wCl += (endD >= now) ? " highlight-week-active" : " highlight-week-concluded";
+                    }
+
                     html += `<div class="week-wrapper ${wCl}" style="display: contents;">`;
                     const weekTasks = tasksData[`${year}-${wNum}`] || [];
+                    
                     w.dws.forEach((d, dI) => {
-                        if (d === null) { html += `<div style="border:1px solid transparent; margin-top:3px;"></div>`; }
-                        else {
+                        if (d === null) { html += `<div style="border:1px solid transparent; margin-top:3px;"></div>`; } else {
                             let dt = new Date(year, mI, d), cl = "day";
                             let dtStr = `${year}-${String(mI + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                             if (dt < now) cl += " past"; else if (dt.getTime() === now.getTime()) cl += " today";
                             else cl += (dt.getDay() === 6) ? " sat-future" : (dt.getDay() === 0) ? " sun-future" : " future";
+                            
                             const hasEntornos = entornosData.some(e => e.year === year && e.q === Math.floor(mI/3) && e.months.includes(mI % 3) && e.weeks.includes(localW) && e.days.includes(dI));
                             const hasTasks = weekTasks.some(t => getTaskDay(t) === dI);
                             let hasNotesDay = notesData[dtStr] && notesData[dtStr].trim().length > 0;
+                            
                             const taskDot = (hasTasks || hasEntornos) ? '<span class="task-dot"></span>' : '';
                             const noteDot = hasNotesDay ? '<span class="note-dot"></span>' : '';
+                            
                             const pressHandlers = `onpointerdown="handleDayPointerDown(event, ${year}, ${mI}, ${localW}, ${dI}, '${dtStr}')" onpointerup="handleDayPointerUp(event, ${year}, ${mI}, ${localW}, ${dI}, '${dtStr}')" onpointercancel="handleDayPointerCancel(event)" onpointerleave="handleDayPointerCancel(event)" oncontextmenu="event.preventDefault();"`;
+                            
                             if (w.isMain && dI === fR) html += `<div class="${cl} block-start" ${pressHandlers}><span class="block-label">W${localW}</span>${d}${taskDot}${noteDot}</div>`;
                             else if (w.isMain && dI === lR) html += `<div class="${cl} block-end" ${pressHandlers}>${d}${taskDot}${noteDot}</div>`;
                             else html += `<div class="${cl}" ${pressHandlers}>${d}${taskDot}${noteDot}</div>`;
@@ -3683,66 +4142,85 @@
                 });
                 html += `</div></div>`;
             }
-            html += `<div class="quarter-tasks-wrapper"><div class="quarter-tasks-panel"><div data-tabs></div><div class="qt-list" data-list></div><div data-toggle></div></div></div></div>`;
+            html += `<div class="quarter-tasks-wrapper"><div class="quarter-tasks-panel">
+                <div data-tabs></div>
+                <div class="qt-list" data-list></div>
+                <div data-toggle></div>
+            </div></div></div>`;
             bodyEl.innerHTML = html;
-            win._lastQbarCache = null;
+            
             updateMasterTaskListInto(bodyEl, win);
             updateQuarterBarInto(bodyEl, win);
         }
 
-        function openMetricsModal() {
+        function openMetricsModal() { 
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
-            document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`;
-            renderMetricsModalBody(selectedQuarter);
-            document.getElementById('modal-content-metrics').style.display = 'block';
-            openModal();
+            document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`; 
+            renderMetricsModalBody(selectedQuarter); 
+            document.getElementById('modal-content-metrics').style.display = 'block'; 
+            openModal(); 
         }
-
+        
         function renderMetricsModalBody(q) {
             let html = ''; let qTotal = 0, qDone = 0;
             for (let m = 0; m < 3; m++) {
                 const mI = q * 3 + m; let mTotal = 0, mDone = 0;
-                for (let w = 0; w <= 5; w++) {
+                for (let w = 0; w <= 5; w++) { 
                     const tasks = tasksData[`${selectedYear}-${mI * 10 + w}`] || [];
                     mTotal += tasks.length; mDone += tasks.filter(t => t.done).length;
                 }
                 const mPct = mTotal === 0 ? 0 : (mDone / mTotal) * 100;
-                html += `<div class="m-bar-row"><div class="m-label">${escapeHtml(meses[mI])}</div><div class="m-progress"><div class="m-fill" style="width:${mPct}%"></div></div><div class="m-pct">${Math.round(mPct)}%</div></div>`;
+                html += `<div class="m-bar-row"><div class="m-label">${meses[mI]}</div><div class="m-progress"><div class="m-fill" style="width:${mPct}%"></div></div><div class="m-pct">${Math.round(mPct)}%</div></div>`;
                 qTotal += mTotal; qDone += mDone;
             }
             const qPct = qTotal === 0 ? 0 : (qDone / qTotal) * 100;
             html += `<div class="m-bar-row" style="margin-top:18px; padding-top:18px; border-top:1px solid var(--border);"><div class="m-label" style="color:var(--text);font-weight:700;">T${q + 1}</div><div class="m-progress"><div class="m-fill" style="width:${qPct}%;background:var(--year-bar);"></div></div><div class="m-pct">${Math.round(qPct)}%</div></div>`;
+            
             let totalTimers = timerStats.length;
             let successTimers = timerStats.filter(t => t.success).length;
             let timerPct = totalTimers === 0 ? 0 : (successTimers / totalTimers) * 100;
             html += `<div class="m-bar-row" style="margin-top:18px; padding-top:18px; border-top:1px solid var(--border);"><div class="m-label" style="color:var(--text);font-weight:700;">Temporizador</div><div class="m-progress"><div class="m-fill" style="width:${timerPct}%;background:var(--accent);"></div></div><div class="m-pct">${Math.round(timerPct)}% (${successTimers}/${totalTimers})</div></div>`;
+
             document.getElementById('ms-body').innerHTML = html;
         }
 
-        function openModal() {
-            if (minimizedWindows.has('main-modal')) { minimizedWindows.delete('main-modal'); renderMinimizedBar(); persistMinimized(); }
-            document.getElementById('modal-overlay').classList.add('active');
+        function openModal() { 
+            if (minimizedWindows.has('main-modal')) {
+                minimizedWindows.delete('main-modal');
+                renderMinimizedBar();
+                persistMinimized();
+            }
+            document.getElementById('modal-overlay').classList.add('active'); 
             updateBodyOverflow();
             updateTimersDisplayValues();
         }
-
-        function closeModal(e) {
+        
+        function closeModal(e) { 
             if(e && e.target.id !== 'modal-overlay') return;
-            flushNotesSave();
+            
             try {
                 saveModalState(document.getElementById('main-modal-card'), 'wkModalState-main');
-                saveModalState(document.getElementById('dual-notes-card'), 'wkModalState-dual-notes');
+                saveModalState(document.getElementById('dual-notes-card'),  'wkModalState-dual-notes');
             } catch(_) {}
+            
             document.getElementById('modal-overlay').classList.remove('active');
             document.getElementById('modal-overlay').classList.remove('dual-mode-active');
             document.getElementById('main-modal-card').classList.remove('wide');
             document.getElementById('dual-notes-card').style.display = 'none';
+            
             editingEntornoId = null;
+            
             ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes', 'timecalc', 'history'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
-            if (minimizedWindows.has('main-modal')) { minimizedWindows.delete('main-modal'); renderMinimizedBar(); persistMinimized(); }
+
+            if (minimizedWindows.has('main-modal')) {
+                minimizedWindows.delete('main-modal');
+                renderMinimizedBar();
+                persistMinimized();
+            }
+            
             updateBodyOverflow();
             updateTimersDisplayValues();
         }
@@ -3764,14 +4242,18 @@
         function openTimeCalcModal() {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-timecalc').style.display = 'block';
+
             const now = new Date();
             const startH = String(now.getHours()).padStart(2, '0') + ':00';
             const endH = String((now.getHours() + 1) % 24).padStart(2, '0') + ':00';
+
             document.getElementById('inp-calc-start').value = startH;
             document.getElementById('inp-calc-end').value = endH;
+
             document.getElementById('inp-add-base').value = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
             document.getElementById('inp-add-h').value = '';
             document.getElementById('inp-add-m').value = '';
+
             setCalcMode('interval');
             openModal();
             document.getElementById('inp-calc-start').focus();
@@ -3782,26 +4264,47 @@
             const endVal = document.getElementById('inp-calc-end').value;
             const resultEl = document.getElementById('calc-result');
             if (!resultEl) return;
-            if (!startVal || !endVal) { resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.82rem;">Ingresa ambas horas</span>'; return; }
+
+            if (!startVal || !endVal) {
+                resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.82rem;">Ingresa ambas horas</span>';
+                return;
+            }
+
             const [sh, sm] = startVal.split(':').map(Number);
             const [eh, em] = endVal.split(':').map(Number);
+
             let startSec = sh * 3600 + sm * 60;
             let endSec = eh * 3600 + em * 60;
             let diff = endSec - startSec;
             let crossed = false;
             if (diff < 0) { diff += 24 * 3600; crossed = true; }
-            if (diff === 0) { resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.82rem;">Misma hora — sin intervalo</span>'; return; }
-            const h = Math.floor(diff / 3600), m = Math.floor((diff % 3600) / 60), s = diff % 60;
+
+            if (diff === 0) {
+                resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.82rem;">Misma hora — sin intervalo</span>';
+                return;
+            }
+
+            const h = Math.floor(diff / 3600);
+            const m = Math.floor((diff % 3600) / 60);
+            const s = diff % 60;
+
             const parts = [];
             if (h > 0) parts.push(`${h}h`);
             if (m > 0) parts.push(`${m}m`);
             if (s > 0) parts.push(`${s}s`);
+
             const warnSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0;vertical-align:-1px;margin-right:4px;" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
             resultEl.innerHTML = `
-                <div style="font-size: 2rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.03em;">${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</div>
-                <div style="font-size: 0.82rem; color: var(--subtext); margin-top: 6px; font-weight: 500;">${parts.join(' ')}</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.03em;">
+                    ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}
+                </div>
+                <div style="font-size: 0.82rem; color: var(--subtext); margin-top: 6px; font-weight: 500;">
+                    ${parts.join(' ')}
+                </div>
                 ${crossed ? `<div style="font-size: 0.72rem; color: var(--work); margin-top: 8px; font-weight: 600; display:inline-flex; align-items:center;">${warnSvg}Cruza medianoche (+24h)</div>` : ''}
-                <div style="font-size: 0.68rem; color: var(--muted); margin-top: 6px;">Total: ${Math.floor(diff/60)} minutos · ${diff} segundos</div>`;
+                <div style="font-size: 0.68rem; color: var(--muted); margin-top: 6px;">Total: ${Math.floor(diff/60)} minutos · ${diff} segundos</div>
+            `;
         }
 
         function calculateAdd() {
@@ -3810,38 +4313,47 @@
             const m = parseInt(document.getElementById('inp-add-m').value) || 0;
             const resultEl = document.getElementById('calc-add-result');
             if (!resultEl) return;
-            if (!baseVal) { resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.82rem;">Ingresa una hora base</span>'; return; }
+
+            if (!baseVal) {
+                resultEl.innerHTML = '<span style="color: var(--muted); font-size: 0.82rem;">Ingresa una hora base</span>';
+                return;
+            }
+
             const [bh, bm] = baseVal.split(':').map(Number);
             const totalMin = bh * 60 + bm + h * 60 + m;
             const daysCrossed = Math.floor(totalMin / (24 * 60));
             const modMin = ((totalMin % (24 * 60)) + 24 * 60) % (24 * 60);
-            const rh = Math.floor(modMin / 60), rm = modMin % 60;
+            const rh = Math.floor(modMin / 60);
+            const rm = modMin % 60;
             const resStr = `${String(rh).padStart(2,'0')}:${String(rm).padStart(2,'0')}`;
+
             const parts = [];
             if (h > 0) parts.push(`${h}h`);
             if (m > 0) parts.push(`${m}m`);
             if (parts.length === 0) parts.push('0m');
+
             const warnSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0;vertical-align:-1px;margin-right:4px;" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
             resultEl.innerHTML = `
                 <div style="font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px;">Resultado</div>
-                <div style="font-size: 2rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.03em;">${resStr}</div>
-                <div style="font-size: 0.82rem; color: var(--subtext); margin-top: 6px; font-weight: 500;">${baseVal} + ${parts.join(' ')}</div>
-                ${daysCrossed > 0 ? `<div style="font-size: 0.72rem; color: var(--work); margin-top: 8px; font-weight: 600; display:inline-flex; align-items:center;">${warnSvg}Cruza ${daysCrossed} día${daysCrossed > 1 ? 's' : ''}</div>` : ''}`;
+                <div style="font-size: 2rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.03em;">
+                    ${resStr}
+                </div>
+                <div style="font-size: 0.82rem; color: var(--subtext); margin-top: 6px; font-weight: 500;">
+                    ${baseVal} + ${parts.join(' ')}
+                </div>
+                ${daysCrossed > 0 ? `<div style="font-size: 0.72rem; color: var(--work); margin-top: 8px; font-weight: 600; display:inline-flex; align-items:center;">${warnSvg}Cruza ${daysCrossed} día${daysCrossed > 1 ? 's' : ''}</div>` : ''}
+            `;
         }
 
-        function openBlockModal() {
+        function openBlockModal() { 
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
-            document.getElementById('modal-content-block').style.display = 'block';
-            document.getElementById('inp-block-start').value = blockConfig.startYear;
-            document.getElementById('inp-block-years').value = blockConfig.years;
-            openModal();
+            document.getElementById('modal-content-block').style.display = 'block'; 
+            document.getElementById('inp-block-start').value = blockConfig.startYear; 
+            document.getElementById('inp-block-years').value = blockConfig.years; 
+            openModal(); 
         }
-        function saveBlockSettings() {
-            blockConfig.years = parseInt(document.getElementById('inp-block-years').value);
-            blockConfig.startYear = parseInt(document.getElementById('inp-block-start').value);
-            safeSetItem('wkBlockCfg', JSON.stringify(blockConfig));
-            renderBlockTicks(); update(); updateQuarterBar(); closeModal();
-        }
+        function saveBlockSettings() { blockConfig.years = parseInt(document.getElementById('inp-block-years').value); blockConfig.startYear = parseInt(document.getElementById('inp-block-start').value); localStorage.setItem('wkBlockCfg', JSON.stringify(blockConfig)); renderBlockTicks(); update(); updateQuarterBar(); closeModal(); }
         function renderBlockTicks() {
             const container = document.getElementById('block-ticks'); document.getElementById('label-block').innerText = `Bloque ${blockConfig.years} Años`;
             let html = '';
@@ -3852,40 +4364,35 @@
             container.innerHTML = html;
         }
 
-        function openWorkModal() {
+        function openWorkModal() { 
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
-            document.getElementById('modal-content-work').style.display = 'block';
-            document.getElementById('inp-work-start').value = workConfig.start;
-            document.getElementById('inp-work-end').value = workConfig.end;
-            openModal();
+            document.getElementById('modal-content-work').style.display = 'block'; 
+            document.getElementById('inp-work-start').value = workConfig.start; 
+            document.getElementById('inp-work-end').value = workConfig.end; 
+            openModal(); 
         }
         function saveWorkSettings() {
-            let s = parseInt(document.getElementById('inp-work-start').value), e = parseInt(document.getElementById('inp-work-end').value);
+            let s = parseInt(document.getElementById('inp-work-start').value); let e = parseInt(document.getElementById('inp-work-end').value);
             if(isNaN(s) || isNaN(e) || s >= e) { alert("Horario inválido. Inicio debe ser menor a Fin."); return; }
-            workConfig = { start: s, end: e }; safeSetItem('wkWorkCfg', JSON.stringify(workConfig)); renderWorkTicks(); update(); closeModal();
+            workConfig = { start: s, end: e }; localStorage.setItem('wkWorkCfg', JSON.stringify(workConfig)); renderWorkTicks(); update(); closeModal();
         }
         function renderWorkTicks() {
             const container = document.getElementById('work-ticks'); document.getElementById('label-work').innerText = `Jornada (${workConfig.start}h - ${workConfig.end}h)`;
             let html = '';
             for(let i = workConfig.start; i <= workConfig.end; i++) {
-                let num = i > 12 ? i - 12 : (i === 0 ? 12 : i);
-                let align = i === workConfig.start ? 'left' : (i === workConfig.end ? 'right' : 'center');
+                let num = i > 12 ? i - 12 : (i === 0 ? 12 : i); let align = i === workConfig.start ? 'left' : (i === workConfig.end ? 'right' : 'center');
                 html += `<span class="tick" style="text-align: ${align};">${num}h</span>`;
             }
             container.innerHTML = html;
         }
 
-        function openDayModal() {
+        function openDayModal() { 
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
-            document.getElementById('modal-content-day').style.display = 'block';
-            document.getElementById('inp-day-format').value = dayConfig.format;
-            openModal();
+            document.getElementById('modal-content-day').style.display = 'block'; 
+            document.getElementById('inp-day-format').value = dayConfig.format; 
+            openModal(); 
         }
-        function saveDaySettings() {
-            dayConfig.format = document.getElementById('inp-day-format').value;
-            safeSetItem('wkDayCfg', JSON.stringify(dayConfig));
-            renderDayTicks(); closeModal();
-        }
+        function saveDaySettings() { dayConfig.format = document.getElementById('inp-day-format').value; localStorage.setItem('wkDayCfg', JSON.stringify(dayConfig)); renderDayTicks(); closeModal(); }
         function renderDayTicks() {
             const container = document.getElementById('day-ticks'); let html = '';
             for(let i = 0; i <= 24; i++) {
@@ -3904,108 +4411,115 @@
             if(!markersData[barId]) markersData[barId] = [];
             markersData[barId].push({ id: Date.now(), pct: 50, color: '#34d399' }); saveMarkers(); renderMarkers(barId);
         }
-        function saveMarkers() { safeSetItem('wkMarkers', JSON.stringify(markersData)); }
+        function saveMarkers() { localStorage.setItem('wkMarkers', JSON.stringify(markersData)); }
         function renderAllMarkers() { ['block', 'year', 'week', 'work', 'day'].forEach(renderMarkers); }
 
         function renderMarkers(barId) {
             const container = document.getElementById(`bar-${barId}`); if(!container) return;
             container.querySelectorAll('.bar-marker').forEach(e => e.remove());
             (markersData[barId] || []).forEach(m => {
-                let el = document.createElement('div');
-                el.className = 'bar-marker';
-                el.id = `m-${barId}-${m.id}`;
-                el.style.left = `${m.pct}%`;
-                el.style.setProperty('--m-color', m.color);
-                el.onmousedown = (e) => startDrag(e, barId, m);
-                el.ontouchstart = (e) => startDrag(e, barId, m);
+                let el = document.createElement('div'); el.className = 'bar-marker'; el.id = `m-${barId}-${m.id}`; el.style.left = `${m.pct}%`; el.style.setProperty('--m-color', m.color);
+                el.onmousedown = (e) => startDrag(e, barId, m); el.ontouchstart = (e) => startDrag(e, barId, m);
                 container.appendChild(el);
             });
         }
         function startDrag(e, barId, markerObj) {
             e.preventDefault(); e.stopPropagation();
-            const el = document.getElementById(`m-${barId}-${markerObj.id}`);
-            const barWrapper = document.getElementById(`bar-${barId}`);
+            const el = document.getElementById(`m-${barId}-${markerObj.id}`); const barWrapper = document.getElementById(`bar-${barId}`);
             dragState = { barId, obj: markerObj, el, wrapper: barWrapper, moved: false, startX: e.touches ? e.touches[0].clientX : e.clientX };
         }
-        window.addEventListener('mousemove', dragMarker);
-        window.addEventListener('touchmove', dragMarker, {passive: false});
-        window.addEventListener('mouseup', endDrag);
-        window.addEventListener('touchend', endDrag);
+        window.addEventListener('mousemove', dragMarker); window.addEventListener('touchmove', dragMarker, {passive: false});
+        window.addEventListener('mouseup', endDrag); window.addEventListener('touchend', endDrag);
+
         function dragMarker(e) {
             if(!dragState) return;
             let clientX = e.touches ? e.touches[0].clientX : e.clientX;
             if(Math.abs(clientX - dragState.startX) > 3) dragState.moved = true;
             if(!dragState.moved) return;
             let rect = dragState.wrapper.getBoundingClientRect();
-            let pct = ((clientX - rect.left) / rect.width) * 100;
-            pct = Math.max(0, Math.min(100, pct));
+            let pct = ((clientX - rect.left) / rect.width) * 100; pct = Math.max(0, Math.min(100, pct));
             dragState.el.style.left = `${pct}%`; dragState.obj.pct = pct;
         }
         function endDrag(e) {
             if(!dragState) return;
-            if(!dragState.moved) openMarkerModal(dragState.barId, dragState.obj);
-            else saveMarkers();
+            if(!dragState.moved) openMarkerModal(dragState.barId, dragState.obj); else saveMarkers();
             dragState = null;
         }
         function openMarkerModal(barId, markerObj) {
-            activeMarker = { barId, obj: markerObj };
+            activeMarker = { barId, obj: markerObj }; 
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-marker').style.display = 'block';
-            document.getElementById('inp-marker-color').value = markerObj.color;
-            openModal();
+            document.getElementById('inp-marker-color').value = markerObj.color; openModal();
         }
         function saveMarkerSettings() {
-            if(!activeMarker) return;
-            activeMarker.obj.color = document.getElementById('inp-marker-color').value;
+            if(!activeMarker) return; activeMarker.obj.color = document.getElementById('inp-marker-color').value;
             saveMarkers(); renderMarkers(activeMarker.barId); closeModal();
         }
         function deleteActiveMarker() {
-            if(!activeMarker) return;
-            markersData[activeMarker.barId] = markersData[activeMarker.barId].filter(m => m.id !== activeMarker.obj.id);
+            if(!activeMarker) return; markersData[activeMarker.barId] = markersData[activeMarker.barId].filter(m => m.id !== activeMarker.obj.id);
             saveMarkers(); renderMarkers(activeMarker.barId); closeModal();
         }
 
         let lastDayMarksSig = '';
         function renderDayTaskMarks() {
             const container = document.getElementById('bar-day'); if (!container) return;
+
             const now = new Date(); const year = now.getFullYear(); const mI = now.getMonth(); const dayNum = now.getDate();
             const weekInfo = getWeekForDay(year, mI, dayNum);
+            
             let sig = `${year}-${mI}-${dayNum}|`;
             let itemsToRender = [];
+
             if (weekInfo) {
-                const localM = mI % 3, localW = weekInfo.localW;
-                const todayEntornos = entornosData.filter(e =>
+                const localM = mI % 3;
+                const localW = weekInfo.localW;
+                const todayEntornos = entornosData.filter(e => 
                     e.year === year && e.q === Math.floor(mI/3) &&
                     e.months.includes(localM) && e.weeks.includes(localW) && e.days.includes(weekInfo.dayIdx)
                 ).map(e => ({...e, isEntorno: true}));
+                
                 const wNum = mI * 10 + weekInfo.localW;
                 const weekTasks = tasksData[`${year}-${wNum}`] || [];
                 const todayTasks = weekTasks.filter(t => getTaskDay(t) === weekInfo.dayIdx && t.hour && t.color);
+                
                 itemsToRender = [...todayEntornos, ...todayTasks];
                 sig += itemsToRender.map(t => `${t.id}:${t.hour}:${t.hourEnd||''}:${t.color}:${t.done||false}`).join('|');
             }
+
             if (sig === lastDayMarksSig) return;
             lastDayMarksSig = sig;
+
             container.querySelectorAll('.day-task-mark').forEach(e => e.remove());
+
             itemsToRender.forEach(t => {
                 if(!t.hour) return;
                 const [hStr, mStr] = t.hour.split(':');
                 const hour = parseInt(hStr); const minute = parseInt(mStr) || 0;
                 const startPct = ((hour * 60 + minute) / (24 * 60)) * 100;
                 let endPct;
+                
                 if (t.hourEnd) {
                     const [ehStr, emStr] = t.hourEnd.split(':');
                     const eHour = parseInt(ehStr); const eMinute = parseInt(emStr) || 0;
                     endPct = ((eHour * 60 + eMinute) / (24 * 60)) * 100;
-                    if (endPct <= startPct) endPct = startPct + (100 / 24);
-                } else endPct = Math.min(100, startPct + (100 / 24));
+                    if (endPct <= startPct) endPct = startPct + (100 / 24); 
+                } else {
+                    endPct = Math.min(100, startPct + (100 / 24));
+                }
+
                 const mark = document.createElement('div');
                 mark.className = 'day-task-mark';
                 mark.style.left = startPct + '%';
                 mark.style.width = (endPct - startPct) + '%';
                 mark.style.background = t.color;
-                if (t.isEntorno) { mark.style.opacity = '0.35'; mark.style.mixBlendMode = 'screen'; }
-                else mark.style.opacity = t.done ? '0.9' : '0.6';
+                
+                if (t.isEntorno) {
+                    mark.style.opacity = '0.35';
+                    mark.style.mixBlendMode = 'screen';
+                } else {
+                    mark.style.opacity = t.done ? '0.9' : '0.6';
+                }
+                
                 mark.title = `${t.text} · ${t.hour}${t.hourEnd ? ' - '+t.hourEnd : ''}`;
                 container.appendChild(mark);
             });
@@ -4015,47 +4529,50 @@
             const container = document.getElementById('bar-day');
             if (!container) return;
             let nowMarker = container.querySelector('.now-marker');
-            if (!nowMarker) { nowMarker = document.createElement('div'); nowMarker.className = 'now-marker'; container.appendChild(nowMarker); }
+            if (!nowMarker) {
+                nowMarker = document.createElement('div');
+                nowMarker.className = 'now-marker';
+                container.appendChild(nowMarker);
+            }
             const now = new Date();
             const h = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
-            nowMarker.style.left = ((h / 24) * 100).toFixed(4) + '%';
+            const pct = (h / 24) * 100;
+            nowMarker.style.left = pct.toFixed(4) + '%';
         }
 
         function update() {
             const now = new Date(); const year = now.getFullYear();
             const h = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
             const hh = now.getHours(), mm = now.getMinutes();
-            const ampm = hh >= 12 ? 'PM' : 'AM', displayHour = hh % 12 || 12;
-            const overlayDate = document.getElementById('overlay-date');
-            const overlayTime = document.getElementById('overlay-time');
+            const ampm = hh >= 12 ? 'PM' : 'AM', displayHour = hh % 12 || 12; 
+
+            const overlayDate = document.getElementById('overlay-date'); const overlayTime = document.getElementById('overlay-time');
             if (overlayDate) overlayDate.innerText = `${now.getDate()} de ${meses[now.getMonth()]}, ${year}`;
             if (overlayTime) overlayTime.innerText = `${displayHour}:${String(mm).padStart(2, '0')} ${ampm}`;
+
             const startBlock = blockConfig.startYear; const endBlock = startBlock + blockConfig.years;
             const blockTotalMs = new Date(endBlock, 0, 1) - new Date(startBlock, 0, 1);
             const blockElapsedMs = now - new Date(startBlock, 0, 1);
             let blockPct = (blockElapsedMs / blockTotalMs * 100);
             if(blockPct < 0) blockPct = 0; else if(blockPct > 100) blockPct = 100;
-            document.getElementById('block-fill').style.width = blockPct.toFixed(4) + '%';
-            document.getElementById('block-pct').innerText = blockPct.toFixed(2) + '%';
+            document.getElementById('block-fill').style.width = blockPct.toFixed(4) + '%'; document.getElementById('block-pct').innerText = blockPct.toFixed(2) + '%';
+
             const yearPct = ((now - new Date(year,0,1)) / (new Date(year+1,0,1) - new Date(year,0,1)) * 100);
-            document.getElementById('year-fill').style.width = yearPct.toFixed(4) + '%';
-            document.getElementById('year-pct').innerText = yearPct.toFixed(2) + '%';
-            let dW = now.getDay(), adj = dW === 0 ? 6 : dW - 1, sW = new Date(now);
-            sW.setDate(now.getDate() - adj); sW.setHours(0,0,0,0);
+            document.getElementById('year-fill').style.width = yearPct.toFixed(4) + '%'; document.getElementById('year-pct').innerText = yearPct.toFixed(2) + '%';
+
+            let dW = now.getDay(), adj = dW === 0 ? 6 : dW - 1, sW = new Date(now); sW.setDate(now.getDate() - adj); sW.setHours(0,0,0,0);
             const wkP = ((now - sW) / (7 * 24 * 60 * 60 * 1000)) * 100;
-            document.getElementById('week-fill').style.width = wkP.toFixed(4) + '%';
-            document.getElementById('week-pct').innerText = wkP.toFixed(2) + '%';
+            document.getElementById('week-fill').style.width = wkP.toFixed(4) + '%'; document.getElementById('week-pct').innerText = wkP.toFixed(2) + '%';
+
             let wP = 0, wT = "Libre";
-            if (h >= workConfig.start && h < workConfig.end) {
+            if (h >= workConfig.start && h < workConfig.end) { 
                 wP = ((h - workConfig.start) / (workConfig.end - workConfig.start)) * 100;
-                wT = new Date((workConfig.end - h) * 3600 * 1000).toISOString().substr(11, 8);
+                wT = new Date((workConfig.end - h) * 3600 * 1000).toISOString().substr(11, 8); 
             } else if (h >= workConfig.end) { wP = 100; wT = "¡Finalizado!"; }
-            document.getElementById('work-fill').style.width = wP.toFixed(4) + '%';
-            document.getElementById('work-timer').innerText = wT;
-            document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
-            const dP = (h / 24) * 100;
-            document.getElementById('day-fill').style.width = dP.toFixed(4) + '%';
-            document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
+            document.getElementById('work-fill').style.width = wP.toFixed(4) + '%'; document.getElementById('work-timer').innerText = wT; document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
+
+            const dP = (h / 24) * 100; document.getElementById('day-fill').style.width = dP.toFixed(4) + '%'; document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
+
             const endOfDay = new Date(year, now.getMonth(), now.getDate(), 23, 59, 59, 999);
             const msLeftDay = endOfDay - now;
             const hLeftDay = Math.floor(msLeftDay / 3600000);
@@ -4064,65 +4581,63 @@
             const dayTimerStr = `-${String(hLeftDay).padStart(2,'0')}:${String(mLeftDay).padStart(2,'0')}:${String(sLeftDay).padStart(2,'0')}`;
             const dayTimerEl = document.getElementById('day-timer');
             if (dayTimerEl) dayTimerEl.innerText = dayTimerStr;
+
             updateTimersDisplayValues();
+
             renderDayTaskMarks();
             renderNowMarker();
-            quarterWindows.forEach((win) => { updateQuarterBarInto(win.bodyEl, win); });
-        }
 
-        // === FIX #3: bucle con pausa en background ===
-        let updateIntervalId = null;
-        function startUpdateLoop() {
-            if (updateIntervalId) return;
-            updateIntervalId = setInterval(update, 1000);
-            update();
+            quarterWindows.forEach((win) => {
+                updateQuarterBarInto(win.bodyEl, win);
+            });
         }
-        function stopUpdateLoop() {
-            if (updateIntervalId) { clearInterval(updateIntervalId); updateIntervalId = null; }
-        }
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                stopUpdateLoop();
-                if (goalOverlayInterval) { clearInterval(goalOverlayInterval); goalOverlayInterval = null; }
-                flushNotesSave();
-            } else {
-                startUpdateLoop();
-                if (activeTimerForGoal && !goalOverlayInterval) {
-                    renderGoalOverlayStats();
-                    goalOverlayInterval = setInterval(renderGoalOverlayStats, 500);
-                }
-            }
-        });
-        window.addEventListener('pagehide', flushNotesSave);
-        window.addEventListener('beforeunload', flushNotesSave);
 
         async function syncExport() {
-            let backup = {
-                tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig,
-                day: dayConfig, markers: markersData, collapsed: collapsedMonths,
-                trackedYears: trackedYears, timerStats: timerStats, timersList: timersList, notes: notesData
+            let backup = { 
+                tasks: tasksData, 
+                entornos: entornosData, 
+                work: workConfig, 
+                block: blockConfig, 
+                day: dayConfig, 
+                markers: markersData, 
+                collapsed: collapsedMonths, 
+                trackedYears: trackedYears, 
+                timerStats: timerStats, 
+                timersList: timersList,
+                notes: notesData
             };
             const jsonStr = JSON.stringify(backup, null, 2);
+
             if ('showSaveFilePicker' in window) {
                 try {
                     const fileHandle = await window.showSaveFilePicker({
                         suggestedName: `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`,
-                        types: [{ description: 'Archivo JSON', accept: { 'application/json': ['.json'] } }],
+                        types: [{
+                            description: 'Archivo JSON',
+                            accept: { 'application/json': ['.json'] },
+                        }],
                     });
                     const writable = await fileHandle.createWritable();
                     await writable.write(jsonStr);
                     await writable.close();
                     alert("Copia guardada exitosamente en la carpeta elegida.");
                 } catch (err) {
-                    if (err.name !== 'AbortError') { console.error("Error al guardar:", err); alert("Error al guardar el archivo."); }
+                    if (err.name !== 'AbortError') {
+                        console.error("Error al guardar:", err);
+                        alert("Error al guardar el archivo.");
+                    }
                 }
             } else {
                 const blob = new Blob([jsonStr], { type: "application/json" });
-                const url = URL.createObjectURL(blob);
+                const url = URL.createObjectURL(blob); 
                 const a = document.createElement("a");
-                a.href = url;
+                a.href = url; 
                 a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
-                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+                document.body.appendChild(a); 
+                a.click(); 
+                document.body.removeChild(a); 
+                URL.revokeObjectURL(url);
+                
                 alert("Copia guardada en tu carpeta de Descargas. Si usas Google Drive, se sincronizará automáticamente.");
             }
         }
@@ -4130,27 +4645,37 @@
         function syncImport(event) {
             const file = event.target.files[0];
             if (!file) return;
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (!data.tasks || !data.timersList) { alert("El archivo no parece ser una copia de seguridad válida de Tiempo."); return; }
-                    if(confirm("¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.")) {
-                        if (data.tasks) safeSetItem('wkTasks', JSON.stringify(data.tasks));
-                        if (data.entornos) safeSetItem('wkEntornos', JSON.stringify(data.entornos));
-                        if (data.work) safeSetItem('wkWorkCfg', JSON.stringify(data.work));
-                        if (data.block) safeSetItem('wkBlockCfg', JSON.stringify(data.block));
-                        if (data.day) safeSetItem('wkDayCfg', JSON.stringify(data.day));
-                        if (data.markers) safeSetItem('wkMarkers', JSON.stringify(data.markers));
-                        if (data.collapsed) safeSetItem('wkCollapsedMonths', JSON.stringify(data.collapsed));
-                        if (data.trackedYears) safeSetItem('wkYears', JSON.stringify(data.trackedYears));
-                        if (data.timerStats) safeSetItem('wkTimerStats', JSON.stringify(data.timerStats));
-                        if (data.timersList) safeSetItem('wkTimersList', JSON.stringify(data.timersList));
-                        if (data.notes) safeSetItem('wkNotes', JSON.stringify(data.notes));
-                        alert("Datos restaurados correctamente. La página se reiniciará para aplicar los cambios.");
-                        location.reload();
+                    
+                    if (!data.tasks || !data.timersList) {
+                        alert("El archivo no parece ser una copia de seguridad válida de Tiempo.");
+                        return;
                     }
-                } catch (err) { alert("Error al leer el archivo. Asegúrate de que sea un JSON válido."); console.error(err); }
+
+                    if(confirm("¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.")) {
+                        if (data.tasks) localStorage.setItem('wkTasks', JSON.stringify(data.tasks));
+                        if (data.entornos) localStorage.setItem('wkEntornos', JSON.stringify(data.entornos));
+                        if (data.work) localStorage.setItem('wkWorkCfg', JSON.stringify(data.work));
+                        if (data.block) localStorage.setItem('wkBlockCfg', JSON.stringify(data.block));
+                        if (data.day) localStorage.setItem('wkDayCfg', JSON.stringify(data.day));
+                        if (data.markers) localStorage.setItem('wkMarkers', JSON.stringify(data.markers));
+                        if (data.collapsed) localStorage.setItem('wkCollapsedMonths', JSON.stringify(data.collapsed));
+                        if (data.trackedYears) localStorage.setItem('wkYears', JSON.stringify(data.trackedYears));
+                        if (data.timerStats) localStorage.setItem('wkTimerStats', JSON.stringify(data.timerStats));
+                        if (data.timersList) localStorage.setItem('wkTimersList', JSON.stringify(data.timersList));
+                        if (data.notes) localStorage.setItem('wkNotes', JSON.stringify(data.notes));
+
+                        alert("Datos restaurados correctamente. La página se reiniciará para aplicar los cambios.");
+                        location.reload(); 
+                    }
+                } catch (err) {
+                    alert("Error al leer el archivo. Asegúrate de que sea un JSON válido.");
+                    console.error(err);
+                }
                 event.target.value = '';
             };
             reader.readAsText(file);
@@ -4162,7 +4687,9 @@
             const h = Math.floor(totalSec / 3600);
             const m = Math.floor((totalSec % 3600) / 60);
             const s = totalSec % 60;
-            return h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            return h > 0
+                ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+                : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }
 
         function openHistoryModal() {
@@ -4176,11 +4703,14 @@
         function renderHistoryModal() {
             const container = document.getElementById('history-list');
             if (!container) return;
+
             if (timerStats.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding:44px 20px; color:var(--muted); font-size:0.88rem;">Aún no hay temporizadores registrados.<br>Detén o completa un temporizador de cuenta atrás para verlo aquí.</div>';
                 return;
             }
+
             const sorted = [...timerStats].sort((a, b) => new Date(b.date) - new Date(a.date));
+
             const groups = {};
             sorted.forEach(s => {
                 const d = new Date(s.date);
@@ -4188,13 +4718,16 @@
                 if (!groups[key]) groups[key] = [];
                 groups[key].push(s);
             });
+
             const today = new Date();
             const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
             const yest = new Date(today); yest.setDate(today.getDate() - 1);
             const yestKey = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
             const nombresDias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
             const checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px;margin-right:3px;" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>';
             const xSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="width:12px;height:12px;vertical-align:-2px;margin-right:3px;" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+
             let html = '';
             Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(key => {
                 let label;
@@ -4207,7 +4740,10 @@
                 }
                 const totalHoy = groups[key].length;
                 const okHoy = groups[key].filter(x => x.success).length;
-                html += `<div class="history-date-group"><div class="history-date-label">${escapeHtml(label)} · ${okHoy}/${totalHoy} cumplidos</div>`;
+
+                html += `<div class="history-date-group">
+                    <div class="history-date-label">${label} · ${okHoy}/${totalHoy} cumplidos</div>`;
+
                 groups[key].forEach(item => {
                     const t = new Date(item.date);
                     const hh = String(t.getHours()).padStart(2, '0');
@@ -4217,49 +4753,67 @@
                     const check = item.success
                         ? `<span style="color:var(--accent); font-weight:800;">${checkSvg}Sí</span>`
                         : `<span style="color:var(--sunday); font-weight:800;">${xSvg}No</span>`;
+
                     html += `<div class="history-item">
                         <div class="history-info">
-                            <div class="history-name">${escapeHtml(item.timerName || 'Temporizador')}</div>
-                            <div class="history-meta">${hh}:${mm} · ${escapeHtml(dur + extra)}</div>
+                            <div class="history-name">${item.timerName || 'Temporizador'}</div>
+                            <div class="history-meta">${hh}:${mm} · ${dur}${extra}</div>
                         </div>
                         <div class="history-check">${check}</div>
-                        <button class="history-del" onclick="deleteHistoryItem('${escapeHtml(String(item.id))}')" title="Eliminar">×</button>
+                        <button class="history-del" onclick="deleteHistoryItem('${item.id}')" title="Eliminar">×</button>
                     </div>`;
                 });
                 html += '</div>';
             });
+
             container.innerHTML = html;
         }
 
         function deleteHistoryItem(id) {
             timerStats = timerStats.filter(s => String(s.id) !== String(id));
-            safeSetItem('wkTimerStats', JSON.stringify(timerStats));
+            localStorage.setItem('wkTimerStats', JSON.stringify(timerStats));
             renderHistoryModal();
         }
 
         function exportHistoryExcel() {
-            if (timerStats.length === 0) { alert('No hay historial para exportar.'); return; }
+            if (timerStats.length === 0) {
+                alert('No hay historial para exportar.');
+                return;
+            }
             const sorted = [...timerStats].sort((a, b) => new Date(b.date) - new Date(a.date));
-            let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;} th{background:#34d399;color:#fff;padding:8px;text-align:left;} td{padding:6px 8px;border:1px solid #ccc;}</style></head><body><table><thead><tr><th>Fecha</th><th>Hora</th><th>Nombre</th><th>Duración</th><th>Tiempo extra</th><th>Cumplimiento</th></tr></thead><tbody>';
+
+            let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">'
+                + '<head><meta charset="UTF-8">'
+                + '<style>body{font-family:Arial,sans-serif;} th{background:#34d399;color:#fff;padding:8px;text-align:left;} td{padding:6px 8px;border:1px solid #ccc;}</style>'
+                + '</head><body>'
+                + '<table><thead><tr><th>Fecha</th><th>Hora</th><th>Nombre</th><th>Duración</th><th>Tiempo extra</th><th>Cumplimiento</th></tr></thead><tbody>';
+
             sorted.forEach(s => {
                 const d = new Date(s.date);
                 const date = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
                 const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-                const dur = formatClock(s.elapsedMs || s.durationMs || 0);
+                const dur  = formatClock(s.elapsedMs || s.durationMs || 0);
                 const extra = s.extraMs ? formatClock(s.extraMs) : '—';
                 const comp = s.success ? 'Sí' : 'No';
-                const name = String(s.timerName || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                const name = String(s.timerName || '')
+                    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
                 html += `<tr><td>${date}</td><td>${time}</td><td>${name}</td><td>${dur}</td><td>${extra}</td><td>${comp}</td></tr>`;
             });
+
             html += '</tbody></table></body></html>';
+
             const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = `Historial_Temporizadores_${new Date().toISOString().slice(0,10)}.xls`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
+        /* === MODALES ARRASTRABLES Y REDIMENSIONABLES === */
         function initModalDragResize() {
             initDraggableModal(document.getElementById('main-modal-card'), 'main');
             initDraggableModal(document.getElementById('dual-notes-card'), 'dual-notes');
@@ -4268,24 +4822,31 @@
         function initDraggableModal(modalEl, key) {
             if (!modalEl || modalEl.dataset.dragResizeInit === '1') return;
             modalEl.dataset.dragResizeInit = '1';
+
             const dragHandle = document.createElement('div');
             dragHandle.className = 'modal-drag-handle';
             dragHandle.title = 'Mover ventana';
             dragHandle.innerHTML = '<span class="grip"></span>';
             modalEl.appendChild(dragHandle);
+
             const resizeHandle = document.createElement('div');
             resizeHandle.className = 'modal-resize-handle';
             resizeHandle.title = 'Redimensionar';
             resizeHandle.innerHTML = '<svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="2.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="2.5" r="0.9"/></svg>';
             modalEl.appendChild(resizeHandle);
+
             const storageKey = `wkModalState-${key}`;
             const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
             if (saved) applyModalState(modalEl, saved);
+
             let dragging = false;
             let dragStartX = 0, dragStartY = 0, dragStartLeft = 0, dragStartTop = 0;
+
             const onDragStart = (e) => {
                 if (e.button !== undefined && e.button !== 0) return;
-                e.preventDefault(); e.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation();
+
                 const rect = modalEl.getBoundingClientRect();
                 if (modalEl.style.position !== 'fixed') {
                     modalEl.style.position = 'fixed';
@@ -4293,20 +4854,30 @@
                     modalEl.style.top = rect.top + 'px';
                     modalEl.style.left = rect.left + 'px';
                 }
-                dragStartX = e.clientX; dragStartY = e.clientY;
+
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
                 dragStartLeft = parseFloat(modalEl.style.left) || rect.left;
-                dragStartTop = parseFloat(modalEl.style.top) || rect.top;
+                dragStartTop  = parseFloat(modalEl.style.top) || rect.top;
+
                 dragging = true;
                 modalEl.classList.add('dragging');
                 try { dragHandle.setPointerCapture(e.pointerId); } catch(err) {}
             };
+
             const onDragMove = (e) => {
                 if (!dragging) return;
-                const dx = e.clientX - dragStartX, dy = e.clientY - dragStartY;
+                const dx = e.clientX - dragStartX;
+                const dy = e.clientY - dragStartY;
                 const mw = modalEl.offsetWidth;
-                modalEl.style.top = Math.max(0, Math.min(window.innerHeight - 40, dragStartTop + dy)) + 'px';
-                modalEl.style.left = Math.max(-(mw - 40), Math.min(window.innerWidth - 40, dragStartLeft + dx)) + 'px';
+                let newTop = dragStartTop + dy;
+                let newLeft = dragStartLeft + dx;
+                newTop = Math.max(0, Math.min(window.innerHeight - 40, newTop));
+                newLeft = Math.max(-(mw - 40), Math.min(window.innerWidth - 40, newLeft));
+                modalEl.style.top = newTop + 'px';
+                modalEl.style.left = newLeft + 'px';
             };
+
             const onDragEnd = (e) => {
                 if (!dragging) return;
                 dragging = false;
@@ -4314,16 +4885,21 @@
                 try { dragHandle.releasePointerCapture(e.pointerId); } catch(err) {}
                 saveModalState(modalEl, storageKey);
             };
+
             dragHandle.addEventListener('pointerdown', onDragStart);
             dragHandle.addEventListener('pointermove', onDragMove);
             dragHandle.addEventListener('pointerup', onDragEnd);
             dragHandle.addEventListener('pointercancel', onDragEnd);
+
             let resizing = false;
             let resizeStartX = 0, resizeStartY = 0, resizeStartW = 0, resizeStartH = 0;
             const isCalendar = modalEl.classList.contains('calendar-detail');
+
             const onResizeStart = (e) => {
                 if (e.button !== undefined && e.button !== 0) return;
-                e.preventDefault(); e.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation();
+
                 const rect = modalEl.getBoundingClientRect();
                 if (modalEl.style.position !== 'fixed') {
                     modalEl.style.position = 'fixed';
@@ -4331,21 +4907,30 @@
                     modalEl.style.top = rect.top + 'px';
                     modalEl.style.left = rect.left + 'px';
                 }
-                resizeStartX = e.clientX; resizeStartY = e.clientY;
-                resizeStartW = rect.width; resizeStartH = rect.height;
+
+                resizeStartX = e.clientX;
+                resizeStartY = e.clientY;
+                resizeStartW = rect.width;
+                resizeStartH = rect.height;
+
                 resizing = true;
                 modalEl.classList.add('resizing');
                 if (!isCalendar) modalEl.style.overflowY = 'auto';
                 try { resizeHandle.setPointerCapture(e.pointerId); } catch(err) {}
             };
+
             const onResizeMove = (e) => {
                 if (!resizing) return;
-                const dx = e.clientX - resizeStartX, dy = e.clientY - resizeStartY;
-                modalEl.style.width = Math.max(240, resizeStartW + dx) + 'px';
-                modalEl.style.height = Math.max(100, resizeStartH + dy) + 'px';
+                const dx = e.clientX - resizeStartX;
+                const dy = e.clientY - resizeStartY;
+                const newW = Math.max(240, resizeStartW + dx);
+                const newH = Math.max(100, resizeStartH + dy);
+                modalEl.style.width = newW + 'px';
+                modalEl.style.height = newH + 'px';
                 modalEl.style.maxWidth = 'none';
                 modalEl.style.maxHeight = 'none';
             };
+
             const onResizeEnd = (e) => {
                 if (!resizing) return;
                 resizing = false;
@@ -4353,6 +4938,7 @@
                 try { resizeHandle.releasePointerCapture(e.pointerId); } catch(err) {}
                 saveModalState(modalEl, storageKey);
             };
+
             resizeHandle.addEventListener('pointerdown', onResizeStart);
             resizeHandle.addEventListener('pointermove', onResizeMove);
             resizeHandle.addEventListener('pointerup', onResizeEnd);
@@ -4367,11 +4953,16 @@
                 modalEl.style.top = saved.top + 'px';
                 modalEl.style.left = saved.left + 'px';
             }
-            if (typeof saved.width === 'number') { modalEl.style.width = saved.width + 'px'; modalEl.style.maxWidth = 'none'; }
+            if (typeof saved.width === 'number') {
+                modalEl.style.width = saved.width + 'px';
+                modalEl.style.maxWidth = 'none';
+            }
             if (typeof saved.height === 'number') {
                 modalEl.style.height = saved.height + 'px';
                 modalEl.style.maxHeight = 'none';
-                if (!modalEl.classList.contains('calendar-detail')) modalEl.style.overflowY = 'auto';
+                if (!modalEl.classList.contains('calendar-detail')) {
+                    modalEl.style.overflowY = 'auto';
+                }
             }
         }
 
@@ -4388,12 +4979,14 @@
             if (state.top === undefined && state.left === undefined && state.width === undefined && state.height === undefined) {
                 localStorage.removeItem(storageKey);
             } else {
-                safeSetItem(storageKey, JSON.stringify(state));
+                localStorage.setItem(storageKey, JSON.stringify(state));
             }
         }
 
         function resetModalPositions() {
-            ['main', 'dual-notes'].forEach(key => localStorage.removeItem(`wkModalState-${key}`));
+            ['main', 'dual-notes'].forEach(key => {
+                localStorage.removeItem(`wkModalState-${key}`);
+            });
             quarterWindows.forEach((win, key) => {
                 localStorage.removeItem(`wkModalState-cal-${key}`);
                 win.card.style.position = '';
@@ -4406,7 +4999,10 @@
                 win.card.style.maxHeight = '';
                 win.card.style.overflowY = '';
             });
-            const els = [document.getElementById('main-modal-card'), document.getElementById('dual-notes-card')];
+            const els = [
+                document.getElementById('main-modal-card'),
+                document.getElementById('dual-notes-card')
+            ];
             els.forEach(el => {
                 if (!el) return;
                 el.style.position = '';
@@ -4435,7 +5031,8 @@
         initModalDragResize();
         initFloatingTimerDrag();
         restoreMinimizedFromStorage();
-        startUpdateLoop();
+        setInterval(update, 1000);
+        update();
     </script>
 </body>
 </html>

@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- Forzamos la escala exacta y bloqueamos zoom -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Timer</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1286,17 +1287,33 @@
         #main-modal-card { padding-top: 22px; }
         #dual-notes-card { padding-top: 20px; }
 
-        @media (max-width: 380px) {
+        /* =========================================================
+           NUEVO @MEDIA: Aplicamos el diseño compacto a todos los móviles
+           (antes solo se aplicaba a <= 380px)
+           ========================================================= */
+        @media (max-width: 600px) {
             body { padding: 12px; padding-top: calc(12px + env(safe-area-inset-top)); }
-            .header-title { font-size: 1.75rem; }
-            .header-title::before { height: 26px; }
-            .progress-btn { padding: 14px 2px; font-size: 0.78rem; }
+            .header-title { font-size: 1.6rem; }
+            .header-title::before { height: 22px; width: 3px; }
+            .header-menu-btn { width: 36px; height: 36px; border-radius: 12px; }
+            .header-menu-btn svg { width: 18px; height: 18px; }
+            
+            .section-label { font-size: 0.65rem; margin: 14px 0 10px 2px; }
+            .progress-btn { padding: 12px 2px 10px; font-size: 0.75rem; }
+            .progress-btn.active::after { width: 24px; }
+            
+            .timer-widget { padding: 12px 14px; }
+            .timer-title { top: 4px; left: 14px; font-size: 0.5rem; }
+            .timer-display { font-size: 1.3rem; }
+            .timer-input-group input { width: 34px; font-size: 0.8rem; padding: 4px 2px; }
+            .timer-input-group span { font-size: 0.65rem; }
+            .timer-controls .t-btn { width: 28px; height: 28px; }
+            .timer-controls { gap: 5px; }
+            
             .day { font-size: 0.58rem; margin-top: 3px; }
             .week-day { font-size: 0.44rem; }
             .month-name { font-size: 0.68rem; }
             .block-label { font-size: 0.38rem; top: -8px; }
-            .timer-display { font-size: 1.3rem; }
-            .timer-widget { padding: 12px 14px; }
         }
     </style>
 </head>

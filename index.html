@@ -1315,6 +1315,205 @@
             .month-name { font-size: 0.68rem; }
             .block-label { font-size: 0.38rem; top: -8px; }
         }
+
+        /* =========================================================
+           COMPACT MODE - Tamaños reducidos globalmente
+           ========================================================= */
+
+        /* --- Layout base --- */
+        body { padding: 10px; padding-top: calc(10px + env(safe-area-inset-top)); }
+
+        /* --- Cabecera --- */
+        .header-top { margin: 2px 2px 16px; }
+        .header-title { font-size: 1.45rem; gap: 8px; }
+        .header-title::before { width: 3px; height: 21px; }
+        .header-menu-btn { width: 36px; height: 36px; border-radius: 11px; }
+        .header-menu-btn svg { width: 16px; height: 16px; }
+
+        /* --- Etiquetas de sección --- */
+        .section-label { font-size: 0.58rem; margin: 12px 0 9px 2px; gap: 7px; }
+        .section-label svg { width: 12px; height: 12px; }
+
+        /* --- Botones de progreso --- */
+        .progress-buttons { padding: 5px; gap: 4px; border-radius: 16px; margin-bottom: 3px; }
+        .progress-btn { padding: 11px 2px 7px; font-size: 0.68rem; border-radius: 11px; gap: 2px; }
+        .progress-btn::after { top: 5px; width: 14px; height: 2px; }
+        .progress-btn:hover::after { width: 18px; }
+        .progress-btn.active::after { width: 22px; }
+        .progress-btn .pb-arrow { font-size: 0.42rem; }
+
+        /* --- Timers --- */
+        .timers-header-bar { font-size: 0.54rem; margin: -3px 4px 7px 4px; }
+        .timers-toggle-btn { font-size: 0.54rem; padding: 3px 5px; }
+        .timers-container { gap: 7px; margin-bottom: 12px; }
+
+        .timer-widget { padding: 10px 12px; border-radius: 14px; }
+        .timer-title { font-size: 0.45rem; top: 3px; left: 12px; }
+        .timer-color-dot { width: 7px; height: 7px; margin-right: 4px; }
+        .timer-input-group { gap: 3px; margin-top: 6px; }
+        .timer-input-group input { width: 32px; padding: 4px 3px; font-size: 0.7rem; border-radius: 6px; }
+        .timer-input-group span { font-size: 0.56rem; }
+        .timer-display { font-size: 1.15rem; margin-top: 5px; }
+        .timer-controls { gap: 4px; margin-top: 6px; }
+        .t-btn { width: 26px; height: 26px; border-radius: 8px; }
+        .t-btn-hide { width: 16px; height: 16px; top: 4px; right: 6px; }
+        .t-btn-hide svg { width: 10px; height: 10px; }
+        .add-timer-inline-btn { width: 24px; height: 24px; font-size: 0.85rem; }
+        .t-btn-delete { font-size: 0.95rem; padding: 4px; }
+
+        /* --- Paneles de progreso (dock) --- */
+        .dock-panel { padding: 12px 14px; border-radius: 16px; margin-top: 10px; }
+        .label { font-size: 0.62rem; }
+        .timer { font-size: 1.05rem; margin: 6px 0; }
+        .icon-btn { font-size: 0.82rem; padding: 2px 7px; height: 26px; border-radius: 8px; }
+        .icon-btn.small-txt { font-size: 0.6rem; padding: 4px 7px; }
+        .icon-btn.small-txt svg { width: 12px; height: 12px; }
+
+        .bar-wrapper { height: 8px; border-radius: 5px; }
+        .tall-bar { height: 32px !important; border-radius: 9px !important; }
+        .bar-text-overlay { font-size: 0.62rem; padding: 0 12px; }
+        .ticks { margin-top: 6px; }
+        .tick { font-size: 0.5rem; width: 20px; }
+        .tick.year-tick { width: 34px; }
+        .tick.day-tick { font-size: 0.44rem; }
+
+        #block-pct, #year-pct, #week-pct, #work-pct, #day-pct { font-size: 0.7rem; }
+        #day-timer { font-size: 0.72rem !important; }
+
+        .bar-marker { width: 12px; height: 12px; top: -11px; }
+        .bar-marker::after { top: 11px; left: 3.5px; width: 2px; height: 8px; }
+        .tall-bar .bar-marker::after { height: 26px; }
+
+        /* --- Calendario: días y meses --- */
+        .months-container { gap: 7px; }
+        .month { padding: 9px 7px; border-radius: 11px; }
+        .month-name { font-size: 0.63rem; margin-bottom: 5px; }
+        .week-day { font-size: 0.4rem; margin-bottom: 4px; }
+        .day { font-size: 0.5rem; margin-top: 2px; border-radius: 5px; }
+        .block-label { font-size: 0.34rem; top: -7px; }
+        .task-dot, .note-dot { width: 2.5px; height: 2.5px; }
+
+        /* --- Vista de trimestres --- */
+        .quarters-header { margin-bottom: 10px; }
+        .quarters-header .back-btn { padding: 7px 12px; font-size: 0.7rem; border-radius: 9px; }
+        .quarters-title { font-size: 0.98rem; }
+        .quarters-grid { gap: 8px; }
+        .quarter-compact { padding: 12px 9px; border-radius: 14px; }
+        .qc-num { font-size: 0.92rem; }
+        .qc-badge { font-size: 0.4rem; padding: 2px 5px; top: 7px; right: 7px; }
+        .qc-bar { height: 4px; margin: 8px 0 5px; }
+        .qc-pct { font-size: 0.7rem; }
+
+        /* --- Vista de años --- */
+        .years-view { gap: 10px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+        .year-box { padding: 14px 10px; border-radius: 15px; }
+        .year-num { font-size: 1.25rem; margin-bottom: 7px; }
+        .year-badge { font-size: 0.44rem; padding: 2px 5px; top: 8px; right: 8px; }
+        .year-progress { height: 4px; margin: 7px 0 4px; }
+        .year-pct { font-size: 0.7rem; }
+        .delete-year-btn { width: 20px; height: 20px; top: 7px; left: 7px; font-size: 0.8rem; border-radius: 6px; }
+
+        /* --- Ventanas de trimestre --- */
+        .calendar-detail { border-radius: 20px; max-height: 94vh; }
+        .calendar-detail-header { padding: 9px 12px; padding-top: 14px; gap: 6px; }
+        .calendar-title-text { font-size: 0.9rem; min-width: 65px; }
+        .nav-btn { font-size: 1.15rem; padding: 0 7px; }
+        .add-task-btn, .metrics-btn, .close-btn, .minimize-btn { width: 27px; height: 27px; border-radius: 8px; }
+        .add-task-btn { font-size: 1rem; }
+        .add-task-btn svg, .metrics-btn svg, .close-btn svg { width: 12px; height: 12px; }
+        .minimize-btn svg { width: 11px; height: 11px; }
+        .header-btns { gap: 4px; }
+        .calendar-detail-body { padding: 9px; }
+
+        .qbar-widget { padding: 6px 9px; gap: 8px; margin-bottom: 8px; border-radius: 9px; }
+        .qbar-badge { font-size: 0.48rem; padding: 3px 6px; min-width: 56px; }
+        .qbar-track { height: 5px; }
+        .qbar-pct { font-size: 0.6rem; min-width: 32px; }
+
+        /* --- Pestañas y listas del trimestre --- */
+        .list-tabs { gap: 4px; margin-bottom: 7px; }
+        .tab-row { gap: 4px; }
+        .tab-btn { padding: 5px 2px; font-size: 0.48rem; border-radius: 6px; }
+        .qt-item { padding: 5px 0; gap: 6px; font-size: 0.6rem; }
+        .qt-text { font-size: 0.6rem; }
+        .qt-meta { font-size: 0.44rem; }
+        .qt-empty { font-size: 0.58rem; padding: 10px 2px; }
+        .qt-delete { font-size: 0.82rem; }
+        .entorno-tag { font-size: 0.38rem; padding: 1px 4px; margin-bottom: 1px; }
+        .task-day-tag { font-size: 0.44rem; }
+        .custom-check { width: 15px; height: 15px; border-radius: 4px; }
+        .custom-check::before { width: 7px; height: 7px; }
+        .mode-toggle-corner { width: 18px; height: 18px; font-size: 0.5rem; bottom: 5px; right: 5px; }
+        .quarter-tasks-panel { padding: 8px; border-radius: 11px; min-height: 185px; }
+        .quarter-tasks-wrapper { min-height: 185px; }
+
+        /* --- Modales --- */
+        .modal-card { padding: 15px 17px; border-radius: 20px; width: 290px; }
+        .modal-card.wide { width: 500px; }
+        .modal-card h3 { font-size: 0.92rem; }
+        .modal-actions { gap: 8px; margin-top: 10px; }
+        .btn { padding: 9px 13px; font-size: 0.78rem; border-radius: 10px; }
+        .input-group { font-size: 0.78rem; margin-bottom: 10px; }
+        .input-group input, .input-group select { padding: 6px 9px; font-size: 0.8rem; border-radius: 8px; }
+        .input-group input[type="color"] { width: 36px; height: 36px; }
+
+        .tc-desc input { padding: 6px 10px; height: 32px; font-size: 0.8rem; }
+        .tc-field label { font-size: 0.46rem; }
+        .tc-field select, .tc-field input { height: 30px; font-size: 0.78rem; padding: 3px 7px; }
+        .tc-row { gap: 7px; margin-bottom: 5px; }
+
+        .calc-mode-tabs { gap: 5px; margin-bottom: 10px; }
+        .calc-mode-btn { padding: 7px 5px; font-size: 0.66rem; border-radius: 8px; }
+        .chk-btn { padding: 3px 6px; font-size: 0.58rem; border-radius: 5px; }
+
+        .modal-minimize-btn { width: 20px; height: 18px; top: 3px; right: 6px; }
+        .modal-minimize-btn svg { width: 11px; height: 11px; }
+        .modal-drag-handle { top: 2px; height: 8px; }
+        .modal-drag-handle .grip { width: 18px; height: 2.5px; }
+
+        /* --- Modales duales (notas al lado) --- */
+        .modal-overlay.dual-mode-active #dual-notes-card { height: 230px; min-height: 230px; max-height: 230px; }
+        .modal-overlay.dual-mode-active #main-modal-card { height: 160px; min-height: 160px; max-height: 160px; padding: 10px 16px; }
+        #dual-notes-text { padding: 10px; font-size: 0.82rem; }
+        #notes-main-textarea { padding: 11px; font-size: 0.84rem; }
+
+        /* --- Barra minimizada --- */
+        #minimized-bar { padding: 5px 6px; gap: 6px; border-radius: 11px; bottom: 10px; }
+        .minimized-pill { padding: 5px 8px 5px 10px; font-size: 0.66rem; border-radius: 8px; }
+        .minimized-pill .pill-close { width: 14px; height: 14px; font-size: 0.8rem; }
+
+        /* --- Timers ocultos --- */
+        .hidden-timers-bar { padding: 6px 10px; border-radius: 11px; gap: 6px; }
+        .hidden-bar-toggle { width: 16px; height: 18px; }
+        .hidden-bar-toggle svg { width: 10px; height: 10px; }
+        .hidden-bar-search-btn { width: 20px; height: 20px; }
+        .hidden-bar-search-btn svg { width: 12px; height: 12px; }
+        .hidden-bar-search-input { font-size: 0.64rem; height: 22px; padding: 3px 7px; }
+        .hidden-timer-pill { padding: 4px 9px 4px 8px; font-size: 0.58rem; }
+        .hidden-bar-result-item { padding: 4px 8px; font-size: 0.58rem; }
+        .hidden-dot { width: 8px; height: 8px; }
+
+        /* --- Timer flotante --- */
+        #floating-timer { padding: 5px 9px; gap: 6px; border-radius: 10px; top: max(38px, calc(env(safe-area-inset-top) + 20px)); left: 12px; }
+        #floating-time { font-size: 0.68rem; }
+        .floating-stop-btn { width: 17px; height: 17px; }
+
+        /* --- Historial --- */
+        .history-date-label { font-size: 0.64rem; margin-bottom: 8px; }
+        .history-item { padding: 9px 11px; border-radius: 10px; margin-bottom: 6px; gap: 8px; }
+        .history-name { font-size: 0.78rem; }
+        .history-meta { font-size: 0.64rem; }
+        .history-check { font-size: 0.7rem; }
+        .history-del { font-size: 1rem; padding: 3px 6px; }
+
+        /* --- Métricas --- */
+        .m-label { width: 78px; font-size: 0.72rem; }
+        .m-pct { width: 48px; font-size: 0.72rem; }
+        .m-progress { height: 7px; }
+        .m-bar-row { margin-bottom: 11px; gap: 12px; }
+
+        /* --- Calculadora resultado --- */
+        #calc-result, #calc-add-result { padding: 14px; min-height: 68px; border-radius: 11px; }
     </style>
 </head>
 <body>

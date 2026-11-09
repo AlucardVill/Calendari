@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Timer</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1825,14 +1825,10 @@
             syncModalSliders();
         }
 
-        // FIX sliders: lee directo de localStorage (con fallback a CSS).
-        // Maneja el caso 0% correctamente (antes caía al default por usar `||`).
         function syncModalSliders() {
             const bgStored = localStorage.getItem('wkModalBgAlpha');
             const borderStored = localStorage.getItem('wkModalBorderAlpha');
-
             let bgPct, borderPct;
-
             if (bgStored !== null && !isNaN(parseInt(bgStored))) {
                 bgPct = parseInt(bgStored);
             } else {
@@ -1840,7 +1836,6 @@
                 const raw = parseFloat(cs.getPropertyValue('--modal-bg-alpha'));
                 bgPct = Math.round((isNaN(raw) ? 0.42 : raw) * 100);
             }
-
             if (borderStored !== null && !isNaN(parseInt(borderStored))) {
                 borderPct = parseInt(borderStored);
             } else {
@@ -1848,7 +1843,6 @@
                 const raw = parseFloat(cs.getPropertyValue('--modal-border-alpha'));
                 borderPct = Math.round((isNaN(raw) ? 0.10 : raw) * 100);
             }
-
             const bgEl = document.getElementById('inp-modal-alpha');
             const borderEl = document.getElementById('inp-modal-border-alpha');
             const bgLbl = document.getElementById('lbl-modal-alpha');
@@ -2332,7 +2326,6 @@
                 elapsedMs = Math.max(0, remaining);
                 durationMs = elapsedMs;
             }
-            // FIX tiempo real: si ya había terminado en background, usar el instante real de fin
             if (elapsedMs > 1000 && hadProgress) {
                 let completedAt = Date.now();
                 if (t.tMode === 'down' && runningSetMs > 0) {
@@ -2381,8 +2374,6 @@
             updateTimersDisplayValues();
         }
 
-        // Sistema de goals con cola
-        // FIX tiempo real: usa `completedAt` cuando existe (instante real de fin del timer)
         function enqueueGoal(goal) {
             if (activeTimerForGoal) {
                 goalQueue.push(goal);
@@ -2438,7 +2429,6 @@
 
             if (goalQueue.length > 0) {
                 activeTimerForGoal = goalQueue.shift();
-                // FIX tiempo real: usar completedAt real del siguiente goal
                 goalCompletedAt = activeTimerForGoal.completedAt || Date.now();
                 startAlarmSound();
                 renderGoalOverlayStats();
@@ -2470,7 +2460,6 @@
                     else                  current -= Date.now() - t.tRef;
 
                     if (t.tMode === 'down' && current <= 0 && !t.tCompleted) {
-                        // FIX tiempo real: calcular instante real antes de modificar t.tAcc/t.tRef
                         const actualFinishTime = t.tRef + t.tAcc;
                         current = 0;
                         t.tRunning = false;
@@ -3541,7 +3530,6 @@
             const overlay = document.createElement('div');
             overlay.className = 'calendar-overlay active';
             overlay.dataset.quarterKey = key;
-            // FIX z-index: reset defensivo si llega cerca del modal (9000)
             if (winZCounter >= 8900) winZCounter = 2000;
             overlay.style.zIndex = ++winZCounter;
 
@@ -3608,7 +3596,6 @@
             selectedQuarter = win.q;
             activeTabM = win.activeTabM;
             activeTabW = win.activeTabW;
-            // FIX z-index: reset defensivo si llega cerca del modal (9000)
             if (winZCounter >= 8900) {
                 winZCounter = 2000;
                 quarterWindows.forEach((w, k) => {

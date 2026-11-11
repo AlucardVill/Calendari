@@ -116,9 +116,7 @@
         }
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-
         html { background: var(--bg); min-height: 100%; }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif;
             background: transparent; color: var(--text); margin: 0; padding: 16px;
@@ -129,7 +127,6 @@
             -moz-osx-font-smoothing: grayscale;
             letter-spacing: -0.011em;
         }
-
         html::before {
             content: ''; position: fixed; inset: -30%; z-index: -1; pointer-events: none;
             background:
@@ -476,7 +473,6 @@
         .hidden-dot:active { transform: scale(0.9); }
         .hidden-dot.is-running { animation: dotPulse 1.8s ease-in-out infinite; }
 
-        /* Dot de caja: cuadrado hueco cuando cerrada, relleno cuando abierta */
         .hidden-dot.box-dot {
             border-radius: 3px;
             border: 1.5px solid var(--dot-color);
@@ -1554,7 +1550,6 @@
         }
         .bc-timer-row .bc-del:hover { color: var(--sunday); background: rgba(255,69,58,0.12); }
 
-        /* Header compacto de caja (debajo de la barra de ocultos) */
         .box-section {
             display: flex;
             flex-direction: column;
@@ -2057,7 +2052,6 @@
                 </div>
             </div>
 
-            <!-- ===== CAJAS: Añadir timer a caja ===== -->
             <div id="modal-content-timermenu" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                     <span id="tm-name-display" style="display: flex; align-items: center; gap: 8px;"></span>
@@ -2071,7 +2065,6 @@
                 </div>
             </div>
 
-            <!-- ===== CAJAS: Crear nueva caja ===== -->
             <div id="modal-content-newbox" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 18px;">Nueva Caja</h3>
                 <div class="tc-desc" style="margin-bottom: 12px;">
@@ -2089,7 +2082,6 @@
                 </div>
             </div>
 
-            <!-- ===== CAJAS: Contenido de una caja (long-press) ===== -->
             <div id="modal-content-boxcontents" style="display:none;">
                 <h3 id="bc-title" style="color: var(--accent); margin-bottom: 14px;">Caja</h3>
                 <div id="bc-timer-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; margin-bottom: 14px;"></div>
@@ -2360,11 +2352,11 @@
         }
 
         function cycleTimerColor(id) {
-            const t = timersList.find(x => x.id === id);
+            const t = findTimerById(id);
             if (!t) return;
             const i = TIMER_PALETTE.indexOf(t.color);
             t.color = TIMER_PALETTE[(i + 1) % TIMER_PALETTE.length];
-            saveTimersState();
+            saveAllTimers();
             renderTimersUI();
         }
 
@@ -2377,13 +2369,52 @@
         let editingNewBoxContext = null;
         let currentBoxForContents = null;
 
+        // Migración y saneamiento
         timerBoxes = timerBoxes.filter(b => b && b.id && b.name);
         timerBoxes.forEach(b => {
-            if (!Array.isArray(b.timerIds)) b.timerIds = [];
             if (!b.color) b.color = '#3b82f6';
-            b.timerIds = b.timerIds.filter(id => timersList.some(t => t.id === id));
+            if (!Array.isArray(b.timers)) {
+                // Migración desde el modelo antiguo timerIds → timers independientes
+                const oldIds = Array.isArray(b.timerIds) ? b.timerIds : [];
+                b.timers = oldIds.map(oldId => {
+                    const orig = timersList.find(t => t.id === oldId);
+                    if (!orig) return null;
+                    const hasCountdown = orig.setMs && orig.setMs > 0;
+                    return {
+                        id: 'bt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+                        originId: oldId,
+                        name: orig.name,
+                        color: orig.color,
+                        tMode: hasCountdown ? 'down' : 'up',
+                        tRunning: false,
+                        tRef: 0,
+                        tAcc: hasCountdown ? orig.setMs : 0,
+                        tCompleted: false,
+                        setMs: orig.setMs || 0,
+                        inputH: orig.inputH || '',
+                        inputM: orig.inputM || '',
+                        scope: 'box',
+                        boxId: b.id
+                    };
+                }).filter(Boolean);
+                delete b.timerIds;
+            }
         });
         openedBoxIds = new Set(Array.from(openedBoxIds).filter(id => timerBoxes.some(b => b.id === id)));
+
+        function findTimerById(id) {
+            const main = timersList.find(t => t.id === id);
+            if (main) return main;
+            for (const box of timerBoxes) {
+                const bt = box.timers.find(t => t.id === id);
+                if (bt) return bt;
+            }
+            return null;
+        }
+        function saveAllTimers() {
+            saveTimersState();
+            saveBoxes();
+        }
 
         function saveBoxes() {
             safeSetItem('wkTimerBoxes', JSON.stringify(timerBoxes));
@@ -2416,7 +2447,7 @@
                 html += `<div style="color:var(--muted); font-size:0.74rem; padding:10px 0; text-align:center; font-style:italic;">Aún no hay cajas</div>`;
             } else {
                 timerBoxes.forEach(box => {
-                    const inBox = box.timerIds.includes(t.id);
+                    const inBox = box.timers.some(bt => bt.originId === t.id);
                     html += `<button class="box-select-item ${inBox ? 'in-box' : ''}" onclick="toggleTimerInBox('${escapeHtml(box.id)}')">
                         <span class="timer-color-dot" style="background:${escapeHtml(box.color)}; margin:0; flex-shrink:0;"></span>
                         <span style="flex:1;">${escapeHtml(box.name)}</span>
@@ -2432,13 +2463,30 @@
 
         function toggleTimerInBox(boxId) {
             const box = timerBoxes.find(b => b.id === boxId);
-            const t = timersList.find(x => x.id === currentTimerForMenu);
-            if (!box || !t) return;
+            const orig = timersList.find(x => x.id === currentTimerForMenu);
+            if (!box || !orig) return;
 
-            if (box.timerIds.includes(t.id)) {
-                box.timerIds = box.timerIds.filter(id => id !== t.id);
+            const existingIdx = box.timers.findIndex(bt => bt.originId === orig.id);
+            if (existingIdx !== -1) {
+                box.timers.splice(existingIdx, 1);
             } else {
-                box.timerIds.push(t.id);
+                const hasCountdown = orig.setMs && orig.setMs > 0;
+                box.timers.push({
+                    id: 'bt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+                    originId: orig.id,
+                    name: orig.name,
+                    color: orig.color,
+                    tMode: hasCountdown ? 'down' : 'up',
+                    tRunning: false,
+                    tRef: 0,
+                    tAcc: hasCountdown ? orig.setMs : 0,
+                    tCompleted: false,
+                    setMs: orig.setMs || 0,
+                    inputH: orig.inputH || '',
+                    inputM: orig.inputM || '',
+                    scope: 'box',
+                    boxId: boxId
+                });
             }
             saveBoxes();
             renderTimerMenuBoxList();
@@ -2461,10 +2509,28 @@
             if (!name) { alert('Escribe un nombre para la caja.'); return; }
             const color = document.getElementById('inp-newbox-color').value || '#3b82f6';
 
-            const newBox = { id: 'box_' + Date.now(), name, color, timerIds: [] };
+            const newBox = { id: 'box_' + Date.now(), name, color, timers: [] };
             if (editingNewBoxContext) {
-                const t = timersList.find(x => x.id === editingNewBoxContext);
-                if (t) newBox.timerIds.push(t.id);
+                const orig = timersList.find(x => x.id === editingNewBoxContext);
+                if (orig) {
+                    const hasCountdown = orig.setMs && orig.setMs > 0;
+                    newBox.timers.push({
+                        id: 'bt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+                        originId: orig.id,
+                        name: orig.name,
+                        color: orig.color,
+                        tMode: hasCountdown ? 'down' : 'up',
+                        tRunning: false,
+                        tRef: 0,
+                        tAcc: hasCountdown ? orig.setMs : 0,
+                        tCompleted: false,
+                        setMs: orig.setMs || 0,
+                        inputH: orig.inputH || '',
+                        inputM: orig.inputM || '',
+                        scope: 'box',
+                        boxId: newBox.id
+                    });
+                }
             }
             timerBoxes.push(newBox);
             saveBoxes();
@@ -2531,17 +2597,15 @@
             const box = timerBoxes.find(b => b.id === currentBoxForContents);
             if (!listEl || !box) return;
 
-            if (box.timerIds.length === 0) {
+            if (box.timers.length === 0) {
                 listEl.innerHTML = '<div style="color:var(--muted); font-size:0.78rem; padding:14px 0; text-align:center; font-style:italic;">Esta caja está vacía</div>';
                 return;
             }
-            listEl.innerHTML = box.timerIds.map(tid => {
-                const t = timersList.find(x => x.id === tid);
-                if (!t) return '';
+            listEl.innerHTML = box.timers.map(bt => {
                 return `<div class="bc-timer-row">
-                    <span class="timer-color-dot" style="background:${escapeHtml(t.color)}; margin:0; flex-shrink:0;"></span>
-                    <span style="flex:1;">${escapeHtml(t.name)}</span>
-                    <button class="bc-del" onclick="removeTimerFromBox('${escapeHtml(box.id)}', '${escapeHtml(tid)}')" title="Quitar de la caja">×</button>
+                    <span class="timer-color-dot" style="background:${escapeHtml(bt.color)}; margin:0; flex-shrink:0;"></span>
+                    <span style="flex:1;">${escapeHtml(bt.name)}</span>
+                    <button class="bc-del" onclick="removeTimerFromBox('${escapeHtml(box.id)}', '${escapeHtml(bt.id)}')" title="Quitar de la caja">×</button>
                 </div>`;
             }).join('');
         }
@@ -2549,7 +2613,7 @@
         function removeTimerFromBox(boxId, timerId) {
             const box = timerBoxes.find(b => b.id === boxId);
             if (!box) return;
-            box.timerIds = box.timerIds.filter(id => id !== timerId);
+            box.timers = box.timers.filter(bt => bt.id !== timerId);
             saveBoxes();
             renderBoxContentsList();
             renderTimersUI();
@@ -2558,7 +2622,7 @@
         function deleteBoxFromContents() {
             const box = timerBoxes.find(b => b.id === currentBoxForContents);
             if (!box) return;
-            if (!confirm(`¿Eliminar la caja "${box.name}"? Los temporizadores no se eliminarán.`)) return;
+            if (!confirm(`¿Eliminar la caja "${box.name}"? Los temporizadores originales no se eliminarán.`)) return;
             timerBoxes = timerBoxes.filter(b => b.id !== box.id);
             openedBoxIds.delete(box.id);
             currentBoxForContents = null;
@@ -2628,11 +2692,11 @@
             if (!boxDraggedTimer || boxId !== boxDraggedFromBox) return;
             const box = timerBoxes.find(b => b.id === boxId);
             if (!box) return;
-            const fromIdx = box.timerIds.indexOf(boxDraggedTimer);
-            const toIdx = box.timerIds.indexOf(targetTimerId);
+            const fromIdx = box.timers.findIndex(bt => bt.id === boxDraggedTimer);
+            const toIdx = box.timers.findIndex(bt => bt.id === targetTimerId);
             if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return;
-            const [moved] = box.timerIds.splice(fromIdx, 1);
-            box.timerIds.splice(toIdx, 0, moved);
+            const [moved] = box.timers.splice(fromIdx, 1);
+            box.timers.splice(toIdx, 0, moved);
             saveBoxes();
             renderTimersUI();
         }
@@ -2670,11 +2734,11 @@
                 if (targetTimerId && targetTimerId !== boxTouchTimerId) {
                     const box = timerBoxes.find(b => b.id === boxTouchBoxId);
                     if (!box) return;
-                    const fromIdx = box.timerIds.indexOf(boxTouchTimerId);
-                    const toIdx = box.timerIds.indexOf(targetTimerId);
+                    const fromIdx = box.timers.findIndex(bt => bt.id === boxTouchTimerId);
+                    const toIdx = box.timers.findIndex(bt => bt.id === targetTimerId);
                     if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
-                        const [moved] = box.timerIds.splice(fromIdx, 1);
-                        box.timerIds.splice(toIdx, 0, moved);
+                        const [moved] = box.timers.splice(fromIdx, 1);
+                        box.timers.splice(toIdx, 0, moved);
                         saveBoxes();
                         renderTimersUI();
                         boxTouchEl = document.querySelector(`[data-box-id="${boxTouchBoxId}"][data-timer-id="${boxTouchTimerId}"]`);
@@ -2868,7 +2932,7 @@
 
             openedBoxIds.forEach(boxId => {
                 const box = timerBoxes.find(b => b.id === boxId);
-                if (!box || box.timerIds.length === 0) return;
+                if (!box || box.timers.length === 0) return;
                 html += `<div class="box-section">
                     <div class="box-section-header">
                         <span class="box-section-dot" style="background:${escapeHtml(box.color)}; color:${escapeHtml(box.color)};"></span>
@@ -2878,10 +2942,8 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
                         </button>
                     </div>`;
-                box.timerIds.forEach(tid => {
-                    const t = timersList.find(x => x.id === tid);
-                    if (!t) return;
-                    html += renderBoxTimerCard(t, boxId, box);
+                box.timers.forEach(bt => {
+                    html += renderBoxTimerCard(bt, boxId, box);
                 });
                 html += `</div>`;
             });
@@ -2892,7 +2954,7 @@
         }
 
         function syncTimerInputs(id) {
-            const t = timersList.find(x => x.id === id);
+            const t = findTimerById(id);
             if (!t) return;
 
             const active = document.activeElement;
@@ -2913,7 +2975,7 @@
             const m = parseInt(mEl.value) || 0;
             t.inputH = h > 0 ? h : '';
             t.inputM = m > 0 ? m : '';
-            saveTimersState();
+            saveAllTimers();
 
             document.querySelectorAll(`[data-timer-input-h="${id}"]`).forEach(el => {
                 if (el !== hEl) el.value = t.inputH || '';
@@ -3020,12 +3082,8 @@
         }
 
         function deleteTimer(id) {
-            if (confirm("¿Estás seguro de eliminar este temporizador?")) {
+            if (confirm("¿Estás seguro de eliminar este temporizador?\n\nLas copias en cajas no se verán afectadas.")) {
                 timersList = timersList.filter(t => t.id !== id);
-                timerBoxes.forEach(box => {
-                    box.timerIds = box.timerIds.filter(tid => tid !== id);
-                });
-                saveBoxes();
                 saveTimersState();
                 renderTimersUI();
             }
@@ -3040,7 +3098,7 @@
 
         function toggleTimer(id) {
             stopAlarmSound();
-            const t = timersList.find(x => x.id === id);
+            const t = findTimerById(id);
             if (!t) return;
             const hEl = document.querySelector(`[data-timer-input-h="${id}"]`);
             const mEl = document.querySelector(`[data-timer-input-m="${id}"]`);
@@ -3070,13 +3128,13 @@
                     t.tRunning = true;
                 }
             }
-            saveTimersState();
+            saveAllTimers();
             updateTimersDisplayValues();
         }
 
         function stopTimer(id) {
             stopAlarmSound();
-            let t = timersList.find(x => x.id === id);
+            let t = findTimerById(id);
             if (!t) return;
             const hEl = document.querySelector(`[data-timer-input-h="${id}"]`);
             const mEl = document.querySelector(`[data-timer-input-m="${id}"]`);
@@ -3124,13 +3182,13 @@
             const hNow = parseInt(t.inputH) || 0;
             const mNow = parseInt(t.inputM) || 0;
             t.setMs = (hNow * 3600 + mNow * 60) * 1000;
-            saveTimersState();
+            saveAllTimers();
             updateTimersDisplayValues();
         }
 
         function resetTimer(id) {
             stopAlarmSound();
-            let t = timersList.find(x => x.id === id);
+            let t = findTimerById(id);
             if (!t) return;
             const hEl = document.querySelector(`[data-timer-input-h="${id}"]`);
             const mEl = document.querySelector(`[data-timer-input-m="${id}"]`);
@@ -3147,7 +3205,7 @@
             t.tCompleted = false;
             if (setMs > 0) { t.tMode = 'down'; t.tAcc = setMs; t.setMs = setMs; }
             else           { t.tMode = 'up';   t.tAcc = 0;     t.setMs = 0;     }
-            saveTimersState();
+            saveAllTimers();
             updateTimersDisplayValues();
         }
 
@@ -3230,7 +3288,11 @@
             let firstRunningInfo = null;
             let firstWithTimeInfo = null;
 
-            timersList.forEach(t => {
+            // Timers principales + timers de cajas
+            const allTimers = [...timersList];
+            timerBoxes.forEach(box => box.timers.forEach(bt => allTimers.push(bt)));
+
+            allTimers.forEach(t => {
                 let current = t.tAcc;
                 if (t.tRunning) {
                     if (t.tMode === 'up') current += Date.now() - t.tRef;
@@ -3252,6 +3314,9 @@
                                 completedAt: actualFinishTime
                             });
                         }
+                        // Persistir cambio de estado
+                        if (timersList.some(x => x.id === t.id)) saveTimersState();
+                        else saveBoxes();
                     }
                 }
 

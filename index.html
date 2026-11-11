@@ -150,6 +150,7 @@
         @media (prefers-reduced-motion: reduce) { html::before { animation: none; } }
 
         .header-top { display: flex; justify-content: space-between; align-items: center; margin: 8px 4px 28px; }
+        .header-btns-top { display: flex; gap: 8px; align-items: center; }
         .header-title {
             font-size: 2rem; font-weight: 800; color: var(--text);
             letter-spacing: -0.04em; margin: 0;
@@ -173,6 +174,167 @@
         .header-menu-btn:active { transform: scale(0.94); }
         .header-menu-btn svg { width: 20px; height: 20px; display: block; }
 
+        /* ===================== FOCUS MODE ===================== */
+        .focus-bar {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--card)), var(--card));
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+            border-radius: 14px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 12px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text);
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        body.focus-mode .focus-bar { display: flex; }
+
+        .focus-bar-icon {
+            width: 18px; height: 18px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: var(--accent);
+        }
+        .focus-bar-icon svg { width: 16px; height: 16px; display: block; }
+        .focus-bar-title {
+            flex: 1; min-width: 0;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .focus-bar-title:hover { color: var(--accent); }
+        .focus-bar-count {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--muted);
+            padding: 2px 7px;
+            background: var(--item-bg);
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        .focus-bar-exit {
+            width: 26px; height: 26px;
+            border-radius: 8px;
+            background: var(--item-bg);
+            border: 1px solid var(--border-input);
+            color: var(--muted);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        .focus-bar-exit:hover {
+            color: var(--sunday);
+            border-color: var(--sunday);
+            transform: scale(1.05);
+        }
+        .focus-bar-exit:active { transform: scale(0.95); }
+        .focus-bar-exit svg { width: 12px; height: 12px; display: block; }
+
+        body.focus-mode .header-top,
+        body.focus-mode .section-label,
+        body.focus-mode .progress-buttons,
+        body.focus-mode .dock-panel,
+        body.focus-mode .timers-header-bar,
+        body.focus-mode .hidden-timers-bar,
+        body.focus-mode .box-section-header,
+        body.focus-mode #calendar-container {
+            display: none !important;
+        }
+        body.focus-mode html::before { animation: none; }
+        body.focus-mode .timer-widget {
+            backdrop-filter: blur(10px) saturate(120%);
+            -webkit-backdrop-filter: blur(10px) saturate(120%);
+        }
+        body.focus-mode .focus-bar {
+            backdrop-filter: blur(10px) saturate(120%);
+            -webkit-backdrop-filter: blur(10px) saturate(120%);
+        }
+
+        .focus-option {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; background: var(--item-bg);
+            border: 1px solid var(--border-input); border-radius: 10px;
+            color: var(--text); font-family: inherit; font-size: 0.82rem;
+            font-weight: 600; cursor: pointer; text-align: left;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1); width: 100%;
+        }
+        .focus-option:hover { border-color: var(--accent); transform: translateY(-1px); }
+        .focus-option:active { transform: scale(0.98); }
+        .focus-option .focus-option-count {
+            margin-left: auto;
+            font-size: 0.68rem;
+            color: var(--muted);
+            font-weight: 700;
+        }
+        .focus-option.primary {
+            background: color-mix(in srgb, var(--accent) 12%, var(--item-bg));
+            border-color: color-mix(in srgb, var(--accent) 35%, var(--border-input));
+        }
+        .focus-option-icon {
+            width: 16px; height: 16px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: var(--muted);
+        }
+        .focus-option.primary .focus-option-icon { color: var(--accent); }
+        .focus-option-icon svg { width: 14px; height: 14px; display: block; }
+        .focus-option-dot {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 6px currentColor;
+        }
+        .focus-modal-section-label {
+            font-size: 0.58rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--muted); margin: 12px 4px 6px;
+        }
+        .focus-checkbox-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 10px; background: var(--item-bg);
+            border: 1px solid var(--border); border-radius: 8px;
+            font-size: 0.78rem; font-weight: 600; cursor: pointer;
+            user-select: none;
+        }
+        .focus-checkbox-item:hover { border-color: var(--border-input); }
+        .focus-checkbox-item .focus-cb-tag {
+            font-size: 0.55rem; font-weight: 800;
+            color: var(--muted); background: var(--card-solid);
+            padding: 1px 5px; border-radius: 4px; margin-left: auto;
+        }
+        .focus-list-scroll {
+            max-height: 260px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 5px;
+            padding-right: 2px;
+        }
+
+        /* Botón de focus en el header de la caja */
+        .box-section-focus {
+            margin-left: auto;
+            margin-right: 4px;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            width: 18px; height: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0.55;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        .box-section-focus:hover {
+            opacity: 1;
+            color: var(--accent);
+            background: var(--item-bg);
+        }
+        .box-section-focus svg { width: 11px; height: 11px; display: block; }
+        .box-section-close { margin-left: 0; }
+
         .section-label {
             display: flex; align-items: center; gap: 10px;
             margin: 20px 0 14px 4px;
@@ -193,19 +355,13 @@
             box-shadow: var(--card-shadow);
         }
         .progress-btn {
-            flex: 1;
-            padding: 18px 3px 11px;
-            border-radius: 15px;
-            border: 1px solid transparent;
-            background: transparent;
+            flex: 1; padding: 18px 3px 11px; border-radius: 15px;
+            border: 1px solid transparent; background: transparent;
             font-family: inherit; font-size: 0.82rem; font-weight: 800;
-            color: var(--text);
-            cursor: pointer;
+            color: var(--text); cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column; align-items: center; gap: 4px;
-            letter-spacing: 0.01em;
-            position: relative;
-            overflow: hidden;
+            letter-spacing: 0.01em; position: relative; overflow: hidden;
             -webkit-tap-highlight-color: transparent;
         }
         .progress-btn::before {
@@ -1583,9 +1739,7 @@
             flex-shrink: 0;
             box-shadow: 0 0 6px currentColor;
         }
-        .box-section-name {
-            color: var(--subtext);
-        }
+        .box-section-name { color: var(--subtext); }
         .box-section-tag {
             font-size: 0.52rem;
             color: var(--muted);
@@ -1593,7 +1747,7 @@
             letter-spacing: 0.06em;
         }
         .box-section-close {
-            margin-left: auto;
+            margin-left: 0;
             background: transparent;
             border: none;
             color: var(--muted);
@@ -1618,6 +1772,8 @@
             .box-section-tag { font-size: 0.46rem; }
             .box-section-close { width: 16px; height: 16px; }
             .box-section-close svg { width: 9px; height: 9px; }
+            .box-section-focus { width: 16px; height: 16px; }
+            .box-section-focus svg { width: 10px; height: 10px; }
             .box-select-item { font-size: 0.76rem; padding: 8px 10px; }
             .bc-timer-row { font-size: 0.74rem; padding: 7px 9px; }
         }
@@ -1631,12 +1787,40 @@
 
     <div class="header-top">
         <h2 class="header-title">Timer</h2>
-        <button class="header-menu-btn" onclick="openGeneralModal()" title="Menú" aria-label="Menú">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <circle cx="12" cy="5" r="1.8"/>
-                <circle cx="12" cy="12" r="1.8"/>
-                <circle cx="12" cy="19" r="1.8"/>
+        <div class="header-btns-top">
+            <button class="header-menu-btn" onclick="openFocusModal()" title="Modo concentración" aria-label="Modo concentración">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
+            <button class="header-menu-btn" onclick="openGeneralModal()" title="Menú" aria-label="Menú">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <circle cx="12" cy="5" r="1.8"/>
+                    <circle cx="12" cy="12" r="1.8"/>
+                    <circle cx="12" cy="19" r="1.8"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="focus-bar" id="focus-bar">
+        <span class="focus-bar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                <circle cx="12" cy="12" r="3"/>
             </svg>
+        </span>
+        <span class="focus-bar-title" id="focus-bar-title" onclick="openFocusModal()" title="Cambiar selección"></span>
+        <span class="focus-bar-count" id="focus-bar-count"></span>
+        <button class="focus-bar-exit" onclick="exitFocusMode()" title="Salir" aria-label="Salir del modo concentración">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
         </button>
     </div>
 
@@ -2091,6 +2275,32 @@
                 </div>
             </div>
 
+            <div id="modal-content-focus" style="display:none;">
+                <h3 style="color: var(--accent); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true">
+                        <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                        <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                        <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                        <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Modo Concentración
+                </h3>
+
+                <div style="font-size: 0.6rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 6px;">
+                    Selección rápida
+                </div>
+                <div id="focus-quick-options" style="display: flex; flex-direction: column; gap: 6px;"></div>
+
+                <div class="focus-modal-section-label">Selección manual</div>
+                <div class="focus-list-scroll" id="focus-manual-list"></div>
+
+                <div class="modal-actions" style="margin-top: 14px;">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn btn-save" onclick="applyManualFocus()">Aplicar</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -2122,7 +2332,7 @@
                     if (!_storageQuotaWarned) {
                         _storageQuotaWarned = true;
                         setTimeout(() => { _storageQuotaWarned = false; }, 60000);
-                        alert('⚠️ Almacenamiento lleno.\n\nHaz una copia de seguridad (Configuración → Guardar Copia de Seguridad) y elimina datos que no necesites.');
+                        alert('Almacenamiento lleno.\n\nHaz una copia de seguridad (Configuración → Guardar Copia de Seguridad) y elimina datos que no necesites.');
                     }
                 } else {
                     console.error('Error guardando en localStorage:', key, e);
@@ -2369,12 +2579,10 @@
         let editingNewBoxContext = null;
         let currentBoxForContents = null;
 
-        // Migración y saneamiento
         timerBoxes = timerBoxes.filter(b => b && b.id && b.name);
         timerBoxes.forEach(b => {
             if (!b.color) b.color = '#3b82f6';
             if (!Array.isArray(b.timers)) {
-                // Migración desde el modelo antiguo timerIds → timers independientes
                 const oldIds = Array.isArray(b.timerIds) ? b.timerIds : [];
                 b.timers = oldIds.map(oldId => {
                     const orig = timersList.find(t => t.id === oldId);
@@ -2451,7 +2659,7 @@
                     html += `<button class="box-select-item ${inBox ? 'in-box' : ''}" onclick="toggleTimerInBox('${escapeHtml(box.id)}')">
                         <span class="timer-color-dot" style="background:${escapeHtml(box.color)}; margin:0; flex-shrink:0;"></span>
                         <span style="flex:1;">${escapeHtml(box.name)}</span>
-                        <span style="font-size:0.68rem; color:${inBox ? 'var(--accent)' : 'var(--muted)'}; font-weight:800;">${inBox ? '✓ En caja' : '+ Añadir'}</span>
+                        <span style="font-size:0.68rem; color:${inBox ? 'var(--accent)' : 'var(--muted)'}; font-weight:800;">${inBox ? 'En caja' : 'Añadir'}</span>
                     </button>`;
                 });
             }
@@ -2671,7 +2879,6 @@
             </div>`;
         }
 
-        /* --- Reordenar timers dentro de una caja (mouse) --- */
         let boxDraggedTimer = null;
         let boxDraggedFromBox = null;
 
@@ -2706,7 +2913,6 @@
             boxDraggedFromBox = null;
         }
 
-        /* --- Reordenar timers dentro de una caja (touch) --- */
         let boxTouchEl = null;
         let boxTouchBoxId = null;
         let boxTouchTimerId = null;
@@ -2805,6 +3011,208 @@
             </div>`;
         }
 
+        /* ============================================================
+           MODO CONCENTRACIÓN
+           ============================================================ */
+        let focusMode = {
+            active: false,
+            type: null,           // 'all' | 'box' | 'manual'
+            boxId: null,
+            timerIds: [],
+            label: ''
+        };
+
+        // Cargar desde localStorage
+        try {
+            const savedFocus = JSON.parse(localStorage.getItem('wkFocusMode') || 'null');
+            if (savedFocus && savedFocus.active) {
+                focusMode = savedFocus;
+                // Validar que los ids aún existen
+                if (focusMode.type === 'box') {
+                    if (!timerBoxes.some(b => b.id === focusMode.boxId)) focusMode.active = false;
+                } else if (focusMode.type === 'manual') {
+                    focusMode.timerIds = focusMode.timerIds.filter(id => {
+                        if (timersList.some(t => t.id === id)) return true;
+                        for (const box of timerBoxes) if (box.timers.some(t => t.id === id)) return true;
+                        return false;
+                    });
+                    if (focusMode.timerIds.length === 0) focusMode.active = false;
+                }
+            }
+        } catch(_) {}
+
+        function saveFocusMode() {
+            safeSetItem('wkFocusMode', JSON.stringify(focusMode));
+        }
+
+        function isTimerInFocus(id) {
+            if (!focusMode.active) return true;
+            if (focusMode.type === 'all') return true;
+            if (focusMode.type === 'box') {
+                const box = timerBoxes.find(b => b.id === focusMode.boxId);
+                if (!box) return false;
+                return box.timers.some(bt => bt.id === id);
+            }
+            if (focusMode.type === 'manual') {
+                return focusMode.timerIds.includes(id);
+            }
+            return true;
+        }
+
+        function applyFocusMode() {
+            document.body.classList.toggle('focus-mode', focusMode.active);
+            const bar = document.getElementById('focus-bar');
+            if (!focusMode.active) {
+                if (bar) bar.style.display = 'none';
+                return;
+            }
+            const titleEl = document.getElementById('focus-bar-title');
+            const countEl = document.getElementById('focus-bar-count');
+            let count = 0;
+            if (focusMode.type === 'all') {
+                count = timersList.filter(t => t.id === 'general' || !t.hidden).length;
+                const boxesVisible = timerBoxes.filter(b => openedBoxIds.has(b.id)).reduce((sum, b) => sum + b.timers.length, 0);
+                count += boxesVisible;
+            } else if (focusMode.type === 'box') {
+                const box = timerBoxes.find(b => b.id === focusMode.boxId);
+                count = box ? box.timers.length : 0;
+            } else if (focusMode.type === 'manual') {
+                count = focusMode.timerIds.length;
+            }
+            if (titleEl) titleEl.textContent = focusMode.label || 'Concentración';
+            if (countEl) countEl.textContent = count + (count === 1 ? ' timer' : ' timers');
+        }
+
+        function enterFocus(type, options) {
+            options = options || {};
+            focusMode.active = true;
+            focusMode.type = type;
+            if (type === 'box') {
+                focusMode.boxId = options.boxId;
+                const box = timerBoxes.find(b => b.id === options.boxId);
+                focusMode.label = box ? box.name : 'Caja';
+                // Asegurar que la caja está abierta para verla
+                if (!openedBoxIds.has(options.boxId)) openedBoxIds.add(options.boxId);
+            } else if (type === 'manual') {
+                focusMode.timerIds = options.timerIds || [];
+                focusMode.label = options.label || 'Personalizado';
+            } else if (type === 'all') {
+                focusMode.label = 'Todos los visibles';
+            }
+            saveFocusMode();
+            saveBoxes();
+            renderTimersUI();
+            applyFocusMode();
+            // Auto-scroll arriba para empezar limpio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function exitFocusMode() {
+            focusMode.active = false;
+            focusMode.type = null;
+            focusMode.boxId = null;
+            focusMode.timerIds = [];
+            focusMode.label = '';
+            saveFocusMode();
+            document.body.classList.remove('focus-mode');
+            const bar = document.getElementById('focus-bar');
+            if (bar) bar.style.display = 'none';
+            renderTimersUI();
+        }
+
+        function openFocusModal() {
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]')
+                .forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-focus').style.display = 'block';
+            renderFocusModalContent();
+            openModal();
+        }
+
+        function renderFocusModalContent() {
+            const quickEl = document.getElementById('focus-quick-options');
+            const manualEl = document.getElementById('focus-manual-list');
+
+            let quickHtml = '';
+
+            // Opción: Todos los visibles
+            const visibleCount = timersList.filter(t => t.id === 'general' || !t.hidden).length;
+            quickHtml += `<button class="focus-option primary" onclick="enterFocus('all'); closeModal();">
+                <span class="focus-option-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                        <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                        <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                        <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                    </svg>
+                </span>
+                <span>Todos los visibles</span>
+                <span class="focus-option-count">${visibleCount}</span>
+            </button>`;
+
+            // Opciones: una por caja
+            timerBoxes.forEach(box => {
+                if (box.timers.length === 0) return;
+                quickHtml += `<button class="focus-option" onclick="enterFocus('box', {boxId: '${escapeHtml(box.id)}'}); closeModal();">
+                    <span class="focus-option-dot" style="background:${escapeHtml(box.color)}; color:${escapeHtml(box.color)};"></span>
+                    <span>${escapeHtml(box.name)}</span>
+                    <span class="focus-option-count">${box.timers.length}</span>
+                </button>`;
+            });
+
+            if (timerBoxes.filter(b => b.timers.length > 0).length === 0) {
+                quickHtml += `<div style="color:var(--muted); font-size:0.72rem; padding:6px 4px; font-style:italic;">Aún no hay cajas con timers</div>`;
+            }
+
+            quickEl.innerHTML = quickHtml;
+
+            // Selección manual
+            const currentlySelected = focusMode.type === 'manual' ? focusMode.timerIds : [];
+            let manualHtml = '';
+
+            // Todos los timers del sistema (principales + cajas)
+            const allTimers = [];
+            timersList.forEach(t => {
+                if (t.id === 'general' || !t.hidden) allTimers.push({ ...t, scope: 'main' });
+            });
+            timerBoxes.forEach(box => {
+                box.timers.forEach(bt => {
+                    allTimers.push({ ...bt, scope: 'box', boxName: box.name, boxColor: box.color });
+                });
+            });
+
+            if (allTimers.length === 0) {
+                manualHtml = `<div style="color:var(--muted); font-size:0.74rem; padding:14px 0; text-align:center; font-style:italic;">No hay timers disponibles</div>`;
+            } else {
+                manualHtml = allTimers.map(t => {
+                    const checked = currentlySelected.includes(t.id);
+                    const tag = t.scope === 'box'
+                        ? `<span class="focus-cb-tag" style="color:${escapeHtml(t.boxColor || '#3b82f6')};">${escapeHtml(t.boxName || 'Box')}</span>`
+                        : `<span class="focus-cb-tag">Principal</span>`;
+                    return `<label class="focus-checkbox-item">
+                        <input type="checkbox" class="custom-check focus-manual-cb" data-timer-id="${escapeHtml(t.id)}" ${checked ? 'checked' : ''}>
+                        <span class="timer-color-dot" style="background:${escapeHtml(t.color)}; margin:0; flex-shrink:0;"></span>
+                        <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(t.name)}</span>
+                        ${tag}
+                    </label>`;
+                }).join('');
+            }
+            manualEl.innerHTML = manualHtml;
+        }
+
+        function applyManualFocus() {
+            const checkedIds = Array.from(document.querySelectorAll('.focus-manual-cb:checked'))
+                .map(cb => cb.dataset.timerId);
+            if (checkedIds.length === 0) {
+                alert('Selecciona al menos un temporizador.');
+                return;
+            }
+            enterFocus('manual', { timerIds: checkedIds, label: 'Personalizado' });
+            closeModal();
+        }
+
+        /* ============================================================
+           RENDERIZADO PRINCIPAL
+           ============================================================ */
         function renderTimersUI() {
             const container = document.getElementById('timers-container');
             const headerBar = document.getElementById('timers-header-bar');
@@ -2812,7 +3220,7 @@
             const visibleExtras = timersList.filter(t => t.id !== 'general' && !t.hidden).length;
             const hiddenList    = timersList.filter(t => t.id !== 'general' && t.hidden);
 
-            if (visibleExtras + hiddenList.length > 0) {
+            if (visibleExtras + hiddenList.length > 0 && !focusMode.active) {
                 headerBar.style.display = 'flex';
                 const label = hiddenList.length
                     ? `Adicionales (${visibleExtras}) · ${hiddenList.length} oculto${hiddenList.length > 1 ? 's' : ''}`
@@ -2828,10 +3236,12 @@
 
             let html = '';
             const generalIdx = timersList.findIndex(t => t.id === 'general');
-            if (generalIdx !== -1) html += renderTimerCard(timersList[generalIdx], generalIdx);
+            if (generalIdx !== -1 && isTimerInFocus('general')) {
+                html += renderTimerCard(timersList[generalIdx], generalIdx);
+            }
 
             const totalHiddenItems = hiddenList.length + timerBoxes.length;
-            if (totalHiddenItems > 0) {
+            if (totalHiddenItems > 0 && !focusMode.active) {
                 const dotsHtml =
                     hiddenList.map(t => `
                         <button class="hidden-dot ${t.tRunning ? 'is-running' : ''}"
@@ -2927,22 +3337,38 @@
 
             timersList.forEach((t, index) => {
                 if (t.id === 'general' || t.hidden) return;
+                if (!isTimerInFocus(t.id)) return;
                 html += renderTimerCard(t, index);
             });
 
             openedBoxIds.forEach(boxId => {
                 const box = timerBoxes.find(b => b.id === boxId);
                 if (!box || box.timers.length === 0) return;
-                html += `<div class="box-section">
+                // En focus mode solo mostrar la cabecera de caja si contiene timers visibles
+                const visibleTimers = box.timers.filter(bt => isTimerInFocus(bt.id));
+                if (visibleTimers.length === 0) return;
+
+                const headerHtml = focusMode.active ? '' : `
                     <div class="box-section-header">
                         <span class="box-section-dot" style="background:${escapeHtml(box.color)}; color:${escapeHtml(box.color)};"></span>
                         <span class="box-section-name">${escapeHtml(box.name)}</span>
                         <span class="box-section-tag">|Box</span>
+                        <button class="box-section-focus" onclick="event.stopPropagation(); enterFocus('box', {boxId: '${escapeHtml(boxId)}'})" title="Concentrarme en esta caja" aria-label="Concentrarme en esta caja">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                                <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                                <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                                <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
                         <button class="box-section-close" onclick="event.stopPropagation(); closeBox('${escapeHtml(boxId)}')" title="Cerrar caja" aria-label="Cerrar caja">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
                         </button>
                     </div>`;
-                box.timers.forEach(bt => {
+
+                html += `<div class="box-section">${headerHtml}`;
+                visibleTimers.forEach(bt => {
                     html += renderBoxTimerCard(bt, boxId, box);
                 });
                 html += `</div>`;
@@ -2951,6 +3377,7 @@
             container.innerHTML = html;
             updateTimersDisplayValues();
             applyHiddenSearchFilter();
+            applyFocusMode();
         }
 
         function syncTimerInputs(id) {
@@ -3288,7 +3715,6 @@
             let firstRunningInfo = null;
             let firstWithTimeInfo = null;
 
-            // Timers principales + timers de cajas
             const allTimers = [...timersList];
             timerBoxes.forEach(box => box.timers.forEach(bt => allTimers.push(bt)));
 
@@ -3314,7 +3740,6 @@
                                 completedAt: actualFinishTime
                             });
                         }
-                        // Persistir cambio de estado
                         if (timersList.some(x => x.id === t.id)) saveTimersState();
                         else saveBoxes();
                     }
@@ -3578,7 +4003,7 @@
                 'modal-content-marker': 'Marcador', 'modal-content-notes': 'Notas',
                 'modal-content-timecalc': 'Calculadora', 'modal-content-history': 'Historial',
                 'modal-content-timermenu': 'Caja', 'modal-content-newbox': 'Nueva Caja',
-                'modal-content-boxcontents': 'Caja'
+                'modal-content-boxcontents': 'Caja', 'modal-content-focus': 'Concentración'
             };
             let title = 'Modal';
             const activePanel = Array.from(modal.querySelectorAll(':scope > div[id^="modal-content-"]'))
@@ -4084,7 +4509,7 @@
             document.getElementById('inp-tc-title').value = '';
             document.getElementById('inp-tc-title').focus();
             const btn = document.getElementById('btn-save-tc');
-            btn.innerText = '¡Guardado!';
+            btn.innerText = 'Guardado';
             btn.style.backgroundColor = '#34d399';
             setTimeout(() => { updateTcUI(); btn.style.backgroundColor = ''; }, 1000);
         }
@@ -4123,7 +4548,7 @@
             document.getElementById('inp-tc-title').value = '';
             document.getElementById('inp-tc-title').focus();
             const btn = document.getElementById('btn-save-tc');
-            btn.innerText = '¡Guardado!';
+            btn.innerText = 'Guardado';
             btn.style.backgroundColor = '#34d399';
             setTimeout(() => { updateTcUI(); btn.style.backgroundColor = ''; }, 1000);
         }
@@ -4611,7 +5036,7 @@
             editingNewBoxContext = null;
             currentBoxForContents = null;
             ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes', 'timecalc', 'history',
-             'timermenu', 'newbox', 'boxcontents'].forEach(id => {
+             'timermenu', 'newbox', 'boxcontents', 'focus'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
@@ -4922,7 +5347,7 @@
             if (h >= workConfig.start && h < workConfig.end) {
                 wP = ((h - workConfig.start) / (workConfig.end - workConfig.start)) * 100;
                 wT = new Date((workConfig.end - h) * 3600 * 1000).toISOString().substr(11, 8);
-            } else if (h >= workConfig.end) { wP = 100; wT = "¡Finalizado!"; }
+            } else if (h >= workConfig.end) { wP = 100; wT = "Finalizado"; }
             document.getElementById('work-fill').style.width = wP.toFixed(4) + '%';
             document.getElementById('work-timer').innerText = wT;
             document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
@@ -4938,8 +5363,10 @@
             const dayTimerEl = document.getElementById('day-timer');
             if (dayTimerEl) dayTimerEl.innerText = dayTimerStr;
             updateTimersDisplayValues();
-            renderDayTaskMarks();
-            renderNowMarker();
+            if (!focusMode.active) {
+                renderDayTaskMarks();
+                renderNowMarker();
+            }
             quarterWindows.forEach((win) => { updateQuarterBarInto(win.bodyEl, win); });
         }
 
@@ -4973,7 +5400,8 @@
                 tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig,
                 day: dayConfig, markers: markersData, collapsed: collapsedMonths,
                 trackedYears: trackedYears, timerStats: timerStats, timersList: timersList, notes: notesData,
-                timerBoxes: timerBoxes, openedBoxes: Array.from(openedBoxIds)
+                timerBoxes: timerBoxes, openedBoxes: Array.from(openedBoxIds),
+                focusMode: focusMode
             };
             const jsonStr = JSON.stringify(backup, null, 2);
             if ('showSaveFilePicker' in window) {
@@ -5022,6 +5450,7 @@
                         if (data.notes) safeSetItem('wkNotes', JSON.stringify(data.notes));
                         if (data.timerBoxes) safeSetItem('wkTimerBoxes', JSON.stringify(data.timerBoxes));
                         if (data.openedBoxes) safeSetItem('wkOpenedBoxes', JSON.stringify(data.openedBoxes));
+                        if (data.focusMode) safeSetItem('wkFocusMode', JSON.stringify(data.focusMode));
                         alert("Datos restaurados correctamente. La página se reiniciará para aplicar los cambios.");
                         location.reload();
                     }
@@ -5307,6 +5736,7 @@
         renderDayTicks();
         renderAllMarkers();
         renderTimersUI();
+        applyFocusMode();
         initModalDragResize();
         initFloatingTimerDrag();
         restoreMinimizedFromStorage();

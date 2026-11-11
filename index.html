@@ -476,6 +476,18 @@
         .hidden-dot:active { transform: scale(0.9); }
         .hidden-dot.is-running { animation: dotPulse 1.8s ease-in-out infinite; }
 
+        /* Dot de caja: cuadrado hueco cuando cerrada, relleno cuando abierta */
+        .hidden-dot.box-dot {
+            border-radius: 3px;
+            border: 1.5px solid var(--dot-color);
+            background: transparent;
+            box-shadow: 0 0 5px var(--dot-color);
+        }
+        .hidden-dot.box-dot.is-open {
+            background: var(--dot-color);
+            animation: dotPulse 1.8s ease-in-out infinite;
+        }
+
         @keyframes dotPulse {
             0%,100% { box-shadow: 0 0 5px var(--dot-color); }
             50%     { box-shadow: 0 0 12px var(--dot-color), 0 0 20px var(--dot-color); }
@@ -1513,12 +1525,6 @@
             border-left-color: var(--box-color, var(--accent)) !important;
             border-left-width: 4px !important;
         }
-        .box-tag {
-            font-size: 0.5rem; font-weight: 800; padding: 2px 6px;
-            border-radius: 5px; margin-left: 6px; letter-spacing: 0.03em;
-            text-transform: uppercase; vertical-align: middle;
-            display: inline-block;
-        }
         .box-select-item {
             display: flex; align-items: center; gap: 10px;
             padding: 10px 12px; background: var(--item-bg);
@@ -1548,8 +1554,75 @@
         }
         .bc-timer-row .bc-del:hover { color: var(--sunday); background: rgba(255,69,58,0.12); }
 
+        /* Header compacto de caja (debajo de la barra de ocultos) */
+        .box-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 10px;
+            position: relative;
+        }
+        .box-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 6px; right: 6px;
+            height: 1px;
+            background: var(--border);
+        }
+        .box-section-header {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 0 4px;
+            font-size: 0.64rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            user-select: none;
+        }
+        .box-section-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 6px currentColor;
+        }
+        .box-section-name {
+            color: var(--subtext);
+        }
+        .box-section-tag {
+            font-size: 0.52rem;
+            color: var(--muted);
+            opacity: 0.6;
+            letter-spacing: 0.06em;
+        }
+        .box-section-close {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            width: 18px; height: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0.55;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        .box-section-close:hover {
+            opacity: 1;
+            color: var(--sunday);
+            background: var(--item-bg);
+        }
+        .box-section-close svg { width: 10px; height: 10px; display: block; }
+
         @media (max-width: 600px) {
-            .box-tag { font-size: 0.44rem; padding: 1px 4px; margin-left: 4px; }
+            .box-section { gap: 7px; margin-top: 11px; padding-top: 8px; }
+            .box-section-header { font-size: 0.55rem; gap: 6px; }
+            .box-section-tag { font-size: 0.46rem; }
+            .box-section-close { width: 16px; height: 16px; }
+            .box-section-close svg { width: 9px; height: 9px; }
             .box-select-item { font-size: 0.76rem; padding: 8px 10px; }
             .bc-timer-row { font-size: 0.74rem; padding: 7px 9px; }
         }
@@ -2498,11 +2571,20 @@
             const ctx = `box-${boxId}-${t.id}`;
             return `
             <div class="timer-widget extra-timer box-timer-card" id="card-${ctx}"
-                 style="--timer-color:${escapeHtml(t.color)}; --box-color:${escapeHtml(box.color)};">
+                 data-box-id="${escapeHtml(boxId)}"
+                 data-timer-id="${escapeHtml(t.id)}"
+                 style="--timer-color:${escapeHtml(t.color)}; --box-color:${escapeHtml(box.color)};"
+                 draggable="true"
+                 ondragstart="onBoxDragStart(event, '${escapeHtml(boxId)}', '${escapeHtml(t.id)}')"
+                 ondragover="onBoxDragOver(event)"
+                 ondrop="onBoxDrop(event, '${escapeHtml(boxId)}', '${escapeHtml(t.id)}')"
+                 ondragend="onBoxDragEnd(event)"
+                 ontouchstart="onBoxTouchStart(event, '${escapeHtml(boxId)}', '${escapeHtml(t.id)}')"
+                 ontouchmove="onBoxTouchMove(event)"
+                 ontouchend="onBoxTouchEnd(event)">
                 <span class="timer-title">
                     <span class="timer-color-dot" onclick="event.stopPropagation();cycleTimerColor('${escapeHtml(t.id)}')" title="Cambiar color"></span>
                     ${escapeHtml(t.name)}
-                    <span class="box-tag" style="background:${escapeHtml(box.color)}25; color:${escapeHtml(box.color)};">|Box · ${escapeHtml(box.name)}</span>
                 </span>
                 <div class="timer-input-group">
                     <input type="number" id="input-h-${ctx}" data-timer-input-h="${escapeHtml(t.id)}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" oninput="syncTimerInputs('${escapeHtml(t.id)}')" onchange="syncTimerInputs('${escapeHtml(t.id)}')">
@@ -2521,11 +2603,93 @@
                     <button class="t-btn" onclick="resetTimer('${escapeHtml(t.id)}')" title="Reiniciar">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     </button>
-                    <button class="t-btn" onclick="closeBox('${escapeHtml(boxId)}')" title="Cerrar caja" style="margin-left:auto;">
-                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
-                    </button>
                 </div>
             </div>`;
+        }
+
+        /* --- Reordenar timers dentro de una caja (mouse) --- */
+        let boxDraggedTimer = null;
+        let boxDraggedFromBox = null;
+
+        function onBoxDragStart(e, boxId, timerId) {
+            if (e.target.tagName === 'INPUT' || e.target.closest('button')) { e.preventDefault(); return; }
+            boxDraggedTimer = timerId;
+            boxDraggedFromBox = boxId;
+            e.currentTarget.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            try { e.dataTransfer.setData('text/plain', timerId); } catch(_) {}
+        }
+        function onBoxDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        function onBoxDrop(e, boxId, targetTimerId) {
+            e.preventDefault();
+            if (!boxDraggedTimer || boxId !== boxDraggedFromBox) return;
+            const box = timerBoxes.find(b => b.id === boxId);
+            if (!box) return;
+            const fromIdx = box.timerIds.indexOf(boxDraggedTimer);
+            const toIdx = box.timerIds.indexOf(targetTimerId);
+            if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return;
+            const [moved] = box.timerIds.splice(fromIdx, 1);
+            box.timerIds.splice(toIdx, 0, moved);
+            saveBoxes();
+            renderTimersUI();
+        }
+        function onBoxDragEnd(e) {
+            e.currentTarget.classList.remove('dragging');
+            boxDraggedTimer = null;
+            boxDraggedFromBox = null;
+        }
+
+        /* --- Reordenar timers dentro de una caja (touch) --- */
+        let boxTouchEl = null;
+        let boxTouchBoxId = null;
+        let boxTouchTimerId = null;
+        let boxTouchStartY = 0;
+
+        function onBoxTouchStart(e, boxId, timerId) {
+            if (e.target.closest('button, input')) return;
+            boxTouchEl = e.currentTarget;
+            boxTouchBoxId = boxId;
+            boxTouchTimerId = timerId;
+            boxTouchStartY = e.touches[0].clientY;
+            boxTouchEl.classList.add('dragging');
+        }
+        function onBoxTouchMove(e) {
+            if (!boxTouchEl) return;
+            e.preventDefault();
+            const currentY = e.touches[0].clientY;
+            const diffY = currentY - boxTouchStartY;
+            boxTouchEl.style.transform = `translateY(${diffY}px)`;
+            const touch = e.touches[0];
+            const elBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const targetCard = elBelow ? elBelow.closest(`[data-box-id="${boxTouchBoxId}"][data-timer-id]`) : null;
+            if (targetCard && targetCard !== boxTouchEl) {
+                const targetTimerId = targetCard.dataset.timerId;
+                if (targetTimerId && targetTimerId !== boxTouchTimerId) {
+                    const box = timerBoxes.find(b => b.id === boxTouchBoxId);
+                    if (!box) return;
+                    const fromIdx = box.timerIds.indexOf(boxTouchTimerId);
+                    const toIdx = box.timerIds.indexOf(targetTimerId);
+                    if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+                        const [moved] = box.timerIds.splice(fromIdx, 1);
+                        box.timerIds.splice(toIdx, 0, moved);
+                        saveBoxes();
+                        renderTimersUI();
+                        boxTouchEl = document.querySelector(`[data-box-id="${boxTouchBoxId}"][data-timer-id="${boxTouchTimerId}"]`);
+                        if (boxTouchEl) boxTouchEl.classList.add('dragging');
+                        boxTouchStartY = currentY;
+                    }
+                }
+            }
+        }
+        function onBoxTouchEnd() {
+            if (boxTouchEl) { boxTouchEl.classList.remove('dragging'); boxTouchEl.style.transform = ''; }
+            boxTouchEl = null;
+            boxTouchBoxId = null;
+            boxTouchTimerId = null;
+            renderTimersUI();
         }
 
         function renderTimerCard(t, index) {
@@ -2604,12 +2768,24 @@
 
             const totalHiddenItems = hiddenList.length + timerBoxes.length;
             if (totalHiddenItems > 0) {
-                const dotsHtml = hiddenList.map(t => `
-                    <button class="hidden-dot ${t.tRunning ? 'is-running' : ''}"
-                            style="--dot-color:${escapeHtml(t.color)}"
-                            onclick="toggleTimerHidden('${escapeHtml(t.id)}')"
-                            title="${escapeHtml(t.name)}${t.tRunning ? ' · corriendo' : ''} — clic para mostrar"></button>`
-                ).join('');
+                const dotsHtml =
+                    hiddenList.map(t => `
+                        <button class="hidden-dot ${t.tRunning ? 'is-running' : ''}"
+                                style="--dot-color:${escapeHtml(t.color)}"
+                                onclick="toggleTimerHidden('${escapeHtml(t.id)}')"
+                                title="${escapeHtml(t.name)}${t.tRunning ? ' · corriendo' : ''} — clic para mostrar"></button>`
+                    ).join('')
+                    + timerBoxes.map(box => {
+                        const isOpened = openedBoxIds.has(box.id);
+                        return `<button class="hidden-dot box-dot ${isOpened ? 'is-open' : ''}"
+                                style="--dot-color:${escapeHtml(box.color)}"
+                                onpointerdown="handleBoxPillDown(event, '${escapeHtml(box.id)}')"
+                                onpointerup="handleBoxPillUp(event, '${escapeHtml(box.id)}')"
+                                onpointercancel="handleBoxPillCancel()"
+                                onpointerleave="handleBoxPillCancel()"
+                                oncontextmenu="event.preventDefault();"
+                                title="${escapeHtml(box.name)} |Box"></button>`;
+                    }).join('');
 
                 const safeQuery = escapeHtml(hiddenSearchQuery);
 
@@ -2692,12 +2868,22 @@
 
             openedBoxIds.forEach(boxId => {
                 const box = timerBoxes.find(b => b.id === boxId);
-                if (!box) return;
+                if (!box || box.timerIds.length === 0) return;
+                html += `<div class="box-section">
+                    <div class="box-section-header">
+                        <span class="box-section-dot" style="background:${escapeHtml(box.color)}; color:${escapeHtml(box.color)};"></span>
+                        <span class="box-section-name">${escapeHtml(box.name)}</span>
+                        <span class="box-section-tag">|Box</span>
+                        <button class="box-section-close" onclick="event.stopPropagation(); closeBox('${escapeHtml(boxId)}')" title="Cerrar caja" aria-label="Cerrar caja">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+                        </button>
+                    </div>`;
                 box.timerIds.forEach(tid => {
                     const t = timersList.find(x => x.id === tid);
                     if (!t) return;
                     html += renderBoxTimerCard(t, boxId, box);
                 });
+                html += `</div>`;
             });
 
             container.innerHTML = html;

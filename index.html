@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- Forzamos la escala exacta y bloqueamos zoom -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Timer</title>
     <link rel="manifest" href="manifest.json">
@@ -120,17 +119,17 @@
 
         html { background: var(--bg); min-height: 100%; }
 
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif; 
-            background: transparent; color: var(--text); margin: 0; padding: 16px; 
-            padding-top: calc(16px + env(safe-area-inset-top)); 
-            overflow-x: hidden; 
-            transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif;
+            background: transparent; color: var(--text); margin: 0; padding: 16px;
+            padding-top: calc(16px + env(safe-area-inset-top));
+            overflow-x: hidden;
+            transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             letter-spacing: -0.011em;
         }
-        
+
         html::before {
             content: ''; position: fixed; inset: -30%; z-index: -1; pointer-events: none;
             background:
@@ -154,8 +153,8 @@
         @media (prefers-reduced-motion: reduce) { html::before { animation: none; } }
 
         .header-top { display: flex; justify-content: space-between; align-items: center; margin: 8px 4px 28px; }
-        .header-title { 
-            font-size: 2rem; font-weight: 800; color: var(--text); 
+        .header-title {
+            font-size: 2rem; font-weight: 800; color: var(--text);
             letter-spacing: -0.04em; margin: 0;
             display: flex; align-items: center; gap: 12px;
         }
@@ -164,11 +163,11 @@
             background: linear-gradient(180deg, var(--accent) 0%, var(--year-bar) 55%, var(--bi-bar) 100%);
             box-shadow: 0 0 16px rgba(52, 211, 153, 0.4); flex-shrink: 0;
         }
-        .header-menu-btn { 
-            width: 44px; height: 44px; border-radius: 14px; 
-            background: var(--card); 
+        .header-menu-btn {
+            width: 44px; height: 44px; border-radius: 14px;
+            background: var(--card);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--border); color: var(--text); 
+            border: 1px solid var(--border); color: var(--text);
             cursor: pointer; padding: 0; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; align-items: center; justify-content: center;
             box-shadow: var(--card-shadow);
@@ -258,7 +257,7 @@
 
         .timer-widget {
             display: flex; align-items: center; justify-content: space-between; gap: 10px;
-            margin: 0; padding: 14px 18px; background: var(--card); 
+            margin: 0; padding: 14px 18px; background: var(--card);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border); border-radius: 18px;
             box-shadow: var(--card-shadow); position: relative; flex-shrink: 0;
@@ -278,7 +277,17 @@
         .timer-color-dot:hover { transform: scale(1.35); }
 
         .timer-title { position: absolute; top: 5px; left: 18px; font-size: 0.55rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-        
+
+        .timer-name-btn {
+            background: none; border: none; color: inherit;
+            font-family: inherit; font-size: inherit; font-weight: inherit;
+            letter-spacing: inherit; text-transform: inherit;
+            padding: 0; margin: 0; cursor: pointer;
+            transition: color 0.2s;
+        }
+        .timer-name-btn:hover { color: var(--accent); }
+        .timer-name-btn:active { transform: scale(0.96); }
+
         .t-btn-hide {
             position: absolute; top: 6px; right: 8px;
             background: transparent; border: none; color: var(--muted);
@@ -293,47 +302,47 @@
         .t-btn-hide:active { transform: scale(0.85); }
 
         .timer-input-group { display: flex; align-items: center; gap: 5px; margin-top: 8px; }
-        .timer-input-group input { 
-            width: 40px; background: var(--input-bg); border: 1px solid var(--border-input); 
-            color: var(--text); padding: 6px 4px; border-radius: 8px; text-align: center; 
+        .timer-input-group input {
+            width: 40px; background: var(--input-bg); border: 1px solid var(--border-input);
+            color: var(--text); padding: 6px 4px; border-radius: 8px; text-align: center;
             font-weight: 600; font-family: inherit; font-size: 0.82rem; outline: none; transition: all 0.2s;
         }
         .timer-input-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15); }
         .timer-input-group span { font-size: 0.7rem; color: var(--muted); font-weight: 500; }
-        
-        .timer-display { 
-            font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; 
+
+        .timer-display {
+            font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums;
             color: var(--text); letter-spacing: -0.03em; flex: 1; text-align: center; margin-top: 8px;
             transition: color 0.3s;
         }
         .timer-display.running { color: var(--accent); text-shadow: 0 0 16px rgba(52, 211, 153, 0.35); }
-        
+
         .timer-controls { display: flex; gap: 7px; margin-top: 8px; align-items: center; }
-        .t-btn { 
-            width: 32px; height: 32px; border-radius: 10px; background: var(--item-bg); 
-            border: 1px solid var(--border-input); color: var(--text); 
-            display: flex; align-items: center; justify-content: center; 
+        .t-btn {
+            width: 32px; height: 32px; border-radius: 10px; background: var(--item-bg);
+            border: 1px solid var(--border-input); color: var(--text);
+            display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .t-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.06); }
         .t-btn:active { transform: scale(0.94); }
         .t-btn.active { background: var(--sunday); border-color: var(--sunday); color: #fff; }
         .t-btn.active:hover { border-color: #ff3b30; background: #ff3b30; color: #fff; }
-        
+
         .t-btn-delete { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 6px; font-size: 1.1rem; border-radius: 8px; transition: color 0.2s; line-height: 1; }
         .t-btn-delete:hover { color: var(--sunday); }
 
         .add-timer-inline-btn {
             background: transparent; border: 1.5px dashed var(--border-input); color: var(--muted);
             width: 28px; height: 28px; border-radius: 50%; font-size: 0.95rem; font-weight: 600;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
             transition: all 0.2s; margin-left: auto;
         }
         .add-timer-inline-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--item-bg); }
 
         .hidden-timers-bar {
             display: none; align-items: center; gap: 8px; margin: 0; padding: 8px 12px;
-            background: var(--card); 
+            background: var(--card);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border); border-radius: 14px;
             box-shadow: var(--card-shadow);
@@ -432,6 +441,10 @@
             background: var(--result-color); box-shadow: 0 0 6px var(--result-color); flex-shrink: 0;
         }
         .hidden-bar-result-item .result-name { overflow: hidden; text-overflow: ellipsis; opacity: 0.9; }
+        .hidden-bar-result-item .result-suffix {
+            font-size: 0.55rem; font-weight: 800; color: var(--result-color);
+            opacity: 0.85; margin-left: 2px;
+        }
 
         .hidden-bar-result-empty,
         .hidden-bar-pill-empty {
@@ -493,11 +506,20 @@
         .hidden-timer-pill .pill-name { opacity: 0.85; }
         .hidden-timer-pill .pill-time { font-variant-numeric: tabular-nums; color: var(--pill-color); font-weight: 700; letter-spacing: -0.01em; }
         .hidden-timer-pill.is-running .pill-dot { animation: dotPulse 1.8s ease-in-out infinite; }
+        .hidden-timer-pill.box-pill .pill-suffix {
+            font-size: 0.55rem; font-weight: 800; color: var(--pill-color);
+            letter-spacing: 0.04em; opacity: 0.85; margin-left: 2px;
+        }
+        .hidden-timer-pill.box-pill.is-opened {
+            background: color-mix(in srgb, var(--pill-color) 22%, var(--item-bg));
+            border-color: var(--pill-color);
+        }
+        .hidden-timer-pill.box-pill.is-opened .pill-dot { animation: dotPulse 1.8s ease-in-out infinite; }
 
         #floating-timer {
-            display: none; position: fixed; 
-            top: max(45px, calc(env(safe-area-inset-top) + 25px)); 
-            left: 18px; z-index: 10000; 
+            display: none; position: fixed;
+            top: max(45px, calc(env(safe-area-inset-top) + 25px));
+            left: 18px; z-index: 10000;
             align-items: center; gap: 8px; padding: 6px 12px;
             background: var(--card);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
@@ -517,11 +539,11 @@
         .floating-stop-btn:hover { color: var(--text); transform: scale(1.1); }
         .floating-stop-btn:active { transform: scale(0.9); }
 
-        .dock-panel { 
-            display: none; background: var(--card); 
+        .dock-panel {
+            display: none; background: var(--card);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-top: 12px;
-            box-shadow: var(--card-shadow); 
+            box-shadow: var(--card-shadow);
         }
         .dock-panel.active { display: block; animation: panelIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes panelIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
@@ -529,14 +551,14 @@
 
         .label { font-size: 0.75rem; color: var(--subtext); display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
         .timer { font-size: 1.4rem; font-weight: 800; margin: 8px 0; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
-        
+
         .controls-group { display: flex; align-items: center; gap: 8px; }
 
-        .icon-btn { 
-            background: var(--item-bg); color: var(--text); cursor: pointer; 
-            font-size: 1rem; font-weight: 700; padding: 2px 10px; border-radius: 10px; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            border: 1px solid var(--border-input); 
+        .icon-btn {
+            background: var(--item-bg); color: var(--text); cursor: pointer;
+            font-size: 1rem; font-weight: 700; padding: 2px 10px; border-radius: 10px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-input);
             display: flex; align-items: center; justify-content: center; height: 30px;
         }
         .icon-btn:hover { background: var(--border-input); }
@@ -547,18 +569,18 @@
         .progress-container { margin-top: 14px; margin-bottom: 3px; position: relative; }
         .bar-wrapper { position: relative; width: 100%; height: 12px; border-radius: 6px; background: var(--item-bg); box-shadow: inset 0 1px 4px rgba(0,0,0,0.3); }
         [data-theme="light"] .bar-wrapper { box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-        
+
         .progress-bar { height: 100%; border-radius: inherit; overflow: hidden; position: absolute; width: 100%; top: 0; left: 0; z-index: 2; pointer-events: none; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); }
         [data-theme="light"] .progress-bar { box-shadow: inset 0 1px 0 rgba(255,255,255,0.55); }
         .fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-        
+
         #day-fill { background: var(--day-bar); opacity: 0.75; mix-blend-mode: hard-light; }
         [data-theme="light"] #day-fill { mix-blend-mode: multiply; opacity: 0.55; }
 
         .ticks { display: flex; justify-content: space-between; padding: 0; margin-top: 10px; }
         .tick { font-size: 0.65rem; color: var(--muted); font-weight: 600; text-align: center; width: 24px; opacity: 0.85; letter-spacing: 0.02em; }
-        .tick.year-tick { width: 40px; } 
-        .tick.day-tick { font-size: 0.56rem; width: auto; letter-spacing: -0.02em; flex: 1; } 
+        .tick.year-tick { width: 40px; }
+        .tick.day-tick { font-size: 0.56rem; width: auto; letter-spacing: -0.02em; flex: 1; }
 
         .tall-bar { height: 44px !important; border-radius: 12px !important; }
         .bar-text-overlay {
@@ -571,13 +593,13 @@
 
         #block-pct, #year-pct, #week-pct, #work-pct, #day-pct { font-variant-numeric: tabular-nums; font-size: 0.85rem; letter-spacing: -0.02em; font-weight: 700; }
 
-        .bar-marker { 
-            position: absolute; top: -13px; width: 15px; height: 15px; 
-            background: var(--m-color); border-radius: 50%; 
-            transform: translateX(-50%); cursor: grab; z-index: 10; 
-            border: 2px solid var(--card-solid); 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4); 
-            touch-action: none; transition: transform 0.1s; 
+        .bar-marker {
+            position: absolute; top: -13px; width: 15px; height: 15px;
+            background: var(--m-color); border-radius: 50%;
+            transform: translateX(-50%); cursor: grab; z-index: 10;
+            border: 2px solid var(--card-solid);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            touch-action: none; transition: transform 0.1s;
         }
         .bar-marker::after { content: ''; position: absolute; top: 13px; left: 4.5px; width: 2px; height: 10px; background: var(--m-color); border-radius: 1px;}
         .tall-bar .bar-marker::after { height: 34px; }
@@ -586,13 +608,13 @@
         .now-marker {
             position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent);
             transform: translateX(-50%); z-index: 15; pointer-events: none; border-radius: 1px;
-            box-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent); 
+            box-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent);
             transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .now-marker::before {
             content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
             width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
-            box-shadow: 0 0 0 2px var(--card-solid), 0 0 10px var(--accent); 
+            box-shadow: 0 0 0 2px var(--card-solid), 0 0 10px var(--accent);
             animation: nowDotPulse 1.8s ease-in-out infinite;
         }
         @keyframes nowDotPulse {
@@ -603,17 +625,17 @@
 
         .day-task-mark {
             position: absolute; top: 0; height: 100%; border-radius: 2px;
-            pointer-events: none; z-index: 1; 
+            pointer-events: none; z-index: 1;
             box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
             transition: opacity 0.3s;
         }
 
         .years-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
         .year-box {
-            background: var(--card); 
+            background: var(--card);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border); border-radius: 20px;
-            padding: 20px 16px; cursor: pointer; 
+            padding: 20px 16px; cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--card-shadow); position: relative; text-align: center;
         }
@@ -647,11 +669,11 @@
 
         .quarters-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding: 0 2px; }
         .quarters-header .back-btn {
-            background: var(--card); 
+            background: var(--card);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border); color: var(--text);
             padding: 10px 16px; border-radius: 12px; font-family: inherit; font-size: 0.82rem; font-weight: 600;
-            cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+            cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--card-shadow);
         }
         .quarters-header .back-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateX(-2px); }
@@ -659,10 +681,10 @@
 
         .quarters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .quarter-compact {
-            background: var(--card); 
+            background: var(--card);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border); border-radius: 18px;
-            padding: 18px 14px; cursor: pointer; 
+            padding: 18px 14px; cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--card-shadow); position: relative; text-align: center;
         }
@@ -680,7 +702,6 @@
         .qc-bar .fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--accent); }
         .qc-pct { font-size: 0.88rem; font-weight: 800; color: var(--text); }
 
-        /* Multi-ventana: overlays transparentes a clics */
         .calendar-overlay {
             display: none; position: fixed; inset: 0;
             z-index: 900;
@@ -693,7 +714,6 @@
         .calendar-overlay.active { display: flex; }
         .calendar-overlay .calendar-detail { pointer-events: auto; }
 
-        /* FIX: z-index del modal por encima de las ventanas de trimestre (2001-8999) */
         #modal-overlay { pointer-events: none; z-index: 9000; }
         #modal-overlay.active { pointer-events: none; z-index: 9000; }
         #modal-overlay .modal-card { pointer-events: auto; }
@@ -709,7 +729,7 @@
             display: flex; flex-direction: column;
             border: 1px solid rgba(var(--modal-border-rgb), var(--modal-border-alpha));
             animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: hidden; 
+            overflow: hidden;
             box-shadow: 0 32px 64px -12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
             position: relative;
         }
@@ -730,13 +750,13 @@
             -webkit-backdrop-filter: blur(20px);
             padding-top: 20px;
         }
-        
+
         .calendar-detail-title { display: flex; align-items: center; justify-content: center; gap: 4px; justify-self: center; }
         .calendar-title-text { font-size: 1.1rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; min-width: 75px; text-align: center; }
-        .nav-btn { 
-            background: transparent; border: none; color: var(--muted); font-size: 1.5rem; 
-            cursor: pointer; padding: 0 10px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            font-weight: 500; line-height: 1; display: flex; align-items: center; 
+        .nav-btn {
+            background: transparent; border: none; color: var(--muted); font-size: 1.5rem;
+            cursor: pointer; padding: 0 10px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500; line-height: 1; display: flex; align-items: center;
             justify-content: center; margin-top: -2px; border-radius: 6px;
         }
         .nav-btn:hover { color: var(--accent); transform: scale(1.15); }
@@ -749,7 +769,7 @@
         .close-btn {
             background: var(--item-bg); border: 1px solid var(--border-input); color: var(--text);
             width: 34px; height: 34px; border-radius: 10px; font-size: 0.85rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; 
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 700;
         }
         .close-btn:hover { color: var(--sunday); border-color: var(--sunday); }
@@ -759,7 +779,7 @@
         .minimize-btn {
             background: var(--item-bg); border: 1px solid var(--border-input); color: var(--text);
             width: 34px; height: 34px; border-radius: 10px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; 
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 0;
         }
@@ -836,7 +856,7 @@
         .add-task-btn {
             background: var(--accent); color: var(--btn-text); border: none;
             width: 34px; height: 34px; border-radius: 10px; font-size: 1.2rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; 
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 800; padding: 0; line-height: 1;
         }
@@ -847,7 +867,7 @@
         .metrics-btn {
             background: var(--item-bg); border: 1px solid var(--border-input); color: var(--accent);
             width: 34px; height: 34px; border-radius: 10px; font-size: 0.95rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; 
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); padding: 0;
         }
         .metrics-btn:hover { border-color: var(--accent); transform: scale(1.08); }
@@ -861,10 +881,10 @@
 
         .qbar-widget {
             display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-            padding: 9px 12px; background: var(--item-bg); 
+            padding: 9px 12px; background: var(--item-bg);
             border: 1px solid var(--border);
             border-radius: 12px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            user-select: none; -webkit-tap-highlight-color: transparent; 
+            user-select: none; -webkit-tap-highlight-color: transparent;
             box-shadow: none;
         }
         .qbar-widget:hover { border-color: var(--border-input); }
@@ -891,10 +911,10 @@
         .qbar-widget[data-mode="b"] .qbar-pct { color: var(--bi-bar); }
 
         .months-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
-        .month { 
-            background: var(--item-bg); padding: 12px 10px; border-radius: 14px; 
-            border: 1px solid var(--border); transition: all 0.3s ease; 
-            box-shadow: none; min-width: 0; 
+        .month {
+            background: var(--item-bg); padding: 12px 10px; border-radius: 14px;
+            border: 1px solid var(--border); transition: all 0.3s ease;
+            box-shadow: none; min-width: 0;
         }
         .month-name { font-size: 0.76rem; font-weight: 800; margin-bottom: 8px; color: var(--text); text-align: center; position: relative; cursor: pointer; user-select: none; letter-spacing: -0.02em; }
         .month-toggle { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 1rem; color: var(--muted); font-weight: 400; }
@@ -904,50 +924,50 @@
 
         .days-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; text-align: center; }
         .week-day { font-size: 0.5rem; color: var(--muted); margin-bottom: 6px; font-weight: 700; letter-spacing: 0.05em; }
-        
-        .day { 
-            font-size: 0.62rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; 
-            font-weight: 600; border: 1px solid transparent; box-sizing: border-box; 
-            margin-top: 3px; position: relative; border-radius: 7px; 
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease; 
-            cursor: pointer; min-width: 0; 
+
+        .day {
+            font-size: 0.62rem; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            font-weight: 600; border: 1px solid transparent; box-sizing: border-box;
+            margin-top: 3px; position: relative; border-radius: 7px;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer; min-width: 0;
         }
         .day:hover { transform: translateY(-1px) scale(1.06); box-shadow: 0 3px 10px rgba(0,0,0,0.18); background: var(--item-bg); }
         .day:not(.today):hover { transform: translateY(-1px) scale(1.04); }
-        
+
         .block-label { position: absolute; top: -10px; left: 0; font-size: 0.42rem; color: var(--block-id); font-weight: 800; z-index: 10; }
-        
+
         .task-dot { position: absolute; bottom: 1.5px; left: 50%; transform: translateX(-50%); width: 3.5px; height: 3.5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 4px var(--accent); pointer-events: none; }
         .note-dot { position: absolute; top: 2px; right: 2px; width: 3.5px; height: 3.5px; border-radius: 50%; background: var(--work); box-shadow: 0 0 4px var(--work); pointer-events: none; }
 
         .current-week-glow .day:not(.today) { background-color: var(--current-week-bg); z-index: 1; }
-        
-        .day.future { color: var(--future); } 
-        .day.past { color: var(--subtext); background: var(--past) !important; border-radius: 7px; } 
-        
-        .day.today { 
-            background: var(--today) !important; color: var(--today-text); 
-            font-weight: 800; border-radius: 7px; transform: scale(1.06); 
+
+        .day.future { color: var(--future); }
+        .day.past { color: var(--subtext); background: var(--past) !important; border-radius: 7px; }
+
+        .day.today {
+            background: var(--today) !important; color: var(--today-text);
+            font-weight: 800; border-radius: 7px; transform: scale(1.06);
             z-index: 5; box-shadow: var(--shadow-today) !important;
-        } 
+        }
         .day.today:hover { transform: scale(1.1); box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--accent), 0 6px 22px rgba(52, 211, 153, 0.5) !important; }
-        
+
         .day.sat-future { color: var(--saturday); } .day.sun-future { color: var(--sunday); }
-        
-        .highlight-week-active .day { 
-            border-top-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
-            border-bottom-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
-            border-radius: 0; 
-        } 
-        .highlight-week-active .block-start { 
-            border-left-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
-            border-top-left-radius: 7px; 
-            border-bottom-left-radius: 7px; 
-        } 
-        .highlight-week-active .block-end { 
-            border-right-color: color-mix(in srgb, var(--week-box-active) 65%, transparent); 
-            border-top-right-radius: 7px; 
-            border-bottom-right-radius: 7px; 
+
+        .highlight-week-active .day {
+            border-top-color: color-mix(in srgb, var(--week-box-active) 65%, transparent);
+            border-bottom-color: color-mix(in srgb, var(--week-box-active) 65%, transparent);
+            border-radius: 0;
+        }
+        .highlight-week-active .block-start {
+            border-left-color: color-mix(in srgb, var(--week-box-active) 65%, transparent);
+            border-top-left-radius: 7px;
+            border-bottom-left-radius: 7px;
+        }
+        .highlight-week-active .block-end {
+            border-right-color: color-mix(in srgb, var(--week-box-active) 65%, transparent);
+            border-top-right-radius: 7px;
+            border-bottom-right-radius: 7px;
         }
 
         .quarter-tasks-wrapper { position: relative; height: 100%; min-height: 220px; }
@@ -956,20 +976,20 @@
             padding: 10px; box-shadow: none; display: flex; flex-direction: column;
             position: absolute; top: 0; left: 0; right: 0; bottom: 0; min-height: 220px;
         }
-        
+
         .list-tabs { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
         .tab-row { display: flex; gap: 5px; justify-content: center; }
-        .tab-btn { 
-            flex: 1; background: var(--item-bg); color: var(--text); 
-            border: 1px solid var(--border-input); 
-            padding: 8px 3px; font-size: 0.58rem; font-weight: 700; border-radius: 8px; 
-            cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+        .tab-btn {
+            flex: 1; background: var(--item-bg); color: var(--text);
+            border: 1px solid var(--border-input);
+            padding: 8px 3px; font-size: 0.58rem; font-weight: 700; border-radius: 8px;
+            cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             letter-spacing: 0.03em;
         }
-        .tab-btn.active { background: var(--accent); color: var(--btn-text); border-color: var(--accent); box-shadow: 0 4px 14px rgba(52, 211, 153, 0.35); transform: translateY(-1px); } 
+        .tab-btn.active { background: var(--accent); color: var(--btn-text); border-color: var(--accent); box-shadow: 0 4px 14px rgba(52, 211, 153, 0.35); transform: translateY(-1px); }
         .tab-btn:hover:not(.active) { border-color: var(--muted); transform: translateY(-1px); }
         .tab-btn:active { transform: scale(0.96); }
-        
+
         .qt-list { flex: 1; overflow-y: auto; padding-right: 2px; min-height: 0; position: relative; padding-bottom: 26px; }
         .qt-list::-webkit-scrollbar { width: 4px; }
         .qt-list::-webkit-scrollbar-track { background: transparent; }
@@ -983,7 +1003,7 @@
         .qt-empty { color: var(--muted); font-size: 0.64rem; font-style: italic; text-align: center; padding: 14px 2px; }
         .qt-delete { color: var(--muted); font-size: 1rem; cursor: pointer; opacity: 0.5; font-weight: 700; padding: 0 3px; flex-shrink: 0; line-height: 1; transition: 0.2s; border-radius: 4px; }
         .qt-delete:hover { opacity: 1; color: var(--sunday); }
-        
+
         .entorno-tag { background: rgba(96, 165, 250, 0.15); color: var(--year-bar); padding: 2px 5px; border-radius: 4px; font-size: 0.46rem; font-weight: 700; display: inline-block; margin-bottom: 2px; letter-spacing: 0.04em; }
         .task-day-tag { color: var(--block-id); font-size: 0.52rem; font-weight: 700; display: inline-block; margin-left: 5px; letter-spacing: 0.04em; }
 
@@ -993,49 +1013,49 @@
             color: var(--subtext); width: 22px; height: 22px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 0.6rem; font-weight: 700; cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .mode-toggle-corner:hover { color: var(--accent); border-color: var(--accent); transform: scale(1.1); }
         .mode-toggle-corner:active { transform: scale(0.94); }
 
-        .modal-overlay { 
-            display: none; position: fixed; inset: 0; 
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
             background: rgba(var(--modal-overlay-rgb), var(--modal-overlay-alpha));
-            z-index: 1000; 
-            align-items: center; justify-content: center; 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            z-index: 1000;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             padding: 16px; flex-direction: column;
         }
         .modal-overlay.active { display: flex; animation: fadeIn 0.25s; }
         #modal-overlay.active { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .modal-card { 
+
+        .modal-card {
             background: rgba(var(--modal-bg-rgb), var(--modal-bg-alpha));
             backdrop-filter: blur(50px) saturate(180%);
             -webkit-backdrop-filter: blur(50px) saturate(180%);
-            border: 1px solid rgba(var(--modal-border-rgb), var(--modal-border-alpha)); 
-            border-radius: 24px; 
-            padding: 20px 22px; width: 320px; max-width: 92vw; 
-            box-shadow: 0 32px 64px -12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04); 
-            animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); 
+            border: 1px solid rgba(var(--modal-border-rgb), var(--modal-border-alpha));
+            border-radius: 24px;
+            padding: 20px 22px; width: 320px; max-width: 92vw;
+            box-shadow: 0 32px 64px -12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+            animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
         [data-theme="light"] .modal-card {
             box-shadow: 0 32px 64px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04);
         }
 
         .modal-card.wide { width: 560px; max-width: 95vw; }
-        
+
         .modal-overlay.dual-mode-active { padding: 8px; gap: 8px; }
-        
+
         .modal-overlay.dual-mode-active #dual-notes-card {
             display: flex !important; flex-direction: column;
             width: 340px; max-width: 95vw;
             height: 260px; min-height: 260px; max-height: 260px;
             margin-bottom: 0; box-sizing: border-box;
         }
-        
+
         .modal-overlay.dual-mode-active #main-modal-card {
             width: 340px; max-width: 95vw;
             height: 175px; min-height: 175px; max-height: 175px;
@@ -1050,29 +1070,29 @@
         }
 
         .modal-card h3 { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
-        
+
         .modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 
-        .input-group { 
-            margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; 
+        .input-group {
+            margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
             font-size: 0.88rem; color: var(--subtext); font-weight: 500;
         }
-        .input-group input[type="text"], 
-        .input-group input[type="number"], 
-        .input-group input[type="time"], 
-        .input-group select { 
-            width: auto; min-width: 80px; max-width: 180px; 
-            background: var(--input-bg); border: 1px solid var(--border-input); 
-            color: var(--text); padding: 8px 10px; border-radius: 10px; 
-            text-align: center; font-weight: 600; font-family: inherit; 
+        .input-group input[type="text"],
+        .input-group input[type="number"],
+        .input-group input[type="time"],
+        .input-group select {
+            width: auto; min-width: 80px; max-width: 180px;
+            background: var(--input-bg); border: 1px solid var(--border-input);
+            color: var(--text); padding: 8px 10px; border-radius: 10px;
+            text-align: center; font-weight: 600; font-family: inherit;
             transition: all 0.2s; outline: none;
         }
-        .input-group input:focus, .input-group select:focus { 
+        .input-group input:focus, .input-group select:focus {
             border-color: var(--accent); box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
         }
-        .input-group input[type="color"] { 
-            background: none; border: none; padding: 0; 
-            width: 42px; height: 42px; cursor: pointer; border-radius: 10px; 
+        .input-group input[type="color"] {
+            background: none; border: none; padding: 0;
+            width: 42px; height: 42px; cursor: pointer; border-radius: 10px;
         }
 
         input[type="range"] {
@@ -1096,12 +1116,12 @@
             border: 2px solid var(--card-solid);
             box-shadow: 0 2px 8px rgba(52, 211, 153, 0.4);
         }
-        
+
         .modal-actions { display: flex; gap: 10px; margin-top: 12px; }
-        .btn { 
-            flex: 1; padding: 12px 16px; border: none; border-radius: 12px; 
-            font-weight: 600; cursor: pointer; font-size: 0.88rem; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+        .btn {
+            flex: 1; padding: 12px 16px; border: none; border-radius: 12px;
+            font-weight: 600; cursor: pointer; font-size: 0.88rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: inherit;
         }
         .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
@@ -1147,7 +1167,7 @@
             flex: 1; background: var(--item-bg); border: 1px solid var(--border-input);
             color: var(--subtext); padding: 10px 6px; border-radius: 10px;
             font-size: 0.74rem; font-weight: 700; cursor: pointer;
-            font-family: inherit; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+            font-family: inherit; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             letter-spacing: 0.02em;
         }
         .calc-mode-btn:hover { border-color: var(--accent); color: var(--accent); }
@@ -1158,33 +1178,33 @@
             background: var(--input-bg); border: 1px solid var(--border-input);
             color: var(--muted); padding: 4px 8px; border-radius: 6px;
             font-size: 0.7rem; font-weight: 700; cursor: pointer; user-select: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center; flex: 1; min-width: 24px;
         }
         .chk-btn.active { background: var(--accent); color: var(--btn-text); border-color: var(--accent); box-shadow: 0 2px 8px rgba(52, 211, 153, 0.3); }
 
         .toggle-mode-btn {
-            background: none; border: none; color: var(--accent); 
-            font-size: 0.72rem; font-weight: 600; cursor: pointer; 
-            padding: 4px 6px; text-decoration: none; 
+            background: none; border: none; color: var(--accent);
+            font-size: 0.72rem; font-weight: 600; cursor: pointer;
+            padding: 4px 6px; text-decoration: none;
             border-radius: 6px; transition: all 0.2s;
             display: inline-flex; align-items: center;
         }
         .toggle-mode-btn:hover { background: rgba(52, 211, 153, 0.1); }
 
-        .custom-check { 
-            appearance: none; background-color: var(--input-bg); margin: 0; 
-            width: 18px; height: 18px; border: 1.5px solid var(--border-input); 
-            border-radius: 5px; display: grid; place-content: center; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            margin-top: 2px; flex-shrink: 0; cursor: pointer; 
+        .custom-check {
+            appearance: none; background-color: var(--input-bg); margin: 0;
+            width: 18px; height: 18px; border: 1.5px solid var(--border-input);
+            border-radius: 5px; display: grid; place-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 2px; flex-shrink: 0; cursor: pointer;
         }
-        .custom-check::before { 
-            content: ""; width: 9px; height: 9px; transform: scale(0); 
-            transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: inset 1em 1em var(--check-color); 
-            transform-origin: center; 
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); 
+        .custom-check::before {
+            content: ""; width: 9px; height: 9px; transform: scale(0);
+            transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 1em 1em var(--check-color);
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
         }
         .custom-check:checked { background-color: var(--accent); border-color: var(--accent); }
         .custom-check:checked::before { transform: scale(1); }
@@ -1199,7 +1219,7 @@
         #history-list { overflow-y: auto; max-height: 55vh; padding-right: 4px; }
         #history-list::-webkit-scrollbar { width: 6px; }
         #history-list::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 3px; }
-        
+
         .history-date-group { margin-bottom: 18px; }
         .history-date-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 10px; padding: 0 4px; }
         .history-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--item-bg); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -1287,21 +1307,17 @@
         #main-modal-card { padding-top: 22px; }
         #dual-notes-card { padding-top: 20px; }
 
-        /* =========================================================
-           NUEVO @MEDIA: Aplicamos el diseño compacto a todos los móviles
-           (antes solo se aplicaba a <= 380px)
-           ========================================================= */
         @media (max-width: 600px) {
             body { padding: 12px; padding-top: calc(12px + env(safe-area-inset-top)); }
             .header-title { font-size: 1.6rem; }
             .header-title::before { height: 22px; width: 3px; }
             .header-menu-btn { width: 36px; height: 36px; border-radius: 12px; }
             .header-menu-btn svg { width: 18px; height: 18px; }
-            
+
             .section-label { font-size: 0.65rem; margin: 14px 0 10px 2px; }
             .progress-btn { padding: 12px 2px 10px; font-size: 0.75rem; }
             .progress-btn.active::after { width: 24px; }
-            
+
             .timer-widget { padding: 12px 14px; }
             .timer-title { top: 4px; left: 14px; font-size: 0.5rem; }
             .timer-display { font-size: 1.3rem; }
@@ -1309,32 +1325,24 @@
             .timer-input-group span { font-size: 0.65rem; }
             .timer-controls .t-btn { width: 28px; height: 28px; }
             .timer-controls { gap: 5px; }
-            
+
             .day { font-size: 0.58rem; margin-top: 3px; }
             .week-day { font-size: 0.44rem; }
             .month-name { font-size: 0.68rem; }
             .block-label { font-size: 0.38rem; top: -8px; }
         }
 
-        /* =========================================================
-           COMPACT MODE - Tamaños reducidos globalmente
-           ========================================================= */
-
-        /* --- Layout base --- */
         body { padding: 10px; padding-top: calc(10px + env(safe-area-inset-top)); }
 
-        /* --- Cabecera --- */
         .header-top { margin: 2px 2px 16px; }
         .header-title { font-size: 1.45rem; gap: 8px; }
         .header-title::before { width: 3px; height: 21px; }
         .header-menu-btn { width: 36px; height: 36px; border-radius: 11px; }
         .header-menu-btn svg { width: 16px; height: 16px; }
 
-        /* --- Etiquetas de sección --- */
         .section-label { font-size: 0.58rem; margin: 12px 0 9px 2px; gap: 7px; }
         .section-label svg { width: 12px; height: 12px; }
 
-        /* --- Botones de progreso --- */
         .progress-buttons { padding: 5px; gap: 4px; border-radius: 16px; margin-bottom: 3px; }
         .progress-btn { padding: 11px 2px 7px; font-size: 0.68rem; border-radius: 11px; gap: 2px; }
         .progress-btn::after { top: 5px; width: 14px; height: 2px; }
@@ -1342,7 +1350,6 @@
         .progress-btn.active::after { width: 22px; }
         .progress-btn .pb-arrow { font-size: 0.42rem; }
 
-        /* --- Timers --- */
         .timers-header-bar { font-size: 0.54rem; margin: -3px 4px 7px 4px; }
         .timers-toggle-btn { font-size: 0.54rem; padding: 3px 5px; }
         .timers-container { gap: 7px; margin-bottom: 12px; }
@@ -1361,7 +1368,6 @@
         .add-timer-inline-btn { width: 24px; height: 24px; font-size: 0.85rem; }
         .t-btn-delete { font-size: 0.95rem; padding: 4px; }
 
-        /* --- Paneles de progreso (dock) --- */
         .dock-panel { padding: 12px 14px; border-radius: 16px; margin-top: 10px; }
         .label { font-size: 0.62rem; }
         .timer { font-size: 1.05rem; margin: 6px 0; }
@@ -1384,7 +1390,6 @@
         .bar-marker::after { top: 11px; left: 3.5px; width: 2px; height: 8px; }
         .tall-bar .bar-marker::after { height: 26px; }
 
-        /* --- Calendario: días y meses --- */
         .months-container { gap: 7px; }
         .month { padding: 9px 7px; border-radius: 11px; }
         .month-name { font-size: 0.63rem; margin-bottom: 5px; }
@@ -1393,7 +1398,6 @@
         .block-label { font-size: 0.34rem; top: -7px; }
         .task-dot, .note-dot { width: 2.5px; height: 2.5px; }
 
-        /* --- Vista de trimestres --- */
         .quarters-header { margin-bottom: 10px; }
         .quarters-header .back-btn { padding: 7px 12px; font-size: 0.7rem; border-radius: 9px; }
         .quarters-title { font-size: 0.98rem; }
@@ -1404,7 +1408,6 @@
         .qc-bar { height: 4px; margin: 8px 0 5px; }
         .qc-pct { font-size: 0.7rem; }
 
-        /* --- Vista de años --- */
         .years-view { gap: 10px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
         .year-box { padding: 14px 10px; border-radius: 15px; }
         .year-num { font-size: 1.25rem; margin-bottom: 7px; }
@@ -1413,7 +1416,6 @@
         .year-pct { font-size: 0.7rem; }
         .delete-year-btn { width: 20px; height: 20px; top: 7px; left: 7px; font-size: 0.8rem; border-radius: 6px; }
 
-        /* --- Ventanas de trimestre --- */
         .calendar-detail { border-radius: 20px; max-height: 94vh; }
         .calendar-detail-header { padding: 9px 12px; padding-top: 14px; gap: 6px; }
         .calendar-title-text { font-size: 0.9rem; min-width: 65px; }
@@ -1430,7 +1432,6 @@
         .qbar-track { height: 5px; }
         .qbar-pct { font-size: 0.6rem; min-width: 32px; }
 
-        /* --- Pestañas y listas del trimestre --- */
         .list-tabs { gap: 4px; margin-bottom: 7px; }
         .tab-row { gap: 4px; }
         .tab-btn { padding: 5px 2px; font-size: 0.48rem; border-radius: 6px; }
@@ -1447,7 +1448,6 @@
         .quarter-tasks-panel { padding: 8px; border-radius: 11px; min-height: 185px; }
         .quarter-tasks-wrapper { min-height: 185px; }
 
-        /* --- Modales --- */
         .modal-card { padding: 15px 17px; border-radius: 20px; width: 290px; }
         .modal-card.wide { width: 500px; }
         .modal-card h3 { font-size: 0.92rem; }
@@ -1471,18 +1471,15 @@
         .modal-drag-handle { top: 2px; height: 8px; }
         .modal-drag-handle .grip { width: 18px; height: 2.5px; }
 
-        /* --- Modales duales (notas al lado) --- */
         .modal-overlay.dual-mode-active #dual-notes-card { height: 230px; min-height: 230px; max-height: 230px; }
         .modal-overlay.dual-mode-active #main-modal-card { height: 160px; min-height: 160px; max-height: 160px; padding: 10px 16px; }
         #dual-notes-text { padding: 10px; font-size: 0.82rem; }
         #notes-main-textarea { padding: 11px; font-size: 0.84rem; }
 
-        /* --- Barra minimizada --- */
         #minimized-bar { padding: 5px 6px; gap: 6px; border-radius: 11px; bottom: 10px; }
         .minimized-pill { padding: 5px 8px 5px 10px; font-size: 0.66rem; border-radius: 8px; }
         .minimized-pill .pill-close { width: 14px; height: 14px; font-size: 0.8rem; }
 
-        /* --- Timers ocultos --- */
         .hidden-timers-bar { padding: 6px 10px; border-radius: 11px; gap: 6px; }
         .hidden-bar-toggle { width: 16px; height: 18px; }
         .hidden-bar-toggle svg { width: 10px; height: 10px; }
@@ -1493,12 +1490,10 @@
         .hidden-bar-result-item { padding: 4px 8px; font-size: 0.58rem; }
         .hidden-dot { width: 8px; height: 8px; }
 
-        /* --- Timer flotante --- */
         #floating-timer { padding: 5px 9px; gap: 6px; border-radius: 10px; top: max(38px, calc(env(safe-area-inset-top) + 20px)); left: 12px; }
         #floating-time { font-size: 0.68rem; }
         .floating-stop-btn { width: 17px; height: 17px; }
 
-        /* --- Historial --- */
         .history-date-label { font-size: 0.64rem; margin-bottom: 8px; }
         .history-item { padding: 9px 11px; border-radius: 10px; margin-bottom: 6px; gap: 8px; }
         .history-name { font-size: 0.78rem; }
@@ -1506,14 +1501,58 @@
         .history-check { font-size: 0.7rem; }
         .history-del { font-size: 1rem; padding: 3px 6px; }
 
-        /* --- Métricas --- */
         .m-label { width: 78px; font-size: 0.72rem; }
         .m-pct { width: 48px; font-size: 0.72rem; }
         .m-progress { height: 7px; }
         .m-bar-row { margin-bottom: 11px; gap: 12px; }
 
-        /* --- Calculadora resultado --- */
         #calc-result, #calc-add-result { padding: 14px; min-height: 68px; border-radius: 11px; }
+
+        /* ===================== CAJAS DE TEMPORIZADORES ===================== */
+        .box-timer-card {
+            border-left-color: var(--box-color, var(--accent)) !important;
+            border-left-width: 4px !important;
+        }
+        .box-tag {
+            font-size: 0.5rem; font-weight: 800; padding: 2px 6px;
+            border-radius: 5px; margin-left: 6px; letter-spacing: 0.03em;
+            text-transform: uppercase; vertical-align: middle;
+            display: inline-block;
+        }
+        .box-select-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; background: var(--item-bg);
+            border: 1px solid var(--border-input); border-radius: 10px;
+            color: var(--text); font-family: inherit; font-size: 0.82rem;
+            font-weight: 600; cursor: pointer; text-align: left;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1); width: 100%;
+        }
+        .box-select-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+        .box-select-item:active { transform: scale(0.98); }
+        .box-select-item.in-box { border-color: var(--accent); background: rgba(52,211,153,0.08); }
+        .box-select-item.new-box {
+            justify-content: center; color: var(--accent);
+            border-style: dashed; margin-top: 4px;
+        }
+        .bc-timer-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 10px; background: var(--item-bg);
+            border: 1px solid var(--border); border-radius: 9px;
+            font-size: 0.8rem; font-weight: 600;
+        }
+        .bc-timer-row .bc-del {
+            margin-left: auto; background: transparent; border: none;
+            color: var(--muted); font-size: 1.05rem; cursor: pointer;
+            padding: 2px 8px; border-radius: 6px; line-height: 1;
+            transition: all 0.2s;
+        }
+        .bc-timer-row .bc-del:hover { color: var(--sunday); background: rgba(255,69,58,0.12); }
+
+        @media (max-width: 600px) {
+            .box-tag { font-size: 0.44rem; padding: 1px 4px; margin-left: 4px; }
+            .box-select-item { font-size: 0.76rem; padding: 8px 10px; }
+            .bc-timer-row { font-size: 0.74rem; padding: 7px 9px; }
+        }
     </style>
 </head>
 <body>
@@ -1591,7 +1630,7 @@
 
     <div id="panel-day" class="dock-panel">
         <div class="label">
-            <span style="font-weight: 800;">Día Actual (24h)</span> 
+            <span style="font-weight: 800;">Día Actual (24h)</span>
             <div class="controls-group">
                 <span id="day-timer" style="margin-right:8px; font-weight:800; color:var(--day-bar); font-variant-numeric:tabular-nums;">--:--:--</span>
                 <span id="day-pct" style="margin-right:8px; font-weight:bold; color:var(--text)">0.00%</span>
@@ -1633,14 +1672,14 @@
         </div>
     </div>
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
-        
+
         <div class="modal-card" id="dual-notes-card" style="display:none;" onclick="event.stopPropagation()">
             <h3 id="dual-notes-title" style="color: var(--accent); margin-top:0; margin-bottom: 10px;">Notas</h3>
             <textarea id="dual-notes-text" oninput="saveDualNotes()"></textarea>
         </div>
 
         <div class="modal-card" id="main-modal-card" onclick="event.stopPropagation()">
-            
+
             <div class="modal-minimize-btn" onclick="event.stopPropagation(); minimizeMainModal()" title="Minimizar" aria-label="Minimizar">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
                     <path d="M5 12h14"/>
@@ -1679,7 +1718,7 @@
 
             <div id="modal-content-general" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 22px;">Configuración</h3>
-                
+
                 <h4 style="color: var(--subtext); margin-bottom: 12px; font-size: 0.88rem; font-weight: 600;">Colores de Interfaz</h4>
                 <div class="input-group">
                     <label>Semana Pendiente:</label>
@@ -1722,7 +1761,7 @@
 
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 28px;">
                     <button class="btn btn-cancel" onclick="toggleTheme()">Alternar Tema Oscuro / Claro</button>
-                    
+
                     <button class="btn btn-save" onclick="syncExport()" style="background: var(--accent); color: #000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;flex-shrink:0;" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Guardar Copia de Seguridad
@@ -1732,7 +1771,7 @@
                         Cargar Copia de Seguridad
                         <input type="file" id="import-file-input" accept=".json" onchange="syncImport(event)" style="display: none;">
                     </label>
-                    
+
                 </div>
                 <div class="modal-actions" style="margin-top: 28px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div>
             </div>
@@ -1745,7 +1784,7 @@
                         Crear Entorno
                     </button>
                 </div>
-                
+
                 <div class="tc-desc">
                     <input type="text" id="inp-tc-title" placeholder="Descripción...">
                 </div>
@@ -1871,9 +1910,9 @@
                     </select>
                 </div>
                 <input type="date" id="notes-date-picker" style="display:none; margin-bottom:14px; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:10px; border-radius:10px; outline:none; font-family:inherit;" onchange="loadNoteForPicker()">
-                
+
                 <textarea id="notes-main-textarea" style="flex:1; min-height: 50vh; width:100%; box-sizing:border-box; resize:vertical; border:1px solid var(--border-input); color:var(--text); border-radius:10px; padding:14px; font-family:inherit; font-size:0.9rem;" oninput="saveMainNote()"></textarea>
-            
+
                 <div class="modal-actions" style="margin-top:16px;">
                     <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
                 </div>
@@ -1944,7 +1983,49 @@
                     <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
                 </div>
             </div>
-            
+
+            <!-- ===== CAJAS: Añadir timer a caja ===== -->
+            <div id="modal-content-timermenu" style="display:none;">
+                <h3 style="color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <span id="tm-name-display" style="display: flex; align-items: center; gap: 8px;"></span>
+                </h3>
+                <div style="font-size: 0.62rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 8px;">
+                    Añadir a caja
+                </div>
+                <div id="tm-box-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; padding-right: 2px;"></div>
+                <div class="modal-actions" style="margin-top: 14px;">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
+                </div>
+            </div>
+
+            <!-- ===== CAJAS: Crear nueva caja ===== -->
+            <div id="modal-content-newbox" style="display:none;">
+                <h3 style="color: var(--accent); margin-bottom: 18px;">Nueva Caja</h3>
+                <div class="tc-desc" style="margin-bottom: 12px;">
+                    <input type="text" id="inp-newbox-name" placeholder="Nombre de la caja">
+                </div>
+                <div class="tc-row">
+                    <div class="tc-field" style="grid-column: span 2;">
+                        <label>Color del dot</label>
+                        <input type="color" id="inp-newbox-color" value="#3b82f6">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn btn-save" onclick="saveNewBox()">Crear</button>
+                </div>
+            </div>
+
+            <!-- ===== CAJAS: Contenido de una caja (long-press) ===== -->
+            <div id="modal-content-boxcontents" style="display:none;">
+                <h3 id="bc-title" style="color: var(--accent); margin-bottom: 14px;">Caja</h3>
+                <div id="bc-timer-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; margin-bottom: 14px;"></div>
+                <div class="modal-actions" style="flex-wrap: wrap;">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
+                    <button class="btn btn-delete" id="bc-delete-box-btn" onclick="deleteBoxFromContents()" style="flex: 0 0 auto; padding: 12px 18px;">Eliminar Caja</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -1959,7 +2040,6 @@
     </script>
 
     <script>
-        /* === HELPERS DE SEGURIDAD === */
         function escapeHtml(s) {
             return String(s ?? '').replace(/[&<>"']/g, c => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -1986,7 +2066,6 @@
             }
         }
 
-        /* === PALETA MODERNA === */
         const themeColors = { green: '#6ee7b7', blue: '#818cf8', orange: '#fb923c' };
 
         function changeThemeColors() {
@@ -2216,15 +2295,296 @@
             renderTimersUI();
         }
 
+        /* ============================================================
+           CAJAS DE TEMPORIZADORES
+           ============================================================ */
+        let timerBoxes = JSON.parse(localStorage.getItem('wkTimerBoxes')) || [];
+        let openedBoxIds = new Set(JSON.parse(localStorage.getItem('wkOpenedBoxes') || '[]'));
+        let currentTimerForMenu = null;
+        let editingNewBoxContext = null;
+        let currentBoxForContents = null;
+
+        timerBoxes = timerBoxes.filter(b => b && b.id && b.name);
+        timerBoxes.forEach(b => {
+            if (!Array.isArray(b.timerIds)) b.timerIds = [];
+            if (!b.color) b.color = '#3b82f6';
+            b.timerIds = b.timerIds.filter(id => timersList.some(t => t.id === id));
+        });
+        openedBoxIds = new Set(Array.from(openedBoxIds).filter(id => timerBoxes.some(b => b.id === id)));
+
+        function saveBoxes() {
+            safeSetItem('wkTimerBoxes', JSON.stringify(timerBoxes));
+            safeSetItem('wkOpenedBoxes', JSON.stringify(Array.from(openedBoxIds)));
+        }
+
+        function openTimerMenu(timerId) {
+            const t = timersList.find(x => x.id === timerId);
+            if (!t) return;
+            currentTimerForMenu = timerId;
+
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]')
+                .forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-timermenu').style.display = 'block';
+
+            const nameEl = document.getElementById('tm-name-display');
+            nameEl.innerHTML = `<span class="timer-color-dot" style="background:${escapeHtml(t.color)}; margin:0;"></span>${escapeHtml(t.name)}`;
+
+            renderTimerMenuBoxList();
+            openModal();
+        }
+
+        function renderTimerMenuBoxList() {
+            const listEl = document.getElementById('tm-box-list');
+            const t = timersList.find(x => x.id === currentTimerForMenu);
+            if (!listEl || !t) return;
+
+            let html = '';
+            if (timerBoxes.length === 0) {
+                html += `<div style="color:var(--muted); font-size:0.74rem; padding:10px 0; text-align:center; font-style:italic;">Aún no hay cajas</div>`;
+            } else {
+                timerBoxes.forEach(box => {
+                    const inBox = box.timerIds.includes(t.id);
+                    html += `<button class="box-select-item ${inBox ? 'in-box' : ''}" onclick="toggleTimerInBox('${escapeHtml(box.id)}')">
+                        <span class="timer-color-dot" style="background:${escapeHtml(box.color)}; margin:0; flex-shrink:0;"></span>
+                        <span style="flex:1;">${escapeHtml(box.name)}</span>
+                        <span style="font-size:0.68rem; color:${inBox ? 'var(--accent)' : 'var(--muted)'}; font-weight:800;">${inBox ? '✓ En caja' : '+ Añadir'}</span>
+                    </button>`;
+                });
+            }
+            html += `<button class="box-select-item new-box" onclick="openNewBoxModal()">
+                <span style="font-size:1rem;">+</span><span>Nueva caja</span>
+            </button>`;
+            listEl.innerHTML = html;
+        }
+
+        function toggleTimerInBox(boxId) {
+            const box = timerBoxes.find(b => b.id === boxId);
+            const t = timersList.find(x => x.id === currentTimerForMenu);
+            if (!box || !t) return;
+
+            if (box.timerIds.includes(t.id)) {
+                box.timerIds = box.timerIds.filter(id => id !== t.id);
+            } else {
+                box.timerIds.push(t.id);
+            }
+            saveBoxes();
+            renderTimerMenuBoxList();
+            renderTimersUI();
+        }
+
+        function openNewBoxModal() {
+            editingNewBoxContext = currentTimerForMenu;
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]')
+                .forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-newbox').style.display = 'block';
+            document.getElementById('inp-newbox-name').value = '';
+            document.getElementById('inp-newbox-color').value = '#3b82f6';
+            openModal();
+            setTimeout(() => { try { document.getElementById('inp-newbox-name').focus(); } catch(_) {} }, 100);
+        }
+
+        function saveNewBox() {
+            const name = document.getElementById('inp-newbox-name').value.trim();
+            if (!name) { alert('Escribe un nombre para la caja.'); return; }
+            const color = document.getElementById('inp-newbox-color').value || '#3b82f6';
+
+            const newBox = { id: 'box_' + Date.now(), name, color, timerIds: [] };
+            if (editingNewBoxContext) {
+                const t = timersList.find(x => x.id === editingNewBoxContext);
+                if (t) newBox.timerIds.push(t.id);
+            }
+            timerBoxes.push(newBox);
+            saveBoxes();
+            renderTimersUI();
+            closeModal();
+        }
+
+        let boxPillTimer = null;
+        let boxPillFlag = false;
+        let boxPillStart = { x: 0, y: 0 };
+
+        function handleBoxPillDown(e, boxId) {
+            if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
+            boxPillFlag = false;
+            boxPillStart = { x: e.clientX, y: e.clientY };
+            if (boxPillTimer) clearTimeout(boxPillTimer);
+            boxPillTimer = setTimeout(() => {
+                boxPillFlag = true;
+                openBoxContentsModal(boxId);
+            }, 500);
+        }
+        function handleBoxPillUp(e, boxId) {
+            if (boxPillTimer) { clearTimeout(boxPillTimer); boxPillTimer = null; }
+            if (boxPillFlag) { boxPillFlag = false; return; }
+            if (Math.hypot(e.clientX - boxPillStart.x, e.clientY - boxPillStart.y) < 12) {
+                toggleOpenBox(boxId);
+            }
+        }
+        function handleBoxPillCancel() {
+            if (boxPillTimer) { clearTimeout(boxPillTimer); boxPillTimer = null; }
+            boxPillFlag = false;
+        }
+
+        function toggleOpenBox(boxId) {
+            if (openedBoxIds.has(boxId)) openedBoxIds.delete(boxId);
+            else openedBoxIds.add(boxId);
+            saveBoxes();
+            renderTimersUI();
+        }
+
+        function closeBox(boxId) {
+            openedBoxIds.delete(boxId);
+            saveBoxes();
+            renderTimersUI();
+        }
+
+        function openBoxContentsModal(boxId) {
+            const box = timerBoxes.find(b => b.id === boxId);
+            if (!box) return;
+            currentBoxForContents = boxId;
+
+            document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]')
+                .forEach(el => el.style.display = 'none');
+            document.getElementById('modal-content-boxcontents').style.display = 'block';
+            document.getElementById('bc-title').innerHTML =
+                `<span class="timer-color-dot" style="background:${escapeHtml(box.color)}; margin-right:6px;"></span>${escapeHtml(box.name)} <span style="color:var(--muted); font-size:0.7rem; font-weight:600;">|Box</span>`;
+
+            renderBoxContentsList();
+            openModal();
+        }
+
+        function renderBoxContentsList() {
+            const listEl = document.getElementById('bc-timer-list');
+            const box = timerBoxes.find(b => b.id === currentBoxForContents);
+            if (!listEl || !box) return;
+
+            if (box.timerIds.length === 0) {
+                listEl.innerHTML = '<div style="color:var(--muted); font-size:0.78rem; padding:14px 0; text-align:center; font-style:italic;">Esta caja está vacía</div>';
+                return;
+            }
+            listEl.innerHTML = box.timerIds.map(tid => {
+                const t = timersList.find(x => x.id === tid);
+                if (!t) return '';
+                return `<div class="bc-timer-row">
+                    <span class="timer-color-dot" style="background:${escapeHtml(t.color)}; margin:0; flex-shrink:0;"></span>
+                    <span style="flex:1;">${escapeHtml(t.name)}</span>
+                    <button class="bc-del" onclick="removeTimerFromBox('${escapeHtml(box.id)}', '${escapeHtml(tid)}')" title="Quitar de la caja">×</button>
+                </div>`;
+            }).join('');
+        }
+
+        function removeTimerFromBox(boxId, timerId) {
+            const box = timerBoxes.find(b => b.id === boxId);
+            if (!box) return;
+            box.timerIds = box.timerIds.filter(id => id !== timerId);
+            saveBoxes();
+            renderBoxContentsList();
+            renderTimersUI();
+        }
+
+        function deleteBoxFromContents() {
+            const box = timerBoxes.find(b => b.id === currentBoxForContents);
+            if (!box) return;
+            if (!confirm(`¿Eliminar la caja "${box.name}"? Los temporizadores no se eliminarán.`)) return;
+            timerBoxes = timerBoxes.filter(b => b.id !== box.id);
+            openedBoxIds.delete(box.id);
+            currentBoxForContents = null;
+            saveBoxes();
+            renderTimersUI();
+            closeModal();
+        }
+
+        function renderBoxTimerCard(t, boxId, box) {
+            const ctx = `box-${boxId}-${t.id}`;
+            return `
+            <div class="timer-widget extra-timer box-timer-card" id="card-${ctx}"
+                 style="--timer-color:${escapeHtml(t.color)}; --box-color:${escapeHtml(box.color)};">
+                <span class="timer-title">
+                    <span class="timer-color-dot" onclick="event.stopPropagation();cycleTimerColor('${escapeHtml(t.id)}')" title="Cambiar color"></span>
+                    ${escapeHtml(t.name)}
+                    <span class="box-tag" style="background:${escapeHtml(box.color)}25; color:${escapeHtml(box.color)};">|Box · ${escapeHtml(box.name)}</span>
+                </span>
+                <div class="timer-input-group">
+                    <input type="number" id="input-h-${ctx}" data-timer-input-h="${escapeHtml(t.id)}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" oninput="syncTimerInputs('${escapeHtml(t.id)}')" onchange="syncTimerInputs('${escapeHtml(t.id)}')">
+                    <span>h</span>
+                    <input type="number" id="input-m-${ctx}" data-timer-input-m="${escapeHtml(t.id)}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" oninput="syncTimerInputs('${escapeHtml(t.id)}')" onchange="syncTimerInputs('${escapeHtml(t.id)}')">
+                    <span>min</span>
+                </div>
+                <div class="timer-display" id="display-${ctx}" data-timer-display="${escapeHtml(t.id)}">00:00</div>
+                <div class="timer-controls">
+                    <button class="t-btn" id="toggle-${ctx}" data-timer-toggle="${escapeHtml(t.id)}" onclick="toggleTimer('${escapeHtml(t.id)}')" title="Iniciar / Pausar">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button class="t-btn" onclick="stopTimer('${escapeHtml(t.id)}')" title="Detener">
+                        <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+                    </button>
+                    <button class="t-btn" onclick="resetTimer('${escapeHtml(t.id)}')" title="Reiniciar">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                    <button class="t-btn" onclick="closeBox('${escapeHtml(boxId)}')" title="Cerrar caja" style="margin-left:auto;">
+                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+                    </button>
+                </div>
+            </div>`;
+        }
+
+        function renderTimerCard(t, index) {
+            const isGeneral = t.id === 'general';
+            const cardClass = isGeneral ? 'timer-widget' : 'timer-widget extra-timer';
+            const styleAttr = t.color ? `style="--timer-color:${escapeHtml(t.color)}"` : '';
+
+            const deleteBtn = !isGeneral
+                ? `<button class="t-btn-delete" onclick="deleteTimer('${escapeHtml(t.id)}')" title="Eliminar">×</button>` : '';
+            const addBtn = isGeneral
+                ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
+            const hideBtn = !isGeneral
+                ? `<button class="t-btn-hide" onclick="toggleTimerHidden('${escapeHtml(t.id)}')" title="Ocultar" aria-label="Ocultar">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+                   </button>` : '';
+
+            let dragAttrs = '';
+            if (!isGeneral) {
+                dragAttrs = `draggable="true" ondragstart="onDragStart(event, ${index})" ondragover="onDragOver(event)" ondrop="onDrop(event, ${index})" ondragend="onDragEnd(event)" ontouchstart="onTouchStart(event, ${index})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)"`;
+            }
+
+            return `
+            <div class="${cardClass}" id="widget-${escapeHtml(t.id)}" data-index="${index}" ${styleAttr} ${dragAttrs}>
+                <span class="timer-title">
+                    <span class="timer-color-dot" onclick="event.stopPropagation();cycleTimerColor('${escapeHtml(t.id)}')" title="Cambiar color"></span>
+                    <button class="timer-name-btn" onclick="event.stopPropagation(); openTimerMenu('${escapeHtml(t.id)}')" title="Añadir a caja">${escapeHtml(t.name)}</button>
+                </span>
+                ${hideBtn}
+                <div class="timer-input-group">
+                    <input type="number" id="t-input-h-${escapeHtml(t.id)}" data-timer-input-h="${escapeHtml(t.id)}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" oninput="syncTimerInputs('${escapeHtml(t.id)}')" onchange="syncTimerInputs('${escapeHtml(t.id)}')">
+                    <span>h</span>
+                    <input type="number" id="t-input-m-${escapeHtml(t.id)}" data-timer-input-m="${escapeHtml(t.id)}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos" oninput="syncTimerInputs('${escapeHtml(t.id)}')" onchange="syncTimerInputs('${escapeHtml(t.id)}')">
+                    <span>min</span>
+                </div>
+                <div class="timer-display" id="t-display-${escapeHtml(t.id)}" data-timer-display="${escapeHtml(t.id)}">00:00</div>
+                <div class="timer-controls">
+                    <button class="t-btn" id="t-btn-toggle-${escapeHtml(t.id)}" data-timer-toggle="${escapeHtml(t.id)}" onclick="toggleTimer('${escapeHtml(t.id)}')" title="Iniciar / Pausar">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button class="t-btn" onclick="stopTimer('${escapeHtml(t.id)}')" title="Detener">
+                        <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+                    </button>
+                    <button class="t-btn" onclick="resetTimer('${escapeHtml(t.id)}')" title="Reiniciar">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                    ${deleteBtn}
+                    ${addBtn}
+                </div>
+            </div>`;
+        }
+
         function renderTimersUI() {
             const container = document.getElementById('timers-container');
             const headerBar = document.getElementById('timers-header-bar');
 
             const visibleExtras = timersList.filter(t => t.id !== 'general' && !t.hidden).length;
             const hiddenList    = timersList.filter(t => t.id !== 'general' && t.hidden);
-            const totalExtras   = visibleExtras + hiddenList.length;
 
-            if (totalExtras > 0) {
+            if (visibleExtras + hiddenList.length > 0) {
                 headerBar.style.display = 'flex';
                 const label = hiddenList.length
                     ? `Adicionales (${visibleExtras}) · ${hiddenList.length} oculto${hiddenList.length > 1 ? 's' : ''}`
@@ -2242,7 +2602,8 @@
             const generalIdx = timersList.findIndex(t => t.id === 'general');
             if (generalIdx !== -1) html += renderTimerCard(timersList[generalIdx], generalIdx);
 
-            if (hiddenList.length > 0) {
+            const totalHiddenItems = hiddenList.length + timerBoxes.length;
+            if (totalHiddenItems > 0) {
                 const dotsHtml = hiddenList.map(t => `
                     <button class="hidden-dot ${t.tRunning ? 'is-running' : ''}"
                             style="--dot-color:${escapeHtml(t.color)}"
@@ -2252,28 +2613,56 @@
 
                 const safeQuery = escapeHtml(hiddenSearchQuery);
 
-                const pillsHtml = hiddenList.map(t => `
-                    <div class="hidden-timer-pill ${t.tRunning ? 'is-running' : ''}"
-                         style="--pill-color:${escapeHtml(t.color)}"
-                         data-name="${escapeHtml((t.name||'').toLowerCase())}"
-                         onclick="toggleTimerHidden('${escapeHtml(t.id)}')"
-                         title="Mostrar ${escapeHtml(t.name)}">
-                        <span class="pill-dot"></span>
-                        <span class="pill-name">${escapeHtml(t.name)}</span>
-                        <span class="pill-time" id="pill-time-${escapeHtml(t.id)}">00:00</span>
-                    </div>`
-                ).join('') + '<div class="hidden-bar-pill-empty">No hay coincidencias</div>';
+                const pillsHtml =
+                    hiddenList.map(t => `
+                        <div class="hidden-timer-pill ${t.tRunning ? 'is-running' : ''}"
+                             style="--pill-color:${escapeHtml(t.color)}"
+                             data-name="${escapeHtml((t.name||'').toLowerCase())}"
+                             onclick="toggleTimerHidden('${escapeHtml(t.id)}')"
+                             title="Mostrar ${escapeHtml(t.name)}">
+                            <span class="pill-dot"></span>
+                            <span class="pill-name">${escapeHtml(t.name)}</span>
+                            <span class="pill-time" id="pill-time-${escapeHtml(t.id)}">00:00</span>
+                        </div>`).join('')
+                    + timerBoxes.map(box => {
+                        const isOpened = openedBoxIds.has(box.id);
+                        return `<div class="hidden-timer-pill box-pill ${isOpened ? 'is-opened' : ''}"
+                             style="--pill-color:${escapeHtml(box.color)}"
+                             data-name="${escapeHtml(box.name.toLowerCase())}|box"
+                             onpointerdown="handleBoxPillDown(event, '${escapeHtml(box.id)}')"
+                             onpointerup="handleBoxPillUp(event, '${escapeHtml(box.id)}')"
+                             onpointercancel="handleBoxPillCancel()"
+                             onpointerleave="handleBoxPillCancel()"
+                             oncontextmenu="event.preventDefault();"
+                             title="Toca para abrir/cerrar · mantén para opciones">
+                            <span class="pill-dot"></span>
+                            <span class="pill-name">${escapeHtml(box.name)}</span>
+                            <span class="pill-suffix">|Box</span>
+                        </div>`;
+                    }).join('')
+                    + '<div class="hidden-bar-pill-empty">No hay coincidencias</div>';
 
-                const resultsHtml = hiddenList.map(t => `
-                    <div class="hidden-bar-result-item"
-                         style="--result-color:${escapeHtml(t.color)}"
-                         data-name="${escapeHtml((t.name||'').toLowerCase())}"
-                         onclick="toggleTimerHidden('${escapeHtml(t.id)}')"
-                         title="Mostrar ${escapeHtml(t.name)}">
-                        <span class="result-dot"></span>
-                        <span class="result-name">${escapeHtml(t.name)}</span>
-                    </div>`
-                ).join('') + '<div class="hidden-bar-result-empty">No hay coincidencias</div>';
+                const resultsHtml =
+                    hiddenList.map(t => `
+                        <div class="hidden-bar-result-item"
+                             style="--result-color:${escapeHtml(t.color)}"
+                             data-name="${escapeHtml((t.name||'').toLowerCase())}"
+                             onclick="toggleTimerHidden('${escapeHtml(t.id)}')"
+                             title="Mostrar ${escapeHtml(t.name)}">
+                            <span class="result-dot"></span>
+                            <span class="result-name">${escapeHtml(t.name)}</span>
+                        </div>`).join('')
+                    + timerBoxes.map(box => `
+                        <div class="hidden-bar-result-item box-result"
+                             style="--result-color:${escapeHtml(box.color)}"
+                             data-name="${escapeHtml(box.name.toLowerCase())}|box"
+                             onclick="toggleOpenBox('${escapeHtml(box.id)}')"
+                             title="Abrir caja ${escapeHtml(box.name)}">
+                            <span class="result-dot"></span>
+                            <span class="result-name">${escapeHtml(box.name)}</span>
+                            <span class="result-suffix">|Box</span>
+                        </div>`).join('')
+                    + '<div class="hidden-bar-result-empty">No hay coincidencias</div>';
 
                 html += `
                     <div class="hidden-timers-bar active ${hiddenBarExpanded ? 'expanded' : ''} ${hiddenSearchOpen ? 'searching' : ''}" id="hidden-timers-bar">
@@ -2301,69 +2690,51 @@
                 html += renderTimerCard(t, index);
             });
 
+            openedBoxIds.forEach(boxId => {
+                const box = timerBoxes.find(b => b.id === boxId);
+                if (!box) return;
+                box.timerIds.forEach(tid => {
+                    const t = timersList.find(x => x.id === tid);
+                    if (!t) return;
+                    html += renderBoxTimerCard(t, boxId, box);
+                });
+            });
+
             container.innerHTML = html;
             updateTimersDisplayValues();
-        }
-
-        function renderTimerCard(t, index) {
-            const isGeneral = t.id === 'general';
-            const cardClass = isGeneral ? 'timer-widget' : 'timer-widget extra-timer';
-            const styleAttr = t.color ? `style="--timer-color:${escapeHtml(t.color)}"` : '';
-
-            const deleteBtn = !isGeneral
-                ? `<button class="t-btn-delete" onclick="deleteTimer('${escapeHtml(t.id)}')" title="Eliminar">×</button>` : '';
-            const addBtn = isGeneral
-                ? `<button class="add-timer-inline-btn" onclick="openAddTimerModal()" title="Añadir temporizador">+</button>` : '';
-            const hideBtn = !isGeneral
-                ? `<button class="t-btn-hide" onclick="toggleTimerHidden('${escapeHtml(t.id)}')" title="Ocultar" aria-label="Ocultar">
-                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
-                   </button>` : '';
-
-            let dragAttrs = '';
-            if (!isGeneral) {
-                dragAttrs = `draggable="true" ondragstart="onDragStart(event, ${index})" ondragover="onDragOver(event)" ondrop="onDrop(event, ${index})" ondragend="onDragEnd(event)" ontouchstart="onTouchStart(event, ${index})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)"`;
-            }
-
-            return `
-            <div class="${cardClass}" id="widget-${escapeHtml(t.id)}" data-index="${index}" ${styleAttr} ${dragAttrs}>
-                <span class="timer-title">
-                    <span class="timer-color-dot" onclick="event.stopPropagation();cycleTimerColor('${escapeHtml(t.id)}')" title="Cambiar color"></span>${escapeHtml(t.name)}
-                </span>
-                ${hideBtn}
-                <div class="timer-input-group">
-                    <input type="number" id="t-input-h-${escapeHtml(t.id)}" placeholder="0" min="0" max="99" value="${t.inputH || ''}" title="Horas" oninput="syncTimerInputs('${escapeHtml(t.id)}')" onchange="syncTimerInputs('${escapeHtml(t.id)}')">
-                    <span>h</span>
-                    <input type="number" id="t-input-m-${escapeHtml(t.id)}" placeholder="0" min="0" max="999" value="${t.inputM || ''}" title="Minutos" oninput="syncTimerInputs('${escapeHtml(t.id)}')" onchange="syncTimerInputs('${escapeHtml(t.id)}')">
-                    <span>min</span>
-                </div>
-                <div class="timer-display" id="t-display-${escapeHtml(t.id)}">00:00</div>
-                <div class="timer-controls">
-                    <button class="t-btn" id="t-btn-toggle-${escapeHtml(t.id)}" onclick="toggleTimer('${escapeHtml(t.id)}')" title="Iniciar / Pausar">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                    <button class="t-btn" onclick="stopTimer('${escapeHtml(t.id)}')" title="Detener">
-                        <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
-                    </button>
-                    <button class="t-btn" onclick="resetTimer('${escapeHtml(t.id)}')" title="Reiniciar">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                    </button>
-                    ${deleteBtn}
-                    ${addBtn}
-                </div>
-            </div>`;
+            applyHiddenSearchFilter();
         }
 
         function syncTimerInputs(id) {
             const t = timersList.find(x => x.id === id);
             if (!t) return;
-            const hEl = document.getElementById(`t-input-h-${id}`);
-            const mEl = document.getElementById(`t-input-m-${id}`);
+
+            const active = document.activeElement;
+            let hEl = null, mEl = null;
+            if (active && active.matches && active.matches(`[data-timer-input-h="${id}"]`)) {
+                hEl = active;
+                mEl = active.closest('.timer-input-group')?.querySelector(`[data-timer-input-m="${id}"]`);
+            } else if (active && active.matches && active.matches(`[data-timer-input-m="${id}"]`)) {
+                mEl = active;
+                hEl = active.closest('.timer-input-group')?.querySelector(`[data-timer-input-h="${id}"]`);
+            } else {
+                hEl = document.querySelector(`[data-timer-input-h="${id}"]`);
+                mEl = document.querySelector(`[data-timer-input-m="${id}"]`);
+            }
             if (!hEl || !mEl) return;
+
             const h = parseInt(hEl.value) || 0;
             const m = parseInt(mEl.value) || 0;
             t.inputH = h > 0 ? h : '';
             t.inputM = m > 0 ? m : '';
             saveTimersState();
+
+            document.querySelectorAll(`[data-timer-input-h="${id}"]`).forEach(el => {
+                if (el !== hEl) el.value = t.inputH || '';
+            });
+            document.querySelectorAll(`[data-timer-input-m="${id}"]`).forEach(el => {
+                if (el !== mEl) el.value = t.inputM || '';
+            });
         }
 
         let draggedIndex = null;
@@ -2465,6 +2836,10 @@
         function deleteTimer(id) {
             if (confirm("¿Estás seguro de eliminar este temporizador?")) {
                 timersList = timersList.filter(t => t.id !== id);
+                timerBoxes.forEach(box => {
+                    box.timerIds = box.timerIds.filter(tid => tid !== id);
+                });
+                saveBoxes();
                 saveTimersState();
                 renderTimersUI();
             }
@@ -2472,8 +2847,8 @@
 
         function getTimerSetMs(t) {
             if (t.setMs && t.setMs > 0) return t.setMs;
-            const h = parseInt(document.getElementById(`t-input-h-${t.id}`)?.value) || 0;
-            const m = parseInt(document.getElementById(`t-input-m-${t.id}`)?.value) || 0;
+            const h = parseInt(document.querySelector(`[data-timer-input-h="${t.id}"]`)?.value) || 0;
+            const m = parseInt(document.querySelector(`[data-timer-input-m="${t.id}"]`)?.value) || 0;
             return (h * 3600 + m * 60) * 1000;
         }
 
@@ -2481,8 +2856,8 @@
             stopAlarmSound();
             const t = timersList.find(x => x.id === id);
             if (!t) return;
-            const hEl = document.getElementById(`t-input-h-${id}`);
-            const mEl = document.getElementById(`t-input-m-${id}`);
+            const hEl = document.querySelector(`[data-timer-input-h="${id}"]`);
+            const mEl = document.querySelector(`[data-timer-input-m="${id}"]`);
             const h = hEl ? (parseInt(hEl.value) || 0) : 0;
             const m = mEl ? (parseInt(mEl.value) || 0) : 0;
             t.inputH = h || '';
@@ -2517,8 +2892,8 @@
             stopAlarmSound();
             let t = timersList.find(x => x.id === id);
             if (!t) return;
-            const hEl = document.getElementById(`t-input-h-${id}`);
-            const mEl = document.getElementById(`t-input-m-${id}`);
+            const hEl = document.querySelector(`[data-timer-input-h="${id}"]`);
+            const mEl = document.querySelector(`[data-timer-input-m="${id}"]`);
             if (hEl && mEl) {
                 const h = parseInt(hEl.value) || 0;
                 const m = parseInt(mEl.value) || 0;
@@ -2571,8 +2946,8 @@
             stopAlarmSound();
             let t = timersList.find(x => x.id === id);
             if (!t) return;
-            const hEl = document.getElementById(`t-input-h-${id}`);
-            const mEl = document.getElementById(`t-input-m-${id}`);
+            const hEl = document.querySelector(`[data-timer-input-h="${id}"]`);
+            const mEl = document.querySelector(`[data-timer-input-m="${id}"]`);
             let h = 0, m = 0;
             if (hEl && mEl) {
                 h = parseInt(hEl.value) || 0;
@@ -2700,26 +3075,25 @@
                 let s = totalSec % 60;
                 let disp = h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
-                const displayEl = document.getElementById(`t-display-${t.id}`);
-                if (displayEl) displayEl.innerText = disp;
+                document.querySelectorAll(`[data-timer-display="${t.id}"]`).forEach(el => {
+                    el.innerText = disp;
+                    el.classList.toggle('running', !!t.tRunning);
+                });
                 const pillEl = document.getElementById(`pill-time-${t.id}`);
                 if (pillEl) pillEl.innerText = disp;
 
                 if (t.tRunning) { if (!firstRunningInfo) firstRunningInfo = { id: t.id, disp: disp, isRunning: true }; }
                 else if (current > 0) { if (!firstWithTimeInfo) firstWithTimeInfo = { id: t.id, disp: disp, isRunning: false }; }
 
-                const btnToggle = document.getElementById(`t-btn-toggle-${t.id}`);
-                if (btnToggle) {
+                document.querySelectorAll(`[data-timer-toggle="${t.id}"]`).forEach(btn => {
                     if (t.tRunning) {
-                        btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-                        btnToggle.classList.add('active');
-                        if (displayEl) displayEl.classList.add('running');
+                        btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                        btn.classList.add('active');
                     } else {
-                        btnToggle.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-                        btnToggle.classList.remove('active');
-                        if (displayEl) displayEl.classList.remove('running');
+                        btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+                        btn.classList.remove('active');
                     }
-                }
+                });
             });
 
             const activeTimerInfo = firstRunningInfo || firstWithTimeInfo;
@@ -2951,7 +3325,9 @@
                 'modal-content-metrics': 'Métricas', 'modal-content-daystats': 'Día',
                 'modal-content-block': 'Bloque', 'modal-content-work': 'Jornada', 'modal-content-day': 'Día',
                 'modal-content-marker': 'Marcador', 'modal-content-notes': 'Notas',
-                'modal-content-timecalc': 'Calculadora', 'modal-content-history': 'Historial'
+                'modal-content-timecalc': 'Calculadora', 'modal-content-history': 'Historial',
+                'modal-content-timermenu': 'Caja', 'modal-content-newbox': 'Nueva Caja',
+                'modal-content-boxcontents': 'Caja'
             };
             let title = 'Modal';
             const activePanel = Array.from(modal.querySelectorAll(':scope > div[id^="modal-content-"]'))
@@ -3980,7 +4356,11 @@
             document.getElementById('main-modal-card').classList.remove('wide');
             document.getElementById('dual-notes-card').style.display = 'none';
             editingEntornoId = null;
-            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes', 'timecalc', 'history'].forEach(id => {
+            currentTimerForMenu = null;
+            editingNewBoxContext = null;
+            currentBoxForContents = null;
+            ['work', 'marker', 'block', 'day', 'daystats', 'taskcreate', 'metrics', 'general', 'goal', 'addtimer', 'notes', 'timecalc', 'history',
+             'timermenu', 'newbox', 'boxcontents'].forEach(id => {
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
@@ -4341,7 +4721,8 @@
             let backup = {
                 tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig,
                 day: dayConfig, markers: markersData, collapsed: collapsedMonths,
-                trackedYears: trackedYears, timerStats: timerStats, timersList: timersList, notes: notesData
+                trackedYears: trackedYears, timerStats: timerStats, timersList: timersList, notes: notesData,
+                timerBoxes: timerBoxes, openedBoxes: Array.from(openedBoxIds)
             };
             const jsonStr = JSON.stringify(backup, null, 2);
             if ('showSaveFilePicker' in window) {
@@ -4388,6 +4769,8 @@
                         if (data.timerStats) safeSetItem('wkTimerStats', JSON.stringify(data.timerStats));
                         if (data.timersList) safeSetItem('wkTimersList', JSON.stringify(data.timersList));
                         if (data.notes) safeSetItem('wkNotes', JSON.stringify(data.notes));
+                        if (data.timerBoxes) safeSetItem('wkTimerBoxes', JSON.stringify(data.timerBoxes));
+                        if (data.openedBoxes) safeSetItem('wkOpenedBoxes', JSON.stringify(data.openedBoxes));
                         alert("Datos restaurados correctamente. La página se reiniciará para aplicar los cambios.");
                         location.reload();
                     }

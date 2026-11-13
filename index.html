@@ -3022,12 +3022,10 @@
             label: ''
         };
 
-        // Cargar desde localStorage
         try {
             const savedFocus = JSON.parse(localStorage.getItem('wkFocusMode') || 'null');
             if (savedFocus && savedFocus.active) {
                 focusMode = savedFocus;
-                // Validar que los ids aún existen
                 if (focusMode.type === 'box') {
                     if (!timerBoxes.some(b => b.id === focusMode.boxId)) focusMode.active = false;
                 } else if (focusMode.type === 'manual') {
@@ -3091,7 +3089,6 @@
                 focusMode.boxId = options.boxId;
                 const box = timerBoxes.find(b => b.id === options.boxId);
                 focusMode.label = box ? box.name : 'Caja';
-                // Asegurar que la caja está abierta para verla
                 if (!openedBoxIds.has(options.boxId)) openedBoxIds.add(options.boxId);
             } else if (type === 'manual') {
                 focusMode.timerIds = options.timerIds || [];
@@ -3103,7 +3100,6 @@
             saveBoxes();
             renderTimersUI();
             applyFocusMode();
-            // Auto-scroll arriba para empezar limpio
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -3134,7 +3130,6 @@
 
             let quickHtml = '';
 
-            // Opción: Todos los visibles
             const visibleCount = timersList.filter(t => t.id === 'general' || !t.hidden).length;
             quickHtml += `<button class="focus-option primary" onclick="enterFocus('all'); closeModal();">
                 <span class="focus-option-icon">
@@ -3149,7 +3144,6 @@
                 <span class="focus-option-count">${visibleCount}</span>
             </button>`;
 
-            // Opciones: una por caja
             timerBoxes.forEach(box => {
                 if (box.timers.length === 0) return;
                 quickHtml += `<button class="focus-option" onclick="enterFocus('box', {boxId: '${escapeHtml(box.id)}'}); closeModal();">
@@ -3165,11 +3159,9 @@
 
             quickEl.innerHTML = quickHtml;
 
-            // Selección manual
             const currentlySelected = focusMode.type === 'manual' ? focusMode.timerIds : [];
             let manualHtml = '';
 
-            // Todos los timers del sistema (principales + cajas)
             const allTimers = [];
             timersList.forEach(t => {
                 if (t.id === 'general' || !t.hidden) allTimers.push({ ...t, scope: 'main' });
@@ -3344,7 +3336,6 @@
             openedBoxIds.forEach(boxId => {
                 const box = timerBoxes.find(b => b.id === boxId);
                 if (!box || box.timers.length === 0) return;
-                // En focus mode solo mostrar la cabecera de caja si contiene timers visibles
                 const visibleTimers = box.timers.filter(bt => isTimerInFocus(bt.id));
                 if (visibleTimers.length === 0) return;
 
@@ -4146,6 +4137,7 @@
             document.getElementById('notes-mode').value = 'date';
             document.getElementById('notes-date-picker').value = date;
             toggleNotesMode();
+            flushNotesSave();
         }
 
         let notesIndexRefreshTimer = null;
@@ -4181,6 +4173,7 @@
                 localStorage.setItem('wkNotesLastDate', picker.value);
                 loadNoteForPicker();
             }
+            flushNotesSave();
         }
 
         function loadNoteForPicker() {
@@ -4190,6 +4183,7 @@
             if (date) localStorage.setItem('wkNotesLastDate', date);
             const sel = document.getElementById('notes-index-select');
             if (sel && !sel.disabled) sel.value = date;
+            flushNotesSave();
         }
 
         function saveMainNote() {
@@ -5395,7 +5389,15 @@
         window.addEventListener('pagehide', flushNotesSave);
         window.addEventListener('beforeunload', flushNotesSave);
 
+        /* ============================================================
+           GUARDADO PERIÓDICO DE SEGURIDAD (evita pérdida de notas
+           por debounce pendiente al cerrar la pestaña o cambiar de app)
+           ============================================================ */
+        setInterval(() => { flushNotesSave(); }, 30000);
+
         async function syncExport() {
+            // CORRECCIÓN: forzar el guardado de notas pendientes antes de exportar
+            flushNotesSave();
             let backup = {
                 tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig,
                 day: dayConfig, markers: markersData, collapsed: collapsedMonths,
@@ -5437,6 +5439,9 @@
                     const data = JSON.parse(e.target.result);
                     if (!data.tasks || !data.timersList) { alert("El archivo no parece ser una copia de seguridad válida de Tiempo."); return; }
                     if(confirm("¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.")) {
+                        // CORRECCIÓN: las notas se guardan PRIMERO para garantizar que
+                        // siempre se restauran, incluso si otros datos consumen cuota.
+                        if (data.notes) safeSetItem('wkNotes', JSON.stringify(data.notes));
                         if (data.tasks) safeSetItem('wkTasks', JSON.stringify(data.tasks));
                         if (data.entornos) safeSetItem('wkEntornos', JSON.stringify(data.entornos));
                         if (data.work) safeSetItem('wkWorkCfg', JSON.stringify(data.work));
@@ -5447,7 +5452,6 @@
                         if (data.trackedYears) safeSetItem('wkYears', JSON.stringify(data.trackedYears));
                         if (data.timerStats) safeSetItem('wkTimerStats', JSON.stringify(data.timerStats));
                         if (data.timersList) safeSetItem('wkTimersList', JSON.stringify(data.timersList));
-                        if (data.notes) safeSetItem('wkNotes', JSON.stringify(data.notes));
                         if (data.timerBoxes) safeSetItem('wkTimerBoxes', JSON.stringify(data.timerBoxes));
                         if (data.openedBoxes) safeSetItem('wkOpenedBoxes', JSON.stringify(data.openedBoxes));
                         if (data.focusMode) safeSetItem('wkFocusMode', JSON.stringify(data.focusMode));

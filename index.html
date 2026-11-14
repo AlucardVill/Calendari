@@ -174,6 +174,7 @@
         .header-menu-btn:active { transform: scale(0.94); }
         .header-menu-btn svg { width: 20px; height: 20px; display: block; }
 
+        /* ===================== FOCUS MODE ===================== */
         .focus-bar {
             display: none;
             align-items: center;
@@ -311,6 +312,7 @@
             padding-right: 2px;
         }
 
+        /* Botón de focus en el header de la caja */
         .box-section-focus {
             margin-left: auto;
             margin-right: 4px;
@@ -1670,6 +1672,7 @@
 
         #calc-result, #calc-add-result { padding: 14px; min-height: 68px; border-radius: 11px; }
 
+        /* ===================== CAJAS DE TEMPORIZADORES ===================== */
         .box-timer-card {
             border-left-color: var(--box-color, var(--accent)) !important;
             border-left-width: 4px !important;
@@ -2312,14 +2315,6 @@
     </script>
 
     <script>
-        /* ============================================================
-           v3.0 NOTES FIX — Diagnóstico visible y guardado robusto
-           ============================================================ */
-        console.log('%c Timer v3.0 Notes Fix ', 'background:#34d399;color:#000;font-weight:bold;padding:4px 8px;border-radius:4px;');
-        if (navigator.storage && navigator.storage.persist) {
-            navigator.storage.persist().then(g => console.log('Storage persistente:', g ? '✓' : '✗')).catch(()=>{});
-        }
-
         function escapeHtml(s) {
             return String(s ?? '').replace(/[&<>"']/g, c => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -2525,7 +2520,6 @@
         let goalQueue = [];
 
         let notesData = JSON.parse(localStorage.getItem('wkNotes')) || { general: '' };
-        console.log('📝 Notas cargadas al inicio:', Object.keys(notesData).length, 'entradas →', Object.keys(notesData));
 
         let audioCtx = null;
         let alarmInterval = null;
@@ -2576,6 +2570,9 @@
             renderTimersUI();
         }
 
+        /* ============================================================
+           CAJAS DE TEMPORIZADORES
+           ============================================================ */
         let timerBoxes = JSON.parse(localStorage.getItem('wkTimerBoxes')) || [];
         let openedBoxIds = new Set(JSON.parse(localStorage.getItem('wkOpenedBoxes') || '[]'));
         let currentTimerForMenu = null;
@@ -3014,18 +3011,23 @@
             </div>`;
         }
 
+        /* ============================================================
+           MODO CONCENTRACIÓN
+           ============================================================ */
         let focusMode = {
             active: false,
-            type: null,
+            type: null,           // 'all' | 'box' | 'manual'
             boxId: null,
             timerIds: [],
             label: ''
         };
 
+        // Cargar desde localStorage
         try {
             const savedFocus = JSON.parse(localStorage.getItem('wkFocusMode') || 'null');
             if (savedFocus && savedFocus.active) {
                 focusMode = savedFocus;
+                // Validar que los ids aún existen
                 if (focusMode.type === 'box') {
                     if (!timerBoxes.some(b => b.id === focusMode.boxId)) focusMode.active = false;
                 } else if (focusMode.type === 'manual') {
@@ -3089,6 +3091,7 @@
                 focusMode.boxId = options.boxId;
                 const box = timerBoxes.find(b => b.id === options.boxId);
                 focusMode.label = box ? box.name : 'Caja';
+                // Asegurar que la caja está abierta para verla
                 if (!openedBoxIds.has(options.boxId)) openedBoxIds.add(options.boxId);
             } else if (type === 'manual') {
                 focusMode.timerIds = options.timerIds || [];
@@ -3100,6 +3103,7 @@
             saveBoxes();
             renderTimersUI();
             applyFocusMode();
+            // Auto-scroll arriba para empezar limpio
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -3130,6 +3134,7 @@
 
             let quickHtml = '';
 
+            // Opción: Todos los visibles
             const visibleCount = timersList.filter(t => t.id === 'general' || !t.hidden).length;
             quickHtml += `<button class="focus-option primary" onclick="enterFocus('all'); closeModal();">
                 <span class="focus-option-icon">
@@ -3144,6 +3149,7 @@
                 <span class="focus-option-count">${visibleCount}</span>
             </button>`;
 
+            // Opciones: una por caja
             timerBoxes.forEach(box => {
                 if (box.timers.length === 0) return;
                 quickHtml += `<button class="focus-option" onclick="enterFocus('box', {boxId: '${escapeHtml(box.id)}'}); closeModal();">
@@ -3159,9 +3165,11 @@
 
             quickEl.innerHTML = quickHtml;
 
+            // Selección manual
             const currentlySelected = focusMode.type === 'manual' ? focusMode.timerIds : [];
             let manualHtml = '';
 
+            // Todos los timers del sistema (principales + cajas)
             const allTimers = [];
             timersList.forEach(t => {
                 if (t.id === 'general' || !t.hidden) allTimers.push({ ...t, scope: 'main' });
@@ -3202,6 +3210,9 @@
             closeModal();
         }
 
+        /* ============================================================
+           RENDERIZADO PRINCIPAL
+           ============================================================ */
         function renderTimersUI() {
             const container = document.getElementById('timers-container');
             const headerBar = document.getElementById('timers-header-bar');
@@ -3333,6 +3344,7 @@
             openedBoxIds.forEach(boxId => {
                 const box = timerBoxes.find(b => b.id === boxId);
                 if (!box || box.timers.length === 0) return;
+                // En focus mode solo mostrar la cabecera de caja si contiene timers visibles
                 const visibleTimers = box.timers.filter(bt => isTimerInFocus(bt.id));
                 if (visibleTimers.length === 0) return;
 
@@ -3908,38 +3920,18 @@
         let winZCounter = 2000;
         const minimizedWindows = new Map();
 
-        /* ============================================================
-           GUARDADO DE NOTAS — SIN DEBOUNCE
-           ============================================================ */
         let notesSaveTimer = null;
-
         function flushNotesSave() {
             if (notesSaveTimer) { clearTimeout(notesSaveTimer); notesSaveTimer = null; }
-            const ok = safeSetItem('wkNotes', JSON.stringify(notesData));
-            if (!ok) {
-                console.error('⚠️ NO se pudieron guardar las notas. Backup inmediato recomendado.');
-            }
-            return ok;
+            safeSetItem('wkNotes', JSON.stringify(notesData));
         }
-
         function scheduleNotesSave() {
-            // Antes había un debounce de 400ms. Ahora guardamos de inmediato.
-            flushNotesSave();
+            if (notesSaveTimer) clearTimeout(notesSaveTimer);
+            notesSaveTimer = setTimeout(() => {
+                notesSaveTimer = null;
+                safeSetItem('wkNotes', JSON.stringify(notesData));
+            }, 400);
         }
-
-        window.debugNotes = function() {
-            const mem = Object.keys(notesData).filter(k => k !== 'general');
-            let stored = {};
-            try { stored = JSON.parse(localStorage.getItem('wkNotes') || '{}'); } catch(_) {}
-            const st = Object.keys(stored).filter(k => k !== 'general');
-            console.group('📝 DEBUG NOTES');
-            console.log('En memoria:', mem.length, 'fechas →', mem);
-            console.log('En localStorage:', st.length, 'fechas →', st);
-            console.log('Objeto completo en memoria:', notesData);
-            console.log('Objeto completo en storage:', stored);
-            console.groupEnd();
-            return { mem, st, data: notesData, stored };
-        };
 
         function hasVisibleQuarterWindow() {
             return Array.from(quarterWindows.values()).some(w => w.overlay.style.display !== 'none');
@@ -4154,7 +4146,6 @@
             document.getElementById('notes-mode').value = 'date';
             document.getElementById('notes-date-picker').value = date;
             toggleNotesMode();
-            flushNotesSave();
         }
 
         let notesIndexRefreshTimer = null;
@@ -4190,7 +4181,6 @@
                 localStorage.setItem('wkNotesLastDate', picker.value);
                 loadNoteForPicker();
             }
-            flushNotesSave();
         }
 
         function loadNoteForPicker() {
@@ -4200,26 +4190,18 @@
             if (date) localStorage.setItem('wkNotesLastDate', date);
             const sel = document.getElementById('notes-index-select');
             if (sel && !sel.disabled) sel.value = date;
-            flushNotesSave();
         }
 
-        /* CORRECCIÓN CLAVE: guardado inmediato + fallback de fecha */
         function saveMainNote() {
             const mode = document.getElementById('notes-mode').value;
             const ta = document.getElementById('notes-main-textarea');
             if (mode === 'general') {
                 notesData.general = ta.value;
             } else {
-                const picker = document.getElementById('notes-date-picker');
-                let date = picker.value;
-                if (!date) {
-                    const t = new Date();
-                    date = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
-                    picker.value = date;
-                }
-                notesData[date] = ta.value;
+                const date = document.getElementById('notes-date-picker').value;
+                if (date) notesData[date] = ta.value;
             }
-            flushNotesSave();
+            scheduleNotesSave();
             renderDayTaskMarks();
             if (mode === 'date') {
                 clearTimeout(notesIndexRefreshTimer);
@@ -4229,13 +4211,12 @@
             }
         }
 
-        /* CORRECCIÓN CLAVE: guardado inmediato de notas duales */
         function saveDualNotes() {
             const ta = document.getElementById('dual-notes-text');
             const date = ta.dataset.date;
             if (date) {
                 notesData[date] = ta.value;
-                flushNotesSave();
+                scheduleNotesSave();
                 renderActiveWindow();
             }
         }
@@ -5414,16 +5395,7 @@
         window.addEventListener('pagehide', flushNotesSave);
         window.addEventListener('beforeunload', flushNotesSave);
 
-        // Guardado periódico de seguridad cada 30s
-        setInterval(() => { flushNotesSave(); }, 30000);
-
-        /* ============================================================
-           EXPORT / IMPORT — Notas primero y flush garantizado
-           ============================================================ */
         async function syncExport() {
-            flushNotesSave();
-            const notesCount = Object.keys(notesData).length;
-            console.log('📤 EXPORTANDO. Notas en memoria:', notesCount, notesData);
             let backup = {
                 tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig,
                 day: dayConfig, markers: markersData, collapsed: collapsedMonths,
@@ -5441,7 +5413,7 @@
                     const writable = await fileHandle.createWritable();
                     await writable.write(jsonStr);
                     await writable.close();
-                    alert("Copia guardada exitosamente en la carpeta elegida.\nNotas exportadas: " + notesCount);
+                    alert("Copia guardada exitosamente en la carpeta elegida.");
                 } catch (err) {
                     if (err.name !== 'AbortError') { console.error("Error al guardar:", err); alert("Error al guardar el archivo."); }
                 }
@@ -5452,7 +5424,7 @@
                 a.href = url;
                 a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
                 document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-                alert("Copia guardada en tu carpeta de Descargas.\nNotas exportadas: " + notesCount);
+                alert("Copia guardada en tu carpeta de Descargas. Si usas Google Drive, se sincronizará automáticamente.");
             }
         }
 
@@ -5464,16 +5436,7 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if (!data.tasks || !data.timersList) { alert("El archivo no parece ser una copia de seguridad válida de Tiempo."); return; }
-                    const notesCount = data.notes ? Object.keys(data.notes).length : 0;
-                    if(confirm(`¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.\n\nNotas en el archivo: ${notesCount}`)) {
-                        // Notas PRIMERO
-                        if (data.notes) {
-                            const ok = safeSetItem('wkNotes', JSON.stringify(data.notes));
-                            console.log('📥 IMPORTANDO notas:', notesCount, 'entradas. Guardado:', ok ? '✓' : '✗');
-                            if (!ok) {
-                                alert('⚠️ No se pudieron guardar las notas importadas (almacenamiento lleno). Haz espacio y reintenta.');
-                            }
-                        }
+                    if(confirm("¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.")) {
                         if (data.tasks) safeSetItem('wkTasks', JSON.stringify(data.tasks));
                         if (data.entornos) safeSetItem('wkEntornos', JSON.stringify(data.entornos));
                         if (data.work) safeSetItem('wkWorkCfg', JSON.stringify(data.work));
@@ -5484,6 +5447,7 @@
                         if (data.trackedYears) safeSetItem('wkYears', JSON.stringify(data.trackedYears));
                         if (data.timerStats) safeSetItem('wkTimerStats', JSON.stringify(data.timerStats));
                         if (data.timersList) safeSetItem('wkTimersList', JSON.stringify(data.timersList));
+                        if (data.notes) safeSetItem('wkNotes', JSON.stringify(data.notes));
                         if (data.timerBoxes) safeSetItem('wkTimerBoxes', JSON.stringify(data.timerBoxes));
                         if (data.openedBoxes) safeSetItem('wkOpenedBoxes', JSON.stringify(data.openedBoxes));
                         if (data.focusMode) safeSetItem('wkFocusMode', JSON.stringify(data.focusMode));
@@ -5762,6 +5726,7 @@
             alert('Posición y tamaño de ventanas restablecidos.');
         }
 
+        /* === INICIALIZACIÓN === */
         applyModalAlphaSettings();
         applyThemeColors();
         restoreBars();

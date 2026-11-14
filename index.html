@@ -5396,13 +5396,16 @@
         window.addEventListener('beforeunload', flushNotesSave);
 
         async function syncExport() {
+            flushNotesSave();
             let backup = {
                 tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig,
                 day: dayConfig, markers: markersData, collapsed: collapsedMonths,
-                trackedYears: trackedYears, timerStats: timerStats, timersList: timersList, notes: notesData,
+                trackedYears: trackedYears, timerStats: timerStats, timersList: timersList,
+                notes: JSON.parse(JSON.stringify(notesData)),
                 timerBoxes: timerBoxes, openedBoxes: Array.from(openedBoxIds),
                 focusMode: focusMode
             };
+            const totalNotas = Object.keys(backup.notes).filter(k => k !== 'general' && backup.notes[k] && backup.notes[k].trim()).length;
             const jsonStr = JSON.stringify(backup, null, 2);
             if ('showSaveFilePicker' in window) {
                 try {
@@ -5413,7 +5416,7 @@
                     const writable = await fileHandle.createWritable();
                     await writable.write(jsonStr);
                     await writable.close();
-                    alert("Copia guardada exitosamente en la carpeta elegida.");
+                    alert(`Copia guardada exitosamente.\n\nSe exportaron ${totalNotas} notas de días.`);
                 } catch (err) {
                     if (err.name !== 'AbortError') { console.error("Error al guardar:", err); alert("Error al guardar el archivo."); }
                 }
@@ -5424,7 +5427,7 @@
                 a.href = url;
                 a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
                 document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-                alert("Copia guardada en tu carpeta de Descargas. Si usas Google Drive, se sincronizará automáticamente.");
+                alert(`Copia guardada en tu carpeta de Descargas.\n\nSe exportaron ${totalNotas} notas de días.`);
             }
         }
 
@@ -5437,6 +5440,10 @@
                     const data = JSON.parse(e.target.result);
                     if (!data.tasks || !data.timersList) { alert("El archivo no parece ser una copia de seguridad válida de Tiempo."); return; }
                     if(confirm("¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.")) {
+                        const notasPorFecha = data.notes
+                            ? Object.keys(data.notes).filter(k => k !== 'general' && typeof data.notes[k] === 'string' && data.notes[k].trim()).length
+                            : 0;
+
                         if (data.tasks) safeSetItem('wkTasks', JSON.stringify(data.tasks));
                         if (data.entornos) safeSetItem('wkEntornos', JSON.stringify(data.entornos));
                         if (data.work) safeSetItem('wkWorkCfg', JSON.stringify(data.work));
@@ -5447,11 +5454,21 @@
                         if (data.trackedYears) safeSetItem('wkYears', JSON.stringify(data.trackedYears));
                         if (data.timerStats) safeSetItem('wkTimerStats', JSON.stringify(data.timerStats));
                         if (data.timersList) safeSetItem('wkTimersList', JSON.stringify(data.timersList));
-                        if (data.notes) safeSetItem('wkNotes', JSON.stringify(data.notes));
+
+                        let notasOk = true;
+                        if (data.notes) {
+                            notasOk = safeSetItem('wkNotes', JSON.stringify(data.notes));
+                        }
+
                         if (data.timerBoxes) safeSetItem('wkTimerBoxes', JSON.stringify(data.timerBoxes));
                         if (data.openedBoxes) safeSetItem('wkOpenedBoxes', JSON.stringify(data.openedBoxes));
                         if (data.focusMode) safeSetItem('wkFocusMode', JSON.stringify(data.focusMode));
-                        alert("Datos restaurados correctamente. La página se reiniciará para aplicar los cambios.");
+
+                        if (!notasOk) {
+                            alert('⚠️ No se pudieron guardar las notas (posiblemente almacenamiento lleno).\n\nLas notas del archivo se perderán al recargar.');
+                        } else {
+                            alert(`Datos restaurados correctamente.\n\nSe importaron ${notasPorFecha} notas de días.\n\nLa página se reiniciará.`);
+                        }
                         location.reload();
                     }
                 } catch (err) { alert("Error al leer el archivo. Asegúrate de que sea un JSON válido."); console.error(err); }

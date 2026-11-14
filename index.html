@@ -11,10 +11,12 @@
     <meta name="theme-color" id="theme-color-meta" content="#0d1017">
     <link rel="apple-touch-icon" href="icon-192.png">
     <script>
-        const savedTheme = localStorage.getItem('wkTheme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        if(savedTheme === 'light') document.getElementById('theme-color-meta').setAttribute('content', '#eef0f6');
-        if(localStorage.getItem('wkBatterySaver') === 'true') document.documentElement.setAttribute('data-battery-saver', 'true');
+        try {
+            const savedTheme = localStorage.getItem('wkTheme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            if(savedTheme === 'light') document.getElementById('theme-color-meta').setAttribute('content', '#eef0f6');
+            if(localStorage.getItem('wkBatterySaver') === 'true') document.documentElement.setAttribute('data-battery-saver', 'true');
+        } catch(e) { console.error("Error en script inicial:", e); }
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -2402,6 +2404,17 @@
             }[c]));
         }
 
+        function safeJSONParse(str, fallback) {
+            try {
+                if (!str) return fallback;
+                const parsed = JSON.parse(str);
+                return (parsed === null || parsed === undefined) ? fallback : parsed;
+            } catch(e) {
+                console.warn("JSON corrupto detectado, usando fallback:", e);
+                return fallback;
+            }
+        }
+
         let _storageQuotaWarned = false;
         function safeSetItem(key, value) {
             try {
@@ -2522,9 +2535,12 @@
         let globalLastHourEnd = localStorage.getItem('wkLastHourEnd') || '';
         const TIMER_PALETTE = ['#34d399','#60a5fa','#fbbf24','#fb7185','#c084fc','#38bdf8','#f472b6','#a3e635'];
 
-        let timersList = JSON.parse(localStorage.getItem('wkTimersList')) || [
+        let timersList = safeJSONParse(localStorage.getItem('wkTimersList'), [
             { id:'general', name:'General', tMode:'up', tRunning:false, tRef:0, tAcc:0, color:'#34d399' }
-        ];
+        ]);
+        if (!Array.isArray(timersList) || timersList.length === 0) {
+            timersList = [{ id:'general', name:'General', tMode:'up', tRunning:false, tRef:0, tAcc:0, color:'#34d399' }];
+        }
 
         let _migrated = false;
         timersList.forEach((t, i) => {
@@ -2600,7 +2616,8 @@
             if (emptyPill) emptyPill.style.display = (q && !anyPill) ? 'block' : 'none';
         }
 
-        let timerStats = JSON.parse(localStorage.getItem('wkTimerStats')) || [];
+        let timerStats = safeJSONParse(localStorage.getItem('wkTimerStats'), []);
+        if (!Array.isArray(timerStats)) timerStats = [];
         let _needSaveStats = false;
         timerStats.forEach((s, i) => {
             if (!s.id) { s.id = Date.now() - i * 1000; _needSaveStats = true; }
@@ -2615,7 +2632,8 @@
         let goalCompletedAt = 0;
         let goalQueue = [];
 
-        let notesData = JSON.parse(localStorage.getItem('wkNotes')) || { general: '' };
+        let notesData = safeJSONParse(localStorage.getItem('wkNotes'), { general: '' });
+        if (typeof notesData !== 'object' || notesData === null) notesData = { general: '' };
 
         let audioCtx = null;
         let alarmInterval = null;
@@ -2669,8 +2687,9 @@
         /* ============================================================
            CAJAS DE TEMPORIZADORES
            ============================================================ */
-        let timerBoxes = JSON.parse(localStorage.getItem('wkTimerBoxes')) || [];
-        let openedBoxIds = new Set(JSON.parse(localStorage.getItem('wkOpenedBoxes') || '[]'));
+        let timerBoxes = safeJSONParse(localStorage.getItem('wkTimerBoxes'), []);
+        if (!Array.isArray(timerBoxes)) timerBoxes = [];
+        let openedBoxIds = new Set(safeJSONParse(localStorage.getItem('wkOpenedBoxes'), []));
         let currentTimerForMenu = null;
         let editingNewBoxContext = null;
         let currentBoxForContents = null;
@@ -3110,30 +3129,21 @@
         /* ============================================================
            MODO CONCENTRACIÓN
            ============================================================ */
-        let focusMode = {
-            active: false,
-            type: null,
-            boxId: null,
-            timerIds: [],
-            label: ''
-        };
+        let focusMode = safeJSONParse(localStorage.getItem('wkFocusMode'), { active: false, type: null, boxId: null, timerIds: [], label: '' });
+        if (typeof focusMode !== 'object' || focusMode === null) focusMode = { active: false, type: null, boxId: null, timerIds: [], label: '' };
 
-        try {
-            const savedFocus = JSON.parse(localStorage.getItem('wkFocusMode') || 'null');
-            if (savedFocus && savedFocus.active) {
-                focusMode = savedFocus;
-                if (focusMode.type === 'box') {
-                    if (!timerBoxes.some(b => b.id === focusMode.boxId)) focusMode.active = false;
-                } else if (focusMode.type === 'manual') {
-                    focusMode.timerIds = focusMode.timerIds.filter(id => {
-                        if (timersList.some(t => t.id === id)) return true;
-                        for (const box of timerBoxes) if (box.timers.some(t => t.id === id)) return true;
-                        return false;
-                    });
-                    if (focusMode.timerIds.length === 0) focusMode.active = false;
-                }
+        if (focusMode.active) {
+            if (focusMode.type === 'box') {
+                if (!timerBoxes.some(b => b.id === focusMode.boxId)) focusMode.active = false;
+            } else if (focusMode.type === 'manual') {
+                focusMode.timerIds = focusMode.timerIds.filter(id => {
+                    if (timersList.some(t => t.id === id)) return true;
+                    for (const box of timerBoxes) if (box.timers.some(t => t.id === id)) return true;
+                    return false;
+                });
+                if (focusMode.timerIds.length === 0) focusMode.active = false;
             }
-        } catch(_) {}
+        }
 
         function saveFocusMode() {
             safeSetItem('wkFocusMode', JSON.stringify(focusMode));
@@ -3304,6 +3314,7 @@
         function renderTimersUI() {
             const container = document.getElementById('timers-container');
             const headerBar = document.getElementById('timers-header-bar');
+            if (!container || !headerBar) return;
 
             const visibleExtras = timersList.filter(t => t.id !== 'general' && !t.hidden).length;
             const hiddenList    = timersList.filter(t => t.id !== 'general' && t.hidden);
@@ -3882,7 +3893,7 @@
             const el = document.getElementById('floating-timer');
             if (!el || el.dataset.dragInit) return;
             el.dataset.dragInit = '1';
-            const saved = JSON.parse(localStorage.getItem('wkFloatTimerPos') || 'null');
+            const saved = safeJSONParse(localStorage.getItem('wkFloatTimerPos'), null);
             if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
                 el.style.left = saved.left + 'px';
                 el.style.top = saved.top + 'px';
@@ -3927,14 +3938,15 @@
         const diasFull = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
         const currentYear = new Date().getFullYear();
 
-        let rawTasks = JSON.parse(localStorage.getItem('wkTasks')) || {};
+        let rawTasks = safeJSONParse(localStorage.getItem('wkTasks'), {});
         let tasksData = {};
         for (let key in rawTasks) tasksData[key] = rawTasks[key];
         safeSetItem('wkTasks', JSON.stringify(tasksData));
 
-        let entornosData = JSON.parse(localStorage.getItem('wkEntornos')) || [];
+        let entornosData = safeJSONParse(localStorage.getItem('wkEntornos'), []);
+        if (!Array.isArray(entornosData)) entornosData = [];
 
-        let trackedYears = JSON.parse(localStorage.getItem('wkYears'));
+        let trackedYears = safeJSONParse(localStorage.getItem('wkYears'), null);
         if (!trackedYears || !Array.isArray(trackedYears)) {
             let yearsSet = new Set();
             for (let y = currentYear - 1; y <= currentYear + 2; y++) yearsSet.add(y);
@@ -3983,11 +3995,11 @@
             }
         }
 
-        let workConfig = JSON.parse(localStorage.getItem('wkWorkCfg')) || { start: 7, end: 17 };
-        let blockConfig = JSON.parse(localStorage.getItem('wkBlockCfg')) || { years: 2, startYear: currentYear };
-        let dayConfig = JSON.parse(localStorage.getItem('wkDayCfg')) || { format: '24h' };
-        let markersData = JSON.parse(localStorage.getItem('wkMarkers')) || { block:[], year:[], week:[], work:[], day:[] };
-        let collapsedMonths = JSON.parse(localStorage.getItem('wkCollapsedMonths')) || {};
+        let workConfig = safeJSONParse(localStorage.getItem('wkWorkCfg'), { start: 7, end: 17 });
+        let blockConfig = safeJSONParse(localStorage.getItem('wkBlockCfg'), { years: 2, startYear: currentYear });
+        let dayConfig = safeJSONParse(localStorage.getItem('wkDayCfg'), { format: '24h' });
+        let markersData = safeJSONParse(localStorage.getItem('wkMarkers'), { block:[], year:[], week:[], work:[], day:[] });
+        let collapsedMonths = safeJSONParse(localStorage.getItem('wkCollapsedMonths'), {});
 
         if(!blockConfig.startYear) { blockConfig.startYear = currentYear; safeSetItem('wkBlockCfg', JSON.stringify(blockConfig)); }
 
@@ -4101,6 +4113,17 @@
             flushNotesSave();
             overlay.classList.remove('active');
             const PERSISTIBLE = ['modal-content-notes','modal-content-history','modal-content-general','modal-content-timecalc'];
+            let persistData = null;
+            if (activePanel && PERSISTIBLE.includes(activePanel.id)) persistData = { type: 'main', panelId: activePanel.id };
+            minimizeWindow('main-modal', title,
+                () => { overlay.classList.add('active'); updateTimersDisplayValues(); },
+                () => { closeModal(); },
+                persistData
+            );
+        }
+
+        function minimizeQuarterWindow(key) {
+            const win = quarterWindows.get(key);
             if (!win) return;
             const title = `T${win.q+1} · ${win.year}`;
             try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
@@ -4113,7 +4136,7 @@
         }
 
         function restoreMinimizedFromStorage() {
-            const saved = JSON.parse(localStorage.getItem('wkMinimizedWindows') || '[]');
+            const saved = safeJSONParse(localStorage.getItem('wkMinimizedWindows'), []);
             if (!Array.isArray(saved) || saved.length === 0) return;
             const prevYear = selectedYear;
             const prevQ = selectedQuarter;
@@ -4846,7 +4869,16 @@
             return html;
         }
 
-        function drawCalendar() { document.getElementById('calendar-container').innerHTML = calendarView === 'quarters' ? renderQuartersView() : renderYearsView(); }
+        function drawCalendar() {
+            const el = document.getElementById('calendar-container');
+            if (!el) return;
+            try {
+                el.innerHTML = calendarView === 'quarters' ? renderQuartersView() : renderYearsView();
+            } catch(e) {
+                console.error("Error al dibujar el calendario:", e);
+                el.innerHTML = '<div style="color:var(--muted); padding:20px; text-align:center;">Error al cargar el calendario.</div>';
+            }
+        }
 
         function openQuarterDetail(q) {
             if (typeof q !== 'number') q = selectedQuarter;
@@ -4858,6 +4890,12 @@
 
             const now = new Date();
             let startM = 0, startW = 1;
+            if (year === now.getFullYear() && Math.floor(now.getMonth() / 3) === q) {
+                startM = now.getMonth() % 3;
+                const wInfo = getWeekForDay(year, now.getMonth(), now.getDate());
+                startW = wInfo ? wInfo.localW : 1;
+            } else {
+                const weeks = getWeeksForMonth(year, q * 3);
                 startW = weeks.find(w => w.localW === 1) ? 1 : weeks[0].localW;
             }
 
@@ -5212,7 +5250,8 @@
             renderBlockTicks(); update(); updateQuarterBar(); closeModal();
         }
         function renderBlockTicks() {
-            const container = document.getElementById('block-ticks'); document.getElementById('label-block').innerText = `Bloque ${blockConfig.years} Años`;
+            const container = document.getElementById('block-ticks'); if(!container) return;
+            const lbl = document.getElementById('label-block'); if(lbl) lbl.innerText = `Bloque ${blockConfig.years} Años`;
             let html = '';
             for(let i = 0; i <= blockConfig.years; i++) {
                 let align = i === 0 ? 'left' : (i === blockConfig.years ? 'right' : 'center');
@@ -5234,7 +5273,8 @@
             workConfig = { start: s, end: e }; safeSetItem('wkWorkCfg', JSON.stringify(workConfig)); renderWorkTicks(); update(); closeModal();
         }
         function renderWorkTicks() {
-            const container = document.getElementById('work-ticks'); document.getElementById('label-work').innerText = `Jornada (${workConfig.start}h - ${workConfig.end}h)`;
+            const container = document.getElementById('work-ticks'); if(!container) return;
+            const lbl = document.getElementById('label-work'); if(lbl) lbl.innerText = `Jornada (${workConfig.start}h - ${workConfig.end}h)`;
             let html = '';
             for(let i = workConfig.start; i <= workConfig.end; i++) {
                 let num = i > 12 ? i - 12 : (i === 0 ? 12 : i);
@@ -5256,7 +5296,8 @@
             renderDayTicks(); closeModal();
         }
         function renderDayTicks() {
-            const container = document.getElementById('day-ticks'); let html = '';
+            const container = document.getElementById('day-ticks'); if(!container) return;
+            let html = '';
             for(let i = 0; i <= 24; i++) {
                 let label = '';
                 if (dayConfig.format === '12h') {
@@ -5404,27 +5445,27 @@
             const blockElapsedMs = now - new Date(startBlock, 0, 1);
             let blockPct = (blockElapsedMs / blockTotalMs * 100);
             if(blockPct < 0) blockPct = 0; else if(blockPct > 100) blockPct = 100;
-            document.getElementById('block-fill').style.width = blockPct.toFixed(4) + '%';
-            document.getElementById('block-pct').innerText = blockPct.toFixed(2) + '%';
+            const bf = document.getElementById('block-fill'); if(bf) bf.style.width = blockPct.toFixed(4) + '%';
+            const bp = document.getElementById('block-pct'); if(bp) bp.innerText = blockPct.toFixed(2) + '%';
             const yearPct = ((now - new Date(year,0,1)) / (new Date(year+1,0,1) - new Date(year,0,1)) * 100);
-            document.getElementById('year-fill').style.width = yearPct.toFixed(4) + '%';
-            document.getElementById('year-pct').innerText = yearPct.toFixed(2) + '%';
+            const yf = document.getElementById('year-fill'); if(yf) yf.style.width = yearPct.toFixed(4) + '%';
+            const yp = document.getElementById('year-pct'); if(yp) yp.innerText = yearPct.toFixed(2) + '%';
             let dW = now.getDay(), adj = dW === 0 ? 6 : dW - 1, sW = new Date(now);
             sW.setDate(now.getDate() - adj); sW.setHours(0,0,0,0);
             const wkP = ((now - sW) / (7 * 24 * 60 * 60 * 1000)) * 100;
-            document.getElementById('week-fill').style.width = wkP.toFixed(4) + '%';
-            document.getElementById('week-pct').innerText = wkP.toFixed(2) + '%';
+            const wf = document.getElementById('week-fill'); if(wf) wf.style.width = wkP.toFixed(4) + '%';
+            const wp = document.getElementById('week-pct'); if(wp) wp.innerText = wkP.toFixed(2) + '%';
             let wP = 0, wT = "Libre";
             if (h >= workConfig.start && h < workConfig.end) {
                 wP = ((h - workConfig.start) / (workConfig.end - workConfig.start)) * 100;
                 wT = new Date((workConfig.end - h) * 3600 * 1000).toISOString().substr(11, 8);
             } else if (h >= workConfig.end) { wP = 100; wT = "Finalizado"; }
-            document.getElementById('work-fill').style.width = wP.toFixed(4) + '%';
-            document.getElementById('work-timer').innerText = wT;
-            document.getElementById('work-pct').innerText = wP.toFixed(2) + '%';
+            const wof = document.getElementById('work-fill'); if(wof) wof.style.width = wP.toFixed(4) + '%';
+            const wt = document.getElementById('work-timer'); if(wt) wt.innerText = wT;
+            const wop = document.getElementById('work-pct'); if(wop) wop.innerText = wP.toFixed(2) + '%';
             const dP = (h / 24) * 100;
-            document.getElementById('day-fill').style.width = dP.toFixed(4) + '%';
-            document.getElementById('day-pct').innerText = dP.toFixed(2) + '%';
+            const df = document.getElementById('day-fill'); if(df) df.style.width = dP.toFixed(4) + '%';
+            const dp = document.getElementById('day-pct'); if(dp) dp.innerText = dP.toFixed(2) + '%';
             const endOfDay = new Date(year, now.getMonth(), now.getDate(), 23, 59, 59, 999);
             const msLeftDay = endOfDay - now;
             const hLeftDay = Math.floor(msLeftDay / 3600000);
@@ -5680,7 +5721,7 @@
             resizeHandle.innerHTML = '<svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="2.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="2.5" r="0.9"/></svg>';
             modalEl.appendChild(resizeHandle);
             const storageKey = `wkModalState-${key}`;
-            const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+            const saved = safeJSONParse(localStorage.getItem(storageKey), null);
             if (saved) applyModalState(modalEl, saved);
             let dragging = false;
             let dragStartX = 0, dragStartY = 0, dragStartLeft = 0, dragStartTop = 0;
@@ -5824,21 +5865,26 @@
         }
 
         /* === INICIALIZACIÓN === */
-        applyBatterySaver();
-        applyModalAlphaSettings();
-        applyThemeColors();
-        restoreBars();
-        drawCalendar();
-        renderBlockTicks();
-        renderWorkTicks();
-        renderDayTicks();
-        renderAllMarkers();
-        renderTimersUI();
-        applyFocusMode();
-        initModalDragResize();
-        initFloatingTimerDrag();
-        restoreMinimizedFromStorage();
-        startUpdateLoop();
+        try {
+            applyBatterySaver();
+            applyModalAlphaSettings();
+            applyThemeColors();
+            restoreBars();
+            drawCalendar();
+            renderBlockTicks();
+            renderWorkTicks();
+            renderDayTicks();
+            renderAllMarkers();
+            renderTimersUI();
+            applyFocusMode();
+            initModalDragResize();
+            initFloatingTimerDrag();
+            restoreMinimizedFromStorage();
+            startUpdateLoop();
+        } catch(e) {
+            console.error("Error durante la inicialización de la app:", e);
+            alert("Hubo un error al iniciar la app. Intenta recargar la página o limpiar los datos del sitio.");
+        }
     </script>
 </body>
 </html>

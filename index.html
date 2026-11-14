@@ -911,8 +911,8 @@
         #modal-overlay { pointer-events: none; z-index: 9000; }
         #modal-overlay.active { pointer-events: none; z-index: 9000; }
         #modal-overlay .modal-card { pointer-events: auto; }
-        #goal-overlay.modal-overlay { pointer-events: auto; }
-        #goal-overlay.modal-overlay.active { pointer-events: auto; }
+        #goal-overlay.modal-overlay { pointer-events: auto; align-items: center; }
+        #goal-overlay.modal-overlay.active { pointer-events: auto; align-items: center; }
 
         .calendar-detail {
             background: rgba(var(--modal-bg-rgb), var(--modal-bg-alpha));
@@ -1522,6 +1522,7 @@
             min-height: 0;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
         }
 
         #dual-notes-card { padding-top: 20px; }
@@ -1539,6 +1540,7 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            align-items: flex-start;
             gap: 10px;
             max-width: 100%;
             width: 100%;
@@ -1548,73 +1550,39 @@
             max-width: 100%;
             flex-shrink: 0;
         }
-        .unpinned-tray {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: var(--item-bg);
-            border: 1px dashed var(--border-input);
-            border-radius: 12px;
-            width: 100%;
-            max-width: 720px;
-            box-sizing: border-box;
-        }
-        .unpinned-tray-label {
-            font-size: 0.58rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--muted);
-            width: 100%;
-            text-align: center;
-            margin-bottom: 2px;
-        }
-        .unpinned-pill {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 11px 6px 9px;
-            border-radius: 999px;
+
+        /* Barra flotante de puntos para los timers no fijados */
+        .focus-pins-bar {
+            display: none;
+            position: fixed;
+            bottom: max(20px, calc(env(safe-area-inset-bottom) + 10px));
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 16px;
             background: var(--card);
-            border: 1px solid var(--border-input);
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--text);
-            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
-            max-width: 180px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            z-index: 200;
+            align-items: center;
+            gap: 10px;
+            max-width: calc(100vw - 32px);
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .unpinned-pill:hover {
-            border-color: var(--pill-color);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        .focus-pins-bar::-webkit-scrollbar { display: none; }
+        .focus-pins-bar.active { display: flex; }
+        body.has-minimized .focus-pins-bar {
+            bottom: calc(max(20px, calc(env(safe-area-inset-bottom) + 10px)) + 56px);
         }
-        .unpinned-pill:active { transform: scale(0.96); }
-        .unpinned-pill .pill-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--pill-color);
-            box-shadow: 0 0 6px var(--pill-color);
-            flex-shrink: 0;
+        .focus-pins-bar .hidden-dot {
+            width: 12px;
+            height: 12px;
         }
-        .unpinned-pill .pill-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            opacity: 0.85;
-        }
-        .unpinned-pill .pill-plus {
-            width: 11px;
-            height: 11px;
-            flex-shrink: 0;
-            opacity: 0.6;
-            margin-left: 2px;
-        }
-        .unpinned-pill:hover .pill-plus { opacity: 1; color: var(--accent); }
 
         #notes-main-textarea {
             flex: 1 1 auto !important;
@@ -1622,7 +1590,37 @@
             min-height: 100px !important;
             overflow-y: auto !important;
             resize: none !important;
+            padding-bottom: 46px !important;
         }
+
+        /* Botón para insertar hora actual en notas */
+        .notes-time-btn {
+            position: absolute;
+            bottom: 62px;
+            right: 14px;
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: var(--card-solid);
+            border: 1px solid var(--border-input);
+            color: var(--muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            opacity: 0.65;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+        }
+        .notes-time-btn:hover {
+            opacity: 1;
+            color: var(--accent);
+            border-color: var(--accent);
+            transform: scale(1.06);
+        }
+        .notes-time-btn:active { transform: scale(0.94); }
+        .notes-time-btn svg { width: 16px; height: 16px; display: block; }
 
         @media (max-width: 600px) {
             body { padding: 12px; padding-top: calc(12px + env(safe-area-inset-top)); }
@@ -1795,6 +1793,9 @@
         #dual-notes-text { padding: 10px; font-size: 0.82rem; }
         #notes-main-textarea { padding: 11px; font-size: 0.84rem; }
 
+        .notes-time-btn { width: 30px; height: 30px; bottom: 58px; right: 12px; }
+        .notes-time-btn svg { width: 14px; height: 14px; }
+
         #minimized-bar { padding: 5px 6px; gap: 6px; border-radius: 11px; bottom: 10px; }
         .minimized-pill { padding: 5px 8px 5px 10px; font-size: 0.66rem; border-radius: 8px; }
         .minimized-pill .pill-close { width: 14px; height: 14px; }
@@ -1809,6 +1810,11 @@
         .hidden-timer-pill { padding: 4px 9px 4px 8px; font-size: 0.58rem; }
         .hidden-bar-result-item { padding: 4px 8px; font-size: 0.58rem; }
         .hidden-dot { width: 8px; height: 8px; }
+
+        .focus-pins-bar { padding: 8px 12px; gap: 8px; }
+        .focus-pins-bar .hidden-dot { width: 10px; height: 10px; }
+
+        .pinned-timers-center .timer-widget { width: 100%; max-width: 320px; }
 
         #floating-timer { padding: 5px 9px; gap: 6px; border-radius: 10px; top: max(38px, calc(env(safe-area-inset-top) + 20px)); left: 12px; }
         #floating-time { font-size: 0.68rem; }
@@ -1827,10 +1833,6 @@
         .m-bar-row { margin-bottom: 11px; gap: 12px; }
 
         #calc-result, #calc-add-result { padding: 14px; min-height: 68px; border-radius: 11px; }
-
-        .pinned-timers-center .timer-widget { width: 100%; max-width: 320px; }
-        .unpinned-pill { padding: 5px 9px 5px 8px; font-size: 0.64rem; }
-        .unpinned-tray { padding: 7px 9px; gap: 5px; }
 
         /* ===================== CAJAS DE TEMPORIZADORES ===================== */
         .box-timer-card {
@@ -1965,6 +1967,7 @@
         [data-battery-saver="true"] .focus-bar,
         [data-battery-saver="true"] .header-menu-btn,
         [data-battery-saver="true"] .timecalc-btn,
+        [data-battery-saver="true"] .focus-pins-bar,
         [data-battery-saver="true"] #minimized-bar {
             background: var(--card-solid) !important;
             box-shadow: none !important;
@@ -2056,6 +2059,7 @@
     </div>
 
     <div class="timers-container" id="timers-container"></div>
+    <div id="focus-pins-bar" class="focus-pins-bar"></div>
 
     <div class="section-label">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2137,7 +2141,7 @@
     <div id="calendar-container"></div>
 
     <div id="goal-overlay" class="modal-overlay" style="z-index: 9500;">
-        <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-card" id="goal-card" onclick="event.stopPropagation()">
             <h3 style="color: var(--accent); margin-bottom: 8px; text-align: center;">¡Tiempo Finalizado!</h3>
             <p id="goal-overlay-title" style="font-size: 0.92rem; color: var(--text); font-weight: 600; margin: 0 0 16px; text-align: center;">¿Objetivo logrado?</p>
             <div id="goal-overlay-stats" style="background: var(--item-bg); border-radius: 14px; padding: 16px 14px; margin-bottom: 18px; text-align: center;"></div>
@@ -2399,6 +2403,13 @@
                 <input type="date" id="notes-date-picker" style="display:none; margin-bottom:14px; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:10px; border-radius:10px; outline:none; font-family:inherit;" onchange="loadNoteForPicker()">
 
                 <textarea id="notes-main-textarea" style="flex:1 1 auto; height:0; min-height:100px; width:100%; box-sizing:border-box; resize:none; overflow-y:auto; border:1px solid var(--border-input); color:var(--text); border-radius:10px; padding:14px; font-family:inherit; font-size:0.9rem;" oninput="saveMainNote()"></textarea>
+
+                <button class="notes-time-btn" onclick="insertCurrentTimeInNotes()" title="Insertar hora actual" aria-label="Insertar hora actual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M12 7v5l3 2"/>
+                    </svg>
+                </button>
 
                 <div class="modal-actions" style="margin-top:16px;">
                     <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
@@ -3437,6 +3448,8 @@
             document.body.classList.remove('focus-mode');
             const bar = document.getElementById('focus-bar');
             if (bar) bar.style.display = 'none';
+            const pinsBar = document.getElementById('focus-pins-bar');
+            if (pinsBar) { pinsBar.classList.remove('active'); pinsBar.innerHTML = ''; }
             renderTimersUI();
         }
 
@@ -3533,7 +3546,11 @@
         function renderTimersUI() {
             const container = document.getElementById('timers-container');
             const headerBar = document.getElementById('timers-header-bar');
+            const pinsBar = document.getElementById('focus-pins-bar');
             if (!container || !headerBar) return;
+
+            // Limpiar barra de pines por defecto
+            if (pinsBar) { pinsBar.classList.remove('active'); pinsBar.innerHTML = ''; }
 
             // === LAYOUT ESPECIAL CON PINES ===
             if (focusMode.active && focusPinned.length > 0) {
@@ -3732,35 +3749,30 @@
                 else                    pinnedHtml += renderBoxTimerCard(x.timer, x.box.id, x.box);
             });
 
-            let unpinnedHtml = '';
-            unpinned.forEach(x => {
-                const t = x.timer;
-                unpinnedHtml += `
-                    <div class="unpinned-pill"
-                         style="--pill-color:${escapeHtml(t.color)}"
-                         onclick="togglePinTimer('${escapeHtml(t.id)}')"
-                         title="Fijar ${escapeHtml(t.name)}">
-                        <span class="pill-dot"></span>
-                        <span class="pill-name">${escapeHtml(t.name)}</span>
-                        <svg class="pill-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true">
-                            <path d="M12 5v14M5 12h14"/>
-                        </svg>
-                    </div>`;
-            });
+            container.innerHTML = `<div class="pinned-timers-wrapper">
+                <div class="pinned-timers-center">${pinnedHtml}</div>
+            </div>`;
 
-            let html = `<div class="pinned-timers-wrapper">
-                <div class="pinned-timers-center">${pinnedHtml}</div>`;
-
-            if (unpinned.length > 0) {
-                html += `<div class="unpinned-tray">
-                    <div class="unpinned-tray-label">Disponibles · toca para fijar</div>
-                    ${unpinnedHtml}
-                </div>`;
+            // Barra de puntos inferior con los timers disponibles (no fijados)
+            const pinsBar = document.getElementById('focus-pins-bar');
+            if (pinsBar) {
+                if (unpinned.length === 0) {
+                    pinsBar.classList.remove('active');
+                    pinsBar.innerHTML = '';
+                } else {
+                    pinsBar.classList.add('active');
+                    pinsBar.innerHTML = unpinned.map(x => {
+                        const t = x.timer;
+                        const label = x.scope === 'box' ? `${t.name} · ${x.box.name}` : t.name;
+                        return `<button class="hidden-dot"
+                                 style="--dot-color:${escapeHtml(t.color)}"
+                                 onclick="togglePinTimer('${escapeHtml(t.id)}')"
+                                 title="Fijar ${escapeHtml(label)}"
+                                 aria-label="Fijar ${escapeHtml(label)}"></button>`;
+                    }).join('');
+                }
             }
 
-            html += `</div>`;
-
-            container.innerHTML = html;
             updateTimersDisplayValues();
         }
 
@@ -4028,6 +4040,7 @@
             }
             activeTimerForGoal = goal;
             goalCompletedAt = goal.completedAt || Date.now();
+            resetGoalModalPosition();
             startAlarmSound();
             renderGoalOverlayStats();
             if (goalOverlayInterval) clearInterval(goalOverlayInterval);
@@ -4452,8 +4465,14 @@
         function renderMinimizedBar() {
             const bar = document.getElementById('minimized-bar');
             if (!bar) return;
-            if (minimizedWindows.size === 0) { bar.classList.remove('active'); bar.innerHTML = ''; return; }
+            if (minimizedWindows.size === 0) {
+                bar.classList.remove('active');
+                bar.innerHTML = '';
+                document.body.classList.remove('has-minimized');
+                return;
+            }
             bar.classList.add('active');
+            document.body.classList.add('has-minimized');
             bar.innerHTML = Array.from(minimizedWindows.entries()).map(([id, w]) => {
                 const safe = escapeHtml(w.title);
                 return `<div class="minimized-pill" onclick="restoreWindow('${escapeHtml(id)}')" title="Restaurar ${safe}">
@@ -4675,6 +4694,23 @@
                     populateNotesIndex(document.getElementById('notes-date-picker').value);
                 }, 800);
             }
+        }
+
+        function insertCurrentTimeInNotes() {
+            const ta = document.getElementById('notes-main-textarea');
+            if (!ta) return;
+            const now = new Date();
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const timeStr = `[${hh}:${mm}] `;
+            const start = ta.selectionStart ?? ta.value.length;
+            const end = ta.selectionEnd ?? ta.value.length;
+            const val = ta.value;
+            ta.value = val.slice(0, start) + timeStr + val.slice(end);
+            const newPos = start + timeStr.length;
+            try { ta.selectionStart = ta.selectionEnd = newPos; } catch(_) {}
+            ta.focus();
+            saveMainNote();
         }
 
         function saveDualNotes() {
@@ -6232,6 +6268,65 @@
             alert('Posición y tamaño de ventanas restablecidos.');
         }
 
+        /* === MODAL DE FINALIZACIÓN DE TIMER (goal) — movible, siempre centrado al abrir === */
+        function initGoalModalDrag() {
+            const card = document.getElementById('goal-card');
+            if (!card || card.dataset.goalDragInit === '1') return;
+            card.dataset.goalDragInit = '1';
+
+            const dragHandle = document.createElement('div');
+            dragHandle.className = 'modal-drag-handle';
+            dragHandle.title = 'Mover ventana';
+            dragHandle.innerHTML = '<span class="grip"></span>';
+            card.appendChild(dragHandle);
+
+            let dragging = false;
+            let dragStartX = 0, dragStartY = 0, dragStartLeft = 0, dragStartTop = 0;
+
+            const onDragStart = (e) => {
+                if (e.button !== undefined && e.button !== 0) return;
+                e.preventDefault(); e.stopPropagation();
+                const rect = card.getBoundingClientRect();
+                if (card.style.position !== 'fixed') {
+                    card.style.position = 'fixed';
+                    card.style.margin = '0';
+                    card.style.top = rect.top + 'px';
+                    card.style.left = rect.left + 'px';
+                }
+                dragStartX = e.clientX; dragStartY = e.clientY;
+                dragStartLeft = parseFloat(card.style.left) || rect.left;
+                dragStartTop = parseFloat(card.style.top) || rect.top;
+                dragging = true;
+                card.classList.add('dragging');
+                try { dragHandle.setPointerCapture(e.pointerId); } catch(_) {}
+            };
+            const onDragMove = (e) => {
+                if (!dragging) return;
+                const dx = e.clientX - dragStartX, dy = e.clientY - dragStartY;
+                const mw = card.offsetWidth;
+                card.style.top = Math.max(0, Math.min(window.innerHeight - 40, dragStartTop + dy)) + 'px';
+                card.style.left = Math.max(-(mw - 40), Math.min(window.innerWidth - 40, dragStartLeft + dx)) + 'px';
+            };
+            const onDragEnd = (e) => {
+                if (!dragging) return;
+                dragging = false;
+                card.classList.remove('dragging');
+                try { dragHandle.releasePointerCapture(e.pointerId); } catch(_) {}
+            };
+
+            dragHandle.addEventListener('pointerdown', onDragStart);
+            dragHandle.addEventListener('pointermove', onDragMove);
+            dragHandle.addEventListener('pointerup', onDragEnd);
+            dragHandle.addEventListener('pointercancel', onDragEnd);
+        }
+
+        function resetGoalModalPosition() {
+            const card = document.getElementById('goal-card');
+            if (!card) return;
+            resetModalStyles(card);
+            card.classList.remove('dragging');
+        }
+
         /* === INICIALIZACIÓN === */
         try {
             applyBatterySaver();
@@ -6246,6 +6341,7 @@
             renderTimersUI();
             applyFocusMode();
             initModalDragResize();
+            initGoalModalDrag();
             initFloatingTimerDrag();
             restoreMinimizedFromStorage();
             startUpdateLoop();

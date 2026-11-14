@@ -174,7 +174,6 @@
         .header-menu-btn:active { transform: scale(0.94); }
         .header-menu-btn svg { width: 20px; height: 20px; display: block; }
 
-        /* ===================== FOCUS MODE ===================== */
         .focus-bar {
             display: none;
             align-items: center;
@@ -312,7 +311,6 @@
             padding-right: 2px;
         }
 
-        /* Botón de focus en el header de la caja */
         .box-section-focus {
             margin-left: auto;
             margin-right: 4px;
@@ -1672,7 +1670,6 @@
 
         #calc-result, #calc-add-result { padding: 14px; min-height: 68px; border-radius: 11px; }
 
-        /* ===================== CAJAS DE TEMPORIZADORES ===================== */
         .box-timer-card {
             border-left-color: var(--box-color, var(--accent)) !important;
             border-left-width: 4px !important;
@@ -2315,6 +2312,14 @@
     </script>
 
     <script>
+        /* ============================================================
+           v3.0 NOTES FIX — Diagnóstico visible y guardado robusto
+           ============================================================ */
+        console.log('%c Timer v3.0 Notes Fix ', 'background:#34d399;color:#000;font-weight:bold;padding:4px 8px;border-radius:4px;');
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().then(g => console.log('Storage persistente:', g ? '✓' : '✗')).catch(()=>{});
+        }
+
         function escapeHtml(s) {
             return String(s ?? '').replace(/[&<>"']/g, c => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -2520,6 +2525,7 @@
         let goalQueue = [];
 
         let notesData = JSON.parse(localStorage.getItem('wkNotes')) || { general: '' };
+        console.log('📝 Notas cargadas al inicio:', Object.keys(notesData).length, 'entradas →', Object.keys(notesData));
 
         let audioCtx = null;
         let alarmInterval = null;
@@ -2570,9 +2576,6 @@
             renderTimersUI();
         }
 
-        /* ============================================================
-           CAJAS DE TEMPORIZADORES
-           ============================================================ */
         let timerBoxes = JSON.parse(localStorage.getItem('wkTimerBoxes')) || [];
         let openedBoxIds = new Set(JSON.parse(localStorage.getItem('wkOpenedBoxes') || '[]'));
         let currentTimerForMenu = null;
@@ -3011,12 +3014,9 @@
             </div>`;
         }
 
-        /* ============================================================
-           MODO CONCENTRACIÓN
-           ============================================================ */
         let focusMode = {
             active: false,
-            type: null,           // 'all' | 'box' | 'manual'
+            type: null,
             boxId: null,
             timerIds: [],
             label: ''
@@ -3202,9 +3202,6 @@
             closeModal();
         }
 
-        /* ============================================================
-           RENDERIZADO PRINCIPAL
-           ============================================================ */
         function renderTimersUI() {
             const container = document.getElementById('timers-container');
             const headerBar = document.getElementById('timers-header-bar');
@@ -3911,18 +3908,38 @@
         let winZCounter = 2000;
         const minimizedWindows = new Map();
 
+        /* ============================================================
+           GUARDADO DE NOTAS — SIN DEBOUNCE
+           ============================================================ */
         let notesSaveTimer = null;
+
         function flushNotesSave() {
             if (notesSaveTimer) { clearTimeout(notesSaveTimer); notesSaveTimer = null; }
-            safeSetItem('wkNotes', JSON.stringify(notesData));
+            const ok = safeSetItem('wkNotes', JSON.stringify(notesData));
+            if (!ok) {
+                console.error('⚠️ NO se pudieron guardar las notas. Backup inmediato recomendado.');
+            }
+            return ok;
         }
+
         function scheduleNotesSave() {
-            if (notesSaveTimer) clearTimeout(notesSaveTimer);
-            notesSaveTimer = setTimeout(() => {
-                notesSaveTimer = null;
-                safeSetItem('wkNotes', JSON.stringify(notesData));
-            }, 400);
+            // Antes había un debounce de 400ms. Ahora guardamos de inmediato.
+            flushNotesSave();
         }
+
+        window.debugNotes = function() {
+            const mem = Object.keys(notesData).filter(k => k !== 'general');
+            let stored = {};
+            try { stored = JSON.parse(localStorage.getItem('wkNotes') || '{}'); } catch(_) {}
+            const st = Object.keys(stored).filter(k => k !== 'general');
+            console.group('📝 DEBUG NOTES');
+            console.log('En memoria:', mem.length, 'fechas →', mem);
+            console.log('En localStorage:', st.length, 'fechas →', st);
+            console.log('Objeto completo en memoria:', notesData);
+            console.log('Objeto completo en storage:', stored);
+            console.groupEnd();
+            return { mem, st, data: notesData, stored };
+        };
 
         function hasVisibleQuarterWindow() {
             return Array.from(quarterWindows.values()).some(w => w.overlay.style.display !== 'none');
@@ -4186,16 +4203,23 @@
             flushNotesSave();
         }
 
+        /* CORRECCIÓN CLAVE: guardado inmediato + fallback de fecha */
         function saveMainNote() {
             const mode = document.getElementById('notes-mode').value;
             const ta = document.getElementById('notes-main-textarea');
             if (mode === 'general') {
                 notesData.general = ta.value;
             } else {
-                const date = document.getElementById('notes-date-picker').value;
-                if (date) notesData[date] = ta.value;
+                const picker = document.getElementById('notes-date-picker');
+                let date = picker.value;
+                if (!date) {
+                    const t = new Date();
+                    date = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+                    picker.value = date;
+                }
+                notesData[date] = ta.value;
             }
-            scheduleNotesSave();
+            flushNotesSave();
             renderDayTaskMarks();
             if (mode === 'date') {
                 clearTimeout(notesIndexRefreshTimer);
@@ -4205,12 +4229,13 @@
             }
         }
 
+        /* CORRECCIÓN CLAVE: guardado inmediato de notas duales */
         function saveDualNotes() {
             const ta = document.getElementById('dual-notes-text');
             const date = ta.dataset.date;
             if (date) {
                 notesData[date] = ta.value;
-                scheduleNotesSave();
+                flushNotesSave();
                 renderActiveWindow();
             }
         }
@@ -5389,15 +5414,16 @@
         window.addEventListener('pagehide', flushNotesSave);
         window.addEventListener('beforeunload', flushNotesSave);
 
-        /* ============================================================
-           GUARDADO PERIÓDICO DE SEGURIDAD (evita pérdida de notas
-           por debounce pendiente al cerrar la pestaña o cambiar de app)
-           ============================================================ */
+        // Guardado periódico de seguridad cada 30s
         setInterval(() => { flushNotesSave(); }, 30000);
 
+        /* ============================================================
+           EXPORT / IMPORT — Notas primero y flush garantizado
+           ============================================================ */
         async function syncExport() {
-            // CORRECCIÓN: forzar el guardado de notas pendientes antes de exportar
             flushNotesSave();
+            const notesCount = Object.keys(notesData).length;
+            console.log('📤 EXPORTANDO. Notas en memoria:', notesCount, notesData);
             let backup = {
                 tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig,
                 day: dayConfig, markers: markersData, collapsed: collapsedMonths,
@@ -5415,7 +5441,7 @@
                     const writable = await fileHandle.createWritable();
                     await writable.write(jsonStr);
                     await writable.close();
-                    alert("Copia guardada exitosamente en la carpeta elegida.");
+                    alert("Copia guardada exitosamente en la carpeta elegida.\nNotas exportadas: " + notesCount);
                 } catch (err) {
                     if (err.name !== 'AbortError') { console.error("Error al guardar:", err); alert("Error al guardar el archivo."); }
                 }
@@ -5426,7 +5452,7 @@
                 a.href = url;
                 a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`;
                 document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-                alert("Copia guardada en tu carpeta de Descargas. Si usas Google Drive, se sincronizará automáticamente.");
+                alert("Copia guardada en tu carpeta de Descargas.\nNotas exportadas: " + notesCount);
             }
         }
 
@@ -5438,10 +5464,16 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if (!data.tasks || !data.timersList) { alert("El archivo no parece ser una copia de seguridad válida de Tiempo."); return; }
-                    if(confirm("¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.")) {
-                        // CORRECCIÓN: las notas se guardan PRIMERO para garantizar que
-                        // siempre se restauran, incluso si otros datos consumen cuota.
-                        if (data.notes) safeSetItem('wkNotes', JSON.stringify(data.notes));
+                    const notesCount = data.notes ? Object.keys(data.notes).length : 0;
+                    if(confirm(`¿Estás seguro? Esto reemplazará TODOS tus datos actuales con los del archivo.\n\nNotas en el archivo: ${notesCount}`)) {
+                        // Notas PRIMERO
+                        if (data.notes) {
+                            const ok = safeSetItem('wkNotes', JSON.stringify(data.notes));
+                            console.log('📥 IMPORTANDO notas:', notesCount, 'entradas. Guardado:', ok ? '✓' : '✗');
+                            if (!ok) {
+                                alert('⚠️ No se pudieron guardar las notas importadas (almacenamiento lleno). Haz espacio y reintenta.');
+                            }
+                        }
                         if (data.tasks) safeSetItem('wkTasks', JSON.stringify(data.tasks));
                         if (data.entornos) safeSetItem('wkEntornos', JSON.stringify(data.entornos));
                         if (data.work) safeSetItem('wkWorkCfg', JSON.stringify(data.work));
@@ -5730,7 +5762,6 @@
             alert('Posición y tamaño de ventanas restablecidos.');
         }
 
-        /* === INICIALIZACIÓN === */
         applyModalAlphaSettings();
         applyThemeColors();
         restoreBars();

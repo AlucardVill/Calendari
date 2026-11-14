@@ -1217,9 +1217,11 @@
             display: none; position: fixed; inset: 0;
             background: rgba(var(--modal-overlay-rgb), var(--modal-overlay-alpha));
             z-index: 1000;
-            align-items: center; justify-content: center;
+            align-items: flex-start; justify-content: center;
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             padding: 16px; flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .modal-overlay.active { display: flex; animation: fadeIn 0.25s; }
         #modal-overlay.active { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
@@ -1241,7 +1243,7 @@
 
         .modal-card.wide { width: 560px; max-width: 95vw; }
 
-        .modal-overlay.dual-mode-active { padding: 8px; gap: 8px; }
+        .modal-overlay.dual-mode-active { padding: 8px; gap: 8px; align-items: center; }
 
         .modal-overlay.dual-mode-active #dual-notes-card {
             display: flex !important; flex-direction: column;
@@ -1254,6 +1256,7 @@
             width: 340px; max-width: 95vw;
             height: 175px; min-height: 175px; max-height: 175px;
             overflow: hidden; box-sizing: border-box; padding: 12px 18px;
+            margin: 0;
         }
 
         .modal-overlay.dual-mode-active #dual-notes-text {
@@ -1503,7 +1506,8 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            max-height: 90vh;
+            max-height: calc(90vh - 32px);
+            margin: auto 0;
         }
 
         #main-modal-card > div[id^="modal-content-"] {
@@ -1515,11 +1519,110 @@
 
         #main-modal-card > #modal-content-notes {
             flex: 1 1 auto;
+            min-height: 0;
             flex-direction: column;
             overflow: hidden;
         }
 
         #dual-notes-card { padding-top: 20px; }
+
+        /* === Layout modo focus con pines === */
+        .pinned-timers-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        .pinned-timers-center {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            max-width: 100%;
+            width: 100%;
+        }
+        .pinned-timers-center .timer-widget {
+            width: 220px;
+            max-width: 100%;
+            flex-shrink: 0;
+        }
+        .unpinned-tray {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: var(--item-bg);
+            border: 1px dashed var(--border-input);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 720px;
+            box-sizing: border-box;
+        }
+        .unpinned-tray-label {
+            font-size: 0.58rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            width: 100%;
+            text-align: center;
+            margin-bottom: 2px;
+        }
+        .unpinned-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px 6px 9px;
+            border-radius: 999px;
+            background: var(--card);
+            border: 1px solid var(--border-input);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            max-width: 180px;
+        }
+        .unpinned-pill:hover {
+            border-color: var(--pill-color);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        .unpinned-pill:active { transform: scale(0.96); }
+        .unpinned-pill .pill-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--pill-color);
+            box-shadow: 0 0 6px var(--pill-color);
+            flex-shrink: 0;
+        }
+        .unpinned-pill .pill-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0.85;
+        }
+        .unpinned-pill .pill-plus {
+            width: 11px;
+            height: 11px;
+            flex-shrink: 0;
+            opacity: 0.6;
+            margin-left: 2px;
+        }
+        .unpinned-pill:hover .pill-plus { opacity: 1; color: var(--accent); }
+
+        #notes-main-textarea {
+            flex: 1 1 auto !important;
+            height: 0 !important;
+            min-height: 100px !important;
+            overflow-y: auto !important;
+            resize: none !important;
+        }
 
         @media (max-width: 600px) {
             body { padding: 12px; padding-top: calc(12px + env(safe-area-inset-top)); }
@@ -1724,6 +1827,10 @@
         .m-bar-row { margin-bottom: 11px; gap: 12px; }
 
         #calc-result, #calc-add-result { padding: 14px; min-height: 68px; border-radius: 11px; }
+
+        .pinned-timers-center .timer-widget { width: 100%; max-width: 320px; }
+        .unpinned-pill { padding: 5px 9px 5px 8px; font-size: 0.64rem; }
+        .unpinned-tray { padding: 7px 9px; gap: 5px; }
 
         /* ===================== CAJAS DE TEMPORIZADORES ===================== */
         .box-timer-card {
@@ -2291,7 +2398,7 @@
                 </div>
                 <input type="date" id="notes-date-picker" style="display:none; margin-bottom:14px; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:10px; border-radius:10px; outline:none; font-family:inherit;" onchange="loadNoteForPicker()">
 
-                <textarea id="notes-main-textarea" style="flex:1; min-height:150px; width:100%; box-sizing:border-box; resize:none; border:1px solid var(--border-input); color:var(--text); border-radius:10px; padding:14px; font-family:inherit; font-size:0.9rem;" oninput="saveMainNote()"></textarea>
+                <textarea id="notes-main-textarea" style="flex:1 1 auto; height:0; min-height:100px; width:100%; box-sizing:border-box; resize:none; overflow-y:auto; border:1px solid var(--border-input); color:var(--text); border-radius:10px; padding:14px; font-family:inherit; font-size:0.9rem;" oninput="saveMainNote()"></textarea>
 
                 <div class="modal-actions" style="margin-top:16px;">
                     <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
@@ -2796,6 +2903,7 @@
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]')
                 .forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-timermenu').style.display = 'block';
+            switchPanelState('modal-content-timermenu');
 
             const nameEl = document.getElementById('tm-name-display');
             nameEl.innerHTML = `<span class="timer-color-dot" style="background:${escapeHtml(t.color)}; margin:0;"></span>${escapeHtml(t.name)}`;
@@ -2865,6 +2973,7 @@
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]')
                 .forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-newbox').style.display = 'block';
+            switchPanelState('modal-content-newbox');
             document.getElementById('inp-newbox-name').value = '';
             document.getElementById('inp-newbox-color').value = '#3b82f6';
             openModal();
@@ -2952,6 +3061,7 @@
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]')
                 .forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-boxcontents').style.display = 'block';
+            switchPanelState('modal-content-boxcontents');
             document.getElementById('bc-title').innerHTML =
                 `<span class="timer-color-dot" style="background:${escapeHtml(box.color)}; margin-right:6px;"></span>${escapeHtml(box.name)} <span style="color:var(--muted); font-size:0.7rem; font-weight:600;">|Box</span>`;
 
@@ -3239,22 +3349,10 @@
             return true;
         }
 
-        function isTimerVisibleWithPins(id) {
-            return focusPinned.length === 0 || focusPinned.includes(id);
-        }
-
         function togglePinTimer(id) {
             const idx = focusPinned.indexOf(id);
-            if (idx === -1) {
-                focusPinned.push(id);
-                for (const box of timerBoxes) {
-                    if (box.timers.some(bt => bt.id === id) && !openedBoxIds.has(box.id)) {
-                        openedBoxIds.add(box.id); saveBoxes(); break;
-                    }
-                }
-            } else {
-                focusPinned.splice(idx, 1);
-            }
+            if (idx === -1) focusPinned.push(id);
+            else            focusPinned.splice(idx, 1);
             saveFocusPinned();
             renderTimersUI();
         }
@@ -3346,6 +3444,7 @@
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]')
                 .forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-focus').style.display = 'block';
+            switchPanelState('modal-content-focus');
             renderFocusModalContent();
             openModal();
         }
@@ -3436,6 +3535,16 @@
             const headerBar = document.getElementById('timers-header-bar');
             if (!container || !headerBar) return;
 
+            // === LAYOUT ESPECIAL CON PINES ===
+            if (focusMode.active && focusPinned.length > 0) {
+                headerBar.style.display = 'none';
+                container.classList.remove('collapsed');
+                renderPinnedLayout(container);
+                applyFocusMode();
+                return;
+            }
+
+            // === LAYOUT NORMAL ===
             const visibleExtras = timersList.filter(t => t.id !== 'general' && !t.hidden).length;
             const hiddenList    = timersList.filter(t => t.id !== 'general' && t.hidden);
 
@@ -3455,7 +3564,7 @@
 
             let html = '';
             const generalIdx = timersList.findIndex(t => t.id === 'general');
-            if (generalIdx !== -1 && isTimerInFocus('general') && isTimerVisibleWithPins('general')) {
+            if (generalIdx !== -1 && isTimerInFocus('general')) {
                 html += renderTimerCard(timersList[generalIdx], generalIdx);
             }
 
@@ -3557,15 +3666,13 @@
             timersList.forEach((t, index) => {
                 if (t.id === 'general' || t.hidden) return;
                 if (!isTimerInFocus(t.id)) return;
-                if (!isTimerVisibleWithPins(t.id)) return;
                 html += renderTimerCard(t, index);
             });
 
             openedBoxIds.forEach(boxId => {
                 const box = timerBoxes.find(b => b.id === boxId);
                 if (!box || box.timers.length === 0) return;
-                const visibleTimers = box.timers.filter(bt =>
-                    isTimerInFocus(bt.id) && isTimerVisibleWithPins(bt.id));
+                const visibleTimers = box.timers.filter(bt => isTimerInFocus(bt.id));
                 if (visibleTimers.length === 0) return;
 
                 const headerHtml = focusMode.active ? '' : `
@@ -3598,6 +3705,63 @@
             updateTimersDisplayValues();
             applyHiddenSearchFilter();
             applyFocusMode();
+        }
+
+        function renderPinnedLayout(container) {
+            const allInFocus = [];
+
+            timersList.forEach((t, idx) => {
+                if (t.id !== 'general' && t.hidden) return;
+                if (!isTimerInFocus(t.id)) return;
+                allInFocus.push({ timer: t, index: idx, scope: 'main' });
+            });
+
+            timerBoxes.forEach(box => {
+                box.timers.forEach(bt => {
+                    if (!isTimerInFocus(bt.id)) return;
+                    allInFocus.push({ timer: bt, index: -1, scope: 'box', box });
+                });
+            });
+
+            const pinned   = allInFocus.filter(x => focusPinned.includes(x.timer.id));
+            const unpinned = allInFocus.filter(x => !focusPinned.includes(x.timer.id));
+
+            let pinnedHtml = '';
+            pinned.forEach(x => {
+                if (x.scope === 'main') pinnedHtml += renderTimerCard(x.timer, x.index);
+                else                    pinnedHtml += renderBoxTimerCard(x.timer, x.box.id, x.box);
+            });
+
+            let unpinnedHtml = '';
+            unpinned.forEach(x => {
+                const t = x.timer;
+                unpinnedHtml += `
+                    <div class="unpinned-pill"
+                         style="--pill-color:${escapeHtml(t.color)}"
+                         onclick="togglePinTimer('${escapeHtml(t.id)}')"
+                         title="Fijar ${escapeHtml(t.name)}">
+                        <span class="pill-dot"></span>
+                        <span class="pill-name">${escapeHtml(t.name)}</span>
+                        <svg class="pill-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                    </div>`;
+            });
+
+            let html = `<div class="pinned-timers-wrapper">
+                <div class="pinned-timers-center">${pinnedHtml}</div>`;
+
+            if (unpinned.length > 0) {
+                html += `<div class="unpinned-tray">
+                    <div class="unpinned-tray-label">Disponibles · toca para fijar</div>
+                    ${unpinnedHtml}
+                </div>`;
+            }
+
+            html += `</div>`;
+
+            container.innerHTML = html;
+            updateTimersDisplayValues();
         }
 
         function syncTimerInputs(id) {
@@ -3701,6 +3865,7 @@
         function openAddTimerModal() {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-addtimer').style.display = 'block';
+            switchPanelState('modal-content-addtimer');
             document.getElementById('inp-newt-name').value = '';
             document.getElementById('inp-newt-h').value = '';
             document.getElementById('inp-newt-m').value = '';
@@ -4313,6 +4478,9 @@
             overlay.classList.remove('active');
             overlay.classList.remove('dual-mode-active');
             document.getElementById('dual-notes-card').style.display = 'none';
+
+            activeMainPanelId = null;
+
             updateBodyOverflow();
         }
 
@@ -4552,6 +4720,7 @@
         function showDayStats(dateStr, wNum, dI, mI) {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-daystats').style.display = 'block';
+            switchPanelState('modal-content-daystats');
             document.getElementById('ds-title').innerText = `Día: ${dateStr}`;
             const tasksList = document.getElementById('ds-tasks-list');
             let tasks = []; let dayEntornos = [];
@@ -4713,6 +4882,7 @@
             updateTcUI();
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-taskcreate').style.display = 'block';
+            switchPanelState('modal-content-taskcreate');
             openModal();
         }
 
@@ -4777,6 +4947,7 @@
             document.querySelectorAll('#chk-days .chk-btn').forEach(btn => { btn.classList.toggle('active', ent.days.includes(parseInt(btn.dataset.val))); });
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-taskcreate').style.display = 'block';
+            switchPanelState('modal-content-taskcreate');
             openModal();
         }
 
@@ -5294,6 +5465,7 @@
             document.getElementById('ms-title').innerText = `Cumplimiento T${selectedQuarter + 1} · ${selectedYear}`;
             renderMetricsModalBody(selectedQuarter);
             document.getElementById('modal-content-metrics').style.display = 'block';
+            switchPanelState('modal-content-metrics');
             openModal();
         }
 
@@ -5446,6 +5618,7 @@
         function openBlockModal() {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-block').style.display = 'block';
+            switchPanelState('modal-content-block');
             document.getElementById('inp-block-start').value = blockConfig.startYear;
             document.getElementById('inp-block-years').value = blockConfig.years;
             openModal();
@@ -5470,6 +5643,7 @@
         function openWorkModal() {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-work').style.display = 'block';
+            switchPanelState('modal-content-work');
             document.getElementById('inp-work-start').value = workConfig.start;
             document.getElementById('inp-work-end').value = workConfig.end;
             openModal();
@@ -5494,6 +5668,7 @@
         function openDayModal() {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-day').style.display = 'block';
+            switchPanelState('modal-content-day');
             document.getElementById('inp-day-format').value = dayConfig.format;
             openModal();
         }
@@ -5568,6 +5743,7 @@
             activeMarker = { barId, obj: markerObj };
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-marker').style.display = 'block';
+            switchPanelState('modal-content-marker');
             document.getElementById('inp-marker-color').value = markerObj.color;
             openModal();
         }

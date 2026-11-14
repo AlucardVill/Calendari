@@ -219,6 +219,17 @@
             border-radius: 6px;
             flex-shrink: 0;
         }
+        .focus-bar-pins {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.66rem; font-weight: 800; letter-spacing: 0.02em;
+            color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent);
+            padding: 3px 9px; border-radius: 7px; cursor: pointer;
+            flex-shrink: 0; user-select: none; transition: background 0.2s;
+        }
+        .focus-bar-pins:hover { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+        .focus-bar-pins svg { width: 9px; height: 9px; display: block; }
         .focus-bar-exit {
             width: 26px; height: 26px;
             border-radius: 8px;
@@ -487,6 +498,22 @@
 
         .t-btn-delete { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 6px; font-size: 1.1rem; border-radius: 8px; transition: color 0.2s; line-height: 1; }
         .t-btn-delete:hover { color: var(--sunday); }
+
+        .t-btn-pin {
+            width: 32px; height: 32px; border-radius: 10px;
+            background: var(--item-bg); border: 1px solid var(--border-input);
+            color: var(--muted); cursor: pointer; padding: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        .t-btn-pin svg { width: 14px; height: 14px; display: block; }
+        .t-btn-pin:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.06); }
+        .t-btn-pin:active { transform: scale(0.94); }
+        .t-btn-pin.active {
+            background: var(--accent); color: var(--btn-text); border-color: var(--accent);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+        }
+        .t-btn-pin.active:hover { filter: brightness(1.1); }
 
         .add-timer-inline-btn {
             background: transparent; border: 1.5px dashed var(--border-input); color: var(--muted);
@@ -1002,9 +1029,9 @@
             background: transparent; border: none; color: var(--muted);
             width: 16px; height: 16px; padding: 0;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            border-radius: 4px; font-size: 0.9rem; line-height: 1;
-            transition: all 0.2s; flex-shrink: 0;
+            border-radius: 4px; transition: all 0.2s; flex-shrink: 0;
         }
+        .minimized-pill .pill-close svg { width: 10px; height: 10px; display: block; }
         .minimized-pill .pill-close:hover { color: var(--sunday); background: rgba(255, 69, 58, 0.15); }
 
         .timecalc-btn {
@@ -1226,7 +1253,7 @@
         .modal-overlay.dual-mode-active #main-modal-card {
             width: 340px; max-width: 95vw;
             height: 175px; min-height: 175px; max-height: 175px;
-            overflow-y: auto; box-sizing: border-box; padding: 12px 18px;
+            overflow: hidden; box-sizing: border-box; padding: 12px 18px;
         }
 
         .modal-overlay.dual-mode-active #dual-notes-text {
@@ -1471,7 +1498,27 @@
             z-index: 1500;
         }
 
-        #main-modal-card { padding-top: 22px; }
+        #main-modal-card {
+            padding-top: 22px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            max-height: 90vh;
+        }
+
+        #main-modal-card > div[id^="modal-content-"] {
+            flex: 0 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #main-modal-card > #modal-content-notes {
+            flex: 1 1 auto;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
         #dual-notes-card { padding-top: 20px; }
 
         @media (max-width: 600px) {
@@ -1492,6 +1539,8 @@
             .timer-input-group span { font-size: 0.65rem; }
             .timer-controls .t-btn { width: 28px; height: 28px; }
             .timer-controls { gap: 5px; }
+            .t-btn-pin { width: 26px; height: 26px; border-radius: 8px; }
+            .t-btn-pin svg { width: 12px; height: 12px; }
 
             .day { font-size: 0.58rem; margin-top: 3px; }
             .week-day { font-size: 0.44rem; }
@@ -1645,7 +1694,8 @@
 
         #minimized-bar { padding: 5px 6px; gap: 6px; border-radius: 11px; bottom: 10px; }
         .minimized-pill { padding: 5px 8px 5px 10px; font-size: 0.66rem; border-radius: 8px; }
-        .minimized-pill .pill-close { width: 14px; height: 14px; font-size: 0.8rem; }
+        .minimized-pill .pill-close { width: 14px; height: 14px; }
+        .minimized-pill .pill-close svg { width: 8px; height: 8px; }
 
         .hidden-timers-bar { padding: 6px 10px; border-radius: 11px; gap: 6px; }
         .hidden-bar-toggle { width: 16px; height: 18px; }
@@ -1796,7 +1846,6 @@
             transition-duration: 0.08s !important;
         }
 
-        /* Sustituye fondos semitransparentes por sólidos (donde había blur) */
         [data-battery-saver="true"] .timer-widget,
         [data-battery-saver="true"] .dock-panel,
         [data-battery-saver="true"] .progress-buttons,
@@ -1820,12 +1869,10 @@
             border-color: var(--border) !important;
         }
 
-        /* Elimina brillo/glow del reloj corriendo */
         [data-battery-saver="true"] .timer-display.running {
             text-shadow: none !important;
         }
 
-        /* Marcador "ahora" sin glow (se repinta cada segundo) */
         [data-battery-saver="true"] .now-marker {
             box-shadow: none !important;
         }
@@ -1833,18 +1880,15 @@
             box-shadow: 0 0 0 2px var(--card-solid), 0 0 6px var(--accent) !important;
         }
 
-        /* Botones de progreso activos sin glow */
         [data-battery-saver="true"] .progress-btn.active,
         [data-battery-saver="true"] .progress-btn.active::after {
             box-shadow: none !important;
         }
 
-        /* Marcadores arrastrables con sombra mínima */
         [data-battery-saver="true"] .bar-marker {
             box-shadow: 0 1px 2px rgba(0,0,0,0.25) !important;
         }
 
-        /* El brillo animado de las barras se elimina por completo */
         [data-battery-saver="true"] .fill::before {
             display: none !important;
             animation: none !important;
@@ -1891,6 +1935,7 @@
         </span>
         <span class="focus-bar-title" id="focus-bar-title" onclick="openFocusModal()" title="Cambiar selección"></span>
         <span class="focus-bar-count" id="focus-bar-count"></span>
+        <span class="focus-bar-pins" id="focus-bar-pins" style="display:none;" onclick="clearFocusPins()" title="Quitar filtros de prioridad"></span>
         <button class="focus-bar-exit" onclick="exitFocusMode()" title="Salir" aria-label="Salir del modo concentración">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
         </button>
@@ -2226,7 +2271,7 @@
                 <div class="modal-actions" style="flex-wrap: wrap;"><button class="btn btn-delete" onclick="deleteActiveMarker()" style="flex-basis: 100%; margin-bottom: 6px;">Eliminar Marcador</button><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveMarkerSettings()">Guardar</button></div>
             </div>
 
-            <div id="modal-content-notes" style="display:none; flex-direction:column; height:100%;">
+            <div id="modal-content-notes" style="display:none; flex-direction:column;">
                 <div style="display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; margin-bottom:16px;">
                     <h3 style="color:var(--accent); margin:0; font-size:1rem;">Notas</h3>
 
@@ -2246,7 +2291,7 @@
                 </div>
                 <input type="date" id="notes-date-picker" style="display:none; margin-bottom:14px; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:10px; border-radius:10px; outline:none; font-family:inherit;" onchange="loadNoteForPicker()">
 
-                <textarea id="notes-main-textarea" style="flex:1; min-height: 50vh; width:100%; box-sizing:border-box; resize:vertical; border:1px solid var(--border-input); color:var(--text); border-radius:10px; padding:14px; font-family:inherit; font-size:0.9rem;" oninput="saveMainNote()"></textarea>
+                <textarea id="notes-main-textarea" style="flex:1; min-height:150px; width:100%; box-sizing:border-box; resize:none; border:1px solid var(--border-input); color:var(--text); border-radius:10px; padding:14px; font-family:inherit; font-size:0.9rem;" oninput="saveMainNote()"></textarea>
 
                 <div class="modal-actions" style="margin-top:16px;">
                     <button class="btn btn-cancel" onclick="closeModal()">Cerrar</button>
@@ -2304,7 +2349,7 @@
                 </div>
             </div>
 
-            <div id="modal-content-history" style="display:none; flex-direction:column; height:100%;">
+            <div id="modal-content-history" style="display:none; flex-direction:column;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
                     <h3 style="color:var(--accent); margin:0;">Historial</h3>
                     <button class="btn btn-save" onclick="exportHistoryExcel()"
@@ -2517,7 +2562,6 @@
             if (borderLbl) borderLbl.innerText = borderPct + '%';
         }
 
-        /* === MODO AHORRO DE BATERÍA === */
         function applyBatterySaver() {
             const enabled = localStorage.getItem('wkBatterySaver') === 'true';
             if (enabled) document.documentElement.setAttribute('data-battery-saver', 'true');
@@ -2956,6 +3000,16 @@
 
         function renderBoxTimerCard(t, boxId, box) {
             const ctx = `box-${boxId}-${t.id}`;
+            const pinBtn = focusMode.active ? `
+                <button class="t-btn-pin ${focusPinned.includes(t.id) ? 'active' : ''}"
+                        onclick="event.stopPropagation(); togglePinTimer('${escapeHtml(t.id)}')"
+                        title="${focusPinned.includes(t.id) ? 'Quitar prioridad' : 'Fijar prioridad'}"
+                        aria-label="${focusPinned.includes(t.id) ? 'Quitar prioridad' : 'Fijar prioridad'}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 17v5"/>
+                        <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>
+                    </svg>
+                </button>` : '';
             return `
             <div class="timer-widget extra-timer box-timer-card" id="card-${ctx}"
                  data-box-id="${escapeHtml(boxId)}"
@@ -2990,6 +3044,7 @@
                     <button class="t-btn" onclick="resetTimer('${escapeHtml(t.id)}')" title="Reiniciar">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     </button>
+                    ${pinBtn}
                 </div>
             </div>`;
         }
@@ -3091,6 +3146,17 @@
                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
                    </button>` : '';
 
+            const pinBtn = focusMode.active ? `
+                <button class="t-btn-pin ${focusPinned.includes(t.id) ? 'active' : ''}"
+                        onclick="event.stopPropagation(); togglePinTimer('${escapeHtml(t.id)}')"
+                        title="${focusPinned.includes(t.id) ? 'Quitar prioridad' : 'Fijar prioridad'}"
+                        aria-label="${focusPinned.includes(t.id) ? 'Quitar prioridad' : 'Fijar prioridad'}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 17v5"/>
+                        <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>
+                    </svg>
+                </button>` : '';
+
             let dragAttrs = '';
             if (!isGeneral) {
                 dragAttrs = `draggable="true" ondragstart="onDragStart(event, ${index})" ondragover="onDragOver(event)" ondrop="onDrop(event, ${index})" ondragend="onDragEnd(event)" ontouchstart="onTouchStart(event, ${index})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)"`;
@@ -3120,6 +3186,7 @@
                     <button class="t-btn" onclick="resetTimer('${escapeHtml(t.id)}')" title="Reiniciar">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     </button>
+                    ${pinBtn}
                     ${deleteBtn}
                     ${addBtn}
                 </div>
@@ -3127,10 +3194,14 @@
         }
 
         /* ============================================================
-           MODO CONCENTRACIÓN
+           MODO CONCENTRACIÓN + PIN DE PRIORIDAD
            ============================================================ */
         let focusMode = safeJSONParse(localStorage.getItem('wkFocusMode'), { active: false, type: null, boxId: null, timerIds: [], label: '' });
         if (typeof focusMode !== 'object' || focusMode === null) focusMode = { active: false, type: null, boxId: null, timerIds: [], label: '' };
+
+        let focusPinned = safeJSONParse(localStorage.getItem('wkFocusPinned'), []);
+        if (!Array.isArray(focusPinned)) focusPinned = [];
+        function saveFocusPinned() { safeSetItem('wkFocusPinned', JSON.stringify(focusPinned)); }
 
         if (focusMode.active) {
             if (focusMode.type === 'box') {
@@ -3144,6 +3215,11 @@
                 if (focusMode.timerIds.length === 0) focusMode.active = false;
             }
         }
+        focusPinned = focusPinned.filter(id => {
+            if (timersList.some(t => t.id === id)) return true;
+            for (const box of timerBoxes) if (box.timers.some(t => t.id === id)) return true;
+            return false;
+        });
 
         function saveFocusMode() {
             safeSetItem('wkFocusMode', JSON.stringify(focusMode));
@@ -3161,6 +3237,32 @@
                 return focusMode.timerIds.includes(id);
             }
             return true;
+        }
+
+        function isTimerVisibleWithPins(id) {
+            return focusPinned.length === 0 || focusPinned.includes(id);
+        }
+
+        function togglePinTimer(id) {
+            const idx = focusPinned.indexOf(id);
+            if (idx === -1) {
+                focusPinned.push(id);
+                for (const box of timerBoxes) {
+                    if (box.timers.some(bt => bt.id === id) && !openedBoxIds.has(box.id)) {
+                        openedBoxIds.add(box.id); saveBoxes(); break;
+                    }
+                }
+            } else {
+                focusPinned.splice(idx, 1);
+            }
+            saveFocusPinned();
+            renderTimersUI();
+        }
+
+        function clearFocusPins() {
+            focusPinned = [];
+            saveFocusPinned();
+            renderTimersUI();
         }
 
         function applyFocusMode() {
@@ -3185,6 +3287,20 @@
             }
             if (titleEl) titleEl.textContent = focusMode.label || 'Concentración';
             if (countEl) countEl.textContent = count + (count === 1 ? ' timer' : ' timers');
+
+            const pinsEl = document.getElementById('focus-bar-pins');
+            if (pinsEl) {
+                if (focusPinned.length > 0) {
+                    pinsEl.style.display = 'inline-flex';
+                    pinsEl.innerHTML = `${focusPinned.length} fijado${focusPinned.length > 1 ? 's' : ''}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true">
+                            <path d="M6 6l12 12M18 6l-12 12"/>
+                        </svg>`;
+                } else {
+                    pinsEl.style.display = 'none';
+                    pinsEl.innerHTML = '';
+                }
+            }
         }
 
         function enterFocus(type, options) {
@@ -3202,6 +3318,8 @@
             } else if (type === 'all') {
                 focusMode.label = 'Todos los visibles';
             }
+            focusPinned = [];
+            saveFocusPinned();
             saveFocusMode();
             saveBoxes();
             renderTimersUI();
@@ -3215,6 +3333,8 @@
             focusMode.boxId = null;
             focusMode.timerIds = [];
             focusMode.label = '';
+            focusPinned = [];
+            saveFocusPinned();
             saveFocusMode();
             document.body.classList.remove('focus-mode');
             const bar = document.getElementById('focus-bar');
@@ -3335,7 +3455,7 @@
 
             let html = '';
             const generalIdx = timersList.findIndex(t => t.id === 'general');
-            if (generalIdx !== -1 && isTimerInFocus('general')) {
+            if (generalIdx !== -1 && isTimerInFocus('general') && isTimerVisibleWithPins('general')) {
                 html += renderTimerCard(timersList[generalIdx], generalIdx);
             }
 
@@ -3437,13 +3557,15 @@
             timersList.forEach((t, index) => {
                 if (t.id === 'general' || t.hidden) return;
                 if (!isTimerInFocus(t.id)) return;
+                if (!isTimerVisibleWithPins(t.id)) return;
                 html += renderTimerCard(t, index);
             });
 
             openedBoxIds.forEach(boxId => {
                 const box = timerBoxes.find(b => b.id === boxId);
                 if (!box || box.timers.length === 0) return;
-                const visibleTimers = box.timers.filter(bt => isTimerInFocus(bt.id));
+                const visibleTimers = box.timers.filter(bt =>
+                    isTimerInFocus(bt.id) && isTimerVisibleWithPins(bt.id));
                 if (visibleTimers.length === 0) return;
 
                 const headerHtml = focusMode.active ? '' : `
@@ -4019,6 +4141,83 @@
         let winZCounter = 2000;
         const minimizedWindows = new Map();
 
+        /* === Paneles principales del modal === */
+        let activeMainPanelId = null;
+
+        const MAIN_PANEL_TITLES = {
+            'modal-content-notes':'Notas', 'modal-content-history':'Historial',
+            'modal-content-general':'Configuración', 'modal-content-timecalc':'Calculadora'
+        };
+        const MINIMIZABLE_PANELS = Object.keys(MAIN_PANEL_TITLES);
+        const PANEL_OPENERS = {
+            'modal-content-notes':    () => openNotesModal(),
+            'modal-content-history':  () => openHistoryModal(),
+            'modal-content-general':  () => openGeneralModal(),
+            'modal-content-timecalc': () => openTimeCalcModal()
+        };
+
+        function getActiveMainPanel() {
+            const modal = document.getElementById('main-modal-card');
+            return Array.from(modal.querySelectorAll(':scope > div[id^="modal-content-"]'))
+                .find(el => el.style.display === 'block' || el.style.display === 'flex') || null;
+        }
+
+        function getMainPanelStateKey() {
+            return 'wkModalState-panel-' + (activeMainPanelId || 'default');
+        }
+
+        function resetModalStyles(modal) {
+            ['position','margin','top','left','width','height','maxWidth','maxHeight','overflowY']
+                .forEach(p => { modal.style[p] = ''; });
+        }
+
+        function switchPanelState(panelId) {
+            if (activeMainPanelId && activeMainPanelId !== panelId) {
+                saveModalState(document.getElementById('main-modal-card'),
+                    'wkModalState-panel-' + activeMainPanelId);
+            }
+            activeMainPanelId = panelId;
+            const modal = document.getElementById('main-modal-card');
+            resetModalStyles(modal);
+            const state = safeJSONParse(localStorage.getItem('wkModalState-panel-' + panelId), null);
+            if (state) applyModalState(modal, state);
+            updateMinimizeBtnVisibility();
+        }
+
+        function updateMinimizeBtnVisibility() {
+            const btn = document.querySelector('.modal-minimize-btn');
+            if (!btn) return;
+            if (!activeMainPanelId) { btn.style.display = 'none'; return; }
+            btn.style.display = MINIMIZABLE_PANELS.includes(activeMainPanelId) ? 'flex' : 'none';
+        }
+
+        function reopenMainPanel(panelId) {
+            const opener = PANEL_OPENERS[panelId];
+            if (opener) { try { opener(); } catch(e) { console.warn('Error reopening', panelId, e); } }
+        }
+
+        function autoMinimizeCurrentMain() {
+            const activePanel = getActiveMainPanel();
+            if (!activePanel) return;
+            const panelId = activePanel.id;
+            if (!MINIMIZABLE_PANELS.includes(panelId)) return;
+
+            const key = 'main-' + panelId.replace('modal-content-','');
+            if (minimizedWindows.has(key)) return;
+
+            saveModalState(document.getElementById('main-modal-card'), getMainPanelStateKey());
+            flushNotesSave();
+
+            minimizedWindows.set(key, {
+                title: MAIN_PANEL_TITLES[panelId],
+                restoreFn: () => reopenMainPanel(panelId),
+                closeFn: () => {},
+                persistData: { type: 'main', panelId }
+            });
+            renderMinimizedBar();
+            persistMinimized();
+        }
+
         let notesSaveTimer = null;
         function flushNotesSave() {
             if (notesSaveTimer) { clearTimeout(notesSaveTimer); notesSaveTimer = null; }
@@ -4059,6 +4258,15 @@
         function restoreWindow(id) {
             const w = minimizedWindows.get(id);
             if (!w) return;
+
+            if (id.startsWith('main-') && document.getElementById('modal-overlay').classList.contains('active')) {
+                const current = getActiveMainPanel();
+                if (current) {
+                    const curKey = 'main-' + current.id.replace('modal-content-','');
+                    if (curKey !== id) autoMinimizeCurrentMain();
+                }
+            }
+
             minimizedWindows.delete(id);
             renderMinimizedBar();
             persistMinimized();
@@ -4085,41 +4293,27 @@
                 const safe = escapeHtml(w.title);
                 return `<div class="minimized-pill" onclick="restoreWindow('${escapeHtml(id)}')" title="Restaurar ${safe}">
                     <span>${safe}</span>
-                    <button class="pill-close" onclick="event.stopPropagation(); closeMinimizedWindow('${escapeHtml(id)}')" title="Cerrar" aria-label="Cerrar">×</button>
+                    <button class="pill-close" onclick="event.stopPropagation(); closeMinimizedWindow('${escapeHtml(id)}')" title="Cerrar" aria-label="Cerrar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true">
+                            <path d="M6 6l12 12M18 6l-12 12"/>
+                        </svg>
+                    </button>
                 </div>`;
             }).join('');
         }
 
         function minimizeMainModal() {
-            const modal = document.getElementById('main-modal-card');
-            const dualNotes = document.getElementById('dual-notes-card');
+            const activePanel = getActiveMainPanel();
+            if (!activePanel) return;
+            if (!MINIMIZABLE_PANELS.includes(activePanel.id)) return;
+
+            autoMinimizeCurrentMain();
+
             const overlay = document.getElementById('modal-overlay');
-            const panelMap = {
-                'modal-content-goal': 'Objetivo', 'modal-content-addtimer': 'Nuevo Timer',
-                'modal-content-general': 'Configuración', 'modal-content-taskcreate': 'Nueva Acción',
-                'modal-content-metrics': 'Métricas', 'modal-content-daystats': 'Día',
-                'modal-content-block': 'Bloque', 'modal-content-work': 'Jornada', 'modal-content-day': 'Día',
-                'modal-content-marker': 'Marcador', 'modal-content-notes': 'Notas',
-                'modal-content-timecalc': 'Calculadora', 'modal-content-history': 'Historial',
-                'modal-content-timermenu': 'Caja', 'modal-content-newbox': 'Nueva Caja',
-                'modal-content-boxcontents': 'Caja', 'modal-content-focus': 'Concentración'
-            };
-            let title = 'Modal';
-            const activePanel = Array.from(modal.querySelectorAll(':scope > div[id^="modal-content-"]'))
-                .find(el => el.style.display === 'block' || el.style.display === 'flex');
-            if (activePanel) title = panelMap[activePanel.id] || 'Modal';
-            try { saveModalState(modal, 'wkModalState-main'); } catch(_) {}
-            try { saveModalState(dualNotes, 'wkModalState-dual-notes'); } catch(_) {}
-            flushNotesSave();
             overlay.classList.remove('active');
-            const PERSISTIBLE = ['modal-content-notes','modal-content-history','modal-content-general','modal-content-timecalc'];
-            let persistData = null;
-            if (activePanel && PERSISTIBLE.includes(activePanel.id)) persistData = { type: 'main', panelId: activePanel.id };
-            minimizeWindow('main-modal', title,
-                () => { overlay.classList.add('active'); updateTimersDisplayValues(); },
-                () => { closeModal(); },
-                persistData
-            );
+            overlay.classList.remove('dual-mode-active');
+            document.getElementById('dual-notes-card').style.display = 'none';
+            updateBodyOverflow();
         }
 
         function minimizeQuarterWindow(key) {
@@ -4140,6 +4334,7 @@
             if (!Array.isArray(saved) || saved.length === 0) return;
             const prevYear = selectedYear;
             const prevQ = selectedQuarter;
+
             saved.filter(s => s.type === 'quarter').forEach(s => {
                 try {
                     selectedYear = s.year;
@@ -4149,19 +4344,20 @@
                     if (quarterWindows.has(key)) minimizeQuarterWindow(key);
                 } catch(e) { console.warn('Error restoring quarter', e); }
             });
-            const main = saved.find(s => s.type === 'main');
-            if (main) {
-                try {
-                    const opener = {
-                        'modal-content-notes': openNotesModal,
-                        'modal-content-history': openHistoryModal,
-                        'modal-content-general': openGeneralModal,
-                        'modal-content-timecalc': openTimeCalcModal
-                    }[main.panelId];
-                    if (opener) opener(); else openGeneralModal();
-                    minimizeMainModal();
-                } catch(e) { console.warn('Error restoring main', e); }
-            }
+
+            saved.filter(s => s.type === 'main' && s.panelId && MINIMIZABLE_PANELS.includes(s.panelId))
+                .forEach(main => {
+                    const panelId = main.panelId;
+                    const key = 'main-' + panelId.replace('modal-content-','');
+                    minimizedWindows.set(key, {
+                        title: MAIN_PANEL_TITLES[panelId],
+                        restoreFn: () => reopenMainPanel(panelId),
+                        closeFn: () => {},
+                        persistData: { type: 'main', panelId }
+                    });
+                });
+            if (minimizedWindows.size > 0) renderMinimizedBar();
+
             selectedYear = prevYear;
             selectedQuarter = prevQ;
         }
@@ -4209,6 +4405,7 @@
         function openGeneralModal() {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-general').style.display = 'block';
+            switchPanelState('modal-content-general');
             document.getElementById('theme-week-color').value = localStorage.getItem('wkWeekColor') || 'blue';
             document.getElementById('theme-border-color').value = localStorage.getItem('wkBorderColor') || 'default';
             syncModalSliders();
@@ -4254,6 +4451,7 @@
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             const content = document.getElementById('modal-content-notes');
             content.style.display = 'flex';
+            switchPanelState('modal-content-notes');
             const savedMode = localStorage.getItem('wkNotesLastMode') || 'general';
             const savedDate = localStorage.getItem('wkNotesLastDate') || '';
             document.getElementById('notes-mode').value = savedMode;
@@ -4971,8 +5169,6 @@
             activeQuarterKey = key;
             selectedYear = win.year;
             selectedQuarter = win.q;
-            activeTabM = win.activeTabM;
-            activeTabW = win.activeTabW;
             if (winZCounter >= 8900) {
                 winZCounter = 2000;
                 quarterWindows.forEach((w, k) => {
@@ -5123,19 +5319,28 @@
         }
 
         function openModal() {
-            if (minimizedWindows.has('main-modal')) { minimizedWindows.delete('main-modal'); renderMinimizedBar(); persistMinimized(); }
+            if (activeMainPanelId) {
+                const key = 'main-' + activeMainPanelId.replace('modal-content-','');
+                if (minimizedWindows.has(key)) {
+                    minimizedWindows.delete(key);
+                    renderMinimizedBar();
+                    persistMinimized();
+                }
+            }
             document.getElementById('modal-overlay').classList.add('active');
             updateBodyOverflow();
             updateTimersDisplayValues();
+            updateMinimizeBtnVisibility();
         }
 
         function closeModal(e) {
-            if(e && e.target.id !== 'modal-overlay') return;
+            if (e && e.target.id !== 'modal-overlay') return;
             flushNotesSave();
-            try {
-                saveModalState(document.getElementById('main-modal-card'), 'wkModalState-main');
-                saveModalState(document.getElementById('dual-notes-card'), 'wkModalState-dual-notes');
-            } catch(_) {}
+            if (activeMainPanelId) {
+                saveModalState(document.getElementById('main-modal-card'), getMainPanelStateKey());
+            }
+            try { saveModalState(document.getElementById('dual-notes-card'), 'wkModalState-dual-notes'); } catch(_) {}
+
             document.getElementById('modal-overlay').classList.remove('active');
             document.getElementById('modal-overlay').classList.remove('dual-mode-active');
             document.getElementById('main-modal-card').classList.remove('wide');
@@ -5149,6 +5354,7 @@
                 const el = document.getElementById('modal-content-' + id);
                 if (el) el.style.display = 'none';
             });
+            activeMainPanelId = null;
             if (minimizedWindows.has('main-modal')) { minimizedWindows.delete('main-modal'); renderMinimizedBar(); persistMinimized(); }
             updateBodyOverflow();
             updateTimersDisplayValues();
@@ -5171,6 +5377,7 @@
         function openTimeCalcModal() {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-timecalc').style.display = 'block';
+            switchPanelState('modal-content-timecalc');
             const now = new Date();
             const startH = String(now.getHours()).padStart(2, '0') + ':00';
             const endH = String((now.getHours() + 1) % 24).padStart(2, '0') + ':00';
@@ -5581,7 +5788,7 @@
                         if (data.focusMode) safeSetItem('wkFocusMode', JSON.stringify(data.focusMode));
 
                         if (!notasOk) {
-                            alert('⚠️ No se pudieron guardar las notas (posiblemente almacenamiento lleno).\n\nLas notas del archivo se perderán al recargar.');
+                            alert('No se pudieron guardar las notas (posiblemente almacenamiento lleno).\n\nLas notas del archivo se perderán al recargar.');
                         } else {
                             alert(`Datos restaurados correctamente.\n\nSe importaron ${notasPorFecha} notas de días.\n\nLa página se reiniciará.`);
                         }
@@ -5610,6 +5817,7 @@
         function openHistoryModal() {
             document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none');
             document.getElementById('modal-content-history').style.display = 'flex';
+            switchPanelState('modal-content-history');
             document.getElementById('main-modal-card').classList.add('wide');
             renderHistoryModal();
             openModal();
@@ -5703,13 +5911,14 @@
         }
 
         function initModalDragResize() {
-            initDraggableModal(document.getElementById('main-modal-card'), 'main');
-            initDraggableModal(document.getElementById('dual-notes-card'), 'dual-notes');
+            initDraggableModal(document.getElementById('main-modal-card'), getMainPanelStateKey);
+            initDraggableModal(document.getElementById('dual-notes-card'), () => 'wkModalState-dual-notes');
         }
 
-        function initDraggableModal(modalEl, key) {
+        function initDraggableModal(modalEl, keyGetter) {
             if (!modalEl || modalEl.dataset.dragResizeInit === '1') return;
             modalEl.dataset.dragResizeInit = '1';
+            const getKey = typeof keyGetter === 'function' ? keyGetter : () => 'wkModalState-' + keyGetter;
             const dragHandle = document.createElement('div');
             dragHandle.className = 'modal-drag-handle';
             dragHandle.title = 'Mover ventana';
@@ -5720,8 +5929,7 @@
             resizeHandle.title = 'Redimensionar';
             resizeHandle.innerHTML = '<svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="2.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="7.5" r="0.9"/><circle cx="7.5" cy="2.5" r="0.9"/></svg>';
             modalEl.appendChild(resizeHandle);
-            const storageKey = `wkModalState-${key}`;
-            const saved = safeJSONParse(localStorage.getItem(storageKey), null);
+            const saved = safeJSONParse(localStorage.getItem(getKey()), null);
             if (saved) applyModalState(modalEl, saved);
             let dragging = false;
             let dragStartX = 0, dragStartY = 0, dragStartLeft = 0, dragStartTop = 0;
@@ -5754,7 +5962,7 @@
                 dragging = false;
                 modalEl.classList.remove('dragging');
                 try { dragHandle.releasePointerCapture(e.pointerId); } catch(err) {}
-                saveModalState(modalEl, storageKey);
+                saveModalState(modalEl, getKey());
             };
             dragHandle.addEventListener('pointerdown', onDragStart);
             dragHandle.addEventListener('pointermove', onDragMove);
@@ -5793,7 +6001,7 @@
                 resizing = false;
                 modalEl.classList.remove('resizing');
                 try { resizeHandle.releasePointerCapture(e.pointerId); } catch(err) {}
-                saveModalState(modalEl, storageKey);
+                saveModalState(modalEl, getKey());
             };
             resizeHandle.addEventListener('pointerdown', onResizeStart);
             resizeHandle.addEventListener('pointermove', onResizeMove);
@@ -5835,32 +6043,16 @@
         }
 
         function resetModalPositions() {
-            ['main', 'dual-notes'].forEach(key => localStorage.removeItem(`wkModalState-${key}`));
+            localStorage.removeItem('wkModalState-dual-notes');
+            Object.keys(localStorage).forEach(k => {
+                if (k.startsWith('wkModalState-panel-')) localStorage.removeItem(k);
+            });
             quarterWindows.forEach((win, key) => {
                 localStorage.removeItem(`wkModalState-cal-${key}`);
-                win.card.style.position = '';
-                win.card.style.margin = '';
-                win.card.style.top = '';
-                win.card.style.left = '';
-                win.card.style.width = '';
-                win.card.style.height = '';
-                win.card.style.maxWidth = '';
-                win.card.style.maxHeight = '';
-                win.card.style.overflowY = '';
+                resetModalStyles(win.card);
             });
             const els = [document.getElementById('main-modal-card'), document.getElementById('dual-notes-card')];
-            els.forEach(el => {
-                if (!el) return;
-                el.style.position = '';
-                el.style.margin = '';
-                el.style.top = '';
-                el.style.left = '';
-                el.style.width = '';
-                el.style.height = '';
-                el.style.maxWidth = '';
-                el.style.maxHeight = '';
-                el.style.overflowY = '';
-            });
+            els.forEach(el => { if (el) resetModalStyles(el); });
             alert('Posición y tamaño de ventanas restablecidos.');
         }
 

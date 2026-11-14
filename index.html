@@ -14,6 +14,7 @@
         const savedTheme = localStorage.getItem('wkTheme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         if(savedTheme === 'light') document.getElementById('theme-color-meta').setAttribute('content', '#eef0f6');
+        if(localStorage.getItem('wkBatterySaver') === 'true') document.documentElement.setAttribute('data-battery-saver', 'true');
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -1777,6 +1778,75 @@
             .box-select-item { font-size: 0.76rem; padding: 8px 10px; }
             .bc-timer-row { font-size: 0.74rem; padding: 7px 9px; }
         }
+
+        /* ===================== MODO AHORRO DE BATERÍA ===================== */
+        html[data-battery-saver="true"]::before {
+            display: none !important;
+            animation: none !important;
+        }
+
+        [data-battery-saver="true"] *,
+        [data-battery-saver="true"] *::before,
+        [data-battery-saver="true"] *::after {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            animation: none !important;
+            transition-duration: 0.08s !important;
+        }
+
+        /* Sustituye fondos semitransparentes por sólidos (donde había blur) */
+        [data-battery-saver="true"] .timer-widget,
+        [data-battery-saver="true"] .dock-panel,
+        [data-battery-saver="true"] .progress-buttons,
+        [data-battery-saver="true"] .calendar-detail,
+        [data-battery-saver="true"] .modal-card,
+        [data-battery-saver="true"] .year-box,
+        [data-battery-saver="true"] .quarter-compact,
+        [data-battery-saver="true"] .hidden-timers-bar,
+        [data-battery-saver="true"] #floating-timer,
+        [data-battery-saver="true"] .focus-bar,
+        [data-battery-saver="true"] .header-menu-btn,
+        [data-battery-saver="true"] .timecalc-btn,
+        [data-battery-saver="true"] #minimized-bar {
+            background: var(--card-solid) !important;
+            box-shadow: none !important;
+        }
+
+        [data-battery-saver="true"] .modal-card,
+        [data-battery-saver="true"] .calendar-detail {
+            background: var(--card-solid) !important;
+            border-color: var(--border) !important;
+        }
+
+        /* Elimina brillo/glow del reloj corriendo */
+        [data-battery-saver="true"] .timer-display.running {
+            text-shadow: none !important;
+        }
+
+        /* Marcador "ahora" sin glow (se repinta cada segundo) */
+        [data-battery-saver="true"] .now-marker {
+            box-shadow: none !important;
+        }
+        [data-battery-saver="true"] .now-marker::before {
+            box-shadow: 0 0 0 2px var(--card-solid), 0 0 6px var(--accent) !important;
+        }
+
+        /* Botones de progreso activos sin glow */
+        [data-battery-saver="true"] .progress-btn.active,
+        [data-battery-saver="true"] .progress-btn.active::after {
+            box-shadow: none !important;
+        }
+
+        /* Marcadores arrastrables con sombra mínima */
+        [data-battery-saver="true"] .bar-marker {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.25) !important;
+        }
+
+        /* El brillo animado de las barras se elimina por completo */
+        [data-battery-saver="true"] .fill::before {
+            display: none !important;
+            animation: none !important;
+        }
     </style>
 </head>
 <body>
@@ -2010,6 +2080,17 @@
 
                 <button class="btn btn-cancel" style="font-size: 0.72rem; padding: 7px 12px; width: 100%;" onclick="resetModalTransparency()">Restablecer transparencias</button>
                 <button class="btn btn-cancel" style="font-size: 0.72rem; padding: 7px 12px; width: 100%; margin-top: 6px;" onclick="resetModalPositions()">Restablecer posición de ventanas</button>
+
+                <h4 style="color: var(--subtext); margin: 20px 0 12px; font-size: 0.88rem; font-weight: 600;">Rendimiento</h4>
+
+                <label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--item-bg); border: 1px solid var(--border-input); border-radius: 12px; cursor: pointer; margin-bottom: 14px;">
+                    <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text);">Modo ahorro de batería</span>
+                        <span style="font-size: 0.66rem; color: var(--muted); font-weight: 500; line-height: 1.35;">Desactiva animaciones, desenfoques de cristal y sombras decorativas. Todo sigue funcionando igual.</span>
+                    </div>
+                    <input type="checkbox" id="inp-battery-saver" onchange="toggleBatterySaver(this.checked)"
+                           style="width: 22px; height: 22px; min-width: 22px; accent-color: var(--accent); cursor: pointer;">
+                </label>
 
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 28px;">
                     <button class="btn btn-cancel" onclick="toggleTheme()">Alternar Tema Oscuro / Claro</button>
@@ -2421,6 +2502,21 @@
             if (bgLbl) bgLbl.innerText = bgPct + '%';
             if (borderEl) borderEl.value = borderPct;
             if (borderLbl) borderLbl.innerText = borderPct + '%';
+        }
+
+        /* === MODO AHORRO DE BATERÍA === */
+        function applyBatterySaver() {
+            const enabled = localStorage.getItem('wkBatterySaver') === 'true';
+            if (enabled) document.documentElement.setAttribute('data-battery-saver', 'true');
+            else document.documentElement.removeAttribute('data-battery-saver');
+            const cb = document.getElementById('inp-battery-saver');
+            if (cb) cb.checked = enabled;
+        }
+
+        function toggleBatterySaver(enabled) {
+            safeSetItem('wkBatterySaver', enabled ? 'true' : 'false');
+            if (enabled) document.documentElement.setAttribute('data-battery-saver', 'true');
+            else document.documentElement.removeAttribute('data-battery-saver');
         }
 
         let globalLastHourEnd = localStorage.getItem('wkLastHourEnd') || '';
@@ -4005,17 +4101,6 @@
             flushNotesSave();
             overlay.classList.remove('active');
             const PERSISTIBLE = ['modal-content-notes','modal-content-history','modal-content-general','modal-content-timecalc'];
-            let persistData = null;
-            if (activePanel && PERSISTIBLE.includes(activePanel.id)) persistData = { type: 'main', panelId: activePanel.id };
-            minimizeWindow('main-modal', title,
-                () => { overlay.classList.add('active'); updateTimersDisplayValues(); },
-                () => { closeModal(); },
-                persistData
-            );
-        }
-
-        function minimizeQuarterWindow(key) {
-            const win = quarterWindows.get(key);
             if (!win) return;
             const title = `T${win.q+1} · ${win.year}`;
             try { saveModalState(win.card, `wkModalState-cal-${key}`); } catch(_) {}
@@ -4104,6 +4189,7 @@
             document.getElementById('theme-week-color').value = localStorage.getItem('wkWeekColor') || 'blue';
             document.getElementById('theme-border-color').value = localStorage.getItem('wkBorderColor') || 'default';
             syncModalSliders();
+            applyBatterySaver();
             openModal();
         }
 
@@ -4772,12 +4858,6 @@
 
             const now = new Date();
             let startM = 0, startW = 1;
-            if (year === now.getFullYear() && Math.floor(now.getMonth() / 3) === q) {
-                startM = now.getMonth() % 3;
-                const wInfo = getWeekForDay(year, now.getMonth(), now.getDate());
-                startW = wInfo ? wInfo.localW : 1;
-            } else {
-                const weeks = getWeeksForMonth(year, q * 3);
                 startW = weeks.find(w => w.localW === 1) ? 1 : weeks[0].localW;
             }
 
@@ -5744,6 +5824,7 @@
         }
 
         /* === INICIALIZACIÓN === */
+        applyBatterySaver();
         applyModalAlphaSettings();
         applyThemeColors();
         restoreBars();

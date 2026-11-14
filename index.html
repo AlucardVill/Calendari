@@ -3016,18 +3016,16 @@
            ============================================================ */
         let focusMode = {
             active: false,
-            type: null,           // 'all' | 'box' | 'manual'
+            type: null,
             boxId: null,
             timerIds: [],
             label: ''
         };
 
-        // Cargar desde localStorage
         try {
             const savedFocus = JSON.parse(localStorage.getItem('wkFocusMode') || 'null');
             if (savedFocus && savedFocus.active) {
                 focusMode = savedFocus;
-                // Validar que los ids aún existen
                 if (focusMode.type === 'box') {
                     if (!timerBoxes.some(b => b.id === focusMode.boxId)) focusMode.active = false;
                 } else if (focusMode.type === 'manual') {
@@ -3091,7 +3089,6 @@
                 focusMode.boxId = options.boxId;
                 const box = timerBoxes.find(b => b.id === options.boxId);
                 focusMode.label = box ? box.name : 'Caja';
-                // Asegurar que la caja está abierta para verla
                 if (!openedBoxIds.has(options.boxId)) openedBoxIds.add(options.boxId);
             } else if (type === 'manual') {
                 focusMode.timerIds = options.timerIds || [];
@@ -3103,7 +3100,6 @@
             saveBoxes();
             renderTimersUI();
             applyFocusMode();
-            // Auto-scroll arriba para empezar limpio
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -3134,7 +3130,6 @@
 
             let quickHtml = '';
 
-            // Opción: Todos los visibles
             const visibleCount = timersList.filter(t => t.id === 'general' || !t.hidden).length;
             quickHtml += `<button class="focus-option primary" onclick="enterFocus('all'); closeModal();">
                 <span class="focus-option-icon">
@@ -3149,7 +3144,6 @@
                 <span class="focus-option-count">${visibleCount}</span>
             </button>`;
 
-            // Opciones: una por caja
             timerBoxes.forEach(box => {
                 if (box.timers.length === 0) return;
                 quickHtml += `<button class="focus-option" onclick="enterFocus('box', {boxId: '${escapeHtml(box.id)}'}); closeModal();">
@@ -3165,11 +3159,9 @@
 
             quickEl.innerHTML = quickHtml;
 
-            // Selección manual
             const currentlySelected = focusMode.type === 'manual' ? focusMode.timerIds : [];
             let manualHtml = '';
 
-            // Todos los timers del sistema (principales + cajas)
             const allTimers = [];
             timersList.forEach(t => {
                 if (t.id === 'general' || !t.hidden) allTimers.push({ ...t, scope: 'main' });
@@ -3344,7 +3336,6 @@
             openedBoxIds.forEach(boxId => {
                 const box = timerBoxes.find(b => b.id === boxId);
                 if (!box || box.timers.length === 0) return;
-                // En focus mode solo mostrar la cabecera de caja si contiene timers visibles
                 const visibleTimers = box.timers.filter(bt => isTimerInFocus(bt.id));
                 if (visibleTimers.length === 0) return;
 
@@ -5456,8 +5447,12 @@
                         if (data.timersList) safeSetItem('wkTimersList', JSON.stringify(data.timersList));
 
                         let notasOk = true;
-                        if (data.notes) {
+                        if (data.notes && typeof data.notes === 'object') {
                             notasOk = safeSetItem('wkNotes', JSON.stringify(data.notes));
+                            if (notasOk) {
+                                notesData = JSON.parse(JSON.stringify(data.notes));
+                                if (notesSaveTimer) { clearTimeout(notesSaveTimer); notesSaveTimer = null; }
+                            }
                         }
 
                         if (data.timerBoxes) safeSetItem('wkTimerBoxes', JSON.stringify(data.timerBoxes));
@@ -5469,7 +5464,12 @@
                         } else {
                             alert(`Datos restaurados correctamente.\n\nSe importaron ${notasPorFecha} notas de días.\n\nLa página se reiniciará.`);
                         }
-                        location.reload();
+
+                        try {
+                            window.location.reload();
+                        } catch(err1) {
+                            try { window.location.replace(window.location.href); } catch(err2) {}
+                        }
                     }
                 } catch (err) { alert("Error al leer el archivo. Asegúrate de que sea un JSON válido."); console.error(err); }
                 event.target.value = '';

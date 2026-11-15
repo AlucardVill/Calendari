@@ -1037,6 +1037,7 @@
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: all 0.2s; padding: 0; font-family: inherit;
             font-size: 0.85rem;
+            position: relative;
         }
         .notes-format-btn:hover { background: var(--border-input); }
         .notes-format-btn svg { width: 14px; height: 14px; display: block; }
@@ -1056,6 +1057,13 @@
             border-top: 1px solid var(--border-input);
             margin: 16px 0;
             opacity: 0.6;
+        }
+
+        /* Estilo Activo para el Resaltador */
+        .notes-format-btn.highlighter-active {
+            background: var(--item-bg) !important;
+            border: 1px solid currentColor !important;
+            box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 20%, transparent) !important;
         }
 
         #minimized-bar {
@@ -2540,8 +2548,14 @@
                                 <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
                             </svg>
                         </button>
-                        <!-- Botón Resaltador Verde -->
-                        <button class="notes-format-btn" onmousedown="event.preventDefault()" onclick="applyHighlighter()" title="Resaltar en verde" style="color: #a3e635;">
+                        
+                        <!-- Botón Resaltador con long press -->
+                        <button class="notes-format-btn" id="btn-highlighter" 
+                                onmousedown="handleHighlighterDown(event)" 
+                                onmouseup="handleHighlighterUp(event)" 
+                                ontouchstart="handleHighlighterDown(event)" 
+                                ontouchend="handleHighlighterUp(event)" 
+                                title="Resaltar (Mantén pulsado para cambiar color)">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m9 11-6 6v3h9l3-3"/>
                                 <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/>
@@ -4997,15 +5011,91 @@
             saveSelection();
         }
 
-        function applyHighlighter() {
+        // --- Lógica del Resaltador con Toggle y Long Press ---
+        let highlighterActive = false;
+        let highlighterColorIdx = 0;
+        
+        // Colores sutiles con transparencia para que el texto siga viéndose bien
+        const HIGHLIGHTER_COLORS = [
+            { bg: 'rgba(52, 211, 153, 0.35)', icon: '#34d399' }, // Verde
+            { bg: 'rgba(96, 165, 250, 0.35)', icon: '#60a5fa' }, // Azul
+            { bg: 'rgba(251, 113, 133, 0.35)', icon: '#fb7185' }  // Rojo
+        ];
+
+        let highlighterTimer = null;
+
+        function handleHighlighterDown(e) {
+            if (e) e.preventDefault();
+            if (highlighterTimer) clearTimeout(highlighterTimer);
+            highlighterTimer = setTimeout(() => {
+                highlighterTimer = null;
+                cycleHighlighterColor();
+            }, 500);
+        }
+
+        function handleHighlighterUp(e) {
+            if (e) e.preventDefault();
+            if (highlighterTimer) {
+                clearTimeout(highlighterTimer);
+                highlighterTimer = null;
+                toggleHighlighter();
+            }
+        }
+
+        function cycleHighlighterColor() {
+            highlighterColorIdx = (highlighterColorIdx + 1) % HIGHLIGHTER_COLORS.length;
+            updateHighlighterBtnUI();
+            if (highlighterActive) {
+                applyHighlighterColor();
+            }
+        }
+
+        function toggleHighlighter() {
+            highlighterActive = !highlighterActive;
+            updateHighlighterBtnUI();
+            if (highlighterActive) {
+                applyHighlighterColor();
+            } else {
+                removeHighlighter();
+            }
+        }
+
+        function updateHighlighterBtnUI() {
+            const btn = document.getElementById('btn-highlighter');
+            if (!btn) return;
+            const color = HIGHLIGHTER_COLORS[highlighterColorIdx];
+            btn.style.color = color.icon;
+            
+            if (highlighterActive) {
+                btn.classList.add('highlighter-active');
+                btn.style.backgroundColor = color.bg;
+                btn.style.borderColor = color.icon;
+            } else {
+                btn.classList.remove('highlighter-active');
+                btn.style.backgroundColor = 'transparent';
+                btn.style.borderColor = 'transparent';
+            }
+        }
+
+        function applyHighlighterColor() {
             const ta = document.getElementById('notes-main-textarea');
             if (!ta) return;
             ta.focus();
             restoreSelection();
             document.execCommand('styleWithCSS', false, true);
-            // Aplicar resaltador verde lima y forzar texto negro para legibilidad
-            document.execCommand('hiliteColor', false, '#a3e635');
-            document.execCommand('foreColor', false, '#000000');
+            const color = HIGHLIGHTER_COLORS[highlighterColorIdx].bg;
+            document.execCommand('hiliteColor', false, color);
+            saveMainNote();
+            saveSelection();
+        }
+
+        function removeHighlighter() {
+            const ta = document.getElementById('notes-main-textarea');
+            if (!ta) return;
+            ta.focus();
+            restoreSelection();
+            document.execCommand('styleWithCSS', false, true);
+            document.execCommand('hiliteColor', false, 'transparent');
             saveMainNote();
             saveSelection();
         }

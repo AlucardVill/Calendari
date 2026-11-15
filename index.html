@@ -2543,7 +2543,7 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M4 12h16"/></svg>
                         </button>
                         <label class="notes-color-btn" title="Color de texto" onmousedown="saveSelection()" ontouchstart="saveSelection()">
-                            <input type="color" oninput="applyColor(this.value)" value="#eef0f5">
+                            <input type="color" onchange="applyColor(this.value)" value="#eef0f5">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M4 20h16"/>
                                 <path d="M7 16l5-12 5 12"/>
@@ -4997,18 +4997,34 @@
             document.execCommand('styleWithCSS', false, true);
             document.execCommand(cmd, false, val || null);
             saveMainNote();
-            saveSelection(); // Actualizamos la selección post-edición
+            saveSelection();
         }
 
         function applyColor(color) {
             const ta = document.getElementById('notes-main-textarea');
             if (!ta) return;
+            
+            // Enfocar y restaurar selección
             ta.focus();
-            restoreSelection();
+            if (_savedRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(_savedRange);
+            }
+            
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('foreColor', false, color);
             saveMainNote();
-            saveSelection();
+            
+            // Devolver el foco al textarea después de aplicar el color
+            setTimeout(() => {
+                ta.focus();
+                if (_savedRange) {
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(_savedRange);
+                }
+            }, 10);
         }
 
         function insertDivider() {
@@ -6687,6 +6703,14 @@
             initFloatingTimerDrag();
             restoreMinimizedFromStorage();
             startUpdateLoop();
+            
+            // Añadir listeners para guardar la selección continuamente en el contenteditable
+            const taEl = document.getElementById('notes-main-textarea');
+            if (taEl) {
+                taEl.addEventListener('mouseup', saveSelection);
+                taEl.addEventListener('keyup', saveSelection);
+                taEl.addEventListener('touchend', saveSelection);
+            }
         } catch(e) {
             console.error("Error durante la inicialización de la app:", e);
             alert("Hubo un error al iniciar la app. Intenta recargar la página o limpiar los datos del sitio.");

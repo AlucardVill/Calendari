@@ -1039,6 +1039,8 @@
             font-size: 0.85rem;
         }
         .notes-format-btn:hover { background: var(--border-input); }
+        .notes-format-btn svg { width: 14px; height: 14px; display: block; }
+        
         .notes-font-select {
             background: transparent; border: none; color: var(--text);
             font-family: inherit; font-size: 0.7rem; font-weight: 600;
@@ -2531,11 +2533,18 @@
                         <button class="notes-format-btn" onmousedown="event.preventDefault()" onclick="insertDivider()" title="Divisor">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M4 12h16"/></svg>
                         </button>
+                        <!-- Botón Deshacer -->
+                        <button class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('undo')" title="Deshacer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 7v6h6"/>
+                                <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
+                            </svg>
+                        </button>
                         <!-- Botón Resaltador Verde -->
                         <button class="notes-format-btn" onmousedown="event.preventDefault()" onclick="applyHighlighter()" title="Resaltar en verde" style="color: #a3e635;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M9 11l-6 6v3h9l3-3"/>
-                                <path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/>
+                                <path d="m9 11-6 6v3h9l3-3"/>
+                                <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/>
                             </svg>
                         </button>
                     </div>
@@ -4994,8 +5003,9 @@
             ta.focus();
             restoreSelection();
             document.execCommand('styleWithCSS', false, true);
-            // Aplicar resaltador verde lima (se ve bien en oscuro y claro)
-            document.execCommand('hiliteColor', false, '#a3e635'); 
+            // Aplicar resaltador verde lima y forzar texto negro para legibilidad
+            document.execCommand('hiliteColor', false, '#a3e635');
+            document.execCommand('foreColor', false, '#000000');
             saveMainNote();
             saveSelection();
         }

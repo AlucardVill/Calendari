@@ -1058,6 +1058,14 @@
         }
         .notes-color-btn svg { width: 14px; height: 14px; display: block; }
 
+        /* Estilo para el divisor en las notas */
+        #notes-main-textarea hr {
+            border: none;
+            border-top: 1px solid var(--border-input);
+            margin: 16px 0;
+            opacity: 0.6;
+        }
+
         #minimized-bar {
             position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
             display: none; gap: 8px; padding: 7px 8px;
@@ -2531,8 +2539,11 @@
                         </select>
                         <button class="notes-format-btn" style="font-weight:900; font-family:serif;" onmousedown="event.preventDefault()" onclick="formatDoc('bold')" title="Negrita">B</button>
                         <button class="notes-format-btn" style="text-decoration:underline; font-weight:600;" onmousedown="event.preventDefault()" onclick="formatDoc('underline')" title="Subrayado">U</button>
-                        <label class="notes-color-btn" title="Color de texto">
-                            <input type="color" oninput="formatDoc('foreColor', this.value)" value="#eef0f5">
+                        <button class="notes-format-btn" onmousedown="event.preventDefault()" onclick="insertDivider()" title="Divisor">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M4 12h16"/></svg>
+                        </button>
+                        <label class="notes-color-btn" title="Color de texto" onmousedown="saveSelection()" ontouchstart="saveSelection()">
+                            <input type="color" oninput="applyColor(this.value)" value="#eef0f5">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M4 20h16"/>
                                 <path d="M7 16l5-12 5 12"/>
@@ -4952,9 +4963,62 @@
             }
         }
 
+        // --- Sistema de formato enriquecido con preservación de selección ---
+        let _savedRange = null;
+
+        function saveSelection() {
+            if (window.getSelection) {
+                const sel = window.getSelection();
+                if (sel.getRangeAt && sel.rangeCount) {
+                    _savedRange = sel.getRangeAt(0);
+                }
+            } else if (document.selection && document.selection.createRange) {
+                _savedRange = document.selection.createRange();
+            }
+        }
+
+        function restoreSelection() {
+            if (_savedRange) {
+                if (window.getSelection) {
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(_savedRange);
+                } else if (document.selection && _savedRange.select) {
+                    _savedRange.select();
+                }
+            }
+        }
+
         function formatDoc(cmd, val) {
+            const ta = document.getElementById('notes-main-textarea');
+            if (!ta) return;
+            ta.focus();
+            restoreSelection();
+            document.execCommand('styleWithCSS', false, true);
             document.execCommand(cmd, false, val || null);
             saveMainNote();
+            saveSelection(); // Actualizamos la selección post-edición
+        }
+
+        function applyColor(color) {
+            const ta = document.getElementById('notes-main-textarea');
+            if (!ta) return;
+            ta.focus();
+            restoreSelection();
+            document.execCommand('styleWithCSS', false, true);
+            document.execCommand('foreColor', false, color);
+            saveMainNote();
+            saveSelection();
+        }
+
+        function insertDivider() {
+            const ta = document.getElementById('notes-main-textarea');
+            if (!ta) return;
+            ta.focus();
+            restoreSelection();
+            document.execCommand('insertHTML', false, '<hr><p><br></p>');
+            saveMainNote();
+            saveSelection();
         }
 
         function insertCurrentTimeInNotes() {
@@ -4966,6 +5030,7 @@
             const timeStr = `[${hh}:${mm}] `;
 
             ta.focus();
+            restoreSelection();
             if (window.getSelection) {
                 const sel = window.getSelection();
                 if (sel.getRangeAt && sel.rangeCount) {

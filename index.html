@@ -411,6 +411,10 @@ html[data-battery-saver="true"]::before{display:none!important;animation:none!im
 [data-battery-saver="true"] *,[data-battery-saver="true"] *::before,[data-battery-saver="true"] *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;animation:none!important;transition-duration:0.08s!important}
 [data-battery-saver="true"] .timer-widget,[data-battery-saver="true"] .dock-panel,[data-battery-saver="true"] .progress-buttons,[data-battery-saver="true"] .calendar-detail,[data-battery-saver="true"] .modal-card,[data-battery-saver="true"] .year-box,[data-battery-saver="true"] .quarter-compact,[data-battery-saver="true"] .hidden-timers-bar,[data-battery-saver="true"] #floating-timer,[data-battery-saver="true"] .focus-bar,[data-battery-saver="true"] .header-menu-btn,[data-battery-saver="true"] .timecalc-btn,[data-battery-saver="true"] .focus-pins-bar,[data-battery-saver="true"] #minimized-bar{background:var(--card-solid)!important;box-shadow:none!important}
 [data-battery-saver="true"] .fill::before{display:none!important;animation:none!important}
+ /* Fondo absolutamente negro en modo concentración */
+html:has(body.focus-mode) { background: #000000 !important; }
+html:has(body.focus-mode)::before { display: none !important; animation: none !important; }
+body.focus-mode { background: #000000 !important; }   
 </style>
 </head>
 <body>

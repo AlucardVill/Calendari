@@ -1025,6 +1025,39 @@
         #main-modal-card.notes-active.notes-pinned .modal-minimize-btn { right: 8px; }
         #main-modal-card.notes-active.notes-pinned .modal-lock-btn { right: 34px; }
 
+        /* ====== Barra de formato para Notas ====== */
+        .notes-format-toolbar {
+            display: flex; align-items: center; gap: 4px;
+            background: var(--item-bg); border: 1px solid var(--border-input);
+            border-radius: 12px; padding: 4px 8px; margin-bottom: 10px;
+            align-self: flex-start;
+        }
+        .notes-format-btn {
+            background: transparent; border: none; color: var(--text);
+            width: 32px; height: 32px; border-radius: 8px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .notes-format-btn:hover { background: var(--border); }
+        .notes-format-btn svg { width: 16px; height: 16px; }
+        .notes-font-select {
+            background: transparent; border: none; color: var(--text);
+            font-family: inherit; font-size: 0.75rem; font-weight: 600;
+            padding: 4px 8px; border-radius: 8px; outline: none; cursor: pointer;
+            -webkit-appearance: none; appearance: none; max-width: 90px;
+        }
+        .notes-font-select:hover { background: var(--border); }
+        .notes-font-select option { background: var(--card-solid); color: var(--text); }
+        .notes-color-btn {
+            position: relative; display: flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
+            color: var(--text); overflow: hidden; transition: 0.2s;
+        }
+        .notes-color-btn:hover { background: var(--border); }
+        .notes-color-btn input[type="color"] {
+            position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;
+        }
+
         #minimized-bar {
             position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
             display: none; gap: 8px; padding: 7px 8px;
@@ -1636,6 +1669,8 @@
             overflow-y: auto !important;
             resize: none !important;
             padding-bottom: 46px !important;
+            white-space: pre-wrap;
+            outline: none;
         }
 
         /* Botón para insertar hora actual en notas */
@@ -1847,6 +1882,12 @@
         #dual-notes-text { padding: 10px; font-size: 0.82rem; }
         #notes-main-textarea { padding: 11px; font-size: 0.84rem; }
 
+        .notes-format-toolbar { padding: 3px 6px; gap: 2px; border-radius: 10px; }
+        .notes-format-btn { width: 28px; height: 28px; }
+        .notes-format-btn svg { width: 14px; height: 14px; }
+        .notes-font-select { font-size: 0.7rem; padding: 3px 6px; max-width: 80px; }
+        .notes-color-btn { width: 28px; height: 28px; }
+
         .notes-time-btn { width: 30px; height: 30px; bottom: 58px; right: 12px; }
         .notes-time-btn svg { width: 14px; height: 14px; }
 
@@ -1954,7 +1995,10 @@
             border-radius: 50%;
             flex-shrink: 0;
             box-shadow: 0 0 6px currentColor;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
+        .box-section-dot:hover { transform: scale(1.3); }
         .box-section-name { color: var(--subtext); }
         .box-section-tag {
             font-size: 0.52rem;
@@ -2060,6 +2104,8 @@
     </style>
 </head>
 <body>
+    <input type="color" id="hidden-box-color-picker" style="position:absolute; bottom:-9999px; left:-9999px; visibility:hidden;">
+
     <div id="floating-timer">
         <span id="floating-time">00:00</span>
         <button id="floating-toggle-btn" class="floating-stop-btn" title="Pausar/Reanudar"></button>
@@ -2476,7 +2522,26 @@
                 </div>
                 <input type="date" id="notes-date-picker" style="display:none; margin-bottom:14px; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:10px; border-radius:10px; outline:none; font-family:inherit;" onchange="loadNoteForPicker()">
 
-                <textarea id="notes-main-textarea" style="flex:1 1 auto; height:0; min-height:100px; width:100%; box-sizing:border-box; resize:none; overflow-y:auto; border:1px solid var(--border-input); color:var(--text); border-radius:10px; padding:14px; font-family:inherit; font-size:0.9rem;" oninput="saveMainNote()"></textarea>
+                <div class="notes-format-toolbar">
+                    <select class="notes-font-select" onchange="formatDoc('fontName', this.value)" onmousedown="event.stopPropagation()">
+                        <option value="system-ui, sans-serif">Fuente</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="'Times New Roman', serif">Times</option>
+                        <option value="'Courier New', monospace">Courier</option>
+                    </select>
+                    <button class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('bold')" title="Negrita">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+                    </button>
+                    <button class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('underline')" title="Subrayado">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
+                    </button>
+                    <label class="notes-color-btn" title="Color de texto">
+                        <input type="color" oninput="formatDoc('foreColor', this.value)" value="#eef0f5">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                    </label>
+                </div>
+
+                <div id="notes-main-textarea" contenteditable="true" style="flex:1 1 auto; height:0; min-height:100px; width:100%; box-sizing:border-box; resize:none; overflow-y:auto; border:1px solid var(--border-input); color:var(--text); border-radius:10px; padding:14px; font-family:inherit; font-size:0.9rem; outline:none; white-space:pre-wrap;" oninput="saveMainNote()"></div>
 
                 <button class="notes-time-btn" onclick="insertCurrentTimeInNotes()" title="Insertar hora actual" aria-label="Insertar hora actual">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2974,6 +3039,26 @@
         function saveBoxes() {
             safeSetItem('wkTimerBoxes', JSON.stringify(timerBoxes));
             safeSetItem('wkOpenedBoxes', JSON.stringify(Array.from(openedBoxIds)));
+        }
+
+        function changeBoxColor(boxId, event) {
+            if (event) event.stopPropagation();
+            const picker = document.getElementById('hidden-box-color-picker');
+            const box = timerBoxes.find(b => b.id === boxId);
+            if (!box) return;
+            picker.value = box.color || '#3b82f6';
+            picker.onchange = () => {
+                box.color = picker.value;
+                saveBoxes();
+                renderTimersUI();
+                if (currentBoxForContents === boxId) {
+                    const bcTitle = document.getElementById('bc-title');
+                    if (bcTitle) {
+                        bcTitle.innerHTML = `<span class="timer-color-dot" style="background:${escapeHtml(box.color)}; margin-right:6px;"></span>${escapeHtml(box.name)} <span style="color:var(--muted); font-size:0.7rem; font-weight:600;">|Box</span>`;
+                    }
+                }
+            };
+            picker.click();
         }
 
         function openTimerMenu(timerId) {
@@ -3764,7 +3849,7 @@
 
                 const headerHtml = focusMode.active ? '' : `
                     <div class="box-section-header">
-                        <span class="box-section-dot" style="background:${escapeHtml(box.color)}; color:${escapeHtml(box.color)};"></span>
+                        <span class="box-section-dot" style="background:${escapeHtml(box.color)}; color:${escapeHtml(box.color)};" onclick="changeBoxColor('${escapeHtml(boxId)}', event)" title="Cambiar color de la caja"></span>
                         <span class="box-section-name">${escapeHtml(box.name)}</span>
                         <span class="box-section-tag">|Box</span>
                         <button class="box-section-focus" onclick="event.stopPropagation(); enterFocus('box', {boxId: '${escapeHtml(boxId)}'})" title="Concentrarme en esta caja" aria-label="Concentrarme en esta caja">
@@ -4782,8 +4867,11 @@
                 html += `<optgroup label="${escapeHtml(meses[m-1] + ' ' + y)}">`;
                 groups[key].forEach(d => {
                     const day = parseInt(d.split('-')[2], 10);
-                    const raw = notesData[d].replace(/\s+/g, ' ').trim();
-                    const preview = raw.length > 28 ? raw.slice(0, 28) + '…' : raw;
+                    const raw = notesData[d];
+                    const temp = document.createElement('div');
+                    temp.innerHTML = raw;
+                    const plainText = (temp.textContent || temp.innerText || "").replace(/\s+/g, ' ').trim();
+                    const preview = plainText.length > 28 ? plainText.slice(0, 28) + '…' : plainText;
                     const selected = d === currentDate ? ' selected' : '';
                     html += `<option value="${escapeHtml(d)}"${selected}>${day} ${escapeHtml(meses[m-1].slice(0,3))} · ${escapeHtml(preview)}</option>`;
                 });
@@ -4823,7 +4911,7 @@
             const ta = document.getElementById('notes-main-textarea');
             if (mode === 'general') {
                 picker.style.display = 'none';
-                ta.value = notesData.general || '';
+                ta.innerHTML = notesData.general || '';
             } else {
                 picker.style.display = 'block';
                 if (!picker.value) {
@@ -4838,7 +4926,7 @@
         function loadNoteForPicker() {
             const date = document.getElementById('notes-date-picker').value;
             const ta = document.getElementById('notes-main-textarea');
-            ta.value = notesData[date] || '';
+            ta.innerHTML = notesData[date] || '';
             if (date) localStorage.setItem('wkNotesLastDate', date);
             const sel = document.getElementById('notes-index-select');
             if (sel && !sel.disabled) sel.value = date;
@@ -4848,10 +4936,10 @@
             const mode = document.getElementById('notes-mode').value;
             const ta = document.getElementById('notes-main-textarea');
             if (mode === 'general') {
-                notesData.general = ta.value;
+                notesData.general = ta.innerHTML;
             } else {
                 const date = document.getElementById('notes-date-picker').value;
-                if (date) notesData[date] = ta.value;
+                if (date) notesData[date] = ta.innerHTML;
             }
             scheduleNotesSave();
             renderDayTaskMarks();
@@ -4863,6 +4951,11 @@
             }
         }
 
+        function formatDoc(cmd, val) {
+            document.execCommand(cmd, false, val || null);
+            saveMainNote();
+        }
+
         function insertCurrentTimeInNotes() {
             const ta = document.getElementById('notes-main-textarea');
             if (!ta) return;
@@ -4870,13 +4963,23 @@
             const hh = String(now.getHours()).padStart(2, '0');
             const mm = String(now.getMinutes()).padStart(2, '0');
             const timeStr = `[${hh}:${mm}] `;
-            const start = ta.selectionStart ?? ta.value.length;
-            const end = ta.selectionEnd ?? ta.value.length;
-            const val = ta.value;
-            ta.value = val.slice(0, start) + timeStr + val.slice(end);
-            const newPos = start + timeStr.length;
-            try { ta.selectionStart = ta.selectionEnd = newPos; } catch(_) {}
+
             ta.focus();
+            if (window.getSelection) {
+                const sel = window.getSelection();
+                if (sel.getRangeAt && sel.rangeCount) {
+                    const range = sel.getRangeAt(0);
+                    range.deleteContents();
+                    const textNode = document.createTextNode(timeStr);
+                    range.insertNode(textNode);
+                    range.setStartAfter(textNode);
+                    range.setEndAfter(textNode);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            } else if (document.selection && document.selection.createRange) {
+                document.selection.createRange().text = timeStr;
+            }
             saveMainNote();
         }
 

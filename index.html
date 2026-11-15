@@ -1047,16 +1047,6 @@
         }
         .notes-font-select:hover { background: var(--border-input); }
         .notes-font-select option { background: var(--card-solid); color: var(--text); }
-        .notes-color-btn {
-            position: relative; display: flex; align-items: center; justify-content: center;
-            width: 26px; height: 26px; border-radius: 6px; cursor: pointer;
-            color: var(--text); transition: 0.2s; overflow: hidden;
-        }
-        .notes-color-btn:hover { background: var(--border-input); }
-        .notes-color-btn input[type="color"] {
-            position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;
-        }
-        .notes-color-btn svg { width: 14px; height: 14px; display: block; }
 
         /* Estilo para el divisor en las notas */
         #notes-main-textarea hr {
@@ -1893,7 +1883,6 @@
         .notes-format-toolbar { padding: 2px; gap: 1px; border-radius: 6px; }
         .notes-format-btn { width: 24px; height: 24px; }
         .notes-font-select { padding: 2px 4px; max-width: 60px; font-size: 0.65rem; }
-        .notes-color-btn { width: 24px; height: 24px; }
 
         .notes-time-btn { width: 30px; height: 30px; bottom: 58px; right: 12px; }
         .notes-time-btn svg { width: 14px; height: 14px; }
@@ -2542,14 +2531,13 @@
                         <button class="notes-format-btn" onmousedown="event.preventDefault()" onclick="insertDivider()" title="Divisor">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M4 12h16"/></svg>
                         </button>
-                        <label class="notes-color-btn" title="Color de texto" onmousedown="saveSelection()" ontouchstart="saveSelection()">
-                            <input type="color" onchange="applyColor(this.value)" value="#eef0f5">
+                        <!-- Botón Resaltador Verde -->
+                        <button class="notes-format-btn" onmousedown="event.preventDefault()" onclick="applyHighlighter()" title="Resaltar en verde" style="color: #a3e635;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M4 20h16"/>
-                                <path d="M7 16l5-12 5 12"/>
-                                <path d="M9 12h6"/>
+                                <path d="M9 11l-6 6v3h9l3-3"/>
+                                <path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/>
                             </svg>
-                        </label>
+                        </button>
                     </div>
                 </div>
 
@@ -5000,31 +4988,16 @@
             saveSelection();
         }
 
-        function applyColor(color) {
+        function applyHighlighter() {
             const ta = document.getElementById('notes-main-textarea');
             if (!ta) return;
-            
-            // Enfocar y restaurar selección
             ta.focus();
-            if (_savedRange) {
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(_savedRange);
-            }
-            
+            restoreSelection();
             document.execCommand('styleWithCSS', false, true);
-            document.execCommand('foreColor', false, color);
+            // Aplicar resaltador verde lima (se ve bien en oscuro y claro)
+            document.execCommand('hiliteColor', false, '#a3e635'); 
             saveMainNote();
-            
-            // Devolver el foco al textarea después de aplicar el color
-            setTimeout(() => {
-                ta.focus();
-                if (_savedRange) {
-                    const sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(_savedRange);
-                }
-            }, 10);
+            saveSelection();
         }
 
         function insertDivider() {

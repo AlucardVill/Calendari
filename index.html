@@ -808,6 +808,82 @@ function saveModalState(modalEl, storageKey) { if (!modalEl) return; const s = {
 function resetModalPositions() { localStorage.removeItem('wkModalState-dual-notes'); Object.keys(localStorage).forEach(k => { if (k.startsWith('wkModalState-panel-')) localStorage.removeItem(k); }); quarterWindows.forEach((w, k) => { localStorage.removeItem(`wkModalState-cal-${k}`); resetModalStyles(w.card); }); const e = [document.getElementById('main-modal-card'), document.getElementById('dual-notes-card')]; e.forEach(x => { if (x) resetModalStyles(x); }); alert('Posiciones restablecidas.'); }
 function initGoalModalDrag() { const c = document.getElementById('goal-card'); if (!c || c.dataset.goalDragInit === '1') return; c.dataset.goalDragInit = '1'; const dH = document.createElement('div'); dH.className = 'modal-drag-handle'; dH.innerHTML = '<span class="grip"></span>'; c.appendChild(dH); let dr = false, dsX = 0, dsY = 0, dsL = 0, dsT = 0; const oDS = (e) => { if (e.button !== undefined && e.button !== 0) return; e.preventDefault(); e.stopPropagation(); const r = c.getBoundingClientRect(); if (c.style.position !== 'fixed') { c.style.position = 'fixed'; c.style.margin = '0'; c.style.top = r.top + 'px'; c.style.left = r.left + 'px'; } dsX = e.clientX; dsY = e.clientY; dsL = parseFloat(c.style.left) || r.left; dsT = parseFloat(c.style.top) || r.top; dr = true; c.classList.add('dragging'); try { dH.setPointerCapture(e.pointerId); } catch(_) {} }; const oDM = (e) => { if (!dr) return; const dx = e.clientX - dsX, dy = e.clientY - dsY; const mw = c.offsetWidth; c.style.top = Math.max(0, Math.min(window.innerHeight - 40, dsT + dy)) + 'px'; c.style.left = Math.max(-(mw - 40), Math.min(window.innerWidth - 40, dsL + dx)) + 'px'; }; const oDE = (e) => { if (!dr) return; dr = false; c.classList.remove('dragging'); try { dH.releasePointerCapture(e.pointerId); } catch(_) {} }; dH.addEventListener('pointerdown', oDS); dH.addEventListener('pointermove', oDM); dH.addEventListener('pointerup', oDE); dH.addEventListener('pointercancel', oDE); }
 function resetGoalModalPosition() { const c = document.getElementById('goal-card'); if (!c) return; resetModalStyles(c); c.classList.remove('dragging'); }
+// ===== FIX DEFINITIVO DEL RESALTADOR =====
+// Intercepta cada carácter antes de que el navegador lo inserte.
+// Si el resaltador está OFF pero el cursor está en zona resaltada,
+// inserta el carácter como texto plano "fuera" del span.
+document.getElementById('notes-main-textarea').addEventListener('beforeinput', function(e) {
+    if (highlighterActive) return;
+    if (!e.isTrusted) return;
+    if (e.inputType !== 'insertText' || !e.data) return;
+
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    if (!range.collapsed) return;
+
+    let node = range.startContainer;
+    let highlighted = null;
+    while (node && node !== this) {
+        if (node.nodeType === 1 && node.style && node.style.backgroundColor) {
+            const bg = node.style.backgroundColor;
+            if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'initial') {
+                highlighted = node;
+                break;
+            }
+        }
+        node = node.parentNode;
+    }
+    if (!highlighted) return;
+
+    e.preventDefault();
+
+    const afterRange = document.createRange();
+    afterRange.setStart(range.startContainer, range.startOffset);
+    afterRange.setEnd(highlighted, highlighted.childNodes.length);
+    const afterHasContent = afterRange.toString().length > 0;
+
+    if (!afterHasContent) {
+        const tn = document.createTextNode(e.data);
+        if (highlighted.nextSibling) {
+            highlighted.parentNode.insertBefore(tn, highlighted.nextSibling);
+        } else {
+            highlighted.parentNode.appendChild(tn);
+        }
+        const nr = document.createRange();
+        nr.setStart(tn, tn.length);
+        nr.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(nr);
+    } else {
+        const beforeRange = document.createRange();
+        beforeRange.selectNodeContents(highlighted);
+        beforeRange.setEnd(range.startContainer, range.startOffset);
+        const beforeContents = beforeRange.cloneContents();
+
+        const beforeSpan = document.createElement('span');
+        beforeSpan.style.cssText = highlighted.style.cssText;
+        beforeSpan.appendChild(beforeContents);
+
+        const afterContents = afterRange.cloneContents();
+        const tn = document.createTextNode(e.data);
+
+        const parent = highlighted.parentNode;
+        parent.insertBefore(beforeSpan, highlighted);
+        parent.insertBefore(tn, highlighted);
+        while (afterContents.firstChild) {
+            parent.insertBefore(afterContents.firstChild, highlighted);
+        }
+        parent.removeChild(highlighted);
+
+        const nr = document.createRange();
+        nr.setStart(tn, tn.length);
+        nr.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(nr);
+    }
+    saveMainNote();
+});    
 try {
 applyBatterySaver();
 applyModalAlphaSettings();

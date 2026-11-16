@@ -487,38 +487,38 @@ body.focus-mode { background: #000000 !important; }
 }
 
 /* =========================================
-   TEMA: JOYAS DESLUSTRADAS (SUAVES Y FRÍAS)
+   TEMA: BOSQUE EDITORIAL (COMO LA REFERENCIA)
    ========================================= */
 
 :root {
-    /* Fondos: Gris pizarra frío (no es verde, no cansa) */
-    --bg: #111413;         
-    --card-solid: #181c1b; 
+    /* 1. Fondos: Verde Bosque muy oscuro */
+    --bg: #06110c;         /* El fondo principal, casi negro pero verde */
+    --card-solid: #0b1a14; /* Tarjetas un poco más claras */
     --card: var(--card-solid);
     
-    /* Textos (Blanco suave) */
-    --text: #d6dbd9;       
-    --muted: #78827f; 
-    --subtext: #9aa5a1;
+    /* 2. Textos: Blanco roto y gris verdoso */
+    --text: #e6ece9;       
+    --muted: #637a70; 
+    --subtext: #94a89f;
     --item-bg: rgba(255, 255, 255, 0.03); 
-    --input-bg: rgba(0, 0, 0, 0.25); 
+    --input-bg: rgba(0, 0, 0, 0.2); 
     
-    /* Colores: Apagados, con un toque de gris (no neón) */
-    --accent: #368c6e;     /* Esmeralda oscuro (para trimestres) */
-    --day-bar: #5b83a8;    /* Azul empolvado (Día) */
-    --week-bar: #4e918c;   /* Turquesa apagado (Semana) */
-    --year-bar: #8670a6;   /* Lavanda oscuro (Año) */
-    --work: #b8964a;       /* Ocre / Oro viejo (Jornada) */
-    --bi-bar: #b86570;     /* Terracota / Rosa viejo (Bloque) */
+    /* 3. Colores Principales: Verde Jade / Esmeralda */
+    --accent: #4ade80;     /* Verde brillante para los títulos, trimestres y acentos */
+    --day-bar: #4ade80;    /* Día en verde */
+    --week-bar: #2dd4bf;   /* Semana en verde azulado (turquesa) para variar un poco */
+    --year-bar: #818cf8;   /* Año en un lila suave que combina con el verde */
+    --work: #fbbf24;       /* Jornada en amarillo cálido */
+    --bi-bar: #fb7185;     /* Bloque en rosa suave */
     
-    /* Bordes */
-    --border: rgba(255, 255, 255, 0.06);
-    --border-input: rgba(255, 255, 255, 0.15);
+    /* 4. Bordes finos */
+    --border: rgba(74, 222, 128, 0.1);
+    --border-input: rgba(255, 255, 255, 0.12);
     
     --glass-blur: none;
 }
 
-/* Tipografía clásica */
+/* Tipografía clásica y elegante para títulos */
 .header-title,
 .section-label,
 .calendar-title-text,
@@ -527,7 +527,7 @@ h3 {
     letter-spacing: 0.02em !important;
 }
 
-/* Fondos sólidos */
+/* Fondos sólidos (adiós al cristal) */
 .timer-widget, 
 .modal-card, 
 .calendar-detail, 
@@ -540,11 +540,22 @@ h3 {
     background-image: none !important; 
     backdrop-filter: none !important; 
     -webkit-backdrop-filter: none !important;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important; 
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important; 
+    border: 1px solid var(--border-input) !important;
 }
 
 body, html {
     background-color: var(--bg) !important;
+}
+
+/* Botones principales estilo "Crema/Hueso" como en tu imagen */
+.btn-save, 
+.btn-cancel, 
+.timecalc-btn {
+    background-color: #f5f0ea !important; /* Color crema */
+    color: #06110c !important; /* Texto oscuro para contrastar */
+    border: none !important;
+    font-weight: 700 !important;
 }
 
 /* Quitar resplandores */
@@ -554,7 +565,7 @@ body, html {
 
 
 /* =========================================
-   FLOR Y LÍNEA EN LAS NOTAS
+   FLOR Y LÍNEA EN LAS NOTAS (INTACTAS)
    ========================================= */
 
 /* 1. Ocultar scroll */

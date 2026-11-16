@@ -447,28 +447,25 @@ body.focus-mode { background: #000000 !important; }
 }  
 
 /* =========================================
-   FLOR EN LA BASE DE LAS LÍNEAS DE NOTAS
+   FLOR EN LA BASE DE LAS LÍNEAS DE NOTAS (CORREGIDO)
    ========================================= */
 
-/* Aseguramos que el textarea sea el contenedor de referencia */
 #notes-main-textarea {
     position: relative;
-    /* Mantenemos sus bordes originales intactos */
+    /* Añadimos un poco de espacio para que la flor no tape el texto */
+    padding-bottom: 40px !important; 
 }
 
-/* Creamos las flores en los laterales */
 #notes-main-textarea::before,
 #notes-main-textarea::after {
     content: '';
     position: absolute;
-    bottom: 0; /* Pegado a la base */
-    height: 25%; /* Ocupa un cuarto de la altura de la línea */
-    width: 24px; /* Grosor fino de la flor */
+    bottom: 0; 
+    height: 25%; /* Ocupa el último cuarto */
+    width: 24px; /* Grosor fino */
     
-    /* El color será exactamente el mismo gris del borde actual */
     background-color: var(--border-input); 
     
-    /* Usamos tu SVG como máscara para pintarlo del color que queramos */
     mask-image: url('flor.svg');
     mask-repeat: no-repeat;
     mask-size: contain;
@@ -478,17 +475,16 @@ body.focus-mode { background: #000000 !important; }
     -webkit-mask-size: contain;
     -webkit-mask-position: bottom center;
     
-    pointer-events: none; /* No estorba al escribir */
+    pointer-events: none;
 }
 
-/* Posicionamos la flor justo sobre el borde izquierdo */
+/* ¡Aquí está la magia! En lugar de -12px, las ponemos en 0 */
 #notes-main-textarea::before { 
-    left: -12px; 
+    left: 0; 
 }
 
-/* Posicionamos la flor justo sobre el borde derecho */
 #notes-main-textarea::after { 
-    right: -12px; 
+    right: 0; 
 }
 </style>
 </head>

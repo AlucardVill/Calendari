@@ -770,7 +770,49 @@ function saveMainNote() { const m = document.getElementById('notes-mode').value;
 let _savedRange = null;
 function saveSelection() { if (window.getSelection) { const s = window.getSelection(); if (s.getRangeAt && s.rangeCount) _savedRange = s.getRangeAt(0); } else if (document.selection && document.selection.createRange) _savedRange = document.selection.createRange(); }
 function restoreSelection() { if (_savedRange) { if (window.getSelection) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(_savedRange); } else if (document.selection && _savedRange.select) _savedRange.select(); } }
-function formatDoc(cmd, val) { const ta = document.getElementById('notes-main-textarea'); if (!ta) return; ta.focus(); restoreSelection(); if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { document.execCommand('styleWithCSS', false, false); document.execCommand(cmd, false, null); } else if (cmd === 'fontName') { document.execCommand('styleWithCSS', false, true); document.execCommand('fontName', false, val); } else if (cmd === 'undo') { document.execCommand('undo', false, null); } else { document.execCommand('styleWithCSS', false, true); document.execCommand(cmd, false, val || null); } saveMainNote(); saveSelection(); updateFormatBtns(); }
+function formatDoc(cmd, val) { 
+    const ta = document.getElementById('notes-main-textarea'); 
+    if (!ta) return; 
+    ta.focus(); 
+    restoreSelection(); 
+    
+    if (cmd === 'fontName') {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0);
+            if (!range.collapsed) {
+                const span = document.createElement('span');
+                span.style.fontFamily = val;
+                try {
+                    range.surroundContents(span);
+                } catch(e) {
+                    const frag = range.extractContents();
+                    span.appendChild(frag);
+                    range.insertNode(span);
+                }
+                const nr = document.createRange();
+                nr.selectNodeContents(span);
+                sel.removeAllRanges();
+                sel.addRange(nr);
+            } else {
+                document.execCommand('styleWithCSS', false, false);
+                document.execCommand('fontName', false, val);
+            }
+        }
+    } else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
+        document.execCommand('styleWithCSS', false, false); 
+        document.execCommand(cmd, false, null); 
+    } else if (cmd === 'undo') { 
+        document.execCommand('undo', false, null); 
+    } else { 
+        document.execCommand('styleWithCSS', false, true); 
+        document.execCommand(cmd, false, val || null); 
+    } 
+    
+    saveMainNote(); 
+    saveSelection(); 
+    updateFormatBtns(); 
+}
 let highlighterActive = false;
 let highlighterColorIdx = 0;
 const HIGHLIGHTER_COLORS = [

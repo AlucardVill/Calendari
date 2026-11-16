@@ -485,47 +485,40 @@ body.focus-mode { background: #000000 !important; }
     pointer-events: none; 
     z-index: 10; /* Para que se dibuje justo encima de la línea */
 }
+
 /* =========================================
-   TEMA: TINTA BOTÁNICA / AZUL PRUSIA
+   TEMA: TINTA BOTÁNICA (COLORES AJUSTADOS)
    ========================================= */
 
 :root {
-    /* ==========================================
-       OPCIÓN 1: TINTA BOTÁNICA (VERDE PROFUNDO)
-       ========================================== */
-    --bg: #0b100f;         /* Fondo: Verde tinta ultra oscuro */
-    --card-solid: #131b19; /* Tarjetas: Verde bosque oscuro */
-    
-    /* ==========================================
-       OPCIÓN 2: AZUL PRUSIA (Por si quieres probar)
-       Solo cambia los dos colores de arriba por estos:
-       --bg: #0b1016;         
-       --card-solid: #121a24; 
-       ========================================== */
-
+    /* Fondo y Tarjetas */
+    --bg: #0b100f;         /* Verde tinta ultra oscuro */
+    --card-solid: #131b19; /* Verde bosque oscuro */
     --card: var(--card-solid);
-    --text: #e4ebe9;       /* Blanco con un matiz frío (no cansa) */
+    
+    /* Textos */
+    --text: #e4ebe9;       /* Blanco roto, suave para la vista */
     --muted: #7d8c88; 
     --subtext: #a3b2ae;
     --item-bg: rgba(255, 255, 255, 0.03); 
     --input-bg: rgba(0, 0, 0, 0.25); 
     
-    /* Colores originales vibrantes */
-    --accent: #34d399; 
-    --day-bar: #c084fc; 
-    --year-bar: #60a5fa; 
-    --week-bar: #34d399; 
-    --bi-bar: #fb7185; 
-    --work: #fbbf24; 
+    /* Colores ajustados: Menos brillo, más profundidad */
+    --accent: #10b981;     /* Verde esmeralda (antes era muy claro) */
+    --day-bar: #8b5cf6;    /* Púrpura profundo */
+    --year-bar: #3b82f6;   /* Azul rey */
+    --week-bar: #10b981;   /* Verde esmeralda */
+    --bi-bar: #e11d48;     /* Rojo carmesí (en lugar del rosa neón) */
+    --work: #f59e0b;       /* Ámbar oscuro / Mostaza */
     
-    /* Bordes finos */
+    /* Bordes */
     --border: rgba(255, 255, 255, 0.06);
     --border-input: rgba(255, 255, 255, 0.12);
     
     --glass-blur: none;
 }
 
-/* Tipografía clásica para los títulos */
+/* Tipografía clásica */
 .header-title,
 .section-label,
 .calendar-title-text,
@@ -534,7 +527,7 @@ h3 {
     letter-spacing: 0.02em !important;
 }
 
-/* Aplicar fondos sólidos (sin cristal) */
+/* Fondos sólidos (sin cristal) */
 .timer-widget, 
 .modal-card, 
 .calendar-detail, 
@@ -555,7 +548,7 @@ body, html {
     background-color: var(--bg) !important;
 }
 
-/* Quitar resplandores para mantener la sobriedad */
+/* Quitar resplandores de neón */
 .timer-display.running {
     text-shadow: none !important;
 }
@@ -568,6 +561,14 @@ body, html {
     box-shadow: none !important; 
 }
 
+/* =========================================
+   FIX: ESPACIO PARA EL TEXTO EN LAS NOTAS
+   ========================================= */
+/* Le damos 45px a los lados para que el texto no toque la flor */
+#notes-main-textarea {
+    padding-left: 45px !important;
+    padding-right: 45px !important;
+}
 </style>
 </head>
 <body>

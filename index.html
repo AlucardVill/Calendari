@@ -749,8 +749,58 @@ function handleHighlighterUp(e) { if (e) e.preventDefault(); if (highlighterTime
 function cycleHighlighterColor() { highlighterColorIdx = (highlighterColorIdx + 1) % HIGHLIGHTER_COLORS.length; updateHighlighterBtnUI(); if (highlighterActive) applyHighlighterColor(); }
 function toggleHighlighter() { highlighterActive = !highlighterActive; updateHighlighterBtnUI(); if (highlighterActive) applyHighlighterColor(); else removeHighlighter(); }
 function updateHighlighterBtnUI() { const b = document.getElementById('btn-highlighter'); if (!b) return; const c = HIGHLIGHTER_COLORS[highlighterColorIdx]; b.style.color = c.icon; if (highlighterActive) { b.classList.add('highlighter-active'); b.style.backgroundColor = c.bg; b.style.borderColor = c.icon; } else { b.classList.remove('highlighter-active'); b.style.backgroundColor = 'transparent'; b.style.borderColor = 'transparent'; } }
-function applyHighlighterColor() { const ta = document.getElementById('notes-main-textarea'); if (!ta) return; ta.focus(); restoreSelection(); document.execCommand('styleWithCSS', false, true); document.execCommand('hiliteColor', false, HIGHLIGHTER_COLORS[highlighterColorIdx].bg); saveMainNote(); saveSelection(); }
-function removeHighlighter() { const ta = document.getElementById('notes-main-textarea'); if (!ta) return; ta.focus(); restoreSelection(); const s = window.getSelection(); if (!s.rangeCount) { saveMainNote(); saveSelection(); return; } const r = s.getRangeAt(0); if (!r.collapsed) { document.execCommand('styleWithCSS', false, true); document.execCommand('hiliteColor', false, 'transparent'); } else { let n = r.startContainer; let hl = null; while (n && n !== ta) { if (n.nodeType === 1 && n.style) { const bg = n.style.backgroundColor; if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'initial') { hl = n; break; } } n = n.parentNode; } if (hl) { const nr = document.createRange(); nr.setStartAfter(hl); nr.collapse(true); s.removeAllRanges(); s.addRange(nr); } document.execCommand('styleWithCSS', false, true); document.execCommand('hiliteColor', false, 'transparent'); } saveMainNote(); saveSelection(); }
+function applyHighlighterColor() {
+    const ta = document.getElementById('notes-main-textarea');
+    if (!ta) return;
+    ta.focus();
+    restoreSelection();
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; }
+    const range = sel.getRangeAt(0);
+    if (range.collapsed) { saveMainNote(); saveSelection(); return; }
+    const color = HIGHLIGHTER_COLORS[highlighterColorIdx].bg;
+    const span = document.createElement('span');
+    span.style.backgroundColor = color;
+    try { range.surroundContents(span); }
+    catch (e) { const frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); }
+    const nr = document.createRange();
+    nr.selectNodeContents(span);
+    sel.removeAllRanges();
+    sel.addRange(nr);
+    saveMainNote();
+    saveSelection();
+}
+function removeHighlighter() {
+    const ta = document.getElementById('notes-main-textarea');
+    if (!ta) return;
+    ta.focus();
+    restoreSelection();
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; }
+    const range = sel.getRangeAt(0);
+    if (range.collapsed) {
+        let node = range.startContainer;
+        while (node && node !== ta) {
+            if (node.nodeType === 1 && node.style && node.style.backgroundColor) {
+                const bg = node.style.backgroundColor;
+                if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'initial') {
+                    node.style.backgroundColor = '';
+                    break;
+                }
+            }
+            node = node.parentNode;
+        }
+    } else {
+        ta.querySelectorAll('span').forEach(span => {
+            const bg = span.style.backgroundColor;
+            if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'initial' && range.intersectsNode(span)) {
+                span.style.backgroundColor = '';
+            }
+        });
+    }
+    saveMainNote();
+    saveSelection();
+}
 function updateFormatBtns() { try { document.querySelectorAll('.notes-format-btn').forEach(b => { const oc = b.getAttribute('onclick') || ''; if (oc.includes("'bold'")) b.classList.toggle('cmd-active', document.queryCommandState('bold')); if (oc.includes("'underline'")) b.classList.toggle('cmd-active', document.queryCommandState('underline')); }); } catch(_) {} }
 function insertDivider() { const ta = document.getElementById('notes-main-textarea'); if (!ta) return; ta.focus(); restoreSelection(); document.execCommand('insertHTML', false, '<hr><p><br></p>'); saveMainNote(); saveSelection(); }
 function insertCurrentTimeInNotes() { const ta = document.getElementById('notes-main-textarea'); if (!ta) return; const n = new Date(); const hh = String(n.getHours()).padStart(2, '0'); const mm = String(n.getMinutes()).padStart(2, '0'); const ts = `[${hh}:${mm}] `; ta.focus(); restoreSelection(); if (window.getSelection) { const s = window.getSelection(); if (s.getRangeAt && s.rangeCount) { const r = s.getRangeAt(0); r.deleteContents(); const tn = document.createTextNode(ts); r.insertNode(tn); r.setStartAfter(tn); r.setEndAfter(tn); s.removeAllRanges(); s.addRange(r); } } else if (document.selection && document.selection.createRange) document.selection.createRange().text = ts; saveMainNote(); }
@@ -1062,7 +1112,7 @@ if (!ta) return;
 const sel = window.getSelection();
 if (!sel || !sel.rangeCount) return;
 const node = sel.anchorNode;
-if (node && (node === ta || ta.contains(node))) updateFormatBtns();
+if (node && (node === ta || ta.contains(node))) { saveSelection(); updateFormatBtns(); }
 });
 } catch(e) {
 console.error("Error init:", e);

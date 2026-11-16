@@ -393,7 +393,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 .modal-card.dragging,.calendar-detail.dragging,.modal-card.resizing,.calendar-detail.resizing{box-shadow:0 0 0 1.5px var(--accent),0 40px 80px -12px rgba(0,0,0,0.65)!important;z-index:1500}
 #main-modal-card{padding-top:22px;display:flex;flex-direction:column;overflow:hidden;max-height:calc(90vh - 32px);margin:auto 0}
 #main-modal-card > div[id^="modal-content-"]{flex:0 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
-#main-modal-card > #modal-content-notes{flex:1 1 auto;min-height:0;flex-direction:column;overflow:hidden;position:relative}
+#main-modal-card>#modal-content-notes{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;position:relative}
 #dual-notes-card{padding-top:20px}
 .pinned-timers-wrapper{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;margin-bottom:16px}
 .pinned-timers-center{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:10px;max-width:100%;width:100%}
@@ -402,7 +402,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 .focus-pins-bar.active{display:flex}
 .focus-pins-bar .hidden-dot{width:10px;height:10px}
 body.has-minimized .focus-pins-bar{bottom:calc(max(20px,calc(env(safe-area-inset-bottom) + 10px)) + 56px)}
-#notes-main-textarea{flex:1 1 auto!important;height:0!important;min-height:100px!important;overflow-y:auto!important;resize:none!important;padding-bottom:46px!important;white-space:pre-wrap;outline:none;padding:11px;font-size:0.84rem}
+#notes-main-textarea{flex:1 1 auto!important;height:100%!important;min-height:100px!important;overflow-y:auto!important;resize:none!important;padding:11px 11px 75px 11px!important;white-space:pre-wrap;outline:none;font-size:0.84rem}
 .notes-time-btn{position:absolute;bottom: 16px;right:12px;width:30px;height:30px;border-radius:9px;background:var(--card-solid);border:1px solid var(--border-input);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;opacity:0.65;z-index:20}
 .notes-time-btn svg{width:14px;height:14px;display:block}
 .box-timer-card{border-left-color:var(--box-color,var(--accent))!important;border-left-width:4px!important}

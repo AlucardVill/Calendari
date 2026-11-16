@@ -765,8 +765,8 @@ function populateNotesIndex(currentDate) { const sel = document.getElementById('
 function onNotesIndexChange(date) { if (!date) return; document.getElementById('notes-mode').value = 'date'; document.getElementById('notes-date-picker').value = date; toggleNotesMode(); }
 let notesIndexRefreshTimer = null;
 function openNotesModal() { document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none'); const c = document.getElementById('modal-content-notes'); c.style.display = 'flex'; switchPanelState('modal-content-notes'); const sM = localStorage.getItem('wkNotesLastMode') || 'general'; const sD = localStorage.getItem('wkNotesLastDate') || ''; document.getElementById('notes-mode').value = sM; if (sM === 'date' && sD) document.getElementById('notes-date-picker').value = sD; toggleNotesMode(); populateNotesIndex(sM === 'date' ? sD : ''); document.getElementById('main-modal-card').classList.add('wide'); openModal(); }
-function toggleNotesMode() { const m = document.getElementById('notes-mode').value; localStorage.setItem('wkNotesLastMode', m); const p = document.getElementById('notes-date-picker'); const ta = document.getElementById('notes-main-textarea'); if (m === 'general') { p.style.display = 'none'; ta.innerHTML = notesData.general || ''; } else {p.style.display = 'flex'; if (!p.value) { const t = new Date(); p.value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; } localStorage.setItem('wkNotesLastDate', p.value); loadNoteForPicker(); } }
-function loadNoteForPicker() { const d = document.getElementById('notes-date-picker').value; const ta = document.getElementById('notes-main-textarea'); ta.innerHTML = notesData[d] || ''; if (d) localStorage.setItem('wkNotesLastDate', d); const s = document.getElementById('notes-index-select'); if (s && !s.disabled) s.value = d; }
+function toggleNotesMode() { const m = document.getElementById('notes-mode').value; localStorage.setItem('wkNotesLastMode', m); const p = document.getElementById('notes-date-picker'); const ta = document.getElementById('notes-main-textarea'); if (m === 'general') { p.style.display = 'none'; ta.innerHTML = notesData.general || ''; } else {p.style.display = 'flex'; if (!p.value) { const t = new Date(); p.value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; } localStorage.setItem('wkNotesLastDate', p.value); loadNoteForPicker(); } undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML; }
+function loadNoteForPicker() { const d = document.getElementById('notes-date-picker').value; const ta = document.getElementById('notes-main-textarea'); ta.innerHTML = notesData[d] || ''; if (d) localStorage.setItem('wkNotesLastDate', d); const s = document.getElementById('notes-index-select'); if (s && !s.disabled) s.value = d; undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML; }
 function saveMainNote() { 
     const m = document.getElementById('notes-mode').value; 
     const ta = document.getElementById('notes-main-textarea'); 
@@ -790,8 +790,12 @@ function saveMainNote() {
         clearTimeout(notesIndexRefreshTimer); 
         notesIndexRefreshTimer = setTimeout(() => { populateNotesIndex(document.getElementById('notes-date-picker').value); }, 800); 
     } 
-}
+}   
 let _savedRange = null;
+let undoStack = [];
+let redoStack = [];
+let isUndoRedoAction = false;
+let lastSavedHtml = '';
 let undoStack = [];
 let redoStack = [];
 let isUndoRedoAction = false;
@@ -813,15 +817,16 @@ function formatDoc(cmd, val) {
             saveMainNote();
             isUndoRedoAction = false;
         } else {
+            ta.focus();
             document.execCommand('undo', false, null);
+            lastSavedHtml = ta.innerHTML;
+            saveMainNote();
         }
         saveSelection();
         updateFormatBtns();
         return;
     }
-
-restoreSelection(); 
-
+    restoreSelection(); 
 if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
@@ -835,7 +840,7 @@ if (cmd === 'fontName') {
             }
         }
 
-                if (range && !range.collapsed) {
+                if (range && !range.collapsed) { saveMainNote();
             saveMainNote();
             const span = document.createElement('span');
             span.style.fontFamily = val;
@@ -893,7 +898,7 @@ function applyHighlighterColor() {
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; }
     const range = sel.getRangeAt(0);
-    if (range.collapsed) { saveMainNote(); saveSelection(); return; }
+if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; } saveMainNote();
       saveMainNote();
     const color = HIGHLIGHTER_COLORS[highlighterColorIdx].bg;
     const span = document.createElement('span');
@@ -1090,7 +1095,7 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
         node = node.parentNode;
     }
 
-    if (!targetNode) return;
+ if (!targetNode) return; saveMainNote();
 
     e.preventDefault();
 

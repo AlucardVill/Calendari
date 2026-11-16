@@ -496,36 +496,37 @@ body.focus-mode { background: #000000 !important; }
     right: -12px; 
 }
  /* =========================================
-   TEMA SOBRIO / EDITORIAL
+   TEMA SOBRIO / NEGRO ABSOLUTO
    ========================================= */
 
-/* 1. Redefinir las variables de color (Modo Oscuro) */
 :root {
-    /* Fondo tipo pizarra/tinta */
-    --bg: #151614; 
-    --card: rgba(34, 36, 33, 0.85); /* Menos transparencia */
-    --card-solid: #222421;
-    --text: #e6e4df; /* Blanco roto */
-    --muted: #8c8d89; 
-    --subtext: #b0b1ac;
+    /* Fondos: Negro puro y gris neutro */
+    --bg: #000000; 
+    --card: rgba(20, 20, 20, 0.85); 
+    --card-solid: #121212; /* Gris oscuro neutro para las tarjetas */
     
-    /* Colores de acento apagados (Tierra y Salvia) */
-    --accent: #8a9a7b; /* Verde Salvia */
-    --day-bar: #9e814a; /* Ocre apagado */
-    --year-bar: #5f7a85; /* Azul Pizarra */
-    --week-bar: #7b8a73; /* Oliva */
-    --bi-bar: #8c6161; /* Terracota / Rosa viejo */
-    --work: #a68a64; /* Bronce */
+    /* Textos limpios */
+    --text: #f2f2f2; 
+    --muted: #888888; 
+    --subtext: #a0a0a0;
     
-    /* Bordes más finos y definidos */
-    --border: rgba(230, 228, 223, 0.12);
-    --border-input: rgba(230, 228, 223, 0.2);
+    /* Colores de acento (Apagados, sin neón) */
+    --accent: #7b8e6d; /* Verde Salvia */
+    --day-bar: #8c7a5b; /* Ocre/Bronce */
+    --year-bar: #6b7f8a; /* Azul Pizarra */
+    --week-bar: #6e7d66; /* Oliva */
+    --bi-bar: #8c6161; /* Terracota */
+    --work: #9a825a; 
     
-    /* Quitar efectos de cristal pesados */
-    --glass-blur: blur(10px);
+    /* Bordes finos para dar estructura sobre el negro */
+    --border: rgba(255, 255, 255, 0.1);
+    --border-input: rgba(255, 255, 255, 0.15);
+    
+    /* Eliminar transparencias pesadas */
+    --glass-blur: blur(5px);
 }
 
-/* 2. Aplicar una fuente Serif clásica (incluida en el teléfono) a los títulos */
+/* 1. Tipografía clásica para los títulos (sin instalar nada) */
 .header-title,
 .section-label,
 .calendar-title-text,
@@ -534,7 +535,7 @@ h3 {
     letter-spacing: 0.02em !important;
 }
 
-/* 3. Eliminar los "brillos" de neón (Glows) */
+/* 2. Eliminar los brillos de neón y los saltos */
 .timer-display.running {
     text-shadow: none !important;
     color: var(--accent) !important;
@@ -551,33 +552,30 @@ h3 {
     background: var(--muted) !important;
 }
 
-/* 4. Suavizar las tarjetas de los temporizadores */
+/* 3. Tarjetas de temporizadores sólidas */
 .timer-widget {
     background: var(--card-solid) !important;
     border: 1px solid var(--border-input) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.8) !important; 
 }
 
-.timer-widget.extra-timer {
-    border-left: 3px solid var(--timer-color, var(--border)) !important;
-}
-
-/* 5. Ajustar los modales y ventanas para que sean más sólidos */
+/* 4. Modales sin efecto de cristal (más serios) */
 .modal-card, .calendar-detail {
     background: var(--card-solid) !important;
     backdrop-filter: none !important; 
     border: 1px solid var(--border-input) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.9) !important;
 }
 
-/* 6. Ajustar el modo claro (si lo usas) */
+/* 5. Modo claro (por si lo usas) */
 [data-theme="light"] {
-    --bg: #f2f0eb; 
+    --bg: #f5f5f5; 
     --card-solid: #ffffff;
     --card: rgba(255, 255, 255, 0.9);
-    --text: #2c2c2c; 
-    --muted: #737373;
-    --accent: #6b7f5e; 
-}   
+    --text: #111111; 
+    --muted: #666666;
+    --accent: #5e7554; 
+} 
 </style>
 </head>
 <body>

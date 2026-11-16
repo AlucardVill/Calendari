@@ -447,25 +447,32 @@ body.focus-mode { background: #000000 !important; }
 }  
 
 /* =========================================
-   FLOR EN LA BASE DE LAS LÍNEAS DE NOTAS (CORREGIDO)
+   FLOR EN LA BASE (CENTRADA EN LA LÍNEA)
    ========================================= */
 
-#notes-main-textarea {
-    position: relative;
-    /* Añadimos un poco de espacio para que la flor no tape el texto */
-    padding-bottom: 40px !important; 
+/* 1. Permitir que las flores sobresalgan del contenedor de notas */
+#modal-content-notes {
+    overflow: visible !important;
 }
 
+/* 2. Nos aseguramos de que el textarea no dibuje flores para evitar duplicados */
 #notes-main-textarea::before,
 #notes-main-textarea::after {
+    display: none !important;
+}
+
+/* 3. Creamos las flores en el contenedor padre (que no las recortará) */
+#modal-content-notes::before,
+#modal-content-notes::after {
     content: '';
     position: absolute;
-    bottom: 0; 
+    bottom: 0; /* Pegado a la base de la línea */
     height: 25%; /* Ocupa el último cuarto */
-    width: 24px; /* Grosor fino */
+    width: 24px; /* Grosor de la flor */
     
-    background-color: var(--border-input); 
+    background-color: var(--border-input); /* El gris exacto de tu línea */
     
+    /* Aplicamos tu SVG como máscara */
     mask-image: url('flor.svg');
     mask-repeat: no-repeat;
     mask-size: contain;
@@ -475,16 +482,18 @@ body.focus-mode { background: #000000 !important; }
     -webkit-mask-size: contain;
     -webkit-mask-position: bottom center;
     
-    pointer-events: none;
+    pointer-events: none; 
+    z-index: 10; /* Para que se dibuje justo encima de la línea */
 }
 
-/* ¡Aquí está la magia! En lugar de -12px, las ponemos en 0 */
-#notes-main-textarea::before { 
-    left: 0; 
+/* 4. Desplazamos la flor a la izquierda exactamente a la mitad de su ancho (12px) */
+#modal-content-notes::before { 
+    left: -12px; 
 }
 
-#notes-main-textarea::after { 
-    right: 0; 
+/* 5. Desplazamos la flor a la derecha exactamente a la mitad de su ancho */
+#modal-content-notes::after { 
+    right: -12px; 
 }
 </style>
 </head>

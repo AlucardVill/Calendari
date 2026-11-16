@@ -767,54 +767,18 @@ let notesIndexRefreshTimer = null;
 function openNotesModal() { document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none'); const c = document.getElementById('modal-content-notes'); c.style.display = 'flex'; switchPanelState('modal-content-notes'); const sM = localStorage.getItem('wkNotesLastMode') || 'general'; const sD = localStorage.getItem('wkNotesLastDate') || ''; document.getElementById('notes-mode').value = sM; if (sM === 'date' && sD) document.getElementById('notes-date-picker').value = sD; toggleNotesMode(); populateNotesIndex(sM === 'date' ? sD : ''); document.getElementById('main-modal-card').classList.add('wide'); openModal(); }
 function toggleNotesMode() { const m = document.getElementById('notes-mode').value; localStorage.setItem('wkNotesLastMode', m); const p = document.getElementById('notes-date-picker'); const ta = document.getElementById('notes-main-textarea'); if (m === 'general') { p.style.display = 'none'; ta.innerHTML = notesData.general || ''; } else {p.style.display = 'flex'; if (!p.value) { const t = new Date(); p.value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; } localStorage.setItem('wkNotesLastDate', p.value); loadNoteForPicker(); } }
 function loadNoteForPicker() { const d = document.getElementById('notes-date-picker').value; const ta = document.getElementById('notes-main-textarea'); ta.innerHTML = notesData[d] || ''; if (d) localStorage.setItem('wkNotesLastDate', d); const s = document.getElementById('notes-index-select'); if (s && !s.disabled) s.value = d; }
-function saveMainNote() { 
-    const m = document.getElementById('notes-mode').value; 
-    const ta = document.getElementById('notes-main-textarea'); 
-    if (!isUndoRedoAction) {
-        const currentHtml = ta.innerHTML;
-        if (currentHtml !== lastSavedHtml) {
-            undoStack.push(lastSavedHtml);
-            lastSavedHtml = currentHtml;
-            redoStack = [];
-            if (undoStack.length > 50) undoStack.shift();
-        }
-    }
-    if (m === 'general') notesData.general = ta.innerHTML; 
-    else { 
-        const d = document.getElementById('notes-date-picker').value; 
-        if (d) notesData[d] = ta.innerHTML; 
-    } 
-    scheduleNotesSave(); 
-    renderDayTaskMarks(); 
-    if (m === 'date') { 
-        clearTimeout(notesIndexRefreshTimer); 
-        notesIndexRefreshTimer = setTimeout(() => { populateNotesIndex(document.getElementById('notes-date-picker').value); }, 800); 
-    } 
-}
+function saveMainNote() { const m = document.getElementById('notes-mode').value; const ta = document.getElementById('notes-main-textarea'); if (m === 'general') notesData.general = ta.innerHTML; else { const d = document.getElementById('notes-date-picker').value; if (d) notesData[d] = ta.innerHTML; } scheduleNotesSave(); renderDayTaskMarks(); if (m === 'date') { clearTimeout(notesIndexRefreshTimer); notesIndexRefreshTimer = setTimeout(() => { populateNotesIndex(document.getElementById('notes-date-picker').value); }, 800); } }
 let _savedRange = null;
-let undoStack = [];
-let redoStack = [];
-let isUndoRedoAction = false;
-let lastSavedHtml = '';
 function saveSelection() { if (window.getSelection) { const s = window.getSelection(); if (s.getRangeAt && s.rangeCount) _savedRange = s.getRangeAt(0); } else if (document.selection && document.selection.createRange) _savedRange = document.selection.createRange(); }
 function restoreSelection() { if (_savedRange) { if (window.getSelection) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(_savedRange); } else if (document.selection && _savedRange.select) _savedRange.select(); } }
 function formatDoc(cmd, val) { 
     const ta = document.getElementById('notes-main-textarea'); 
     if (!ta) return; 
-
-    if (cmd === 'undo') {
-    if (undoStack.length > 0) {
-        isUndoRedoAction = true;
-        const currentHtml = ta.innerHTML;
-        const prevHtml = undoStack.pop();
-        redoStack.push(currentHtml);
-        ta.innerHTML = prevHtml;
-        lastSavedHtml = prevHtml;
-        saveMainNote();
-        isUndoRedoAction = false;
-    } else {
-        document.execCommand('undo', false, null);
-    }
+    
+  if (cmd === 'undo') {
+    ta.focus();
+    document.execCommand('undo', false, null);
+    saveMainNote();
     saveSelection();
     updateFormatBtns();
     return;
@@ -835,9 +799,8 @@ if (cmd === 'fontName') {
             }
         }
 
-  if (range && !range.collapsed) {
-    saveMainNote();
-    const span = document.createElement('span');
+        if (range && !range.collapsed) {
+            const span = document.createElement('span');
             span.style.fontFamily = val;
             try {
                 range.surroundContents(span);
@@ -849,7 +812,40 @@ if (cmd === 'fontName') {
             const nr = document.createRange();
             nr.selectNodeContents(span);
             if (sel) {
-                sel.{ highlighterColorIdx = (highlighterColorIdx + 1) % HIGHLIGHTER_COLORS.length; updateHighlighterBtnUI(); if (highlighterActive) applyHighlighterColor(); }
+                sel.removeAllRanges();
+                sel.addRange(nr);
+            }
+        } else {
+            document.execCommand('styleWithCSS', false, false);
+            document.execCommand('fontName', false, val);
+        }
+    } else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
+        document.execCommand('styleWithCSS', false, false); 
+        document.execCommand(cmd, false, null); 
+    } else if (cmd === 'undo') { 
+        document.execCommand('undo', false, null); 
+    } else { 
+        document.execCommand('styleWithCSS', false, true); 
+        document.execCommand(cmd, false, val || null); 
+    } 
+    
+    saveMainNote(); 
+    saveSelection(); 
+    updateFormatBtns(); 
+}
+let highlighterActive = false;
+let highlighterColorIdx = 0;
+const HIGHLIGHTER_COLORS = [
+    { bg: 'rgba(124, 58, 237, 0.85)', icon: '#a78bfa' },
+    { bg: 'rgba(37, 99, 235, 0.85)', icon: '#60a5fa' },
+    { bg: 'rgba(219, 39, 119, 0.85)', icon: '#f472b6' },
+    { bg: 'rgba(5, 150, 105, 0.85)', icon: '#34d399' },
+    { bg: 'rgba(217, 119, 6, 0.85)', icon: '#fbbf24' }
+]; 
+let highlighterTimer = null;
+function handleHighlighterDown(e) { if (e) e.preventDefault(); if (highlighterTimer) clearTimeout(highlighterTimer); highlighterTimer = setTimeout(() => { highlighterTimer = null; cycleHighlighterColor(); }, 500); }
+function handleHighlighterUp(e) { if (e) e.preventDefault(); if (highlighterTimer) { clearTimeout(highlighterTimer); highlighterTimer = null; toggleHighlighter(); } }
+function cycleHighlighterColor() { highlighterColorIdx = (highlighterColorIdx + 1) % HIGHLIGHTER_COLORS.length; updateHighlighterBtnUI(); if (highlighterActive) applyHighlighterColor(); }
 function toggleHighlighter() { highlighterActive = !highlighterActive; updateHighlighterBtnUI(); if (highlighterActive) applyHighlighterColor(); else removeHighlighter(); }
 function updateHighlighterBtnUI() { const b = document.getElementById('btn-highlighter'); if (!b) return; const c = HIGHLIGHTER_COLORS[highlighterColorIdx]; b.style.color = c.icon; if (highlighterActive) { b.classList.add('highlighter-active'); b.style.backgroundColor = c.bg; b.style.borderColor = c.icon; } else { b.classList.remove('highlighter-active'); b.style.backgroundColor = 'transparent'; b.style.borderColor = 'transparent'; } }
 function applyHighlighterColor() {
@@ -861,9 +857,8 @@ function applyHighlighterColor() {
     if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; }
     const range = sel.getRangeAt(0);
     if (range.collapsed) { saveMainNote(); saveSelection(); return; }
-  saveMainNote();
-const color = HIGHLIGHTER_COLORS[highlighterColorIdx].bg;
-const span = document.createElement('span');
+    const color = HIGHLIGHTER_COLORS[highlighterColorIdx].bg;
+    const span = document.createElement('span');
     span.style.backgroundColor = color;
     try { range.surroundContents(span); }
     catch (e) { const frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); }
@@ -881,7 +876,6 @@ function removeHighlighter() {
     restoreSelection();
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; }
-    saveMainNote();
     const range = sel.getRangeAt(0);
     if (range.collapsed) {
         let node = range.startContainer;

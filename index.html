@@ -1013,26 +1013,101 @@ function updateTextColorBtnUI() {
 }
 
 function applyTextColor() {
-    const ta = document.getElementById('notes-main-textarea');
-    if (!ta) return;
-    ta.focus();
-    restoreSelection();
-    document.execCommand('styleWithCSS', false, true);
-    document.execCommand('foreColor', false, TEXT_COLORS[textColorIdx].color);
-    saveMainNote();
-    saveSelection();
-}
+    const ta = document.getElementById('notes-main-textarea').addEventListener('beforeinput', function(e) {
+    if (!e.isTrusted) return;
+    if (e.inputType !== 'insertText' || !e.data) return;
 
-function removeTextColor() {
-    const ta = document.getElementById('notes-main-textarea');
-    if (!ta) return;
-    ta.focus();
-    restoreSelection();
-    document.execCommand('styleWithCSS', false, true);
-    document.execCommand('foreColor', false, document.documentElement.getAttribute('data-theme') === 'light' ? '#14171e' : '#eef0f5');
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    if (!range.collapsed) return;
+
+    let node = range.startContainer;
+    let targetNode = null;
+
+    while (node && node !== this) {
+        if (node.nodeType === 1) {
+            // Protección del Resaltador
+            if (!highlighterActive && node.style && node.style.backgroundColor) {
+                const bg = node.style.backgroundColor;
+                if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'initial') {
+                    targetNode = node;
+                    break;
+                }
+            }
+            // Protección del Color de Texto
+            if (!textColorActive) {
+                if (node.style && node.style.color) {
+                    const clr = node.style.color;
+                    if (clr && clr !== 'inherit' && clr !== 'initial' && clr !== 'transparent') {
+                        targetNode = node;
+                        break;
+                    }
+                }
+                if (node.tagName === 'FONT' && node.getAttribute('color')) {
+                    targetNode = node;
+                    break;
+                }
+            }
+        }
+        node = node.parentNode;
+    }
+
+    if (!targetNode) return;
+
+    e.preventDefault();
+
+    const afterRange = document.createRange();
+    afterRange.setStart(range.startContainer, range.startOffset);
+    afterRange.setEnd(targetNode, targetNode.childNodes.length);
+    const afterHasContent = afterRange.toString().length > 0;
+
+    if (!afterHasContent) {
+        const tn = document.createTextNode(e.data);
+        if (targetNode.nextSibling) {
+            targetNode.parentNode.insertBefore(tn, targetNode.nextSibling);
+        } else {
+            targetNode.parentNode.appendChild(tn);
+        }
+        const nr = document.createRange();
+        nr.setStart(tn, tn.length);
+        nr.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(nr);
+    } else {
+        const beforeRange = document.createRange();
+        beforeRange.selectNodeContents(targetNode);
+        beforeRange.setEnd(range.startContainer, range.startOffset);
+        const beforeContents = beforeRange.cloneContents();
+
+        const beforeNode = document.createElement(targetNode.nodeName.toLowerCase());
+        if (targetNode.tagName === 'FONT') {
+            for (let attr of targetNode.attributes) beforeNode.setAttribute(attr.name, attr.value);
+        } else {
+            beforeNode.style.cssText = targetNode.style.cssText;
+        }
+        beforeNode.appendChild(beforeContents);
+
+        const afterContents = afterRange.cloneContents();
+        const tn = document.createTextNode(e.data);
+
+        const parent = targetNode.parentNode;
+        parent.insertBefore(beforeNode, targetNode);
+        parent.insertBefore(tn, targetNode);
+        while (afterContents.firstChild) {
+            parent.insertBefore(afterContents.firstChild, targetNode);
+        }
+        parent.removeChild(targetNode);
+
+        const nr = document.createRange();
+        nr.setStart(tn, tn.length);
+        nr.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(nr);
+    }
     saveMainNote();
-    saveSelection();
-}    
+});
+
 try {
 applyBatterySaver();
 applyModalAlphaSettings();

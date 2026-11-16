@@ -487,7 +487,7 @@ body.focus-mode { background: #000000 !important; }
 }
 
 /* =========================================
-   TEMA: TINTA BOTÁNICA (SUAVE Y EQUILIBRADO)
+   TEMA: TINTA BOTÁNICA (TONOS JOYA EQUILIBRADOS)
    ========================================= */
 
 :root {
@@ -496,20 +496,20 @@ body.focus-mode { background: #000000 !important; }
     --card-solid: #161d1b; 
     --card: var(--card-solid);
     
-    /* Textos (Blanco perla, menos brillante) */
-    --text: #d1d5d4;       
+    /* Textos */
+    --text: #e0e5e3;       
     --muted: #7d8c88; 
     --subtext: #a3b2ae;
     --item-bg: rgba(255, 255, 255, 0.03); 
     --input-bg: rgba(0, 0, 0, 0.25); 
     
-    /* Colores suaves, menos intensos y relajantes */
-    --accent: #7eb88a;     /* Verde salvia suave */
-    --day-bar: #a891c9;    /* Lavanda empolvado */
-    --year-bar: #7b9fb8;   /* Azul polvoriento */
-    --week-bar: #7eb88a;   /* Verde salvia */
-    --bi-bar: #c98686;     /* Rosa viejo / Terracota suave */
-    --work: #c7ab70;       /* Oro pálido / Mostaza suave */
+    /* Colores: Vibrantes pero profundos (no neón) */
+    --accent: #2eb873;     /* Verde Esmeralda */
+    --day-bar: #9d5ce6;    /* Púrpura Amatista */
+    --year-bar: #458cc7;   /* Azul Zafiro */
+    --week-bar: #2eb873;   /* Verde Esmeralda */
+    --bi-bar: #db5866;     /* Rojo Rubí / Coral profundo */
+    --work: #e0a141;       /* Ámbar / Oro */
     
     /* Bordes */
     --border: rgba(255, 255, 255, 0.06);
@@ -557,19 +557,19 @@ body, html {
    FIX DEFINITIVO: FLOR Y LÍNEA EN LAS NOTAS
    ========================================= */
 
-/* 1. Ocultar la barra de scroll para que no oculte la flor derecha */
+/* 1. Ocultar scroll */
 #notes-main-textarea::-webkit-scrollbar { display: none; }
 #notes-main-textarea { scrollbar-width: none; }
 
-/* 2. Restaurar la línea vertical del recuadro y ajustar margen */
+/* 2. Líneas verticales y margen del texto */
 #notes-main-textarea {
     border-left: 1px solid var(--border-input) !important;
     border-right: 1px solid var(--border-input) !important;
-    padding-left: 25px !important;  /* Margen más pequeño */
+    padding-left: 25px !important;  
     padding-right: 25px !important;
 }
 
-/* 3. Posicionar las flores perfectamente atravesadas por la línea */
+/* 3. Las flores en la base */
 #modal-content-notes {
     overflow: visible !important;
 }
@@ -594,7 +594,6 @@ body, html {
     z-index: 10;
 }
 
-/* Empujamos exactamente la mitad de la flor (12px) hacia afuera */
 #modal-content-notes::before { left: -12px; }
 #modal-content-notes::after { right: -12px; }
 </style>

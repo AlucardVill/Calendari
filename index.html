@@ -16,7 +16,7 @@ try {
     document.documentElement.setAttribute('data-theme', savedTheme);
     document.getElementById('theme-color-meta').setAttribute('content', savedTheme === 'light' ? '#eef0f6' : '#0d1017');
     if(localStorage.getItem('wkBatterySaver') === 'true') document.documentElement.setAttribute('data-battery-saver', 'true');
-} catch(e) { console.error(e); }
+} catch(e) { console.error(e); }2
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -243,17 +243,17 @@ transform: translateX(-50%);
 z-index: 20;
 display: flex;
 align-items: center;
-gap: 2px;
+gap: 6px;
 background: var(--card-solid);
 border: 1px solid var(--border-input);
-border-radius: 12px;
-padding: 4px 8px;
+border-radius: 14px;
+padding: 6px 10px;
 box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 flex-shrink: 0;}
-.notes-format-btn{background:transparent;border:none;color:var(--text);width:24px;height:24px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit;font-size:0.85rem}
+.notes-format-btn{background:transparent;border:none;color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit;font-size:1.05rem;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .notes-format-btn:hover{background:var(--border-input)}
-.notes-format-btn svg{width:14px;height:14px;display:block}
-.notes-font-select{background:transparent;border:none;color:var(--text);font-family:inherit;font-size:0.65rem;font-weight:600;padding:2px 4px;border-radius:6px;outline:none;cursor:pointer;max-width:60px;text-align:center}
+.notes-format-btn svg{width:18px;height:18px;display:block}
+.notes-font-select{background:transparent;border:none;color:var(--text);font-family:inherit;font-size:0.85rem;font-weight:600;padding:4px 6px;border-radius:6px;outline:none;cursor:pointer;max-width:70px;text-align:center;user-select:none;-webkit-user-select:none}
 .notes-font-select option{background:var(--card-solid);color:var(--text)}
 #notes-main-textarea hr{border:none;border-top:1px solid var(--border-input);margin:16px 0;opacity:0.6}
 .notes-format-btn.highlighter-active,.notes-format-btn.cmd-active{background:var(--item-bg)!important;border:1px solid currentColor!important;box-shadow:0 0 0 2px color-mix(in srgb,currentColor 20%,transparent)!important}
@@ -515,8 +515,8 @@ body.focus-mode { background: #000000 !important; }
 <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('justifyFull')" title="Justificar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 6H3M21 12H3M21 18H3"/></svg></button>
         <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="insertDivider()" title="Divisor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h16"/></svg></button>
         <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('undo')" title="Deshacer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg></button>
-        <button type="button" class="notes-format-btn" id="btn-text-color" onmousedown="handleTextColorDown(event)" onmouseup="handleTextColorUp(event)" ontouchstart="handleTextColorDown(event)" ontouchend="handleTextColorUp(event)" title="Color de texto" style="font-family: serif; font-weight: 900; position: relative;">A</button>
-        <button type="button" class="notes-format-btn" id="btn-highlighter" onmousedown="handleHighlighterDown(event)" onmouseup="handleHighlighterUp(event)" ontouchstart="handleHighlighterDown(event)" ontouchend="handleHighlighterUp(event)" title="Resaltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></button>
+        <button type="button" class="notes-format-btn" id="btn-text-color" onmousedown="handleTextColorDown(event)" onmouseup="handleTextColorUp(event)" ontouchstart="event.preventDefault(); handleTextColorDown(event)" ontouchend="event.preventDefault(); handleTextColorUp(event)"title="Color de texto" style="font-family: serif; font-weight: 900; position: relative;">A</button>
+        <button type="button" class="notes-format-btn" id="btn-highlighter" onmousedown="handleHighlighterDown(event)" onmouseup="handleHighlighterUp(event)"ontouchstart="event.preventDefault(); handleHighlighterDown(event)" ontouchend="event.preventDefault(); handleHighlighterUp(event)"  title="Resaltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></button>
     </div>
 
     <button type="button" class="notes-time-btn" onclick="insertCurrentTimeInNotes()" title="Hora actual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>

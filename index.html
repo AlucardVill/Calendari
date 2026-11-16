@@ -415,6 +415,17 @@ html[data-battery-saver="true"]::before{display:none!important;animation:none!im
 html:has(body.focus-mode) { background: #000000 !important; }
 html:has(body.focus-mode)::before { display: none !important; animation: none !important; }
 body.focus-mode { background: #000000 !important; }   
+#btn-text-color::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    left: 6px;
+    right: 6px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--text-color-indicator, #eef0f5);
+    transition: background 0.2s;
+}
 </style>
 </head>
 <body>
@@ -473,6 +484,15 @@ body.focus-mode { background: #000000 !important; }
 <div style="display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;margin-bottom:12px;"><h3 style="color:var(--accent);margin:0;font-size:1rem;">Notas</h3><select id="notes-index-select" onchange="onNotesIndexChange(this.value)" style="width:100%;min-width:0;background:var(--input-bg);color:var(--text);border:1px solid var(--border-input);border-radius:8px;padding:6px 10px;font-family:inherit;font-size:0.75rem;outline:none;"><option value="">Ir a nota…</option></select><select id="notes-mode" onchange="toggleNotesMode()" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border-input);border-radius:8px;padding:6px 10px;font-size:0.78rem;outline:none;"><option value="general">Generales</option><option value="date">Por Fecha</option></select></div>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;"><input type="date" id="notes-date-picker" style="display:none;background:var(--input-bg);color:var(--text);border:1px solid var(--border-input);padding:6px 10px;border-radius:8px;outline:none;font-size:0.78rem;" onchange="loadNoteForPicker()">
 <div class="notes-format-toolbar" style="margin-left:auto;"><select class="notes-font-select" onchange="formatDoc('fontName',this.value)" onmousedown="event.stopPropagation()"><option value="system-ui, sans-serif">Aa</option><option value="serif">Serif</option><option value="monospace">Mono</option></select><button type="button" class="notes-format-btn" style="font-weight:900;font-family:serif;" onmousedown="event.preventDefault()" onclick="formatDoc('bold')">B</button><button type="button" class="notes-format-btn" style="text-decoration:underline;font-weight:600;" onmousedown="event.preventDefault()" onclick="formatDoc('underline')">U</button><button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="insertDivider()" title="Divisor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h16"/></svg></button><button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('undo')" title="Deshacer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg></button><button type="button" class="notes-format-btn" id="btn-highlighter" onmousedown="handleHighlighterDown(event)" onmouseup="handleHighlighterUp(event)" ontouchstart="handleHighlighterDown(event)" ontouchend="handleHighlighterUp(event)" title="Resaltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></button></div></div>
+<button type="button" class="notes-format-btn" id="btn-text-color"
+        onmousedown="handleTextColorDown(event)"
+        onmouseup="handleTextColorUp(event)"
+        ontouchstart="handleTextColorDown(event)"
+        ontouchend="handleTextColorUp(event)"
+        title="Color de texto (mantén pulsado para cambiar)"
+        style="font-family: serif; font-weight: 900; position: relative;">
+    A
+</button>
 <div id="notes-main-textarea" contenteditable="true" spellcheck="false" style="flex:1 1 auto;height:0;min-height:100px;width:100%;box-sizing:border-box;resize:none;overflow-y:auto;border:1px solid var(--border-input);color:var(--text);border-radius:10px;padding:14px;font-family:inherit;font-size:0.9rem;outline:none;white-space:pre-wrap;" oninput="saveMainNote()"></div>
 <button type="button" class="notes-time-btn" onclick="insertCurrentTimeInNotes()" title="Hora actual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
 </div>
@@ -819,7 +839,6 @@ function resetGoalModalPosition() { const c = document.getElementById('goal-card
 // Si el resaltador está OFF pero el cursor está en zona resaltada,
 // inserta el carácter como texto plano "fuera" del span.
 document.getElementById('notes-main-textarea').addEventListener('beforeinput', function(e) {
-    if (highlighterActive) return;
     if (!e.isTrusted) return;
     if (e.inputType !== 'insertText' || !e.data) return;
 
@@ -829,32 +848,51 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
     if (!range.collapsed) return;
 
     let node = range.startContainer;
-    let highlighted = null;
+    let targetNode = null;
+
     while (node && node !== this) {
-        if (node.nodeType === 1 && node.style && node.style.backgroundColor) {
-            const bg = node.style.backgroundColor;
-            if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'initial') {
-                highlighted = node;
-                break;
+        if (node.nodeType === 1) {
+            // Protección del Resaltador
+            if (!highlighterActive && node.style && node.style.backgroundColor) {
+                const bg = node.style.backgroundColor;
+                if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'initial') {
+                    targetNode = node;
+                    break;
+                }
+            }
+            // Protección del Color de Texto
+            if (!textColorActive) {
+                if (node.style && node.style.color) {
+                    const clr = node.style.color;
+                    if (clr && clr !== 'inherit' && clr !== 'initial' && clr !== 'transparent') {
+                        targetNode = node;
+                        break;
+                    }
+                }
+                if (node.tagName === 'FONT' && node.getAttribute('color')) {
+                    targetNode = node;
+                    break;
+                }
             }
         }
         node = node.parentNode;
     }
-    if (!highlighted) return;
+
+    if (!targetNode) return;
 
     e.preventDefault();
 
     const afterRange = document.createRange();
     afterRange.setStart(range.startContainer, range.startOffset);
-    afterRange.setEnd(highlighted, highlighted.childNodes.length);
+    afterRange.setEnd(targetNode, targetNode.childNodes.length);
     const afterHasContent = afterRange.toString().length > 0;
 
     if (!afterHasContent) {
         const tn = document.createTextNode(e.data);
-        if (highlighted.nextSibling) {
-            highlighted.parentNode.insertBefore(tn, highlighted.nextSibling);
+        if (targetNode.nextSibling) {
+            targetNode.parentNode.insertBefore(tn, targetNode.nextSibling);
         } else {
-            highlighted.parentNode.appendChild(tn);
+            targetNode.parentNode.appendChild(tn);
         }
         const nr = document.createRange();
         nr.setStart(tn, tn.length);
@@ -863,24 +901,28 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
         sel.addRange(nr);
     } else {
         const beforeRange = document.createRange();
-        beforeRange.selectNodeContents(highlighted);
+        beforeRange.selectNodeContents(targetNode);
         beforeRange.setEnd(range.startContainer, range.startOffset);
         const beforeContents = beforeRange.cloneContents();
 
-        const beforeSpan = document.createElement('span');
-        beforeSpan.style.cssText = highlighted.style.cssText;
-        beforeSpan.appendChild(beforeContents);
+        const beforeNode = document.createElement(targetNode.nodeName.toLowerCase());
+        if (targetNode.tagName === 'FONT') {
+            for (let attr of targetNode.attributes) beforeNode.setAttribute(attr.name, attr.value);
+        } else {
+            beforeNode.style.cssText = targetNode.style.cssText;
+        }
+        beforeNode.appendChild(beforeContents);
 
         const afterContents = afterRange.cloneContents();
         const tn = document.createTextNode(e.data);
 
-        const parent = highlighted.parentNode;
-        parent.insertBefore(beforeSpan, highlighted);
-        parent.insertBefore(tn, highlighted);
+        const parent = targetNode.parentNode;
+        parent.insertBefore(beforeNode, targetNode);
+        parent.insertBefore(tn, targetNode);
         while (afterContents.firstChild) {
-            parent.insertBefore(afterContents.firstChild, highlighted);
+            parent.insertBefore(afterContents.firstChild, targetNode);
         }
-        parent.removeChild(highlighted);
+        parent.removeChild(targetNode);
 
         const nr = document.createRange();
         nr.setStart(tn, tn.length);
@@ -889,7 +931,84 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
         sel.addRange(nr);
     }
     saveMainNote();
-});    
+});
+// --- Lógica del Color de Texto ---
+let textColorActive = false;
+let textColorIdx = 0;
+const TEXT_COLORS = [
+    { color: '#22c55e', icon: '#22c55e' }, // Verde
+    { color: '#ef4444', icon: '#ef4444' }, // Rojo
+    { color: '#3b82f6', icon: '#3b82f6' }, // Azul
+    { color: '#eab308', icon: '#eab308' }  // Amarillo
+];
+let textColorTimer = null;
+
+function handleTextColorDown(e) {
+    if (e) e.preventDefault();
+    if (textColorTimer) clearTimeout(textColorTimer);
+    textColorTimer = setTimeout(() => {
+        textColorTimer = null;
+        cycleTextColor();
+    }, 500);
+}
+
+function handleTextColorUp(e) {
+    if (e) e.preventDefault();
+    if (textColorTimer) {
+        clearTimeout(textColorTimer);
+        textColorTimer = null;
+        toggleTextColor();
+    }
+}
+
+function cycleTextColor() {
+    textColorIdx = (textColorIdx + 1) % TEXT_COLORS.length;
+    updateTextColorBtnUI();
+    if (textColorActive) applyTextColor();
+}
+
+function toggleTextColor() {
+    textColorActive = !textColorActive;
+    updateTextColorBtnUI();
+    if (textColorActive) applyTextColor();
+    else removeTextColor();
+}
+
+function updateTextColorBtnUI() {
+    const btn = document.getElementById('btn-text-color');
+    if (!btn) return;
+    const c = TEXT_COLORS[textColorIdx];
+    btn.style.setProperty('--text-color-indicator', c.icon);
+    if (textColorActive) {
+        btn.classList.add('highlighter-active');
+        btn.style.color = c.icon;
+    } else {
+        btn.classList.remove('highlighter-active');
+        btn.style.color = ''; 
+    }
+}
+
+function applyTextColor() {
+    const ta = document.getElementById('notes-main-textarea');
+    if (!ta) return;
+    ta.focus();
+    restoreSelection();
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand('foreColor', false, TEXT_COLORS[textColorIdx].color);
+    saveMainNote();
+    saveSelection();
+}
+
+function removeTextColor() {
+    const ta = document.getElementById('notes-main-textarea');
+    if (!ta) return;
+    ta.focus();
+    restoreSelection();
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand('foreColor', false, document.documentElement.getAttribute('data-theme') === 'light' ? '#14171e' : '#eef0f5');
+    saveMainNote();
+    saveSelection();
+}    
 try {
 applyBatterySaver();
 applyModalAlphaSettings();

@@ -495,6 +495,89 @@ body.focus-mode { background: #000000 !important; }
 #modal-content-notes::after { 
     right: -12px; 
 }
+ /* =========================================
+   TEMA SOBRIO / EDITORIAL
+   ========================================= */
+
+/* 1. Redefinir las variables de color (Modo Oscuro) */
+:root {
+    /* Fondo tipo pizarra/tinta */
+    --bg: #151614; 
+    --card: rgba(34, 36, 33, 0.85); /* Menos transparencia */
+    --card-solid: #222421;
+    --text: #e6e4df; /* Blanco roto */
+    --muted: #8c8d89; 
+    --subtext: #b0b1ac;
+    
+    /* Colores de acento apagados (Tierra y Salvia) */
+    --accent: #8a9a7b; /* Verde Salvia */
+    --day-bar: #9e814a; /* Ocre apagado */
+    --year-bar: #5f7a85; /* Azul Pizarra */
+    --week-bar: #7b8a73; /* Oliva */
+    --bi-bar: #8c6161; /* Terracota / Rosa viejo */
+    --work: #a68a64; /* Bronce */
+    
+    /* Bordes más finos y definidos */
+    --border: rgba(230, 228, 223, 0.12);
+    --border-input: rgba(230, 228, 223, 0.2);
+    
+    /* Quitar efectos de cristal pesados */
+    --glass-blur: blur(10px);
+}
+
+/* 2. Aplicar una fuente Serif clásica (incluida en el teléfono) a los títulos */
+.header-title,
+.section-label,
+.calendar-title-text,
+h3 {
+    font-family: Georgia, 'Times New Roman', serif !important;
+    letter-spacing: 0.02em !important;
+}
+
+/* 3. Eliminar los "brillos" de neón (Glows) */
+.timer-display.running {
+    text-shadow: none !important;
+    color: var(--accent) !important;
+}
+
+.progress-btn.active {
+    box-shadow: none !important; 
+    border-color: var(--text) !important;
+    transform: none !important; 
+}
+
+.header-title::before {
+    box-shadow: none !important; 
+    background: var(--muted) !important;
+}
+
+/* 4. Suavizar las tarjetas de los temporizadores */
+.timer-widget {
+    background: var(--card-solid) !important;
+    border: 1px solid var(--border-input) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; 
+}
+
+.timer-widget.extra-timer {
+    border-left: 3px solid var(--timer-color, var(--border)) !important;
+}
+
+/* 5. Ajustar los modales y ventanas para que sean más sólidos */
+.modal-card, .calendar-detail {
+    background: var(--card-solid) !important;
+    backdrop-filter: none !important; 
+    border: 1px solid var(--border-input) !important;
+}
+
+/* 6. Ajustar el modo claro (si lo usas) */
+[data-theme="light"] {
+    --bg: #f2f0eb; 
+    --card-solid: #ffffff;
+    --card: rgba(255, 255, 255, 0.9);
+    --text: #2c2c2c; 
+    --muted: #737373;
+    --accent: #6b7f5e; 
+}   
 </style>
 </head>
 <body>

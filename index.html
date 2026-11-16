@@ -447,78 +447,38 @@ body.focus-mode { background: #000000 !important; }
 }  
 
 /* =========================================
-   FLOR EN LA BASE (CENTRADA EN LA LÍNEA)
-   ========================================= */
-
-/* 1. Permitir que las flores sobresalgan del contenedor de notas */
-#modal-content-notes {
-    overflow: visible !important;
-}
-
-/* 2. Nos aseguramos de que el textarea no dibuje flores para evitar duplicados */
-#notes-main-textarea::before,
-#notes-main-textarea::after {
-    display: none !important;
-}
-
-/* 3. Creamos las flores en el contenedor padre (que no las recortará) */
-#modal-content-notes::before,
-#modal-content-notes::after {
-    content: '';
-    position: absolute;
-    bottom: 0; /* Pegado a la base de la línea */
-    height: 25%; /* Ocupa el último cuarto */
-    width: 24px; /* Grosor de la flor */
-    
-    background-color: var(--border-input); /* El gris exacto de tu línea */
-    
-    /* Aplicamos tu SVG como máscara */
-    mask-image: url('flor.svg');
-    mask-repeat: no-repeat;
-    mask-size: contain;
-    mask-position: bottom center;
-    -webkit-mask-image: url('flor.svg');
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-size: contain;
-    -webkit-mask-position: bottom center;
-    
-    pointer-events: none; 
-    z-index: 10; /* Para que se dibuje justo encima de la línea */
-}
-
-/* =========================================
-   TEMA: BOSQUE EDITORIAL (COMO LA REFERENCIA)
+   TEMA: VERDE ABETO FRÍO (DEFINITIVO)
    ========================================= */
 
 :root {
-    /* 1. Fondos: Verde Bosque muy oscuro */
-    --bg: #06110c;         /* El fondo principal, casi negro pero verde */
-    --card-solid: #0b1a14; /* Tarjetas un poco más claras */
+    /* Fondos: Verde Abeto frío y profundo */
+    --bg: #0a1112;         
+    --card-solid: #10191a; 
     --card: var(--card-solid);
     
-    /* 2. Textos: Blanco roto y gris verdoso */
-    --text: #e6ece9;       
-    --muted: #637a70; 
-    --subtext: #94a89f;
+    /* Textos */
+    --text: #dce3e1;       
+    --muted: #7f8c8b; 
+    --subtext: #9fb0ae;
     --item-bg: rgba(255, 255, 255, 0.03); 
-    --input-bg: rgba(0, 0, 0, 0.2); 
+    --input-bg: rgba(0, 0, 0, 0.25); 
     
-    /* 3. Colores Principales: Verde Jade / Esmeralda */
-    --accent: #4ade80;     /* Verde brillante para los títulos, trimestres y acentos */
-    --day-bar: #4ade80;    /* Día en verde */
-    --week-bar: #2dd4bf;   /* Semana en verde azulado (turquesa) para variar un poco */
-    --year-bar: #818cf8;   /* Año en un lila suave que combina con el verde */
-    --work: #fbbf24;       /* Jornada en amarillo cálido */
-    --bi-bar: #fb7185;     /* Bloque en rosa suave */
+    /* Colores: Apagados, elegantes, sin fatiga visual */
+    --accent: #2c8a75;     /* Esmeralda frío (Trimestres) */
+    --day-bar: #4d85b5;    /* Azul polvoriento (Día) */
+    --week-bar: #3b918b;   /* Turquesa frío (Semana) */
+    --year-bar: #8670a6;   /* Lavanda oscuro (Año) */
+    --work: #b8964a;       /* Ocre / Oro viejo (Jornada) */
+    --bi-bar: #b86570;     /* Terracota / Rosa viejo (Bloque) */
     
-    /* 4. Bordes finos */
-    --border: rgba(74, 222, 128, 0.1);
-    --border-input: rgba(255, 255, 255, 0.12);
+    /* Bordes */
+    --border: rgba(255, 255, 255, 0.06);
+    --border-input: rgba(255, 255, 255, 0.15);
     
     --glass-blur: none;
 }
 
-/* Tipografía clásica y elegante para títulos */
+/* Tipografía clásica */
 .header-title,
 .section-label,
 .calendar-title-text,
@@ -527,7 +487,7 @@ h3 {
     letter-spacing: 0.02em !important;
 }
 
-/* Fondos sólidos (adiós al cristal) */
+/* Fondos sólidos (Adiós al cristal y transparencias) */
 .timer-widget, 
 .modal-card, 
 .calendar-detail, 
@@ -540,35 +500,24 @@ h3 {
     background-image: none !important; 
     backdrop-filter: none !important; 
     -webkit-backdrop-filter: none !important;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important; 
-    border: 1px solid var(--border-input) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important; 
 }
 
 body, html {
     background-color: var(--bg) !important;
 }
 
-/* Botones principales estilo "Crema/Hueso" como en tu imagen */
-.btn-save, 
-.btn-cancel, 
-.timecalc-btn {
-    background-color: #f5f0ea !important; /* Color crema */
-    color: #06110c !important; /* Texto oscuro para contrastar */
-    border: none !important;
-    font-weight: 700 !important;
-}
-
-/* Quitar resplandores */
+/* Quitar resplandores y efectos modernos */
 .timer-display.running { text-shadow: none !important; }
 .progress-btn.active { box-shadow: none !important; }
 .header-title::before { box-shadow: none !important; }
 
 
 /* =========================================
-   FLOR Y LÍNEA EN LAS NOTAS (INTACTAS)
+   FLOR Y LÍNEA EN LAS NOTAS
    ========================================= */
 
-/* 1. Ocultar scroll */
+/* 1. Ocultar scroll para que no tape la flor derecha */
 #notes-main-textarea::-webkit-scrollbar { display: none; }
 #notes-main-textarea { scrollbar-width: none; }
 
@@ -580,7 +529,7 @@ body, html {
     padding-right: 25px !important;
 }
 
-/* 3. Las flores en la base */
+/* 3. Las flores en la base (centradas en la línea) */
 #modal-content-notes {
     overflow: visible !important;
 }

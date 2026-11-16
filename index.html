@@ -487,33 +487,33 @@ body.focus-mode { background: #000000 !important; }
 }
 
 /* =========================================
-   TEMA: TINTA BOTÁNICA (COLORES AJUSTADOS)
+   TEMA: TINTA BOTÁNICA (SUAVE Y EQUILIBRADO)
    ========================================= */
 
 :root {
-    /* Fondo y Tarjetas */
-    --bg: #0b100f;         /* Verde tinta ultra oscuro */
-    --card-solid: #131b19; /* Verde bosque oscuro */
+    /* Fondos */
+    --bg: #0d1211;         
+    --card-solid: #161d1b; 
     --card: var(--card-solid);
     
-    /* Textos */
-    --text: #e4ebe9;       /* Blanco roto, suave para la vista */
+    /* Textos (Blanco perla, menos brillante) */
+    --text: #d1d5d4;       
     --muted: #7d8c88; 
     --subtext: #a3b2ae;
     --item-bg: rgba(255, 255, 255, 0.03); 
     --input-bg: rgba(0, 0, 0, 0.25); 
     
-    /* Colores ajustados: Menos brillo, más profundidad */
-    --accent: #10b981;     /* Verde esmeralda (antes era muy claro) */
-    --day-bar: #8b5cf6;    /* Púrpura profundo */
-    --year-bar: #3b82f6;   /* Azul rey */
-    --week-bar: #10b981;   /* Verde esmeralda */
-    --bi-bar: #e11d48;     /* Rojo carmesí (en lugar del rosa neón) */
-    --work: #f59e0b;       /* Ámbar oscuro / Mostaza */
+    /* Colores suaves, menos intensos y relajantes */
+    --accent: #7eb88a;     /* Verde salvia suave */
+    --day-bar: #a891c9;    /* Lavanda empolvado */
+    --year-bar: #7b9fb8;   /* Azul polvoriento */
+    --week-bar: #7eb88a;   /* Verde salvia */
+    --bi-bar: #c98686;     /* Rosa viejo / Terracota suave */
+    --work: #c7ab70;       /* Oro pálido / Mostaza suave */
     
     /* Bordes */
     --border: rgba(255, 255, 255, 0.06);
-    --border-input: rgba(255, 255, 255, 0.12);
+    --border-input: rgba(255, 255, 255, 0.15);
     
     --glass-blur: none;
 }
@@ -527,7 +527,7 @@ h3 {
     letter-spacing: 0.02em !important;
 }
 
-/* Fondos sólidos (sin cristal) */
+/* Fondos sólidos */
 .timer-widget, 
 .modal-card, 
 .calendar-detail, 
@@ -541,34 +541,62 @@ h3 {
     backdrop-filter: none !important; 
     -webkit-backdrop-filter: none !important;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important; 
-    border: 1px solid var(--border-input) !important; 
 }
 
 body, html {
     background-color: var(--bg) !important;
 }
 
-/* Quitar resplandores de neón */
-.timer-display.running {
-    text-shadow: none !important;
-}
+/* Quitar resplandores */
+.timer-display.running { text-shadow: none !important; }
+.progress-btn.active { box-shadow: none !important; }
+.header-title::before { box-shadow: none !important; }
 
-.progress-btn.active {
-    box-shadow: none !important; 
-}
-
-.header-title::before {
-    box-shadow: none !important; 
-}
 
 /* =========================================
-   FIX: ESPACIO PARA EL TEXTO EN LAS NOTAS
+   FIX DEFINITIVO: FLOR Y LÍNEA EN LAS NOTAS
    ========================================= */
-/* Le damos 45px a los lados para que el texto no toque la flor */
+
+/* 1. Ocultar la barra de scroll para que no oculte la flor derecha */
+#notes-main-textarea::-webkit-scrollbar { display: none; }
+#notes-main-textarea { scrollbar-width: none; }
+
+/* 2. Restaurar la línea vertical del recuadro y ajustar margen */
 #notes-main-textarea {
-    padding-left: 45px !important;
-    padding-right: 45px !important;
+    border-left: 1px solid var(--border-input) !important;
+    border-right: 1px solid var(--border-input) !important;
+    padding-left: 25px !important;  /* Margen más pequeño */
+    padding-right: 25px !important;
 }
+
+/* 3. Posicionar las flores perfectamente atravesadas por la línea */
+#modal-content-notes {
+    overflow: visible !important;
+}
+
+#modal-content-notes::before,
+#modal-content-notes::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    height: 25%;
+    width: 24px;
+    background-color: var(--border-input);
+    mask-image: url('flor.svg');
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    mask-position: bottom center;
+    -webkit-mask-image: url('flor.svg');
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    -webkit-mask-position: bottom center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Empujamos exactamente la mitad de la flor (12px) hacia afuera */
+#modal-content-notes::before { left: -12px; }
+#modal-content-notes::after { right: -12px; }
 </style>
 </head>
 <body>

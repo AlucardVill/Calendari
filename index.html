@@ -1013,7 +1013,7 @@ function updateTextColorBtnUI() {
 }
 
 function applyTextColor() {
-    const ta = document.getElementById('notes-main-textarea').addEventListener('beforeinput', function(e) {
+    document.getElementById('notes-main-textarea').addEventListener('beforeinput', function(e) {
     if (!e.isTrusted) return;
     if (e.inputType !== 'insertText' || !e.data) return;
 

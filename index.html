@@ -486,96 +486,86 @@ body.focus-mode { background: #000000 !important; }
     z-index: 10; /* Para que se dibuje justo encima de la línea */
 }
 
-/* 4. Desplazamos la flor a la izquierda exactamente a la mitad de su ancho (12px) */
-#modal-content-notes::before { 
-    left: -12px; 
-}
-
-/* 5. Desplazamos la flor a la derecha exactamente a la mitad de su ancho */
-#modal-content-notes::after { 
-    right: -12px; 
-}
- /* =========================================
-   TEMA SOBRIO / NEGRO ABSOLUTO
+/* =========================================
+   TEMA: NEGRO ABSOLUTO CON COLORES VIVOS
    ========================================= */
 
 :root {
-    /* Fondos: Negro puro y gris neutro */
+    /* 1. Fondos en Negro Absoluto */
     --bg: #000000; 
-    --card: rgba(20, 20, 20, 0.85); 
-    --card-solid: #121212; /* Gris oscuro neutro para las tarjetas */
+    --card: #000000; 
+    --card-solid: #000000; 
+    --item-bg: rgba(255, 255, 255, 0.04); /* Un gris casi invisible para las listas */
+    --input-bg: rgba(255, 255, 255, 0.02); /* Fondo de inputs muy sutil */
     
-    /* Textos limpios */
-    --text: #f2f2f2; 
+    /* 2. Textos limpios para máximo contraste */
+    --text: #ffffff; 
     --muted: #888888; 
-    --subtext: #a0a0a0;
+    --subtext: #a3a3a3;
     
-    /* Colores de acento (Apagados, sin neón) */
-    --accent: #7b8e6d; /* Verde Salvia */
-    --day-bar: #8c7a5b; /* Ocre/Bronce */
-    --year-bar: #6b7f8a; /* Azul Pizarra */
-    --week-bar: #6e7d66; /* Oliva */
-    --bi-bar: #8c6161; /* Terracota */
-    --work: #9a825a; 
+    /* 3. Recuperar los colores originales vivos */
+    --accent: #34d399; /* Verde original */
+    --day-bar: #c084fc; /* Púrpura original */
+    --year-bar: #60a5fa; /* Azul original */
+    --week-bar: #34d399; /* Verde original */
+    --bi-bar: #fb7185; /* Rosa/Rojo original */
+    --work: #fbbf24; /* Amarillo original */
     
-    /* Bordes finos para dar estructura sobre el negro */
+    /* 4. Bordes muy sutiles para que todo no sea un bloque negro sin forma */
     --border: rgba(255, 255, 255, 0.1);
     --border-input: rgba(255, 255, 255, 0.15);
     
-    /* Eliminar transparencias pesadas */
-    --glass-blur: blur(5px);
+    /* 5. Quitar transparencias */
+    --glass-blur: none;
 }
 
-/* 1. Tipografía clásica para los títulos (sin instalar nada) */
+/* Tipografía clásica para los títulos */
 .header-title,
 .section-label,
-.calendar-title-text,
+.calendar-title-title,
 h3 {
     font-family: Georgia, 'Times New Roman', serif !important;
     letter-spacing: 0.02em !important;
 }
 
-/* 2. Eliminar los brillos de neón y los saltos */
+/* Forzar el negro absoluto en todos los contenedores */
+.timer-widget, 
+.modal-card, 
+.calendar-detail, 
+.dock-panel, 
+.progress-buttons,
+#notes-main-textarea,
+#main-modal-card,
+#dual-notes-card {
+    background-color: #000000 !important;
+    background-image: none !important; /* Quita cualquier degradado */
+    backdrop-filter: none !important; 
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important; /* Sin sombras falsas */
+    border: 1px solid var(--border-input) !important; /* Borde fino para definir el contorno */
+}
+
+/* Quitar los brillos (glows) de neón */
 .timer-display.running {
     text-shadow: none !important;
-    color: var(--accent) !important;
 }
 
 .progress-btn.active {
     box-shadow: none !important; 
-    border-color: var(--text) !important;
-    transform: none !important; 
 }
 
 .header-title::before {
     box-shadow: none !important; 
-    background: var(--muted) !important;
 }
 
-/* 3. Tarjetas de temporizadores sólidas */
-.timer-widget {
-    background: var(--card-solid) !important;
-    border: 1px solid var(--border-input) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.8) !important; 
-}
-
-/* 4. Modales sin efecto de cristal (más serios) */
-.modal-card, .calendar-detail {
-    background: var(--card-solid) !important;
-    backdrop-filter: none !important; 
-    border: 1px solid var(--border-input) !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.9) !important;
-}
-
-/* 5. Modo claro (por si lo usas) */
+/* Modo claro (por si acaso) */
 [data-theme="light"] {
     --bg: #f5f5f5; 
     --card-solid: #ffffff;
-    --card: rgba(255, 255, 255, 0.9);
-    --text: #111111; 
+    --card: #ffffff;
+    --text: #000000; 
     --muted: #666666;
-    --accent: #5e7554; 
-} 
+}
 </style>
 </head>
 <body>

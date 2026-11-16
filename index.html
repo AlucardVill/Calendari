@@ -444,6 +444,39 @@ body.focus-mode { background: #000000 !important; }
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
     padding: 0 2px;
+}  
+/* =========================================
+   ORNAMENTO ART NOUVEAU EN LAS ESQUINAS DE LA PANTALLA
+   ========================================= */
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0; /* Cubre toda la pantalla */
+    pointer-events: none; /* No interfiere con los toques */
+    z-index: -1; /* Detrás de la interfaz, sobre el fondo */
+    
+    /* Los 4 SVG con las curvas orgánicas del Art Nouveau */
+    background-image: 
+        /* Esquina Superior Izquierda */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.12)' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M0,0 C40,10 60,40 50,70 C45,85 20,95 0,100'/%3E%3Cpath d='M10,10 C30,20 40,45 25,60 C15,70 5,60 10,10 Z'/%3E%3Cpath d='M25,15 C45,20 55,40 40,55 C30,60 20,40 25,15 Z'/%3E%3Cpath d='M30,50 C20,70 30,90 50,90 C65,90 60,70 30,50 Z'/%3E%3Cpath d='M40,20 C50,30 65,25 60,15 C50,5 40,15 40,20 Z'/%3E%3C/g%3E%3C/svg%3E"),
+        /* Esquina Superior Derecha */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.12)' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M100,0 C60,10 40,40 50,70 C55,85 80,95 100,100'/%3E%3Cpath d='M90,10 C70,20 60,45 75,60 C85,70 95,60 90,10 Z'/%3E%3Cpath d='M75,15 C55,20 45,40 60,55 C70,60 80,40 75,15 Z'/%3E%3Cpath d='M70,50 C80,70 70,90 50,90 C35,90 40,70 70,50 Z'/%3E%3Cpath d='M60,20 C50,30 35,25 40,15 C50,5 60,15 60,20 Z'/%3E%3C/g%3E%3C/svg%3E"),
+        /* Esquina Inferior Izquierda */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.12)' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M0,100 C40,90 60,60 50,30 C45,15 20,5 0,0'/%3E%3Cpath d='M10,90 C30,80 40,55 25,40 C15,30 5,40 10,90 Z'/%3E%3Cpath d='M25,85 C45,80 55,60 40,45 C30,40 20,60 25,85 Z'/%3E%3Cpath d='M30,50 C20,30 30,10 50,10 C65,10 60,30 30,50 Z'/%3E%3Cpath d='M40,80 C50,70 65,75 60,85 C50,95 40,85 40,80 Z'/%3E%3C/g%3E%3C/svg%3E"),
+        /* Esquina Inferior Derecha */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.12)' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M100,100 C60,90 40,60 50,30 C55,15 80,5 100,0'/%3E%3Cpath d='M90,90 C70,80 60,55 75,40 C85,30 95,40 90,90 Z'/%3E%3Cpath d='M75,85 C55,80 45,60 60,45 C70,40 80,60 75,85 Z'/%3E%3Cpath d='M70,50 C80,30 70,10 50,10 C35,10 40,30 70,50 Z'/%3E%3Cpath d='M60,80 C50,70 35,75 40,85 C50,95 60,85 60,80 Z'/%3E%3C/g%3E%3C/svg%3E");
+    
+    background-position: top left, top right, bottom left, bottom right;
+    background-repeat: no-repeat;
+    background-size: 140px 140px; /* Tamaño del ornamento */
+    opacity: 0.9;
+}
+
+/* Adaptación automática para el tema claro */
+[data-theme="light"] body::before {
+    filter: invert(1); 
+    opacity: 0.6;
 }    
 </style>
 </head>

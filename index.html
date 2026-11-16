@@ -447,41 +447,49 @@ body.focus-mode { background: #000000 !important; }
 }  
 
 /* =========================================
-   ORNAMENTO ART NOUVEAU (ESTILO MUCHA - REFINADO)
+   FLOR EN LA BASE DE LAS LÍNEAS DE NOTAS
    ========================================= */
 
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: -1; 
-    
-    /* SVG dibujado a mano con tallos, hojas de nenúfar y capullos */
-    background-image: 
-        /* 1. Esquina Superior Izquierda */
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cg transform='translate(0,300) scale(1,-1)' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M 0 300 C 60 280 100 200 80 120 S 180 20 280 10'/%3E%3Cpath d='M 0 240 C 80 240 160 180 180 100 S 260 40 300 50'/%3E%3Cpath d='M 50 300 C 100 250 180 200 200 120 S 280 50 300 30'/%3E%3Cpath d='M 80 120 C 140 140 180 80 130 40 S 50 80 100 110'/%3E%3Cpath d='M 180 100 C 150 140 90 120 110 70 S 180 20 190 60'/%3E%3Cpath d='M 200 120 C 240 150 280 130 260 80 S 200 90 220 110'/%3E%3Cpath d='M 100 220 C 60 200 40 260 80 280 C 120 300 160 260 120 220 C 100 200 80 220 100 240'/%3E%3Cpath d='M 80 280 C 90 250 110 240 100 240'/%3E%3Cpath d='M 160 140 C 120 120 100 180 140 200 C 180 220 220 180 180 140 C 160 120 140 140 160 160'/%3E%3Cpath d='M 140 200 C 150 170 170 160 160 160'/%3E%3Cpath d='M 280 10 C 260 -20 290 -40 300 -10 C 310 20 290 30 280 10 Z'/%3E%3Cpath d='M 280 10 C 275 -10 290 -20 300 -10'/%3E%3Cpath d='M 130 40 C 120 10 150 -10 160 20 C 170 50 140 60 130 40 Z'/%3E%3Cpath d='M 130 40 C 125 10 150 0 160 20'/%3E%3Cpath d='M 0 300 C 20 280 40 280 50 300'/%3E%3Cpath d='M 0 270 C 30 260 40 280 30 300'/%3E%3C/g%3E%3C/svg%3E"),
-        
-        /* 2. Esquina Superior Derecha (Espejo Horizontal) */
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cg transform='translate(300,300) scale(-1,-1)' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M 0 300 C 60 280 100 200 80 120 S 180 20 280 10'/%3E%3Cpath d='M 0 240 C 80 240 160 180 180 100 S 260 40 300 50'/%3E%3Cpath d='M 50 300 C 100 250 180 200 200 120 S 280 50 300 30'/%3E%3Cpath d='M 80 120 C 140 140 180 80 130 40 S 50 80 100 110'/%3E%3Cpath d='M 180 100 C 150 140 90 120 110 70 S 180 20 190 60'/%3E%3Cpath d='M 200 120 C 240 150 280 130 260 80 S 200 90 220 110'/%3E%3Cpath d='M 100 220 C 60 200 40 260 80 280 C 120 300 160 260 120 220 C 100 200 80 220 100 240'/%3E%3Cpath d='M 80 280 C 90 250 110 240 100 240'/%3E%3Cpath d='M 160 140 C 120 120 100 180 140 200 C 180 220 220 180 180 140 C 160 120 140 140 160 160'/%3E%3Cpath d='M 140 200 C 150 170 170 160 160 160'/%3E%3Cpath d='M 280 10 C 260 -20 290 -40 300 -10 C 310 20 290 30 280 10 Z'/%3E%3Cpath d='M 280 10 C 275 -10 290 -20 300 -10'/%3E%3Cpath d='M 130 40 C 120 10 150 -10 160 20 C 170 50 140 60 130 40 Z'/%3E%3Cpath d='M 130 40 C 125 10 150 0 160 20'/%3E%3Cpath d='M 0 300 C 20 280 40 280 50 300'/%3E%3Cpath d='M 0 270 C 30 260 40 280 30 300'/%3E%3C/g%3E%3C/svg%3E"),
-        
-        /* 3. Esquina Inferior Izquierda (Espejo Vertical) */
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cg transform='translate(0,0) scale(1,1)' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M 0 300 C 60 280 100 200 80 120 S 180 20 280 10'/%3E%3Cpath d='M 0 240 C 80 240 160 180 180 100 S 260 40 300 50'/%3E%3Cpath d='M 50 300 C 100 250 180 200 200 120 S 280 50 300 30'/%3E%3Cpath d='M 80 120 C 140 140 180 80 130 40 S 50 80 100 110'/%3E%3Cpath d='M 180 100 C 150 140 90 120 110 70 S 180 20 190 60'/%3E%3Cpath d='M 200 120 C 240 150 280 130 260 80 S 200 90 220 110'/%3E%3Cpath d='M 100 220 C 60 200 40 260 80 280 C 120 300 160 260 120 220 C 100 200 80 220 100 240'/%3E%3Cpath d='M 80 280 C 90 250 110 240 100 240'/%3E%3Cpath d='M 160 140 C 120 120 100 180 140 200 C 180 220 220 180 180 140 C 160 120 140 140 160 160'/%3E%3Cpath d='M 140 200 C 150 170 170 160 160 160'/%3E%3Cpath d='M 280 10 C 260 -20 290 -40 300 -10 C 310 20 290 30 280 10 Z'/%3E%3Cpath d='M 280 10 C 275 -10 290 -20 300 -10'/%3E%3Cpath d='M 130 40 C 120 10 150 -10 160 20 C 170 50 140 60 130 40 Z'/%3E%3Cpath d='M 130 40 C 125 10 150 0 160 20'/%3E%3Cpath d='M 0 300 C 20 280 40 280 50 300'/%3E%3Cpath d='M 0 270 C 30 260 40 280 30 300'/%3E%3C/g%3E%3C/svg%3E"),
-        
-        /* 4. Esquina Inferior Derecha (Espejo Diagonal) */
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cg transform='translate(300,0) scale(-1,1)' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M 0 300 C 60 280 100 200 80 120 S 180 20 280 10'/%3E%3Cpath d='M 0 240 C 80 240 160 180 180 100 S 260 40 300 50'/%3E%3Cpath d='M 50 300 C 100 250 180 200 200 120 S 280 50 300 30'/%3E%3Cpath d='M 80 120 C 140 140 180 80 130 40 S 50 80 100 110'/%3E%3Cpath d='M 180 100 C 150 140 90 120 110 70 S 180 20 190 60'/%3E%3Cpath d='M 200 120 C 240 150 280 130 260 80 S 200 90 220 110'/%3E%3Cpath d='M 100 220 C 60 200 40 260 80 280 C 120 300 160 260 120 220 C 100 200 80 220 100 240'/%3E%3Cpath d='M 80 280 C 90 250 110 240 100 240'/%3E%3Cpath d='M 160 140 C 120 120 100 180 140 200 C 180 220 220 180 180 140 C 160 120 140 140 160 160'/%3E%3Cpath d='M 140 200 C 150 170 170 160 160 160'/%3E%3Cpath d='M 280 10 C 260 -20 290 -40 300 -10 C 310 20 290 30 280 10 Z'/%3E%3Cpath d='M 280 10 C 275 -10 290 -20 300 -10'/%3E%3Cpath d='M 130 40 C 120 10 150 -10 160 20 C 170 50 140 60 130 40 Z'/%3E%3Cpath d='M 130 40 C 125 10 150 0 160 20'/%3E%3Cpath d='M 0 300 C 20 280 40 280 50 300'/%3E%3Cpath d='M 0 270 C 30 260 40 280 30 300'/%3E%3C/g%3E%3C/svg%3E");
-    
-    background-position: top left, top right, bottom left, bottom right;
-    background-repeat: no-repeat;
-    background-size: 220px 220px; /* Un poco más grandes para apreciar el detalle */
-    opacity: 0.8;
+/* Aseguramos que el textarea sea el contenedor de referencia */
+#notes-main-textarea {
+    position: relative;
+    /* Mantenemos sus bordes originales intactos */
 }
 
-/* Adaptación para el tema claro (para que se vea como un grabado sutil) */
-[data-theme="light"] body::before {
-    filter: invert(1); 
-    opacity: 0.5;
-}    
+/* Creamos las flores en los laterales */
+#notes-main-textarea::before,
+#notes-main-textarea::after {
+    content: '';
+    position: absolute;
+    bottom: 0; /* Pegado a la base */
+    height: 25%; /* Ocupa un cuarto de la altura de la línea */
+    width: 24px; /* Grosor fino de la flor */
+    
+    /* El color será exactamente el mismo gris del borde actual */
+    background-color: var(--border-input); 
+    
+    /* Usamos tu SVG como máscara para pintarlo del color que queramos */
+    mask-image: url('flor.svg');
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    mask-position: bottom center;
+    -webkit-mask-image: url('flor.svg');
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    -webkit-mask-position: bottom center;
+    
+    pointer-events: none; /* No estorba al escribir */
+}
+
+/* Posicionamos la flor justo sobre el borde izquierdo */
+#notes-main-textarea::before { 
+    left: -12px; 
+}
+
+/* Posicionamos la flor justo sobre el borde derecho */
+#notes-main-textarea::after { 
+    right: -12px; 
+}
 </style>
 </head>
 <body>

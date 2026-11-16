@@ -775,9 +775,18 @@ function formatDoc(cmd, val) {
     const ta = document.getElementById('notes-main-textarea'); 
     if (!ta) return; 
     
-    restoreSelection(); 
-    
-    if (cmd === 'fontName') {
+  if (cmd === 'undo') {
+    ta.focus();
+    document.execCommand('undo', false, null);
+    saveMainNote();
+    saveSelection();
+    updateFormatBtns();
+    return;
+}
+
+restoreSelection(); 
+
+if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
         

@@ -792,37 +792,6 @@ body, html {
     font-size: 0.65rem;
     color: var(--text);
 } 
-/* =========================================
-   CENEFA INFERIOR (CORREGIDA Y PROPORCIONADA)
-   ========================================= */
-
-body::after {
-    content: '';
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    /* Altura máxima, pero la imagen decidirá su tamaño real */
-    height: 60px; 
-    
-    background-color: #b08d54; 
-    
-    -webkit-mask-image: url('borde2.svg');
-    mask-image: url('borde2.svg');
-    
-    /* ESTO ES LA MAGIA: 100% de ancho, altura automática */
-    -webkit-mask-size: 100% auto; 
-    mask-size: 100% auto;
-    
-    -webkit-mask-position: bottom center;
-    mask-position: bottom center;
-    -webkit-mask-repeat: no-repeat; 
-    mask-repeat: no-repeat;
-    
-    pointer-events: none; 
-    z-index: 9100; 
-    opacity: 1; 
-}
 </style>
 </head>
 <body>

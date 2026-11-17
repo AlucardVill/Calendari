@@ -631,11 +631,14 @@ body, html {
     padding-right: 25px !important;
     border-radius: 10px !important; 
     
-    /* Sombra HACIA AFUERA: esto da el efecto de que la caja está elevada */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5) !important; 
+    /* Sombra exterior muy gruesa y oscura (doble capa para más profundidad) */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 5px 15px rgba(0, 0, 0, 0.6) !important; 
     
-    /* Un fondo ligeramente más oscuro que la tarjeta para que resalte */
-    background-color: rgba(0, 0, 0, 0.15) !important; 
+    /* Fondo un poco más oscuro para resaltar aún más la elevación */
+    background-color: rgba(0, 0, 0, 0.25) !important; 
+    
+    /* Margen para evitar que el contenedor del modal corte la sombra */
+    margin: 10px 0 !important; 
 }
 
 /* 3. Las flores en la base (centradas en la línea) */

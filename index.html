@@ -793,7 +793,7 @@ body, html {
     color: var(--text);
 } 
 /* =========================================
-   CENEFA INFERIOR (ESTIRADA Y DORADA)
+   CENEFA INFERIOR (CORREGIDA Y PROPORCIONADA)
    ========================================= */
 
 body::after {
@@ -802,40 +802,26 @@ body::after {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 80px; /* Altura del borde */
+    /* Altura máxima, pero la imagen decidirá su tamaño real */
+    height: 60px; 
     
-    /* Color dorado de tu tema */
     background-color: #b08d54; 
     
-    /* Usamos el nuevo SVG como máscara */
     -webkit-mask-image: url('borde2.svg');
     mask-image: url('borde2.svg');
     
-    /* Evitamos que se repita */
-    -webkit-mask-repeat: no-repeat; 
-    mask-repeat: no-repeat;
-    
-    /* ESTO ES LA MAGIA: Estira la imagen al 100% del ancho de la pantalla */
-    -webkit-mask-size: 100% 100%; 
-    mask-size: 100% 100%;
+    /* ESTO ES LA MAGIA: 100% de ancho, altura automática */
+    -webkit-mask-size: 100% auto; 
+    mask-size: 100% auto;
     
     -webkit-mask-position: bottom center;
     mask-position: bottom center;
+    -webkit-mask-repeat: no-repeat; 
+    mask-repeat: no-repeat;
     
-    /* Permite hacer clic a través de la cenefa */
     pointer-events: none; 
-    
-    /* Por encima de las notas, por debajo de los minimizados */
     z-index: 9100; 
-    
-    /* Totalmente sólido */
     opacity: 1; 
-}
-
-/* Para el modo claro (opcional) */
-[data-theme="light"] body::after {
-    background-color: #8c6b3e; 
-    opacity: 1;
 }
 </style>
 </head>

@@ -451,6 +451,11 @@ body.focus-mode { background: #000000 !important; }
    ========================================= */
 
 :root {
+ /* =========================================
+   TEMA: VERDE ABETO FRÍO + DETALLES DORADOS
+   ========================================= */
+
+:root {
     /* Fondos: Verde Abeto frío y profundo */
     --bg: #0a1112;         
     --card-solid: #10191a; 
@@ -471,7 +476,7 @@ body.focus-mode { background: #000000 !important; }
     --work: #b8964a;       /* Ocre / Oro viejo (Jornada) */
     --bi-bar: #b86570;     /* Terracota / Rosa viejo (Bloque) */
     
-    /* Bordes */
+    /* Bordes generales de la app */
     --border: rgba(255, 255, 255, 0.06);
     --border-input: rgba(255, 255, 255, 0.15);
     
@@ -514,22 +519,23 @@ body, html {
 
 
 /* =========================================
-   FLOR Y LÍNEA EN LAS NOTAS
+   FLOR Y LÍNEA EN LAS NOTAS (AHORA DORADAS)
    ========================================= */
 
 /* 1. Ocultar scroll para que no tape la flor derecha */
 #notes-main-textarea::-webkit-scrollbar { display: none; }
 #notes-main-textarea { scrollbar-width: none; }
 
-/* 2. Líneas verticales y margen del texto */
+/* 2. Líneas verticales DORADAS y margen del texto */
 #notes-main-textarea {
-    border-left: 1px solid var(--border-input) !important;
-    border-right: 1px solid var(--border-input) !important;
+    /* Usamos un color dorado viejo (Antique Gold) */
+    border-left: 1px solid #c9a76b !important;
+    border-right: 1px solid #c9a76b !important;
     padding-left: 25px !important;  
     padding-right: 25px !important;
 }
 
-/* 3. Las flores en la base (centradas en la línea) */
+/* 3. Las flores en la base (centradas en la línea dorada) */
 #modal-content-notes {
     overflow: visible !important;
 }
@@ -541,7 +547,10 @@ body, html {
     bottom: 0;
     height: 25%;
     width: 24px;
-    background-color: var(--border-input);
+    
+    /* La flor se pinta del mismo color dorado */
+    background-color: #c9a76b; 
+    
     mask-image: url('flor.svg');
     mask-repeat: no-repeat;
     mask-size: contain;
@@ -555,7 +564,7 @@ body, html {
 }
 
 #modal-content-notes::before { left: -12px; }
-#modal-content-notes::after { right: -12px; }
+#modal-content-notes::after { right: -12px; }  
 </style>
 </head>
 <body>

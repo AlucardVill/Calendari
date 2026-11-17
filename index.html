@@ -669,38 +669,34 @@ body, html {
 
 #modal-content-notes::before { left: -12px; }
 #modal-content-notes::after { right: -12px; }
-
- /* =========================================
-   DISEÑO SERIO: ANILLOS DE PRECISIÓN
+/* =========================================
+   DISEÑO SERIO: RELOJERÍA DE PRECISIÓN
    ========================================= */
 
 .hidden-dot {
     width: 14px !important;
     height: 14px !important;
-    background: transparent !important;
-    border: 2px solid var(--dot-color) !important; /* Anillo del color del timer */
+    background: var(--dot-color) !important;
+    border: 1px solid var(--bg) !important; /* Borde exterior simulado */
     border-radius: 50% !important;
-    box-shadow: none !important;
+    box-shadow: 0 0 0 1px var(--dot-color) !important; /* Anillo exterior */
+    opacity: 0.6;
     transition: all 0.2s ease;
+    position: relative;
 }
 
-.hidden-dot:hover {
-    background: var(--dot-color) !important; /* Se rellena al tocar */
+.hidden-dot:hover, .hidden-dot.is-running {
+    opacity: 1;
     transform: scale(1.1);
 }
 
-/* Para las Cajas, usamos un cuadrado perfecto (más arquitectónico) */
+/* Las cajas usan un cuadrado en lugar de círculo */
 .hidden-dot.box-dot {
-    border-radius: 3px !important;
-    transform: rotate(45deg); /* Un rombo sutil */
-}
-
-.hidden-dot.box-dot:hover {
-    transform: rotate(45deg) scale(1.1);
+    border-radius: 2px !important;
 }
 
 .hidden-dot.box-dot.is-open {
-    background: var(--dot-color) !important;
+    opacity: 1;
 }
 </style>
 </head>

@@ -701,45 +701,49 @@ body, html {
     opacity: 1;
 } 
 /* =========================================
-   REDISEÑO: RELICARIO (CON BOTONES ORIGINALES)
+   REDISEÑO: RELICARIO (MÁS ESTRECHO Y FUENTE ORIGINAL)
    ========================================= */
 
-/* 1. La tarjeta base: Esquinas asimétricas y sombra interna */
+/* 1. La tarjeta base */
 .timer-widget {
     background-color: var(--card-solid) !important;
-    /* Esquinas asimétricas: superior izquierda e inferior derecha redondeadas */
     border-radius: 16px 4px 16px 4px !important; 
     border: 1px solid rgba(255, 255, 255, 0.04) !important;
     border-left: 3px solid var(--timer-color) !important;
     
-    /* Sombra interna (da sensación de tallado) y externa sutil */
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4), 
                 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-    padding: 14px 16px !important;
+    
+    /* Hacemos la tarjeta más estrecha */
+    padding: 10px 14px !important; 
+    width: 95% !important;
+    max-width: 340px !important; /* Evita que se estire demasiado en pantallas grandes */
+    margin: 0 auto 8px auto !important; /* La centra y separa del resto */
 }
 
-/* 2. El título con toque clásico */
+/* 2. El título se mantiene clásico */
 .timer-title {
     font-family: Georgia, serif !important;
-    font-size: 0.5rem !important;
+    font-size: 0.48rem !important;
     letter-spacing: 0.08em !important;
     color: var(--subtext) !important;
     text-transform: uppercase;
 }
 
-/* 3. Los números un poco más grandes */
+/* 3. Los números: Volvemos a la fuente original de la app */
 .timer-display {
-    font-family: 'Courier New', monospace !important;
-    font-size: 1.3rem !important;
+    font-family: inherit !important; /* Usa la fuente del sistema (SF Pro / Inter) */
+    font-size: 1.25rem !important;
+    font-variant-numeric: tabular-nums !important;
     color: var(--text) !important;
     text-shadow: 0 1px 2px rgba(0,0,0,0.6) !important;
-    margin-top: 8px !important;
-    margin-bottom: 8px !important;
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
 }
 
 /* 
-   NOTA: No he incluido código para .t-btn (botones) ni para los inputs.
-   Al no sobrescribirlos, la app usará automáticamente tus colores y formas originales.
+   NOTA: Los botones (.t-btn) y los inputs no se tocan, 
+   por lo que mantienen sus colores originales.
 */
 </style>
 </head>

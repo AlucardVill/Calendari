@@ -669,6 +669,68 @@ body, html {
 
 #modal-content-notes::before { left: -12px; }
 #modal-content-notes::after { right: -12px; }
+
+ /* =========================================
+   MEDALLONES FLORALES ART NOUVEAU (MODO CONCENTRACIÓN)
+   ========================================= */
+
+/* 1. Rediseñamos los puntos (dots) para que sean medallones */
+.hidden-dot {
+    width: 32px !important;  /* Más grandes para apreciar el dibujo */
+    height: 32px !important;
+    border-radius: 50%;
+    background-color: var(--dot-color); /* Toma el color del timer */
+    border: none !important;
+    box-shadow: none !important;
+    
+    /* Máscara SVG: Una flor/hoja circular estilo Art Nouveau */
+    -webkit-mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='black' stroke-width='4'/%3E%3Cpath d='M50,6 C25,20 25,80 50,94 C75,80 75,20 50,6' fill='none' stroke='black' stroke-width='4'/%3E%3Cpath d='M50,22 Q70,38 50,54 Q30,38 50,22' fill='black'/%3E%3Cpath d='M50,78 Q30,62 50,46 Q70,62 50,78' fill='black'/%3E%3Ccircle cx='50' cy='50' r='7' fill='black'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='black' stroke-width='4'/%3E%3Cpath d='M50,6 C25,20 25,80 50,94 C75,80 75,20 50,6' fill='none' stroke='black' stroke-width='4'/%3E%3Cpath d='M50,22 Q70,38 50,54 Q30,38 50,22' fill='black'/%3E%3Cpath d='M50,78 Q30,62 50,46 Q70,62 50,78' fill='black'/%3E%3Ccircle cx='50' cy='50' r='7' fill='black'/%3E%3C/svg%3E");
+    
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    
+    opacity: 0.6; /* Semitransparente cuando no está fijado */
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+/* 2. Efecto al pasar el dedo o tocar */
+.hidden-dot:hover, .hidden-dot:active {
+    transform: scale(1.15);
+    opacity: 1;
+}
+
+/* 3. Medallón especial para las Cajas (Box) */
+.hidden-dot.box-dot {
+    border-radius: 50% !important;
+    background-color: var(--dot-color);
+    border: none !important;
+    
+    /* Una máscara ligeramente distinta (forma más cuadrada/geométrica) */
+    -webkit-mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='8' y='8' width='84' height='84' rx='20' fill='none' stroke='black' stroke-width='4'/%3E%3Cpath d='M50,20 Q75,50 50,80 Q25,50 50,20' fill='black'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='8' y='8' width='84' height='84' rx='20' fill='none' stroke='black' stroke-width='4'/%3E%3Cpath d='M50,20 Q75,50 50,80 Q25,50 50,20' fill='black'/%3E%3C/svg%3E");
+}
+
+/* 4. Cuando la caja está abierta */
+.hidden-dot.box-dot.is-open {
+    opacity: 1;
+    background-color: var(--dot-color);
+}
+
+/* 5. Ajustar la barra flotante de fijados para que quepan bien */
+.focus-pins-bar {
+    gap: 12px; /* Más espacio entre medallones */
+    padding: 10px 16px;
+}
+
+.focus-pins-bar .hidden-dot {
+    width: 36px !important;
+    height: 36px !important;
+}   
 </style>
 </head>
 <body>

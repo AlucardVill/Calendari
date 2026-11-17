@@ -670,16 +670,16 @@ body, html {
 #modal-content-notes::before { left: -12px; }
 #modal-content-notes::after { right: -12px; }
 /* =========================================
-   DISEÑO SERIO: RELOJERÍA DE PRECISIÓN
+   DISEÑO SERIO: RELOJERÍA DE PRECISIÓN (PEQUEÑO)
    ========================================= */
 
 .hidden-dot {
-    width: 14px !important;
-    height: 14px !important;
+    width: 10px !important;  /* Reducido a 10px */
+    height: 10px !important;
     background: var(--dot-color) !important;
-    border: 1px solid var(--bg) !important; /* Borde exterior simulado */
+    border: 1px solid var(--bg) !important; /* Mantiene el anillo exterior */
     border-radius: 50% !important;
-    box-shadow: 0 0 0 1px var(--dot-color) !important; /* Anillo exterior */
+    box-shadow: 0 0 0 1px var(--dot-color) !important; 
     opacity: 0.6;
     transition: all 0.2s ease;
     position: relative;
@@ -687,12 +687,14 @@ body, html {
 
 .hidden-dot:hover, .hidden-dot.is-running {
     opacity: 1;
-    transform: scale(1.1);
+    transform: scale(1.2); /* Un pequeño salto visual al tocarlo */
 }
 
-/* Las cajas usan un cuadrado en lugar de círculo */
+/* Las cajas son un poco más pequeñas y cuadradas */
 .hidden-dot.box-dot {
-    border-radius: 2px !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 1.5px !important;
 }
 
 .hidden-dot.box-dot.is-open {

@@ -793,7 +793,7 @@ body, html {
     color: var(--text);
 } 
 /* =========================================
-   CENEFA INFERIOR ART NOUVEAU (POR ENCIMA DE LOS MODALES)
+   CENEFA INFERIOR (POR ENCIMA DE NOTAS, DEBAJO DE MINIMIZADOS)
    ========================================= */
 
 body::after {
@@ -804,7 +804,7 @@ body::after {
     width: 100%;
     height: 80px; 
     
-    background-color: #b08d54; /* Dorado sólido */
+    background-color: #b08d54; 
     
     -webkit-mask-image: url('borde.svg');
     mask-image: url('borde.svg');
@@ -820,10 +820,8 @@ body::after {
     
     pointer-events: none; 
     
-    /* LA MAGIA ESTÁ AQUÍ: Z-INDEX ALTO */
-    /* 9500 lo pone por encima de los modales normales (9000) */
-    /* pero por debajo de la alerta de timer (9500+) y el timer flotante (10000) */
-    z-index: 9450; 
+    /* LA MAGIA ESTÁ AQUÍ: 9100 */
+    z-index: 9100; 
     
     opacity: 1; 
 }

@@ -670,104 +670,50 @@ body, html {
 #modal-content-notes::before { left: -12px; }
 #modal-content-notes::after { right: -12px; }
 /* =========================================
-   DISEÑO SERIO: RELOJERÍA DE PRECISIÓN (PEQUEÑO)
+   REDISEÑO: RELICARIO (TÁCTIL Y ARTESANAL)
    ========================================= */
 
-.hidden-dot {
-    width: 10px !important;  /* Reducido a 10px */
-    height: 10px !important;
-    background: var(--dot-color) !important;
-    border: 1px solid var(--bg) !important; /* Mantiene el anillo exterior */
-    border-radius: 50% !important;
-    box-shadow: 0 0 0 1px var(--dot-color) !important; 
-    opacity: 0.6;
-    transition: all 0.2s ease;
-    position: relative;
-}
-
-.hidden-dot:hover, .hidden-dot.is-running {
-    opacity: 1;
-    transform: scale(1.2); /* Un pequeño salto visual al tocarlo */
-}
-
-/* Las cajas son un poco más pequeñas y cuadradas */
-.hidden-dot.box-dot {
-    width: 8px !important;
-    height: 8px !important;
-    border-radius: 1.5px !important;
-}
-
-.hidden-dot.box-dot.is-open {
-    opacity: 1;
-}
- /* =========================================
-   REDISEÑO: PLACA GRABADA (ARTESANAL)
-   ========================================= */
-
-/* 1. La tarjeta base: Sin fondo sólido, solo un marco fino */
+/* 1. La tarjeta base: Esquinas asimétricas y sombra interna */
 .timer-widget {
-    background: transparent !important;
-    border: 1px solid var(--border) !important;
-    border-left: 3px solid var(--timer-color) !important; /* Mantiene el color identificador */
-    border-radius: 4px !important; /* Esquinas casi rectas, muy sobrias */
-    box-shadow: none !important;
-    padding: 12px 14px !important;
-    /* Efecto de grabado sutil en el borde */
-    outline: 1px solid rgba(255,255,255,0.02) !important;
-    outline-offset: -4px !important;
+    background-color: var(--card-solid) !important;
+    /* Esquinas asimétricas: superior izquierda e inferior derecha más redondeadas */
+    border-radius: 16px 4px 16px 4px !important; 
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-left: 3px solid var(--timer-color) !important;
+    
+    /* Sombra interna (da sensación de estar tallado) y externa sutil */
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4), 
+                0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    padding: 14px 16px !important;
 }
 
-/* 2. El título: Pequeño, con letras espaciadas y una línea que lo subraya */
+/* 2. El título: Un poco más grande y con carácter */
 .timer-title {
-    position: relative !important;
-    font-family: Georgia, serif !important; /* Tipografía clásica */
-    letter-spacing: 0.1em !important;
+    font-family: Georgia, serif !important;
+    font-size: 0.5rem !important;
+    letter-spacing: 0.08em !important;
     color: var(--subtext) !important;
-    opacity: 0.8;
-    padding-bottom: 4px !important;
+    text-transform: uppercase;
+}
+
+/* 3. Los números: Sólidos y legibles */
+.timer-display {
+    font-family: 'Courier New', monospace !important;
+    font-size: 1.3rem !important;
+    color: var(--text) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6) !important;
+    margin-top: 8px !important;
     margin-bottom: 8px !important;
 }
 
-/* Línea decorativa debajo del título */
-.timer-title::after {
-    content: '';
-    position: absolute;
-    left: 12px;
-    bottom: 0;
-    width: 30px; /* Línea corta, como un sello */
-    height: 1px;
-    background-color: var(--timer-color);
-    opacity: 0.5;
-}
-
-/* 3. Los números: Grandes y con sombra tipo "grabado" */
-.timer-display {
-    font-family: 'Courier New', monospace !important;
-    font-size: 1.4rem !important; /* Un poco más grandes */
-    color: var(--text) !important;
-    /* Sombra interna para simular que está hundido en el material */
-    text-shadow: 0px 1px 0px rgba(255,255,255,0.1), 0px -1px 0px rgba(0,0,0,0.8) !important;
-}
-
-/* 4. Los inputs (h/min): Como pequeñas casillas de formulario antiguo */
-.timer-input-group input {
-    background: transparent !important;
-    border: none !important;
-    border-bottom: 1px solid var(--border-input) !important;
-    border-radius: 0 !important;
-    color: var(--muted) !important;
-}
-.timer-input-group input:focus {
-    border-bottom-color: var(--timer-color) !important;
-}
-
-/* 5. Los botones: Círculos finos sin relleno */
+/* 4. Los botones: Como pequeñas teclas de una máquina antigua */
 .t-btn {
-    background: transparent !important;
-    border: 1px solid var(--border-input) !important;
-    border-radius: 50% !important; /* Círculos perfectos */
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 6px !important; /* Cuadrados con bordes suaves */
     color: var(--subtext) !important;
-    transition: all 0.2s ease;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.05) !important;
+    transition: all 0.1s ease;
 }
 
 .t-btn:hover {
@@ -775,11 +721,30 @@ body, html {
     color: var(--timer-color) !important;
 }
 
-/* Botón de Play activo: Se ilumina sutilmente */
+/* Efecto de "presionar" el botón */
+.t-btn:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.8) !important;
+}
+
+/* Botón de Play activo: Se enciende con el color */
 .t-btn.active {
     background: var(--timer-color) !important;
     border-color: var(--timer-color) !important;
     color: var(--bg) !important;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+
+/* 5. Inputs de Hora/Min: Integrados en el diseño */
+.timer-input-group input {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 4px !important;
+    color: var(--text) !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4) !important;
+}
+.timer-input-group input:focus {
+    border-color: var(--timer-color) !important;
 }   
 </style>
 </head>

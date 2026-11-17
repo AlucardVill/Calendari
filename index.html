@@ -670,24 +670,55 @@ body, html {
 #modal-content-notes::before { left: -12px; }
 #modal-content-notes::after { right: -12px; }
 /* =========================================
-   REDISEÑO: RELICARIO (TÁCTIL Y ARTESANAL)
+   DISEÑO SERIO: RELOJERÍA DE PRECISIÓN (PEQUEÑO)
+   ========================================= */
+
+.hidden-dot {
+    width: 10px !important;  /* Reducido a 10px */
+    height: 10px !important;
+    background: var(--dot-color) !important;
+    border: 1px solid var(--bg) !important; /* Mantiene el anillo exterior */
+    border-radius: 50% !important;
+    box-shadow: 0 0 0 1px var(--dot-color) !important; 
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.hidden-dot:hover, .hidden-dot.is-running {
+    opacity: 1;
+    transform: scale(1.2); /* Un pequeño salto visual al tocarlo */
+}
+
+/* Las cajas son un poco más pequeñas y cuadradas */
+.hidden-dot.box-dot {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 1.5px !important;
+}
+
+.hidden-dot.box-dot.is-open {
+    opacity: 1;
+} 
+/* =========================================
+   REDISEÑO: RELICARIO (CON BOTONES ORIGINALES)
    ========================================= */
 
 /* 1. La tarjeta base: Esquinas asimétricas y sombra interna */
 .timer-widget {
     background-color: var(--card-solid) !important;
-    /* Esquinas asimétricas: superior izquierda e inferior derecha más redondeadas */
+    /* Esquinas asimétricas: superior izquierda e inferior derecha redondeadas */
     border-radius: 16px 4px 16px 4px !important; 
     border: 1px solid rgba(255, 255, 255, 0.04) !important;
     border-left: 3px solid var(--timer-color) !important;
     
-    /* Sombra interna (da sensación de estar tallado) y externa sutil */
+    /* Sombra interna (da sensación de tallado) y externa sutil */
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4), 
                 0 4px 12px rgba(0, 0, 0, 0.2) !important;
     padding: 14px 16px !important;
 }
 
-/* 2. El título: Un poco más grande y con carácter */
+/* 2. El título con toque clásico */
 .timer-title {
     font-family: Georgia, serif !important;
     font-size: 0.5rem !important;
@@ -696,7 +727,7 @@ body, html {
     text-transform: uppercase;
 }
 
-/* 3. Los números: Sólidos y legibles */
+/* 3. Los números un poco más grandes */
 .timer-display {
     font-family: 'Courier New', monospace !important;
     font-size: 1.3rem !important;
@@ -706,46 +737,10 @@ body, html {
     margin-bottom: 8px !important;
 }
 
-/* 4. Los botones: Como pequeñas teclas de una máquina antigua */
-.t-btn {
-    background: rgba(0, 0, 0, 0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-radius: 6px !important; /* Cuadrados con bordes suaves */
-    color: var(--subtext) !important;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.05) !important;
-    transition: all 0.1s ease;
-}
-
-.t-btn:hover {
-    border-color: var(--timer-color) !important;
-    color: var(--timer-color) !important;
-}
-
-/* Efecto de "presionar" el botón */
-.t-btn:active {
-    transform: translateY(1px);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.8) !important;
-}
-
-/* Botón de Play activo: Se enciende con el color */
-.t-btn.active {
-    background: var(--timer-color) !important;
-    border-color: var(--timer-color) !important;
-    color: var(--bg) !important;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3) !important;
-}
-
-/* 5. Inputs de Hora/Min: Integrados en el diseño */
-.timer-input-group input {
-    background: rgba(0, 0, 0, 0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-radius: 4px !important;
-    color: var(--text) !important;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4) !important;
-}
-.timer-input-group input:focus {
-    border-color: var(--timer-color) !important;
-}   
+/* 
+   NOTA: No he incluido código para .t-btn (botones) ni para los inputs.
+   Al no sobrescribirlos, la app usará automáticamente tus colores y formas originales.
+*/
 </style>
 </head>
 <body>

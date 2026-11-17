@@ -793,7 +793,7 @@ body, html {
     color: var(--text);
 } 
 /* =========================================
-   CENEFA INFERIOR (POR ENCIMA DE NOTAS, DEBAJO DE MINIMIZADOS)
+   CENEFA INFERIOR (ROSA Y ESPINAS)
    ========================================= */
 
 body::after {
@@ -802,34 +802,26 @@ body::after {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 80px; 
+    height: 70px; /* Ajusta la altura si es necesario */
     
-    background-color: #b08d54; 
-    
-    -webkit-mask-image: url('borde.svg');
-    mask-image: url('borde.svg');
-    
-    -webkit-mask-repeat: repeat-x; 
-    mask-repeat: repeat-x;
-    
-    -webkit-mask-position: bottom center;
-    mask-position: bottom center;
-    
-    -webkit-mask-size: auto 100%;
-    mask-size: auto 100%;
+    /* Cargamos la imagen con sus colores originales */
+    background-image: url('borde2.svg');
+    background-repeat: repeat-x; 
+    background-position: bottom center;
+    background-size: auto 100%;
     
     pointer-events: none; 
     
-    /* LA MAGIA ESTÁ AQUÍ: 9100 */
+    /* Para que tape los modales pero no los minimizados */
     z-index: 9100; 
     
-    opacity: 1; 
+    opacity: 1; /* Totalmente sólido */
 }
 
-/* Para el modo claro */
+/* Para el modo claro, la imagen se ve bien tal cual, 
+   pero si quieres que el negro resalte menos, puedes dejarlo así o quitar este bloque */
 [data-theme="light"] body::after {
-    background-color: #8c6b3e; 
-    opacity: 1;
+    opacity: 0.9; 
 }
 </style>
 </head>

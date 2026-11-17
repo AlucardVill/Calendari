@@ -748,6 +748,50 @@ body, html {
 .timer-controls {
     margin-top: 4px !important;
 }
+/* =========================================
+   TRADUCCIÓN DE BOTONES DE PROGRESO A DARI (CSS)
+   ========================================= */
+
+/* 1. Ocultamos el texto original de los botones (2Y, 1Y, etc.) */
+#btn-block span:first-child,
+#btn-year span:first-child,
+#btn-week span:first-child,
+#btn-work span:first-child,
+#btn-day span:first-child {
+    font-size: 0 !important; 
+    color: transparent !important;
+}
+
+/* 2. Insertamos el texto en dari usando ::before */
+#btn-block span:first-child::before {
+    content: '۲ سال';
+    font-size: 0.65rem;
+    color: var(--text);
+}
+
+#btn-year span:first-child::before {
+    content: '۱ سال';
+    font-size: 0.65rem;
+    color: var(--text);
+}
+
+#btn-week span:first-child::before {
+    content: '۷ روز';
+    font-size: 0.65rem;
+    color: var(--text);
+}
+
+#btn-work span:first-child::before {
+    content: 'کار';
+    font-size: 0.65rem;
+    color: var(--text);
+}
+
+#btn-day span:first-child::before {
+    content: 'روز';
+    font-size: 0.65rem;
+    color: var(--text);
+}    
 </style>
 </head>
 <body>

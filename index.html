@@ -793,7 +793,7 @@ body, html {
     color: var(--text);
 } 
 /* =========================================
-   CENEFA INFERIOR ART NOUVEAU (SVG)
+   CENEFA INFERIOR ART NOUVEAU (SÓLIDA)
    ========================================= */
 
 body::after {
@@ -802,41 +802,34 @@ body::after {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 80px; /* Ajusta la altura si quieres que el borde sea más alto o más bajo */
+    height: 80px; /* Ajusta la altura si es necesario */
     
-    /* Color dorado envejecido a juego con tus notas */
-    background-color: #c9a76b; 
+    /* Un dorado un poco más oscuro y sólido */
+    background-color: #b08d54; 
     
-    /* Aplicamos el SVG como máscara */
     -webkit-mask-image: url('borde.svg');
     mask-image: url('borde.svg');
     
-    /* Hacemos que se repita de izquierda a derecha */
     -webkit-mask-repeat: repeat-x; 
     mask-repeat: repeat-x;
     
-    /* Anclado a la base */
     -webkit-mask-position: bottom center;
     mask-position: bottom center;
     
-    /* Ajustamos el tamaño para que la altura del SVG encaje perfecto */
     -webkit-mask-size: auto 100%;
     mask-size: auto 100%;
     
-    /* Evita que la cenefa bloquee los toques en los botones de abajo */
     pointer-events: none; 
-    
-    /* La mantiene al fondo de la interfaz */
     z-index: -1; 
     
-    /* Transparencia para que sea un detalle sutil y no distraiga */
-    opacity: 0.2; 
+    /* 1 significa 100% sólido, sin transparencia */
+    opacity: 1; 
 }
 
-/* Para el modo claro, si lo usas */
+/* Para el modo claro */
 [data-theme="light"] body::after {
-    background-color: #5c4321; /* Dorado oscuro para contrastar con el fondo claro */
-    opacity: 0.15;
+    background-color: #8c6b3e; /* Dorado más oscuro para contrastar */
+    opacity: 1;
 }
 </style>
 </head>

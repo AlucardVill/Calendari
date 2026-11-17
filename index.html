@@ -793,7 +793,7 @@ body, html {
     color: var(--text);
 } 
 /* =========================================
-   CENEFA INFERIOR ART NOUVEAU (SÓLIDA)
+   CENEFA INFERIOR ART NOUVEAU (POR ENCIMA DE LOS MODALES)
    ========================================= */
 
 body::after {
@@ -802,10 +802,9 @@ body::after {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 80px; /* Ajusta la altura si es necesario */
+    height: 80px; 
     
-    /* Un dorado un poco más oscuro y sólido */
-    background-color: #b08d54; 
+    background-color: #b08d54; /* Dorado sólido */
     
     -webkit-mask-image: url('borde.svg');
     mask-image: url('borde.svg');
@@ -820,15 +819,18 @@ body::after {
     mask-size: auto 100%;
     
     pointer-events: none; 
-    z-index: -1; 
     
-    /* 1 significa 100% sólido, sin transparencia */
+    /* LA MAGIA ESTÁ AQUÍ: Z-INDEX ALTO */
+    /* 9500 lo pone por encima de los modales normales (9000) */
+    /* pero por debajo de la alerta de timer (9500+) y el timer flotante (10000) */
+    z-index: 9450; 
+    
     opacity: 1; 
 }
 
 /* Para el modo claro */
 [data-theme="light"] body::after {
-    background-color: #8c6b3e; /* Dorado más oscuro para contrastar */
+    background-color: #8c6b3e; 
     opacity: 1;
 }
 </style>

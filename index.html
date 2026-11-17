@@ -564,9 +564,15 @@ body, html {
 
 /* 2. Líneas verticales, horizontales y margen del texto */
 #notes-main-textarea {
-    border: 1px solid #c9a76b !important; /* Dorado aplicado a los 4 lados */
+    /* Dorado con un 80% de opacidad para que se vea más fino */
+    border: 1px solid rgba(201, 167, 107, 0.8) !important; 
     padding-left: 25px !important;  
     padding-right: 25px !important;
+    border-radius: 10px !important; /* Recupera las esquinas redondeadas */
+    
+    /* Esto devuelve el efecto de elevación */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important; 
+    background-color: rgba(0, 0, 0, 0.15) !important; /* Fondo un poco más oscuro para dar profundidad */
 }
 
 /* 3. Las flores en la base (centradas en la línea) */
@@ -581,7 +587,7 @@ body, html {
     bottom: 0;
     height: 25%;
     width: 24px;
-    background-color: #c9a76b; /* Flor en el mismo color dorado */
+    background-color: rgba(201, 167, 107, 0.8); /* Flor a juego con la línea */
     mask-image: url('flor.svg');
     mask-repeat: no-repeat;
     mask-size: contain;

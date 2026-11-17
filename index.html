@@ -625,17 +625,17 @@ body, html {
 
 /* 2. Líneas y margen del texto */
 #notes-main-textarea {
-    /* Línea dorada más fina (bajamos la opacidad al 60%) */
+    /* Línea dorada más fina (60% de opacidad) */
     border: 1px solid rgba(201, 167, 107, 0.6) !important; 
     padding-left: 25px !important;  
     padding-right: 25px !important;
     border-radius: 10px !important; 
     
-    /* Sombra INTERNA (inset) justo al lado de la línea, como pediste */
-    box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.4) !important; 
+    /* Sombra HACIA AFUERA: esto da el efecto de que la caja está elevada */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5) !important; 
     
-    /* Un fondo ligeramente oscuro para que la sombra interna se note */
-    background-color: rgba(0, 0, 0, 0.2) !important; 
+    /* Un fondo ligeramente más oscuro que la tarjeta para que resalte */
+    background-color: rgba(0, 0, 0, 0.15) !important; 
 }
 
 /* 3. Las flores en la base (centradas en la línea) */
@@ -650,7 +650,7 @@ body, html {
     bottom: 0;
     height: 25%;
     width: 24px;
-    /* La flor usa la misma opacidad que la línea */
+    /* Flor con la misma opacidad que la línea */
     background-color: rgba(201, 167, 107, 0.6); 
     mask-image: url('flor.svg');
     mask-repeat: no-repeat;

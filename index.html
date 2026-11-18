@@ -1150,26 +1150,37 @@ function formatDoc(cmd, val) {
     if (!ta) return; 
     
 if (cmd === 'undo') {
-        if (undoStack.length > 0) {
-            isUndoRedoAction = true;
-            const currentHtml = ta.innerHTML;
-            const prevHtml = undoStack.pop();
-            redoStack.push(currentHtml);
-            ta.innerHTML = prevHtml;
-            lastSavedHtml = prevHtml;
-            saveMainNote();
-            isUndoRedoAction = false;
-        } else {
-            ta.focus();
-            document.execCommand('undo', false, null);
-            lastSavedHtml = ta.innerHTML;
-            saveMainNote();
-        }
-        saveSelection();
-        updateFormatBtns();
-        return;
+    if (undoStack.length > 0) {
+        isUndoRedoAction = true;
+        
+        // 1. Guardamos la posición actual del scroll
+        const currentScroll = ta.scrollTop; 
+        
+        const currentHtml = ta.innerHTML;
+        const prevHtml = undoStack.pop();
+        redoStack.push(currentHtml);
+        
+        // 2. Reemplazamos el HTML
+        ta.innerHTML = prevHtml;
+        
+        // 3. Restauramos el scroll esperando a que el navegador termine de dibujar
+        setTimeout(() => {
+            ta.scrollTop = currentScroll;
+        }, 10);
+        
+        lastSavedHtml = prevHtml;
+        saveMainNote();
+        isUndoRedoAction = false;
+    } else {
+        ta.focus();
+        document.execCommand('undo', false, null);
+        lastSavedHtml = ta.innerHTML;
+        saveMainNote();
     }
-
+    saveSelection();
+    updateFormatBtns();
+    return;
+}
 restoreSelection(); 
 
 if (cmd === 'fontName') {

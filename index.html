@@ -1243,7 +1243,6 @@ function applyHighlighterColor() {
     if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; }
     const range = sel.getRangeAt(0);
     if (range.collapsed) { saveMainNote(); saveSelection(); return; }
-  saveMainNote();
     const color = HIGHLIGHTER_COLORS[highlighterColorIdx].bg;
     const span = document.createElement('span');
     span.style.backgroundColor = color;
@@ -1263,7 +1262,6 @@ function removeHighlighter() {
     restoreSelection();
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; }
-  saveMainNote();
     const range = sel.getRangeAt(0);
     if (range.collapsed) {
         let node = range.startContainer;
@@ -1600,7 +1598,7 @@ if (document.activeElement && document.activeElement.tagName === 'SELECT') retur
 const sel = window.getSelection();
 if (!sel || !sel.rangeCount) return;
 const node = sel.anchorNode;
-if (node && (node === ta || ta.contains(node))) { saveSelection(); updateFormatBtns(); }
+if (node && (node === ta || ta.contains(node))) { saveSelection(); updateFormatBtns(); } updateFormatBtns(); }
 });
 isInitialLoad = false;
 } catch(e) {

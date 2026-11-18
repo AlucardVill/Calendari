@@ -856,16 +856,86 @@ body.focus-mode::before {
     z-index: 9100;
     transform: scaleY(-1); /* Voltea la imagen verticalmente */
 }
+/* =========================================
+   ESQUINAS ART NOUVEAU (ROTADAS Y AJUSTADAS)
+   ========================================= */
 
-/* 4. Esquina Inferior Derecha (Espejo Diagonal) */
+/* 1. Esquina Superior Izquierda */
+html:has(body.focus-mode)::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 130px; 
+    height: 130px;
+    background-color: #b08d54; 
+    -webkit-mask-image: url('esquina.svg');
+    mask-image: url('esquina.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 9100;
+    
+    /* Rotación para que la base toque los bordes y la punta vaya a la esquina */
+    transform-origin: top left;
+    transform: scale(1, 1); 
+}
+
+/* 2. Esquina Superior Derecha */
+html:has(body.focus-mode)::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 130px;
+    height: 130px;
+    background-color: #b08d54;
+    -webkit-mask-image: url('esquina.svg');
+    mask-image: url('esquina.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 9100;
+    
+    transform-origin: top right;
+    transform: scaleX(-1); /* Espejo Horizontal */
+}
+
+/* 3. Esquina Inferior Izquierda */
+body.focus-mode::before {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 130px;
+    height: 130px;
+    background-color: #b08d54;
+    -webkit-mask-image: url('esquina.svg');
+    mask-image: url('esquina.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 9100;
+    
+    transform-origin: bottom left;
+    transform: scaleY(-1); /* Espejo Vertical */
+}
+
+/* 4. Esquina Inferior Derecha */
 body.focus-mode::after {
     content: '';
     position: fixed;
     bottom: 0;
     right: 0;
-    left: auto !important; /* Anula la cenefa inferior cuando está en modo concentración */
-    width: 120px !important;
-    height: 120px !important;
+    left: auto !important; 
+    width: 130px !important;
+    height: 130px !important;
     background-color: #b08d54 !important;
     -webkit-mask-image: url('esquina.svg') !important;
     mask-image: url('esquina.svg') !important;
@@ -875,7 +945,9 @@ body.focus-mode::after {
     mask-repeat: no-repeat !important;
     pointer-events: none;
     z-index: 9100;
-    transform: scale(-1, -1); /* Voltea horizontal y verticalmente */
+    
+    transform-origin: bottom right;
+    transform: scale(-1, -1); /* Espejo Diagonal */
     opacity: 1 !important;
 }
 </style>

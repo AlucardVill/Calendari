@@ -1237,7 +1237,6 @@ function updateHighlighterBtnUI() { const b = document.getElementById('btn-highl
 function applyHighlighterColor() {
     const ta = document.getElementById('notes-main-textarea');
     if (!ta) return;
-    ta.focus();
     restoreSelection();
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; }
@@ -1259,7 +1258,6 @@ function applyHighlighterColor() {
 function removeHighlighter() {
     const ta = document.getElementById('notes-main-textarea');
     if (!ta) return;
-    ta.focus();
     restoreSelection();
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount) { saveMainNote(); saveSelection(); return; }

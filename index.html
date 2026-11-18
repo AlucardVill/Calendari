@@ -792,136 +792,67 @@ body, html {
     font-size: 0.65rem;
     color: var(--text);
 } 
-/* =========================================
-   ESQUINAS ART NOUVEAU (SOLO EN MODO CONCENTRACIÓN)
-   ========================================= */
-
-/* 1. Esquina Superior Izquierda (Original) */
-html:has(body.focus-mode)::before {
-    display: block !important;
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 120px; /* Puedes agrandar o achicar la esquina aquí */
-    height: 120px;
-    background-color: #b08d54; /* Dorado de la app */
-    -webkit-mask-image: url('esquina.svg');
-    mask-image: url('esquina.svg');
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    pointer-events: none;
-    z-index: 9100;
-    transform: scale(1, 1); /* Sin cambios */
-}
-
-/* 2. Esquina Superior Derecha (Espejo Horizontal) */
-html:has(body.focus-mode)::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 120px;
-    height: 120px;
-    background-color: #b08d54;
-    -webkit-mask-image: url('esquina.svg');
-    mask-image: url('esquina.svg');
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    pointer-events: none;
-    z-index: 9100;
-    transform: scaleX(-1); /* Voltea la imagen como un espejo */
-}
-
-/* 3. Esquina Inferior Izquierda (Espejo Vertical) */
-body.focus-mode::before {
-    content: '';
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 120px;
-    height: 120px;
-    background-color: #b08d54;
-    -webkit-mask-image: url('esquina.svg');
-    mask-image: url('esquina.svg');
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    pointer-events: none;
-    z-index: 9100;
-    transform: scaleY(-1); /* Voltea la imagen verticalmente */
-}
 body.focus-mode {
-  /* ==== AJUSTES PARA LA NUEVA CINTA ==== */
-  --ribbon-thickness: 32px; /* Prueba 25px si la quieres más fina, o 40px si la quieres más ancha */
+  /* 1. Hacemos la cinta mucho más delgada (14px a 18px) */
+  --ribbon-thickness: 15px; 
+  
+  /* 2. Un poco más pequeño para que quepan más flores seguidas */
+  --ribbon-tile-w: 300px; 
   
   --ribbon-gold-1: #e6c48f;
   --ribbon-gold-2: #b08d54;
   --ribbon-gold-3: #7c5e32;
   
-  /* Nombre de tu archivo (cambia a .png si es necesario) */
+  /* Asegúrate de que el nombre sea exacto */
   --ribbon-svg: url('esquina.svg'); 
 }
 
-/* Respaldo por si la imagen no carga */
-body.focus-mode {
-  box-shadow: inset 0 0 0 1px rgba(230, 196, 143, 0.4);
-  overflow: hidden;
-}
-
-/* Base de las 4 tiras */
-html:has(body.focus-mode)::before,
-html:has(body.focus-mode)::after,
+/* =========================================
+   BASE PARA LAS 4 TIRAS
+   ========================================= */
 body.focus-mode::before,
-body.focus-mode::after {
+body.focus-mode::after,
+html:has(body.focus-mode)::before,
+html:has(body.focus-mode)::after {
   content: "";
   position: fixed;
   pointer-events: none;
-  z-index: 2147483647; /* Asegura que esté por encima de todo */
+  z-index: 2147483647; /* Por encima de todo */
 
-  /* Color dorado con gradiente */
   background: linear-gradient(90deg, var(--ribbon-gold-1), var(--ribbon-gold-2), var(--ribbon-gold-3));
 
-  /* La máscara */
   -webkit-mask-image: var(--ribbon-svg);
           mask-image: var(--ribbon-svg);
   
-  /* Ajuste clave: hacemos la imagen grande (350px) para que se vea el detalle, 
-     y tomamos solo el centro */
-  -webkit-mask-size: 350px auto; 
-          mask-size: 350px auto;
-  
+  -webkit-mask-size: var(--ribbon-tile-w) auto;
+          mask-size: var(--ribbon-tile-w) auto;
+          
   -webkit-mask-repeat: repeat-x;
           mask-repeat: repeat-x;
           
+  /* 'center' toma la franja del medio del dibujo para que no se vea aplastado */
   -webkit-mask-position: center;
           mask-position: center;
 
-  /* Un brillo muy sutil para que resalte en el fondo negro */
-  filter: drop-shadow(0 0 5px rgba(230, 196, 143, 0.5));
+  filter: drop-shadow(0 0 4px rgba(230, 196, 143, 0.5));
   opacity: 0.9;
 }
 
-/* ① Superior */
-html:has(body.focus-mode)::before {
+/* ---------- ① BORDE SUPERIOR (Ahora en body::before) ---------- */
+body.focus-mode::before {
   top: 0; left: 0; right: 0;
   height: var(--ribbon-thickness);
 }
 
-/* ② Inferior (Espejada) */
-html:has(body.focus-mode)::after {
+/* ---------- ② BORDE INFERIOR (Ahora en body::after) ---------- */
+body.focus-mode::after {
   bottom: 0; left: 0; right: 0;
   height: var(--ribbon-thickness);
-  transform: scaleY(-1); 
+  transform: scaleY(-1); /* Espejo para que la punta mire hacia abajo */
 }
 
-/* ③ Izquierda (Rotada 90 grados) */
-body.focus-mode::before {
+/* ---------- ③ BORDE IZQUIERDO ---------- */
+html:has(body.focus-mode)::before {
   top: 0; left: 0;
   width: 100vh;
   height: var(--ribbon-thickness);
@@ -929,13 +860,18 @@ body.focus-mode::before {
   transform: translateX(var(--ribbon-thickness)) rotate(90deg);
 }
 
-/* ④ Derecha (Rotada 90 grados) */
-body.focus-mode::after {
+/* ---------- ④ BORDE DERECHO ---------- */
+html:has(body.focus-mode)::after {
   top: 0; left: 100%;
   width: 100vh;
   height: var(--ribbon-thickness);
   transform-origin: top left;
   transform: rotate(90deg);
+}
+
+/* Arreglo para evitar scroll fantasma por las rotaciones */
+body.focus-mode {
+  overflow: hidden;
 }
 </style>
 </head>

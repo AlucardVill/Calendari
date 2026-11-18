@@ -792,6 +792,92 @@ body, html {
     font-size: 0.65rem;
     color: var(--text);
 } 
+/* =========================================
+   ESQUINAS ART NOUVEAU (SOLO EN MODO CONCENTRACIÓN)
+   ========================================= */
+
+/* 1. Esquina Superior Izquierda (Original) */
+html:has(body.focus-mode)::before {
+    display: block !important;
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 120px; /* Puedes agrandar o achicar la esquina aquí */
+    height: 120px;
+    background-color: #b08d54; /* Dorado de la app */
+    -webkit-mask-image: url('esquina.svg');
+    mask-image: url('esquina.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 9100;
+    transform: scale(1, 1); /* Sin cambios */
+}
+
+/* 2. Esquina Superior Derecha (Espejo Horizontal) */
+html:has(body.focus-mode)::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    background-color: #b08d54;
+    -webkit-mask-image: url('esquina.svg');
+    mask-image: url('esquina.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 9100;
+    transform: scaleX(-1); /* Voltea la imagen como un espejo */
+}
+
+/* 3. Esquina Inferior Izquierda (Espejo Vertical) */
+body.focus-mode::before {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 120px;
+    height: 120px;
+    background-color: #b08d54;
+    -webkit-mask-image: url('esquina.svg');
+    mask-image: url('esquina.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 9100;
+    transform: scaleY(-1); /* Voltea la imagen verticalmente */
+}
+
+/* 4. Esquina Inferior Derecha (Espejo Diagonal) */
+body.focus-mode::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: auto !important; /* Anula la cenefa inferior cuando está en modo concentración */
+    width: 120px !important;
+    height: 120px !important;
+    background-color: #b08d54 !important;
+    -webkit-mask-image: url('esquina.svg') !important;
+    mask-image: url('esquina.svg') !important;
+    -webkit-mask-size: contain !important;
+    mask-size: contain !important;
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
+    pointer-events: none;
+    z-index: 9100;
+    transform: scale(-1, -1); /* Voltea horizontal y verticalmente */
+    opacity: 1 !important;
+}
 </style>
 </head>
 <body>

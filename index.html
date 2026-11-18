@@ -1232,7 +1232,20 @@ let highlighterTimer = null;
 function handleHighlighterDown(e) { if (e) e.preventDefault(); if (highlighterTimer) clearTimeout(highlighterTimer); highlighterTimer = setTimeout(() => { highlighterTimer = null; cycleHighlighterColor(); }, 500); }
 function handleHighlighterUp(e) { if (e) e.preventDefault(); if (highlighterTimer) { clearTimeout(highlighterTimer); highlighterTimer = null; toggleHighlighter(); } }
 function cycleHighlighterColor() { highlighterColorIdx = (highlighterColorIdx + 1) % HIGHLIGHTER_COLORS.length; updateHighlighterBtnUI(); if (highlighterActive) applyHighlighterColor(); }
-function toggleHighlighter() { highlighterActive = !highlighterActive; updateHighlighterBtnUI(); if (highlighterActive) applyHighlighterColor(); else removeHighlighter(); }
+function toggleHighlighter() { 
+    const sel = window.getSelection();
+    // Comprobamos si REALMENTE hay texto seleccionado en este instante
+    const hasSelection = sel && sel.rangeCount > 0 && !sel.isCollapsed;
+    
+    highlighterActive = !highlighterActive; 
+    updateHighlighterBtnUI(); 
+    
+    // Solo aplicamos o quitamos el color si hay texto seleccionado
+    if (hasSelection) {
+        if (highlighterActive) applyHighlighterColor(); 
+        else removeHighlighter(); 
+    }
+}
 function updateHighlighterBtnUI() { const b = document.getElementById('btn-highlighter'); if (!b) return; const c = HIGHLIGHTER_COLORS[highlighterColorIdx]; b.style.color = c.icon; if (highlighterActive) { b.classList.add('highlighter-active'); b.style.backgroundColor = c.bg; b.style.borderColor = c.icon; } else { b.classList.remove('highlighter-active'); b.style.backgroundColor = 'transparent'; b.style.borderColor = 'transparent'; } }
 function applyHighlighterColor() {
     const ta = document.getElementById('notes-main-textarea');

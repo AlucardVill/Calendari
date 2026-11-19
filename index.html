@@ -807,7 +807,82 @@ body.focus-mode {
   --ribbon-svg: url('esquina.svg'); 
 }
 
+/* =========================================
+   ESTILOS PARA EL GRAFO DE NOTAS
+   ========================================= */
 
+#notes-project-nav {
+    display: none; 
+    flex-direction: column; 
+    gap: 8px; 
+    margin-bottom: 10px; 
+    width: 100%;
+}
+
+.notes-nav-row {
+    display: flex; 
+    flex-wrap: wrap;
+    gap: 8px; 
+    font-size: 0.75rem; 
+    padding-bottom: 4px;
+}
+
+.proj-link, .fold-link {
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    background: var(--input-bg);
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-input);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.proj-link:hover, .fold-link:hover, .proj-link.active, .fold-link.active {
+    color: #c9a76b; 
+    border-color: #c9a76b;
+}
+
+.nav-add-btn {
+    color: var(--muted);
+    cursor: pointer;
+    font-weight: 700;
+    padding: 5px 10px;
+    border: 1px dashed var(--border-input);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.nav-add-btn:hover { color: #c9a76b; border-color: #c9a76b; }
+
+.nav-back-btn {
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 700;
+    padding: 5px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.nav-back-btn:hover { color: #c9a76b; }
+
+/* Estilo del enlace dentro del texto */
+.wiki-link {
+    color: #c9a76b;
+    border-bottom: 1px dashed #c9a76b;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0 2px;
+    transition: all 0.2s;
+}
+.wiki-link:hover {
+    background: rgba(201, 167, 107, 0.15);
+    border-bottom-style: solid;
+}
 </style>
 </head>
 <body>
@@ -863,11 +938,22 @@ body.focus-mode {
 <div id="modal-content-day" style="display:none;"><h3>Formato del Día</h3><div class="input-group"><label>Formato:</label><select id="inp-day-format"><option value="24h">24 Horas</option><option value="12h">AM / PM</option></select></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveDaySettings()">Guardar</button></div></div>
 <div id="modal-content-marker" style="display:none;"><h3>Marcador</h3><div class="input-group"><label>Color:</label><input type="color" id="inp-marker-color"></div><div class="modal-actions" style="flex-wrap:wrap;"><button class="btn btn-delete" onclick="deleteActiveMarker()" style="flex-basis:100%;margin-bottom:6px;">Eliminar</button><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveMarkerSettings()">Guardar</button></div></div>
 <div id="modal-content-notes" style="display:none;flex-direction:column;">
-    <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px; width:100%; flex-shrink:0;">
-        <select id="notes-index-select" onchange="onNotesIndexChange(this.value)" style="flex:1; min-width:0; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); border-radius:8px; padding:6px 10px; font-family:inherit; font-size:0.75rem; outline:none; cursor:pointer;"><option value="">Ir a nota…</option></select>
-        <select id="notes-mode" onchange="toggleNotesMode()" style="flex:0 0 auto; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); border-radius:8px; padding:6px 10px; font-size:0.78rem; outline:none; cursor:pointer;"><option value="general">Generales</option><option value="date">Por Fecha</option></select>
-        <input type="date" id="notes-date-picker" style="display:none; flex:0 0 auto; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:6px 10px; border-radius:8px; outline:none; font-family:inherit; font-size:0.78rem;" onchange="loadNoteForPicker()">
-    </div>
+   <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px; width:100%; flex-shrink:0;">
+    <select id="notes-index-select" onchange="onNotesIndexChange(this.value)" style="flex:1; min-width:0; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); border-radius:8px; padding:6px 10px; font-family:inherit; font-size:0.75rem; outline:none; cursor:pointer;"><option value="">Ir a nota…</option></select>
+    
+    <select id="notes-mode" onchange="toggleNotesMode()" style="flex:0 0 auto; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); border-radius:8px; padding:6px 10px; font-size:0.78rem; outline:none; cursor:pointer;">
+        <option value="general">Generales</option>
+        <option value="date">Por Fecha</option>
+        <option value="projects">Proyectos</option>
+    </select>
+    
+    <input type="date" id="notes-date-picker" style="display:none; flex:0 0 auto; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:6px 10px; border-radius:8px; outline:none; font-family:inherit; font-size:0.78rem;" onchange="loadNoteForPicker()">
+</div>
+
+<!-- BARRA DE PROYECTOS / NODOS -->
+<div id="notes-project-nav">
+    <div class="notes-nav-row" id="notes-project-list"></div>
+</div>
 
     <div id="notes-main-textarea" contenteditable="true" spellcheck="false" style="flex:1 1 auto;height:0;min-height:100px;width:100%;box-sizing:border-box;resize:none;overflow-y:auto;border:1px solid var(--border-input);color:var(--text);border-radius:10px;padding:14px 14px 75px 14px;font-family:inherit;font-size:0.9rem;outline:none;white-space:pre-wrap;" oninput="saveMainNote()"></div>
 
@@ -880,6 +966,7 @@ body.focus-mode {
         <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('undo')" title="Deshacer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg></button>
         <button type="button" class="notes-format-btn" id="btn-text-color" onmousedown="handleTextColorDown(event)" onmouseup="handleTextColorUp(event)" ontouchstart="event.preventDefault(); handleTextColorDown(event)" ontouchend="event.preventDefault(); handleTextColorUp(event)"title="Color de texto" style="font-family: serif; font-weight: 900; position: relative;">A</button>
         <button type="button" class="notes-format-btn" id="btn-highlighter" onmousedown="handleHighlighterDown(event)" onmouseup="handleHighlighterUp(event)"ontouchstart="event.preventDefault(); handleHighlighterDown(event)" ontouchend="event.preventDefault(); handleHighlighterUp(event)"  title="Resaltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></button>
+    <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="insertWikiLink()" title="Enlazar nota"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
     </div>
 
     <button type="button" class="notes-time-btn" onclick="insertCurrentTimeInNotes()" title="Hora actual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
@@ -933,6 +1020,7 @@ timerStats.forEach((s, i) => { if (!s.id) { s.id = Date.now() - i * 1000; _needS
 if (_needSaveStats) safeSetItem('wkTimerStats', JSON.stringify(timerStats));
 let activeTimerForGoal = null, goalOverlayInterval = null, goalCompletedAt = 0, goalQueue = [];
 let notesData = safeJSONParse(localStorage.getItem('wkNotes'), { general: '' });
+if (!notesData.projects) notesData.projects = {};
 if (typeof notesData !== 'object' || notesData === null) notesData = { general: '' };
 let audioCtx = null, alarmInterval = null;
 function startAlarmSound() { if (alarmInterval) return; try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{}); const beep = () => { if (!audioCtx) return; let o = audioCtx.createOscillator(); let g = audioCtx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(880, audioCtx.currentTime); g.gain.setValueAtTime(0.3, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.4); }; beep(); alarmInterval = setInterval(beep, 800); } catch(e) {} }
@@ -1128,7 +1216,169 @@ function populateNotesIndex(currentDate) { const sel = document.getElementById('
 function onNotesIndexChange(date) { if (!date) return; document.getElementById('notes-mode').value = 'date'; document.getElementById('notes-date-picker').value = date; toggleNotesMode(); }
 let notesIndexRefreshTimer = null;
 function openNotesModal() { document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none'); const c = document.getElementById('modal-content-notes'); c.style.display = 'flex'; switchPanelState('modal-content-notes'); const sM = localStorage.getItem('wkNotesLastMode') || 'general'; const sD = localStorage.getItem('wkNotesLastDate') || ''; document.getElementById('notes-mode').value = sM; if (sM === 'date' && sD) document.getElementById('notes-date-picker').value = sD; toggleNotesMode(); populateNotesIndex(sM === 'date' ? sD : ''); document.getElementById('main-modal-card').classList.add('wide'); openModal(); }
-function toggleNotesMode() { const m = document.getElementById('notes-mode').value; localStorage.setItem('wkNotesLastMode', m); const p = document.getElementById('notes-date-picker'); const ta = document.getElementById('notes-main-textarea'); if (m === 'general') { p.style.display = 'none'; ta.innerHTML = notesData.general || ''; } else {p.style.display = 'flex'; if (!p.value) { const t = new Date(); p.value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; } localStorage.setItem('wkNotesLastDate', p.value); loadNoteForPicker(); } undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML; }
+let activeProjectId = null;
+let projectHistory = []; 
+
+function toggleNotesMode() { 
+    const m = document.getElementById('notes-mode').value; 
+    localStorage.setItem('wkNotesLastMode', m); 
+    
+    const p = document.getElementById('notes-date-picker'); 
+    const ta = document.getElementById('notes-main-textarea'); 
+    const nav = document.getElementById('notes-project-nav');
+    const toolbar = document.querySelector('.notes-format-toolbar');
+    const timeBtn = document.querySelector('.notes-time-btn');
+    
+    p.style.display = 'none'; 
+    nav.style.display = 'none';
+    activeProjectId = null;
+    projectHistory = [];
+    ta.dataset.currentNoteId = "";
+    
+    if (m === 'general') { 
+        ta.style.display = 'block';
+        if (toolbar) toolbar.style.display = 'flex';
+        if (timeBtn) timeBtn.style.display = 'flex';
+        ta.innerHTML = notesData.general || ''; 
+    } else if (m === 'date') {
+        ta.style.display = 'block';
+        if (toolbar) toolbar.style.display = 'flex';
+        if (timeBtn) timeBtn.style.display = 'flex';
+        p.style.display = 'flex'; 
+        if (!p.value) { const t = new Date(); p.value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; } 
+        localStorage.setItem('wkNotesLastDate', p.value); 
+        loadNoteForPicker(); 
+    } else if (m === 'projects') {
+        nav.style.display = 'flex';
+        renderProjectNav();
+        return; 
+    }
+    undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML; 
+}
+
+function renderProjectNav() {
+    const listP = document.getElementById('notes-project-list');
+    const ta = document.getElementById('notes-main-textarea');
+    const toolbar = document.querySelector('.notes-format-toolbar');
+    const timeBtn = document.querySelector('.notes-time-btn');
+
+    let projs = Object.keys(notesData.projects);
+    
+    // Iconos SVG
+    const iconDoc = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
+    const iconPlus = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+    const iconBack = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`;
+
+    // Vista de Directorio (sin nota abierta)
+    if (!activeProjectId) {
+        ta.style.display = 'none'; 
+        if (toolbar) toolbar.style.display = 'none';
+        if (timeBtn) timeBtn.style.display = 'none';
+        listP.style.display = 'flex';
+
+        if (projs.length === 0) {
+            listP.innerHTML = `<span style="color:var(--muted); font-size:0.8rem; font-style:italic;">No hay notas todavía.</span> <span class="nav-add-btn" onclick="addNewProjectNote()">${iconPlus} Nueva Nota</span>`;
+            return;
+        }
+
+        listP.innerHTML = projs.map(id => 
+            `<span class="proj-link" onclick="openProjectNote('${id}')">${iconDoc} ${escapeHtml(notesData.projects[id].name)}</span>`
+        ).join('') + ` <span class="nav-add-btn" onclick="addNewProjectNote()">${iconPlus} Nueva Nota</span>`;
+        return;
+    }
+
+    // Vista de Nota (Editor abierto)
+    ta.style.display = 'block';
+    if (toolbar) toolbar.style.display = 'flex';
+    if (timeBtn) timeBtn.style.display = 'flex';
+    
+    const proj = notesData.projects[activeProjectId];
+    let backBtn = projectHistory.length > 0 ? `<span class="nav-back-btn" onclick="goBackProject()">${iconBack} Volver</span>` : `<span class="nav-back-btn" onclick="exitProject()">${iconBack} Directorio</span>`;
+
+    listP.innerHTML = `${backBtn} <span style="color:#c9a76b; font-weight:700; font-size:0.8rem; margin-left:6px;">${escapeHtml(proj.name)}</span>`;
+
+    if (ta.dataset.currentNoteId !== activeProjectId) {
+        ta.innerHTML = proj.html || '';
+        ta.dataset.currentNoteId = activeProjectId;
+        undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML;
+    }
+}
+
+function openProjectNote(id) {
+    if (activeProjectId && activeProjectId !== id) {
+        projectHistory.push(activeProjectId); 
+    }
+    activeProjectId = id;
+    renderProjectNav();
+}
+
+function exitProject() {
+    saveMainNote();
+    activeProjectId = null;
+    projectHistory = [];
+    renderProjectNav();
+}
+
+function goBackProject() {
+    saveMainNote();
+    if (projectHistory.length > 0) {
+        activeProjectId = projectHistory.pop();
+        renderProjectNav();
+    } else {
+        exitProject();
+    }
+}
+
+function addNewProjectNote() {
+    const name = prompt("Nombre de la nueva nota:");
+    if (name && name.trim()) {
+        const id = 'note_' + Date.now();
+        notesData.projects[id] = { name: name.trim(), html: '' };
+        scheduleNotesSave();
+        openProjectNote(id);
+    }
+}
+
+function insertWikiLink() {
+    if (!activeProjectId) return;
+    const targetName = prompt("¿A qué nota quieres enlazar? (Si no existe, se creará automáticamente)");
+    if (!targetName || !targetName.trim()) return;
+    
+    let targetId = null;
+    for (let key in notesData.projects) {
+        if (notesData.projects[key].name.toLowerCase() === targetName.trim().toLowerCase()) {
+            targetId = key;
+            break;
+        }
+    }
+    
+    if (!targetId) {
+        targetId = 'note_' + Date.now();
+        notesData.projects[targetId] = { name: targetName.trim(), html: '' };
+        scheduleNotesSave();
+    }
+
+    const ta = document.getElementById('notes-main-textarea');
+    ta.focus();
+    restoreSelection();
+    
+    const linkHTML = `<span class="wiki-link" contenteditable="false" data-target="${targetId}">${escapeHtml(targetName.trim())}</span>&nbsp;`;
+    
+    document.execCommand('insertHTML', false, linkHTML);
+    saveMainNote();
+}
+
+// Doble toque en los enlaces para viajar a otras notas
+document.getElementById('notes-main-textarea').addEventListener('click', (e) => {
+    const link = e.target.closest('.wiki-link');
+    if (link && e.detail === 2) { 
+        e.preventDefault();
+        const targetId = link.dataset.target;
+        if (targetId && notesData.projects[targetId]) {
+            openProjectNote(targetId);
+        }
+    }
+});
 function loadNoteForPicker() { const d = document.getElementById('notes-date-picker').value; const ta = document.getElementById('notes-main-textarea'); ta.innerHTML = notesData[d] || ''; if (d) localStorage.setItem('wkNotesLastDate', d); const s = document.getElementById('notes-index-select'); if (s && !s.disabled) s.value = d; undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML; }
 function saveMainNote() { 
     const m = document.getElementById('notes-mode').value; 
@@ -1142,11 +1392,17 @@ function saveMainNote() {
             if (undoStack.length > 50) undoStack.shift();
         }
     }
-    if (m === 'general') notesData.general = ta.innerHTML; 
-    else { 
+    if (m === 'general') {
+        notesData.general = ta.innerHTML; 
+    } else if (m === 'projects') {
+        if (activeProjectId && notesData.projects[activeProjectId]) {
+            notesData.projects[activeProjectId].html = ta.innerHTML;
+        }
+    } else { 
         const d = document.getElementById('notes-date-picker').value; 
         if (d) notesData[d] = ta.innerHTML; 
-    } 
+    }
+
     scheduleNotesSave(); 
     renderDayTaskMarks(); 
     if (m === 'date') { 

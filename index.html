@@ -806,71 +806,42 @@ body.focus-mode {
   /* Asegúrate de que el nombre sea exacto */
   --ribbon-svg: url('esquina.svg'); 
 }
-
 /* =========================================
-   ESTILOS PARA EL GRAFO DE NOTAS
+   RUTA DE NAVEGACIÓN (BREADCRUMBS) Y ENLACES
    ========================================= */
 
 #notes-project-nav {
     display: none; 
-    flex-direction: column; 
-    gap: 8px; 
-    margin-bottom: 10px; 
+    flex-direction: row; 
+    align-items: center;
+    gap: 4px; 
+    margin-bottom: 8px; 
     width: 100%;
-}
-
-.notes-nav-row {
-    display: flex; 
-    flex-wrap: wrap;
-    gap: 8px; 
-    font-size: 0.75rem; 
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none; /* Oculta scroll en Firefox */
+    font-size: 0.8rem;
     padding-bottom: 4px;
 }
+#notes-project-nav::-webkit-scrollbar { display: none; }
 
-.proj-link, .fold-link {
+.breadcrumb-link {
     color: var(--muted);
     cursor: pointer;
-    transition: all 0.2s;
     font-family: inherit;
-    background: var(--input-bg);
-    padding: 5px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border-input);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    transition: color 0.2s;
 }
-
-.proj-link:hover, .fold-link:hover, .proj-link.active, .fold-link.active {
-    color: #c9a76b; 
-    border-color: #c9a76b;
-}
-
-.nav-add-btn {
-    color: var(--muted);
-    cursor: pointer;
+.breadcrumb-link:hover, .breadcrumb-link.active {
+    color: #c9a76b;
     font-weight: 700;
-    padding: 5px 10px;
-    border: 1px dashed var(--border-input);
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
 }
-.nav-add-btn:hover { color: #c9a76b; border-color: #c9a76b; }
 
-.nav-back-btn {
-    color: var(--text);
-    cursor: pointer;
-    font-weight: 700;
-    padding: 5px 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+.breadcrumb-sep {
+    color: var(--border-input);
+    margin: 0 2px;
 }
-.nav-back-btn:hover { color: #c9a76b; }
 
-/* Estilo del enlace dentro del texto */
+/* El enlace dentro del texto */
 .wiki-link {
     color: #c9a76b;
     border-bottom: 1px dashed #c9a76b;
@@ -878,10 +849,11 @@ body.focus-mode {
     font-weight: 600;
     padding: 0 2px;
     transition: all 0.2s;
+    user-select: none; /* Evita que se seleccione como texto normal */
+    -webkit-user-select: none;
 }
-.wiki-link:hover {
-    background: rgba(201, 167, 107, 0.15);
-    border-bottom-style: solid;
+.wiki-link:active {
+    background: rgba(201, 167, 107, 0.2);
 }
 </style>
 </head>
@@ -949,11 +921,9 @@ body.focus-mode {
     
     <input type="date" id="notes-date-picker" style="display:none; flex:0 0 auto; background:var(--input-bg); color:var(--text); border:1px solid var(--border-input); padding:6px 10px; border-radius:8px; outline:none; font-family:inherit; font-size:0.78rem;" onchange="loadNoteForPicker()">
 </div>
-
-<!-- BARRA DE PROYECTOS / NODOS -->
-<div id="notes-project-nav">
-    <div class="notes-nav-row" id="notes-project-list"></div>
-</div>
+    
+<!-- RUTA DE PROYECTOS -->
+<div id="notes-project-nav"></div>
 
     <div id="notes-main-textarea" contenteditable="true" spellcheck="false" style="flex:1 1 auto;height:0;min-height:100px;width:100%;box-sizing:border-box;resize:none;overflow-y:auto;border:1px solid var(--border-input);color:var(--text);border-radius:10px;padding:14px 14px 75px 14px;font-family:inherit;font-size:0.9rem;outline:none;white-space:pre-wrap;" oninput="saveMainNote()"></div>
 
@@ -1216,8 +1186,8 @@ function populateNotesIndex(currentDate) { const sel = document.getElementById('
 function onNotesIndexChange(date) { if (!date) return; document.getElementById('notes-mode').value = 'date'; document.getElementById('notes-date-picker').value = date; toggleNotesMode(); }
 let notesIndexRefreshTimer = null;
 function openNotesModal() { document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none'); const c = document.getElementById('modal-content-notes'); c.style.display = 'flex'; switchPanelState('modal-content-notes'); const sM = localStorage.getItem('wkNotesLastMode') || 'general'; const sD = localStorage.getItem('wkNotesLastDate') || ''; document.getElementById('notes-mode').value = sM; if (sM === 'date' && sD) document.getElementById('notes-date-picker').value = sD; toggleNotesMode(); populateNotesIndex(sM === 'date' ? sD : ''); document.getElementById('main-modal-card').classList.add('wide'); openModal(); }
-let activeProjectId = null;
-let projectHistory = []; 
+let activeProjectId = 'proj_root';
+let projectPath = []; // Guarda la ruta de IDs por donde hemos pasado
 
 function toggleNotesMode() { 
     const m = document.getElementById('notes-mode').value; 
@@ -1231,8 +1201,6 @@ function toggleNotesMode() {
     
     p.style.display = 'none'; 
     nav.style.display = 'none';
-    activeProjectId = null;
-    projectHistory = [];
     ta.dataset.currentNoteId = "";
     
     if (m === 'general') { 
@@ -1249,112 +1217,96 @@ function toggleNotesMode() {
         localStorage.setItem('wkNotesLastDate', p.value); 
         loadNoteForPicker(); 
     } else if (m === 'projects') {
+        ta.style.display = 'block';
+        if (toolbar) toolbar.style.display = 'flex';
+        if (timeBtn) timeBtn.style.display = 'flex';
         nav.style.display = 'flex';
-        renderProjectNav();
+        
+        // Iniciar en la raíz
+        if (!notesData.projects['proj_root']) {
+            notesData.projects['proj_root'] = { name: 'Directorio', html: '' };
+        }
+        activeProjectId = 'proj_root';
+        projectPath = ['proj_root'];
+        loadProjectContext();
         return; 
     }
     undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML; 
 }
 
-function renderProjectNav() {
-    const listP = document.getElementById('notes-project-list');
+function loadProjectContext() {
     const ta = document.getElementById('notes-main-textarea');
-    const toolbar = document.querySelector('.notes-format-toolbar');
-    const timeBtn = document.querySelector('.notes-time-btn');
-
-    let projs = Object.keys(notesData.projects);
+    const proj = notesData.projects[activeProjectId];
+    if (!proj) return;
     
-    // Iconos SVG
-    const iconDoc = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
-    const iconPlus = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
-    const iconBack = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`;
+    ta.innerHTML = proj.html || '';
+    undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML;
+    renderBreadcrumbs();
+}
 
-    // Vista de Directorio (sin nota abierta)
-    if (!activeProjectId) {
-        ta.style.display = 'none'; 
-        if (toolbar) toolbar.style.display = 'none';
-        if (timeBtn) timeBtn.style.display = 'none';
-        listP.style.display = 'flex';
-
-        if (projs.length === 0) {
-            listP.innerHTML = `<span style="color:var(--muted); font-size:0.8rem; font-style:italic;">No hay notas todavía.</span> <span class="nav-add-btn" onclick="addNewProjectNote()">${iconPlus} Nueva Nota</span>`;
-            return;
-        }
-
-        listP.innerHTML = projs.map(id => 
-            `<span class="proj-link" onclick="openProjectNote('${id}')">${iconDoc} ${escapeHtml(notesData.projects[id].name)}</span>`
-        ).join('') + ` <span class="nav-add-btn" onclick="addNewProjectNote()">${iconPlus} Nueva Nota</span>`;
+function renderBreadcrumbs() {
+    const nav = document.getElementById('notes-project-nav');
+    if (!nav) return;
+    
+    // En la raíz principal no mostramos nada en el directorio
+    if (activeProjectId === 'proj_root') {
+        nav.innerHTML = '';
         return;
     }
-
-    // Vista de Nota (Editor abierto)
-    ta.style.display = 'block';
-    if (toolbar) toolbar.style.display = 'flex';
-    if (timeBtn) timeBtn.style.display = 'flex';
     
-    const proj = notesData.projects[activeProjectId];
-    let backBtn = projectHistory.length > 0 ? `<span class="nav-back-btn" onclick="goBackProject()">${iconBack} Volver</span>` : `<span class="nav-back-btn" onclick="exitProject()">${iconBack} Directorio</span>`;
-
-    listP.innerHTML = `${backBtn} <span style="color:#c9a76b; font-weight:700; font-size:0.8rem; margin-left:6px;">${escapeHtml(proj.name)}</span>`;
-
-    if (ta.dataset.currentNoteId !== activeProjectId) {
-        ta.innerHTML = proj.html || '';
-        ta.dataset.currentNoteId = activeProjectId;
-        undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML;
-    }
+    // Generar la ruta: Filosofía > Estoicismo
+    nav.innerHTML = projectPath.filter(id => id !== 'proj_root').map((id, index, arr) => {
+        const proj = notesData.projects[id];
+        const name = proj ? proj.name : '?';
+        const isLast = index === arr.length - 1;
+        return `<span class="breadcrumb-link ${isLast ? 'active' : ''}" onclick="navigateToBreadcrumb('${id}')">${escapeHtml(name)}</span>`;
+    }).join('<span class="breadcrumb-sep">›</span>');
+    
+    // Desplazar la ruta hacia la derecha si es muy larga
+    nav.scrollLeft = nav.scrollWidth;
 }
 
-function openProjectNote(id) {
-    if (activeProjectId && activeProjectId !== id) {
-        projectHistory.push(activeProjectId); 
-    }
-    activeProjectId = id;
-    renderProjectNav();
-}
-
-function exitProject() {
+function navigateToBreadcrumb(targetId) {
+    if (!targetId) return;
     saveMainNote();
-    activeProjectId = null;
-    projectHistory = [];
-    renderProjectNav();
-}
-
-function goBackProject() {
-    saveMainNote();
-    if (projectHistory.length > 0) {
-        activeProjectId = projectHistory.pop();
-        renderProjectNav();
-    } else {
-        exitProject();
-    }
-}
-
-function addNewProjectNote() {
-    const name = prompt("Nombre de la nueva nota:");
-    if (name && name.trim()) {
-        const id = 'note_' + Date.now();
-        notesData.projects[id] = { name: name.trim(), html: '' };
-        scheduleNotesSave();
-        openProjectNote(id);
+    
+    const index = projectPath.indexOf(targetId);
+    if (index !== -1) {
+        projectPath = projectPath.slice(0, index + 1);
+        activeProjectId = targetId;
+        loadProjectContext();
     }
 }
 
 function insertWikiLink() {
-    if (!activeProjectId) return;
-    const targetName = prompt("¿A qué nota quieres enlazar? (Si no existe, se creará automáticamente)");
-    if (!targetName || !targetName.trim()) return;
+    if (document.getElementById('notes-mode').value !== 'projects') return;
     
+    let targetName = '';
+    const sel = window.getSelection();
+    
+    // Si hay texto seleccionado, lo usamos como nombre
+    if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+        targetName = sel.toString().trim();
+    }
+    
+    // Si no hay texto seleccionado, preguntamos
+    if (!targetName) {
+        targetName = prompt("Nombre del nuevo hipervínculo:");
+    }
+    if (!targetName) return;
+    
+    // Buscar si la nota ya existe para no duplicarla
     let targetId = null;
     for (let key in notesData.projects) {
-        if (notesData.projects[key].name.toLowerCase() === targetName.trim().toLowerCase()) {
-            targetId = key;
-            break;
+        if (notesData.projects[key].name.toLowerCase() === targetName.toLowerCase()) {
+            targetId = key; break;
         }
     }
     
+    // Si no existe, la creamos en la base de datos
     if (!targetId) {
         targetId = 'note_' + Date.now();
-        notesData.projects[targetId] = { name: targetName.trim(), html: '' };
+        notesData.projects[targetId] = { name: targetName, html: '' };
         scheduleNotesSave();
     }
 
@@ -1362,20 +1314,109 @@ function insertWikiLink() {
     ta.focus();
     restoreSelection();
     
-    const linkHTML = `<span class="wiki-link" contenteditable="false" data-target="${targetId}">${escapeHtml(targetName.trim())}</span>&nbsp;`;
-    
+    const linkHTML = `<span class="wiki-link" contenteditable="false" data-target="${targetId}">${escapeHtml(targetName)}</span>&nbsp;`;
     document.execCommand('insertHTML', false, linkHTML);
     saveMainNote();
 }
 
-// Doble toque en los enlaces para viajar a otras notas
-document.getElementById('notes-main-textarea').addEventListener('click', (e) => {
+function openLinkEditModal(link) {
+    const targetId = link.dataset.target;
+    const currentName = link.innerText;
+    
+    const newName = prompt(`Editar hipervínculo "${currentName}".\n\n(Deja vacío y pulsa Aceptar para ELIMINARLO):`, currentName);
+    
+    if (newName === null) return; // Cancelado
+    
+    if (newName.trim() === '') {
+        // Eliminar enlace
+        if (confirm(`¿Eliminar el hipervínculo "${currentName}"?`)) {
+            link.remove();
+            saveMainNote();
+        }
+    } else if (newName.trim() !== currentName) {
+        // Editar nombre
+        link.innerText = newName.trim();
+        if (notesData.projects[targetId]) {
+            notesData.projects[targetId].name = newName.trim();
+            scheduleNotesSave();
+        }
+        saveMainNote();
+    }
+}
+
+// =========================================
+// EVENTOS PARA NAVEGACIÓN Y PULSACIÓN LARGA
+// =========================================
+let linkPressTimer = null;
+let isLongPress = false;
+let lastPressedLink = null;
+
+document.getElementById('notes-main-textarea').addEventListener('pointerdown', (e) => {
     const link = e.target.closest('.wiki-link');
-    if (link && e.detail === 2) { 
-        e.preventDefault();
-        const targetId = link.dataset.target;
+    if (link) {
+        lastPressedLink = link;
+        isLongPress = false;
+        if (linkPressTimer) clearTimeout(linkPressTimer);
+        
+        // Iniciar temporizador para pulsación larga (600ms)
+        linkPressTimer = setTimeout(() => {
+            isLongPress = true;
+            openLinkEditModal(link);
+            if (window.navigator.vibrate) window.navigator.vibrate(50); // Pequeña vibración de confirmación
+        }, 600);
+    }
+});
+
+document.getElementById('notes-main-textarea').addEventListener('pointerup', (e) => {
+    if (linkPressTimer) { clearTimeout(linkPressTimer); linkPressTimer = null; }
+    
+    // Si fue un toque rápido, navegar
+    if (lastPressedLink && !isLongPress) {
+        const targetId = lastPressedLink.dataset.target;
         if (targetId && notesData.projects[targetId]) {
-            openProjectNote(targetId);
+            saveMainNote();
+            activeProjectId = targetId;
+            projectPath.push(targetId);
+            loadProjectContext();
+        }
+    }
+    lastPressedLink = null;
+    isLongPress = false;
+});
+
+document.getElementById('notes-main-textarea').addEventListener('pointermove', (e) => {
+    // Si el dedo se mueve mucho, cancelamos la pulsación larga
+    if (linkPressTimer) {
+        clearTimeout(linkPressTimer); linkPressTimer = null;
+        lastPressedLink = null;
+    }
+});
+
+// Prevenir que los enlaces se borren con la tecla de retroceso
+document.getElementById('notes-main-textarea').addEventListener('beforeinput', (e) => {
+    if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0);
+            let node = range.startContainer;
+            if (node.nodeType === 3) node = node.parentNode;
+            
+            // Si estamos borrando un enlace, bloquear
+            if (node.classList && node.classList.contains('wiki-link')) {
+                e.preventDefault(); return;
+            }
+            if (e.inputType === 'deleteContentBackward' && range.startOffset === 0) {
+                let prev = node.previousSibling;
+                if (prev && prev.nodeType === 1 && prev.classList.contains('wiki-link')) {
+                    e.preventDefault();
+                }
+            }
+            if (e.inputType === 'deleteContentForward' && range.startOffset === node.childNodes.length) {
+                let next = node.nextSibling;
+                if (next && next.nodeType === 1 && next.classList.contains('wiki-link')) {
+                    e.preventDefault();
+                }
+            }
         }
     }
 });
@@ -1383,6 +1424,7 @@ function loadNoteForPicker() { const d = document.getElementById('notes-date-pic
 function saveMainNote() { 
     const m = document.getElementById('notes-mode').value; 
     const ta = document.getElementById('notes-main-textarea'); 
+    
     if (!isUndoRedoAction) {
         const currentHtml = ta.innerHTML;
         if (currentHtml !== lastSavedHtml) {
@@ -1392,17 +1434,18 @@ function saveMainNote() {
             if (undoStack.length > 50) undoStack.shift();
         }
     }
+    
     if (m === 'general') {
         notesData.general = ta.innerHTML; 
-    } else if (m === 'projects') {
-        if (activeProjectId && notesData.projects[activeProjectId]) {
-            notesData.projects[activeProjectId].html = ta.innerHTML;
-        }
-    } else { 
+    } else if (m === 'date') { 
         const d = document.getElementById('notes-date-picker').value; 
         if (d) notesData[d] = ta.innerHTML; 
+    } else if (m === 'projects') {
+        if (notesData.projects[activeProjectId]) {
+            notesData.projects[activeProjectId].html = ta.innerHTML;
+        }
     }
-
+    
     scheduleNotesSave(); 
     renderDayTaskMarks(); 
     if (m === 'date') { 

@@ -625,11 +625,11 @@ body, html {
 
 /* 2. Líneas y margen del texto */
 #notes-main-textarea {
-    /* Línea dorada más fina (60% de opacidad) */
     border: 1px solid rgba(201, 167, 107, 0.6) !important; 
     padding-left: 25px !important;  
     padding-right: 25px !important;
-    border-radius: 10px !important; 
+    padding-bottom: 100px !important; /* Espacio extra para que el texto no choque con el adorno */
+    border-radius: 10px !important;  
     
     /* Sombra exterior muy gruesa y oscura (doble capa para más profundidad) */
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 5px 15px rgba(0, 0, 0, 0.6) !important; 
@@ -920,11 +920,11 @@ body.focus-mode #focus-frame {
 
 #notes-bottom-ornament {
     position: absolute;
-    bottom: -12px; /* Un poquito más abajo para que resalte al ser más grande */
+    bottom: -35px; /* Lo empuja hacia afuera del cajón */
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;   /* Más ancho */
-    height: 45px;  /* Más alto, manteniendo la proporción */
+    width: 80px;   
+    height: 45px;  
     
     background-color: #c9a76b; /* Color dorado */
     

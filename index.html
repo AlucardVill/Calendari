@@ -914,6 +914,45 @@ body.focus-mode #focus-frame {
     top: 50%; 
     transform: translateY(-50%); 
 }  
+/* =========================================
+   ADORNO INFERIOR (TIRADOR DE CAJÓN)
+   ========================================= */
+
+#notes-bottom-ornament {
+    position: absolute;
+    bottom: -10px; /* Lo asoma un poquito por debajo del cuadro */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;   /* Tamaño huella */
+    height: 35px;
+    
+    background-color: #c9a76b; /* Color dorado */
+    
+    -webkit-mask-image: url('adorno_bajo.svg');
+    mask-image: url('adorno_bajo.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    
+    cursor: grab;
+    touch-action: none; /* Evita que el teléfono haga scroll al arrastrar */
+    z-index: 100;
+}
+
+#notes-bottom-ornament:active {
+    cursor: grabbing;
+}
+
+/* Subimos un poco la barra de herramientas para que no choque con el adorno */
+.notes-format-toolbar {
+    bottom: 30px !important; 
+}
+.notes-time-btn {
+    bottom: 32px !important;
+}    
 </style>
 </head>
 <body>
@@ -1000,6 +1039,7 @@ body.focus-mode #focus-frame {
     </div>
 
     <button type="button" class="notes-time-btn" onclick="insertCurrentTimeInNotes()" title="Hora actual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+    <div id="notes-bottom-ornament" title="Mover notas"></div>
 </div>
 <div id="modal-content-timecalc" style="display:none;"><h3 style="color:var(--accent);margin-bottom:14px;">Calculadora</h3><div class="calc-mode-tabs"><button class="calc-mode-btn active" id="calc-mode-btn-interval" onclick="setCalcMode('interval')">Intervalo</button><button class="calc-mode-btn" id="calc-mode-btn-add" onclick="setCalcMode('add')">Sumar</button></div><div id="calc-interval-fields"><div class="tc-row" style="gap:12px;margin-bottom:10px;"><div class="tc-field"><label>Inicio</label><input type="time" id="inp-calc-start" oninput="calculateInterval()" onchange="calculateInterval()"></div><div class="tc-field"><label>Fin</label><input type="time" id="inp-calc-end" oninput="calculateInterval()" onchange="calculateInterval()"></div></div><div id="calc-result" style="margin:12px 0 0;padding:18px;background:var(--item-bg);border-radius:14px;text-align:center;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="color:var(--muted);font-size:0.82rem;">Ingresa ambas horas</span></div></div><div id="calc-add-fields" style="display:none;"><div class="tc-row" style="gap:12px;margin-bottom:10px;"><div class="tc-field"><label>Base</label><input type="time" id="inp-add-base" oninput="calculateAdd()" onchange="calculateAdd()"></div><div class="tc-field"><label>Horas</label><input type="number" id="inp-add-h" placeholder="0" min="0" max="999" oninput="calculateAdd()"></div></div><div class="tc-row" style="gap:12px;margin-bottom:10px;"><div class="tc-field" style="grid-column:span 2;"><label>Minutos</label><input type="number" id="inp-add-m" placeholder="0" min="0" max="999" oninput="calculateAdd()"></div></div><div id="calc-add-result" style="margin:12px 0 0;padding:18px;background:var(--item-bg);border-radius:14px;text-align:center;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="color:var(--muted);font-size:0.82rem;">Ingresa hora base</span></div></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div></div>
 <div id="modal-content-history" style="display:none;flex-direction:column;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><h3 style="color:var(--accent);margin:0;">Historial</h3><button class="btn btn-save" onclick="exportHistoryExcel()" style="padding:9px 16px;font-size:0.78rem;width:auto;flex:0 0 auto;">Excel</button></div><div id="history-list"></div><div class="modal-actions" style="margin-top:18px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div></div>
@@ -2041,6 +2081,57 @@ isInitialLoad = false;
 console.error("Error init:", e);
 alert("Error al iniciar. Recarga.");
 }
+// =========================================
+// LÓGICA PARA MOVER EL MODAL CON EL ADORNO INFERIOR
+// =========================================
+setTimeout(() => {
+    const ornament = document.getElementById('notes-bottom-ornament');
+    const modal = document.getElementById('main-modal-card');
+    
+    if (ornament && modal) {
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
+
+        ornament.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            isDragging = true;
+            
+            // Si el modal no está fijo, lo fijamos para poder moverlo
+            if (modal.style.position !== 'fixed') {
+                const rect = modal.getBoundingClientRect();
+                modal.style.position = 'fixed';
+                modal.style.margin = '0';
+                modal.style.top = rect.top + 'px';
+                modal.style.left = rect.left + 'px';
+            }
+
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = parseFloat(modal.style.left) || modal.getBoundingClientRect().left;
+            startTop = parseFloat(modal.style.top) || modal.getBoundingClientRect().top;
+            
+            // Capturar el puntero para que no se suelte
+            ornament.setPointerCapture(e.pointerId);
+        });
+
+        ornament.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            
+            modal.style.left = (startLeft + dx) + 'px';
+            modal.style.top = (startTop + dy) + 'px';
+        });
+
+        ornament.addEventListener('pointerup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            ornament.releasePointerCapture(e.pointerId);
+            // Guardar la nueva posición del modal
+            saveModalState(modal, getMainPanelStateKey());
+        });
+    }
+}, 500);    
 </script>
 </body>
 </html>

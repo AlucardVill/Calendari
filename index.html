@@ -855,9 +855,46 @@ body.focus-mode {
 .wiki-link:active {
     background: rgba(201, 167, 107, 0.2);
 }
+/* =========================================
+   MARCO DORADO CON PUNTOS (MODO CONCENTRACIÓN)
+   ========================================= */
+
+#focus-frame {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    inset: 12px; /* Separación de 12px de los bordes de la pantalla */
+    
+    /* Línea fina dorada, igual a la de las notas */
+    border: 1px solid rgba(201, 167, 107, 0.6); 
+    
+    pointer-events: none; /* No bloquea los toques */
+    z-index: 9000; /* Por encima del fondo, debajo de los modales */
+    
+    /* LA MAGIA DE LOS PUNTOS: 4 gradientes radiales en el centro de cada lado */
+    background-image: 
+        radial-gradient(circle, #c9a76b 2px, transparent 2.5px), /* Punto superior */
+        radial-gradient(circle, #c9a76b 2px, transparent 2.5px), /* Punto inferior */
+        radial-gradient(circle, #c9a76b 2px, transparent 2.5px), /* Punto izquierdo */
+        radial-gradient(circle, #c9a76b 2px, transparent 2.5px); /* Punto derecho */
+        
+    background-position: 
+        50% 0%,       /* Superior medio */
+        50% 100%,     /* Inferior medio */
+        0% 50%,       /* Izquierdo medio */
+        100% 50%;     /* Derecho medio */
+        
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+}
+
+/* Mostrar el marco solo cuando el modo concentración está activo */
+body.focus-mode #focus-frame {
+    display: block;
+}    
 </style>
 </head>
 <body>
+<div id="focus-frame"></div>
 <input type="color" id="hidden-box-color-picker" style="position:absolute;bottom:-9999px;left:-9999px;visibility:hidden;">
 <div id="floating-timer"><span id="floating-time">00:00</span><button id="floating-toggle-btn" class="floating-stop-btn"></button></div>
 <div class="header-top">
@@ -1392,30 +1429,64 @@ document.getElementById('notes-main-textarea').addEventListener('pointermove', (
     }
 });
 
-// Prevenir que los enlaces se borren con la tecla de retroceso
-document.getElementById('notes-main-textarea').addEventListener('beforeinput', (e) => {
-    if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+// =========================================
+// PROTECCIÓN ESTRICTA CONTRA BORRADO DE ENLACES
+// =========================================
+const taEl = document.getElementById('notes-main-textarea');
+
+// 1. Interceptar teclas físicas (Backspace y Delete)
+taEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' || e.key === 'Delete') {
         const sel = window.getSelection();
-        if (sel.rangeCount > 0) {
-            const range = sel.getRangeAt(0);
+        if (!sel.rangeCount) return;
+        const range = sel.getRangeAt(0);
+        
+        // Si hay texto seleccionado e incluye un enlace
+        if (!range.collapsed) {
+            const links = taEl.querySelectorAll('.wiki-link');
+            for (let link of links) {
+                if (range.intersectsNode(link)) {
+                    e.preventDefault(); 
+                    return;
+                }
+            }
+        } else {
+            // Si el cursor está justo al lado de un enlace
             let node = range.startContainer;
             if (node.nodeType === 3) node = node.parentNode;
-            
-            // Si estamos borrando un enlace, bloquear
-            if (node.classList && node.classList.contains('wiki-link')) {
+            if (node.closest && node.closest('.wiki-link')) {
                 e.preventDefault(); return;
             }
-            if (e.inputType === 'deleteContentBackward' && range.startOffset === 0) {
+            if (e.key === 'Backspace') {
                 let prev = node.previousSibling;
-                if (prev && prev.nodeType === 1 && prev.classList.contains('wiki-link')) {
-                    e.preventDefault();
+                if (prev && prev.nodeType === 1 && prev.classList.contains('wiki-link')) e.preventDefault();
+            } else if (e.key === 'Delete') {
+                let next = node.nextSibling;
+                if (next && next.nodeType === 1 && next.classList.contains('wiki-link')) e.preventDefault();
+            }
+        }
+    }
+});
+
+// 2. Interceptar el evento de entrada (para móviles que no usan keydown)
+taEl.addEventListener('beforeinput', (e) => {
+    if (e.inputType.startsWith('delete')) {
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return;
+        const range = sel.getRangeAt(0);
+        
+        if (!range.collapsed) {
+            const links = taEl.querySelectorAll('.wiki-link');
+            for (let link of links) {
+                if (range.intersectsNode(link)) {
+                    e.preventDefault(); return;
                 }
             }
-            if (e.inputType === 'deleteContentForward' && range.startOffset === node.childNodes.length) {
-                let next = node.nextSibling;
-                if (next && next.nodeType === 1 && next.classList.contains('wiki-link')) {
-                    e.preventDefault();
-                }
+        } else {
+            let node = range.startContainer;
+            if (node.nodeType === 3) node = node.parentNode;
+            if (node.closest && node.closest('.wiki-link')) {
+                e.preventDefault(); return;
             }
         }
     }

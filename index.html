@@ -628,8 +628,11 @@ body, html {
     border: 1px solid rgba(201, 167, 107, 0.6) !important; 
     padding-left: 25px !important;  
     padding-right: 25px !important;
-    padding-bottom: 100px !important; /* Espacio extra para que el texto no choque con el adorno */
-    border-radius: 10px !important;  
+    padding-bottom: 80px !important; 
+    border-radius: 10px !important; 
+    margin-bottom: 25px !important; /* Deja espacio para que el adorno se asome */
+    position: relative;
+    z-index: 2; /* Hace que la línea dorada esté por encima del adorno */
     
     /* Sombra exterior muy gruesa y oscura (doble capa para más profundidad) */
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 5px 15px rgba(0, 0, 0, 0.6) !important; 
@@ -952,7 +955,10 @@ body.focus-mode #focus-frame {
 }
 .notes-time-btn {
     bottom: 32px !important;
-}    
+} 
+#main-modal-card.notes-active {
+    overflow: visible !important;
+}
 </style>
 </head>
 <body>

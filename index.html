@@ -651,7 +651,7 @@ body, html {
     content: '';
     position: absolute;
     bottom: 0;
-    height: 25%;
+    height: 45%;
     width: 24px;
     /* Flor con la misma opacidad que la línea */
     background-color: rgba(201, 167, 107, 0.6); 
@@ -856,45 +856,68 @@ body.focus-mode {
     background: rgba(201, 167, 107, 0.2);
 }
 /* =========================================
-   MARCO DORADO CON PUNTOS (MODO CONCENTRACIÓN)
+   MARCO DORADO CON PUNTOS CENTRADOS
    ========================================= */
 
 #focus-frame {
-    display: none; /* Oculto por defecto */
+    display: none;
     position: fixed;
-    inset: 12px; /* Separación de 12px de los bordes de la pantalla */
-    
-    /* Línea fina dorada, igual a la de las notas */
-    border: 1px solid rgba(201, 167, 107, 0.6); 
-    
-    pointer-events: none; /* No bloquea los toques */
-    z-index: 9000; /* Por encima del fondo, debajo de los modales */
-    
-    /* LA MAGIA DE LOS PUNTOS: 4 gradientes radiales en el centro de cada lado */
-    background-image: 
-        radial-gradient(circle, #c9a76b 2px, transparent 2.5px), /* Punto superior */
-        radial-gradient(circle, #c9a76b 2px, transparent 2.5px), /* Punto inferior */
-        radial-gradient(circle, #c9a76b 2px, transparent 2.5px), /* Punto izquierdo */
-        radial-gradient(circle, #c9a76b 2px, transparent 2.5px); /* Punto derecho */
-        
-    background-position: 
-        50% 0%,       /* Superior medio */
-        50% 100%,     /* Inferior medio */
-        0% 50%,       /* Izquierdo medio */
-        100% 50%;     /* Derecho medio */
-        
-    background-size: 6px 6px;
-    background-repeat: no-repeat;
+    inset: 12px;
+    border: 1px solid rgba(201, 167, 107, 0.6);
+    pointer-events: none;
+    z-index: 9000;
+    box-sizing: border-box;
 }
 
-/* Mostrar el marco solo cuando el modo concentración está activo */
 body.focus-mode #focus-frame {
     display: block;
-}    
+}
+
+/* Creamos los 4 puntos exactamente sobre la línea */
+#focus-frame::before,
+#focus-frame::after,
+#focus-frame > div::before,
+#focus-frame > div::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background-color: #c9a76b;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* Punto Superior (centrado en la línea de arriba) */
+#focus-frame::before { 
+    top: -3.5px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+}
+
+/* Punto Inferior (centrado en la línea de abajo) */
+#focus-frame::after { 
+    bottom: -3.5px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+}
+
+/* Punto Izquierdo (centrado en la línea izquierda) */
+#focus-frame > div::before { 
+    left: -3.5px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+}
+
+/* Punto Derecho (centrado en la línea derecha) */
+#focus-frame > div::after { 
+    right: -3.5px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+}  
 </style>
 </head>
 <body>
-<div id="focus-frame"></div>
+<div id="focus-frame"><div></div></div>
 <input type="color" id="hidden-box-color-picker" style="position:absolute;bottom:-9999px;left:-9999px;visibility:hidden;">
 <div id="floating-timer"><span id="floating-time">00:00</span><button id="floating-toggle-btn" class="floating-stop-btn"></button></div>
 <div class="header-top">
@@ -1285,19 +1308,22 @@ function renderBreadcrumbs() {
     const nav = document.getElementById('notes-project-nav');
     if (!nav) return;
     
-    // En la raíz principal no mostramos nada en el directorio
-    if (activeProjectId === 'proj_root') {
-        nav.innerHTML = '';
-        return;
+    // Siempre mostramos "Directorio" como el primer enlace
+    let breadcrumbHtml = `<span class="breadcrumb-link ${activeProjectId === 'proj_root' ? 'active' : ''}" onclick="navigateToBreadcrumb('proj_root')">Directorio</span>`;
+    
+    const nonRoots = projectPath.filter(id => id !== 'proj_root');
+    
+    if (nonRoots.length > 0) {
+        breadcrumbHtml += '<span class="breadcrumb-sep">›</span>';
+        breadcrumbHtml += nonRoots.map((id, index, arr) => {
+            const proj = notesData.projects[id];
+            const name = proj ? proj.name : '?';
+            const isLast = index === arr.length - 1;
+            return `<span class="breadcrumb-link ${isLast ? 'active' : ''}" onclick="navigateToBreadcrumb('${id}')">${escapeHtml(name)}</span>`;
+        }).join('<span class="breadcrumb-sep">›</span>');
     }
     
-    // Generar la ruta: Filosofía > Estoicismo
-    nav.innerHTML = projectPath.filter(id => id !== 'proj_root').map((id, index, arr) => {
-        const proj = notesData.projects[id];
-        const name = proj ? proj.name : '?';
-        const isLast = index === arr.length - 1;
-        return `<span class="breadcrumb-link ${isLast ? 'active' : ''}" onclick="navigateToBreadcrumb('${id}')">${escapeHtml(name)}</span>`;
-    }).join('<span class="breadcrumb-sep">›</span>');
+    nav.innerHTML = breadcrumbHtml;
     
     // Desplazar la ruta hacia la derecha si es muy larga
     nav.scrollLeft = nav.scrollWidth;

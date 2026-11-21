@@ -1554,25 +1554,57 @@ taEl.addEventListener('keydown', (e) => {
     }
 });
 
-// 2. Interceptar el evento de entrada (para móviles que no usan keydown)
-taEl.addEventListener('beforeinput', (e) => {
-    if (e.inputType.startsWith('delete')) {
+// =========================================
+// PROTECCIÓN ESTRICTA DE HIPERVÍNCULOS
+// =========================================
+document.getElementById('notes-main-textarea').addEventListener('beforeinput', function(e) {
+    if (e.inputType && (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward')) {
         const sel = window.getSelection();
         if (!sel.rangeCount) return;
         const range = sel.getRangeAt(0);
-        
+
+        // Si hay texto seleccionado y toca un enlace
         if (!range.collapsed) {
-            const links = taEl.querySelectorAll('.wiki-link');
+            const links = this.querySelectorAll('.wiki-link');
             for (let link of links) {
                 if (range.intersectsNode(link)) {
-                    e.preventDefault(); return;
+                    e.preventDefault(); 
+                    return;
                 }
             }
         } else {
+            // Si el cursor está justo antes o después de un enlace
             let node = range.startContainer;
-            if (node.nodeType === 3) node = node.parentNode;
-            if (node.closest && node.closest('.wiki-link')) {
-                e.preventDefault(); return;
+            
+            // Si el cursor está en un nodo de texto
+            if (node.nodeType === 3) {
+                if (e.inputType === 'deleteContentBackward' && range.startOffset === 0) {
+                    let prev = node.previousSibling;
+                    if (prev && prev.classList && prev.classList.contains('wiki-link')) {
+                        e.preventDefault(); return;
+                    }
+                }
+                if (e.inputType === 'deleteContentForward' && range.startOffset === node.length) {
+                    let next = node.nextSibling;
+                    if (next && next.classList && next.classList.contains('wiki-link')) {
+                        e.preventDefault(); return;
+                    }
+                }
+            } 
+            // Si el cursor está en el contenedor principal
+            else if (node.nodeType === 1) {
+                if (e.inputType === 'deleteContentBackward') {
+                    let prev = node.childNodes[range.startOffset - 1];
+                    if (prev && prev.classList && prev.classList.contains('wiki-link')) {
+                        e.preventDefault(); return;
+                    }
+                }
+                if (e.inputType === 'deleteContentForward') {
+                    let next = node.childNodes[range.startOffset];
+                    if (next && next.classList && next.classList.contains('wiki-link')) {
+                        e.preventDefault(); return;
+                    }
+                }
             }
         }
     }
@@ -2101,18 +2133,10 @@ isInitialLoad = false;
 console.error("Error init:", e);
 alert("Error al iniciar. Recarga.");
 }
-// =========================================
-// LÓGICA PARA MOVER EL MODAL CON EL ADORNO INFERIOR
-// =========================================
-setTimeout(() => {
-    const ornament = document.getElementById('notes-bottom-ornament');
-    const modal = document.getElementById('main-modal-card');
-    
-    if (ornament && modal) {
-        let isDragging = false;
-        let startX, startY, startLeft, startTop;
-
         ornament.addEventListener('pointerdown', (e) => {
+            // SI EL MODAL ESTÁ BLOQUEADO (CANDADO ACTIVO), NO PERMITIR EL ARRASTRE
+            if (notesPinned) return; 
+
             e.preventDefault();
             isDragging = true;
             

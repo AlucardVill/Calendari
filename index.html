@@ -1076,7 +1076,6 @@ body.focus-mode #focus-frame {
 
     <div class="notes-format-toolbar" style="margin:0;">
 <button type="button" class="notes-format-btn" id="btn-font-cycle" onmousedown="event.preventDefault()" onclick="cycleFont()" style="font-family:Georgia, serif; font-weight:600; width:32px;">Aa</button>
-<button type="button" class="notes-format-btn" id="btn-size-cycle" onmousedown="event.preventDefault()" onclick="cycleSize()" style="width:32px; font-weight:700;">A</button>
         <button type="button" class="notes-format-btn" style="font-weight:900;font-family:serif;" onmousedown="event.preventDefault()" onclick="formatDoc('bold')">B</button>
         <button type="button" class="notes-format-btn" style="text-decoration:underline;font-weight:600;" onmousedown="event.preventDefault()" onclick="formatDoc('underline')">U</button>
 <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('justifyFull')" title="Justificar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 6H3M21 12H3M21 18H3"/></svg></button>
@@ -1703,11 +1702,18 @@ function formatDoc(cmd, val) {
             if (sel) { sel.removeAllRanges(); sel.addRange(range); }
         }
 
-        if (range && !range.collapsed) {
+               if (range && !range.collapsed) {
             const span = document.createElement('span');
-            if (cmd === 'fontName') span.style.fontFamily = val;
-            if (cmd === 'fontSize') span.style.fontSize = val || '1rem'; // 1rem es el tamaño normal
+            span.style.fontFamily = val;
             
+            // SI ES PINYON SCRIPT, LE DAMOS UN TAMAÑO GRANDE POR DEFECTO
+            if (val.includes('Pinyon Script')) {
+                span.style.fontSize = '2rem'; /* Tamaño de título */
+                span.style.lineHeight = '1.4';
+                span.style.display = 'inline-block';
+                span.style.paddingBottom = '6px';
+            }
+
             try { range.surroundContents(span); } 
             catch(e) { 
                 const frag = range.extractContents(); 
@@ -2234,8 +2240,6 @@ setTimeout(() => {
 // =========================================
 let currentFontIdx = 0;
 const FONTS = ['system-ui, sans-serif', 'serif', 'monospace', "'Pinyon Script', cursive"];
-let currentSizeIdx = 0;
-const SIZES = ['', '1.2rem', '1.5rem', '2rem'];
 
 function cycleFont() {
     currentFontIdx = (currentFontIdx + 1) % FONTS.length;
@@ -2243,7 +2247,7 @@ function cycleFont() {
     if (btn) {
         if (currentFontIdx === 3) {
             btn.style.fontFamily = "'Pinyon Script', cursive";
-            btn.style.fontSize = '1.2rem';
+            btn.style.fontSize = '1.6rem'; /* Botón más grande para la cursiva */
             btn.innerText = 'Aa';
         } else if (currentFontIdx === 1) {
             btn.style.fontFamily = 'serif';
@@ -2260,15 +2264,6 @@ function cycleFont() {
         }
     }
     formatDoc('fontName', FONTS[currentFontIdx]);
-}
-
-function cycleSize() {
-    currentSizeIdx = (currentSizeIdx + 1) % SIZES.length;
-    const btn = document.getElementById('btn-size-cycle');
-    if (btn) {
-        btn.innerText = currentSizeIdx === 0 ? 'A' : (currentSizeIdx === 1 ? 'A+' : (currentSizeIdx === 2 ? 'A++' : 'A+++'));
-    }
-    formatDoc('fontSize', SIZES[currentSizeIdx]);
 }
 </script>
 </body>

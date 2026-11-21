@@ -1548,7 +1548,7 @@ document.getElementById('notes-main-textarea').addEventListener('pointermove', (
 // PROTECCIÓN ESTRICTA CONTRA BORRADO DE ENLACES
 // =========================================
 // =========================================
-// PROTECCIÓN ESTRICTA DE HIPERVÍNCULOS
+// PROTECCIÓN TOTAL CONTRA BORRADO DE ENLACES
 // =========================================
 document.getElementById('notes-main-textarea').addEventListener('beforeinput', function(e) {
     if (e.inputType && (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward')) {
@@ -1556,7 +1556,7 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
         if (!sel.rangeCount) return;
         const range = sel.getRangeAt(0);
 
-        // Si hay texto seleccionado y toca un enlace
+        // 1. Si hay texto seleccionado, verificar si toca algún enlace
         if (!range.collapsed) {
             const links = this.querySelectorAll('.wiki-link');
             for (let link of links) {
@@ -1565,34 +1565,41 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
                     return;
                 }
             }
-        } else {
-            // Si el cursor está justo antes o después de un enlace
+        } 
+        // 2. Si el cursor está solo (sin selección)
+        else {
             let node = range.startContainer;
             
-            if (node.nodeType === 3) { // Si es un nodo de texto
-                if (e.inputType === 'deleteContentBackward' && range.startOffset === 0) {
+            // Comprobamos si el propio nodo donde está el cursor es un enlace
+            if (node.nodeType === 1 && node.classList.contains('wiki-link')) {
+                e.preventDefault(); return;
+            }
+            if (node.parentElement && node.parentElement.classList.contains('wiki-link')) {
+                e.preventDefault(); return;
+            }
+
+            if (e.inputType === 'deleteContentBackward') {
+                // Si estamos en un nodo de texto al principio de la línea
+                if (node.nodeType === 3 && range.startOffset === 0) {
                     let prev = node.previousSibling;
-                    if (prev && prev.classList && prev.classList.contains('wiki-link')) {
+                    if (prev && (prev.classList?.contains('wiki-link') || prev.querySelector?.('.wiki-link'))) {
                         e.preventDefault(); return;
                     }
-                }
-                if (e.inputType === 'deleteContentForward' && range.startOffset === node.length) {
-                    let next = node.nextSibling;
-                    if (next && next.classList && next.classList.contains('wiki-link')) {
+                } 
+                // Si estamos en un párrafo/div vacío al principio (El caso de presionar Enter)
+                else if (node.nodeType === 1 && range.startOffset === 0) {
+                    let prev = node.previousSibling;
+                    // Revisa si el hermano anterior ES el enlace o CONTIENE el enlace
+                    if (prev && (prev.classList?.contains('wiki-link') || prev.querySelector?.('.wiki-link'))) {
                         e.preventDefault(); return;
                     }
                 }
             } 
-            else if (node.nodeType === 1) { // Si es un contenedor
-                if (e.inputType === 'deleteContentBackward') {
-                    let prev = node.childNodes[range.startOffset - 1];
-                    if (prev && prev.classList && prev.classList.contains('wiki-link')) {
-                        e.preventDefault(); return;
-                    }
-                }
-                if (e.inputType === 'deleteContentForward') {
-                    let next = node.childNodes[range.startOffset];
-                    if (next && next.classList && next.classList.contains('wiki-link')) {
+            // (Opcional) Proteger el borrado hacia adelante (tecla Supr)
+            else if (e.inputType === 'deleteContentForward') {
+                if (node.nodeType === 3 && range.startOffset === node.length) {
+                    let next = node.nextSibling;
+                    if (next && (next.classList?.contains('wiki-link') || next.querySelector?.('.wiki-link'))) {
                         e.preventDefault(); return;
                     }
                 }

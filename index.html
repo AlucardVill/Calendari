@@ -937,6 +937,20 @@ body.focus-mode #focus-frame {
     display: inline-block;
     padding-top: 4px;
     padding-bottom: 2px;
+}
+/* =========================================
+   BARRA DE HERRAMIENTAS AUTO-OCULTABLE
+   ========================================= */
+
+.notes-format-toolbar {
+    transition: opacity 0.3s ease, transform 0.3s ease !important;
+}
+
+/* Clase que oculta la barra */
+.notes-format-toolbar.toolbar-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important; /* Evita que se pulse por accidente si está invisible */
+    transform: translate(-50%, 30px) !important; /* Se hunde un poco hacia abajo al desaparecer */
 }    
 </style>
 </head>
@@ -2164,6 +2178,61 @@ setTimeout(() => {
         hideToolbar();
     });
 }, 500); // Pequeño retraso para asegurar que los elementos ya cargaron
+    // =========================================
+// LÓGICA PARA MOSTRAR/OCULTAR LA BARRA DE HERRAMIENTAS
+// =========================================
+setTimeout(() => {
+    const toolbar = document.querySelector('.notes-format-toolbar');
+    const ta = document.getElementById('notes-main-textarea');
+
+    if (!toolbar || !ta) return;
+
+    // 1. Función para MOSTRAR la barra
+    const showToolbar = () => {
+        toolbar.classList.remove('toolbar-hidden');
+    };
+
+    // 2. Función para OCULTAR la barra
+    const hideToolbar = () => {
+        // No ocultar si el usuario tiene texto seleccionado (podría querer darle formato)
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ta.contains(sel.anchorNode)) return;
+        toolbar.classList.add('toolbar-hidden');
+    };
+
+    // 3. Mostrar al tocar o enfocar el área de texto
+    ta.addEventListener('focus', showToolbar);
+    ta.addEventListener('pointerdown', showToolbar);
+    
+    // 4. Mostrar al seleccionar texto
+    document.addEventListener('selectionchange', () => {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ta.contains(sel.anchorNode)) {
+            showToolbar();
+        }
+    });
+
+    // 5. Ocultar al tocar fuera del área de texto y de la barra
+    document.addEventListener('pointerdown', (e) => {
+        // Si el toque fue en la barra, en el área de texto, en el reloj o en el adorno, no ocultar
+        if (e.target.closest('.notes-format-toolbar') || 
+            e.target.closest('#notes-main-textarea') || 
+            e.target.closest('.notes-time-btn') || 
+            e.target.closest('#notes-bottom-ornament')) {
+            return;
+        }
+        hideToolbar();
+    });
+
+    // 6. (Opcional para Computadora) Mostrar al pasar el ratón por la zona inferior
+    ta.addEventListener('mouseover', (e) => {
+        // Si el ratón está en el último 20% del cuadro de texto, mostrar
+        const rect = ta.getBoundingClientRect();
+        if (e.clientY > rect.bottom - (rect.height * 0.2)) {
+            showToolbar();
+        }
+    });
+}, 500); // Pequeño retraso para asegurar que todo cargó bien
 </script>
 </body>
 </html>

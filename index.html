@@ -1545,64 +1545,80 @@ document.getElementById('notes-main-textarea').addEventListener('pointermove', (
 });
 
 // =========================================
-// PROTECCIÓN ESTRICTA CONTRA BORRADO DE ENLACES
-// =========================================
-// =========================================
-// PROTECCIÓN TOTAL CONTRA BORRADO DE ENLACES
+// PROTECCIÓN ABSOLUTA CONTRA BORRADO DE ENLACES
 // =========================================
 document.getElementById('notes-main-textarea').addEventListener('beforeinput', function(e) {
-    if (e.inputType && (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward')) {
-        const sel = window.getSelection();
-        if (!sel.rangeCount) return;
-        const range = sel.getRangeAt(0);
+    if (!e.inputType || !e.inputType.includes('delete')) return;
+    
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
 
-        // 1. Si hay texto seleccionado, verificar si toca algún enlace
-        if (!range.collapsed) {
-            const links = this.querySelectorAll('.wiki-link');
-            for (let link of links) {
-                if (range.intersectsNode(link)) {
-                    e.preventDefault(); 
-                    return;
-                }
+    // Función auxiliar para saber si un nodo es un enlace o lo contiene
+    const isLinkNode = (n) => {
+        if (!n) return false;
+        // Si es un elemento
+        if (n.nodeType === 1) {
+            return n.classList.contains('wiki-link') || 
+                   n.querySelector('.wiki-link') !== null;
+        }
+        // Si es texto, revisar si su padre es un enlace
+        if (n.nodeType === 3) {
+            return n.parentElement && n.parentElement.closest('.wiki-link') !== null;
+        }
+        return false;
+    };
+
+    // 1. Si hay texto seleccionado
+    if (!range.collapsed) {
+        const links = this.querySelectorAll('.wiki-link');
+        for (let link of links) {
+            if (range.intersectsNode(link)) {
+                e.preventDefault(); return;
             }
-        } 
-        // 2. Si el cursor está solo (sin selección)
-        else {
-            let node = range.startContainer;
+        }
+        return; // Si no toca enlaces, permitir borrar normal
+    }
+
+    // 2. Si el cursor está solo (sin selección)
+    let node = range.startContainer;
+    let offset = range.startOffset;
+
+    // A) Si el cursor está DENTRO de un enlace
+    if (isLinkNode(node)) { e.preventDefault(); return; }
+
+    // B) Retroceso (Backspace)
+    if (e.inputType === 'deleteContentBackward') {
+        // Si estamos al principio de un nodo o línea
+        if (offset === 0) {
+            let block = node.nodeType === 3 ? node.parentNode : node;
+            let prevBlock = block.previousElementSibling;
             
-            // Comprobamos si el propio nodo donde está el cursor es un enlace
-            if (node.nodeType === 1 && node.classList.contains('wiki-link')) {
+            // Si el bloque anterior termina en un enlace
+            if (prevBlock && (isLinkNode(prevBlock) || isLinkNode(prevBlock.lastElementChild) || isLinkNode(prevBlock.lastChild))) {
                 e.preventDefault(); return;
             }
-            if (node.parentElement && node.parentElement.classList.contains('wiki-link')) {
+            // Si el hermano inmediato anterior es un enlace
+            if (node.nodeType === 1 && isLinkNode(node.previousSibling)) {
                 e.preventDefault(); return;
             }
-
-            if (e.inputType === 'deleteContentBackward') {
-                // Si estamos en un nodo de texto al principio de la línea
-                if (node.nodeType === 3 && range.startOffset === 0) {
-                    let prev = node.previousSibling;
-                    if (prev && (prev.classList?.contains('wiki-link') || prev.querySelector?.('.wiki-link'))) {
-                        e.preventDefault(); return;
-                    }
-                } 
-                // Si estamos en un párrafo/div vacío al principio (El caso de presionar Enter)
-                else if (node.nodeType === 1 && range.startOffset === 0) {
-                    let prev = node.previousSibling;
-                    // Revisa si el hermano anterior ES el enlace o CONTIENE el enlace
-                    if (prev && (prev.classList?.contains('wiki-link') || prev.querySelector?.('.wiki-link'))) {
-                        e.preventDefault(); return;
-                    }
-                }
-            } 
-            // (Opcional) Proteger el borrado hacia adelante (tecla Supr)
-            else if (e.inputType === 'deleteContentForward') {
-                if (node.nodeType === 3 && range.startOffset === node.length) {
-                    let next = node.nextSibling;
-                    if (next && (next.classList?.contains('wiki-link') || next.querySelector?.('.wiki-link'))) {
-                        e.preventDefault(); return;
-                    }
-                }
+        }
+    } 
+    
+    // C) Suprimir (Delete)
+    if (e.inputType === 'deleteContentForward') {
+        // Si estamos al final de un nodo o línea
+        if ((node.nodeType === 3 && offset === node.length) || (node.nodeType === 1 && offset === node.childNodes.length)) {
+            let block = node.nodeType === 3 ? node.parentNode : node;
+            let nextBlock = block.nextElementSibling;
+            
+            // Si el bloque siguiente empieza con un enlace
+            if (nextBlock && (isLinkNode(nextBlock) || isLinkNode(nextBlock.firstElementChild) || isLinkNode(nextBlock.firstChild))) {
+                e.preventDefault(); return;
+            }
+            // Si el hermano inmediato siguiente es un enlace
+            if (node.nodeType === 1 && isLinkNode(node.nextSibling)) {
+                e.preventDefault(); return;
             }
         }
     }

@@ -1001,6 +1001,27 @@ body.focus-mode #focus-frame {
     width: 28px !important;
     height: 28px !important;
 }
+/* Estilo para las listas con viñetas */
+#notes-main-textarea ul {
+    list-style-type: none;
+    padding-left: 20px;
+    margin: 8px 0;
+}
+
+#notes-main-textarea ul li {
+    position: relative;
+    padding-left: 15px;
+    margin-bottom: 4px;
+}
+
+#notes-main-textarea ul li::before {
+    content: '•';
+    color: #c9a76b; /* Color dorado de tu app */
+    font-size: 1.2rem;
+    position: absolute;
+    left: 0;
+    top: -2px;
+}
 </style>
 </head>
 <body>
@@ -1084,6 +1105,7 @@ body.focus-mode #focus-frame {
         <button type="button" class="notes-format-btn" id="btn-text-color" onmousedown="handleTextColorDown(event)" onmouseup="handleTextColorUp(event)" ontouchstart="event.preventDefault(); handleTextColorDown(event)" ontouchend="event.preventDefault(); handleTextColorUp(event)"title="Color de texto" style="font-family: serif; font-weight: 900; position: relative;">A</button>
         <button type="button" class="notes-format-btn" id="btn-highlighter" onmousedown="handleHighlighterDown(event)" onmouseup="handleHighlighterUp(event)"ontouchstart="event.preventDefault(); handleHighlighterDown(event)" ontouchend="event.preventDefault(); handleHighlighterUp(event)"  title="Resaltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></button>
     <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="insertWikiLink()" title="Enlazar nota"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+   <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('insertUnorderedList')" title="Lista con viñetas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="5" cy="12" r="1.5"/><circle cx="5" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="6" x2="20" y2="6"/><line x1="10" y1="18" x2="20" y2="18"/></svg></button>
     </div>
 
     <button type="button" class="notes-time-btn" onclick="insertCurrentTimeInNotes()" title="Hora actual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
@@ -1553,22 +1575,17 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
     if (!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
 
-    // Función auxiliar para saber si un nodo es un enlace o lo contiene
     const isLinkNode = (n) => {
         if (!n) return false;
-        // Si es un elemento
         if (n.nodeType === 1) {
-            return n.classList.contains('wiki-link') || 
-                   n.querySelector('.wiki-link') !== null;
+            return n.classList.contains('wiki-link') || n.querySelector('.wiki-link') !== null;
         }
-        // Si es texto, revisar si su padre es un enlace
         if (n.nodeType === 3) {
             return n.parentElement && n.parentElement.closest('.wiki-link') !== null;
         }
         return false;
     };
 
-    // 1. Si hay texto seleccionado
     if (!range.collapsed) {
         const links = this.querySelectorAll('.wiki-link');
         for (let link of links) {
@@ -1576,46 +1593,42 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
                 e.preventDefault(); return;
             }
         }
-        return; // Si no toca enlaces, permitir borrar normal
+        return;
     }
 
-    // 2. Si el cursor está solo (sin selección)
     let node = range.startContainer;
     let offset = range.startOffset;
 
-    // A) Si el cursor está DENTRO de un enlace
     if (isLinkNode(node)) { e.preventDefault(); return; }
 
-    // B) Retroceso (Backspace)
+    // NUEVO: Si el enlace es el primer hijo del contenedor y el cursor está al inicio
+    const firstChild = this.firstChild;
+    if (e.inputType === 'deleteContentBackward' && offset === 0 && firstChild && isLinkNode(firstChild)) {
+        if (node === this || (node.nodeType === 1 && node.parentNode === this && node === firstChild)) {
+            e.preventDefault(); return;
+        }
+    }
+
     if (e.inputType === 'deleteContentBackward') {
-        // Si estamos al principio de un nodo o línea
         if (offset === 0) {
             let block = node.nodeType === 3 ? node.parentNode : node;
             let prevBlock = block.previousElementSibling;
-            
-            // Si el bloque anterior termina en un enlace
             if (prevBlock && (isLinkNode(prevBlock) || isLinkNode(prevBlock.lastElementChild) || isLinkNode(prevBlock.lastChild))) {
                 e.preventDefault(); return;
             }
-            // Si el hermano inmediato anterior es un enlace
             if (node.nodeType === 1 && isLinkNode(node.previousSibling)) {
                 e.preventDefault(); return;
             }
         }
     } 
-    
-    // C) Suprimir (Delete)
+
     if (e.inputType === 'deleteContentForward') {
-        // Si estamos al final de un nodo o línea
         if ((node.nodeType === 3 && offset === node.length) || (node.nodeType === 1 && offset === node.childNodes.length)) {
             let block = node.nodeType === 3 ? node.parentNode : node;
             let nextBlock = block.nextElementSibling;
-            
-            // Si el bloque siguiente empieza con un enlace
             if (nextBlock && (isLinkNode(nextBlock) || isLinkNode(nextBlock.firstElementChild) || isLinkNode(nextBlock.firstChild))) {
                 e.preventDefault(); return;
             }
-            // Si el hermano inmediato siguiente es un enlace
             if (node.nodeType === 1 && isLinkNode(node.nextSibling)) {
                 e.preventDefault(); return;
             }
@@ -1693,7 +1706,8 @@ function formatDoc(cmd, val) {
     restoreSelection(); 
     
     // Lógica para Fuente y Tamaño (envuelve en <span>)
-    if (cmd === 'fontName' || cmd === 'fontSize') {
+       // Lógica para Fuente (envuelve en <span> y limpia estilos viejos)
+    if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
         
@@ -1702,28 +1716,50 @@ function formatDoc(cmd, val) {
             if (sel) { sel.removeAllRanges(); sel.addRange(range); }
         }
 
-               if (range && !range.collapsed) {
+        if (range && !range.collapsed) {
+            // 1. Clonar el contenido seleccionado
+            const frag = range.cloneContents();
+            const tempDiv = document.createElement('div');
+            tempDiv.appendChild(frag);
+
+            // 2. Limpiar CUALQUIER tamaño o fuente anterior de los hijos
+            tempDiv.querySelectorAll('span').forEach(s => {
+                s.style.fontSize = '';
+                s.style.lineHeight = '';
+                s.style.display = '';
+                s.style.paddingBottom = '';
+                s.style.fontFamily = ''; 
+            });
+
+            // 3. Reemplazar el contenido original con la versión limpia
+            range.deleteContents();
+            range.insertNode(tempDiv);
+
+            // 4. Envolver todo en un nuevo span con la nueva fuente
             const span = document.createElement('span');
             span.style.fontFamily = val;
             
-            // SI ES PINYON SCRIPT, LE DAMOS UN TAMAÑO GRANDE POR DEFECTO
+            // Tamaño por defecto para Pinyon Script
             if (val.includes('Pinyon Script')) {
-                span.style.fontSize = '2rem'; /* Tamaño de título */
+                span.style.fontSize = '2rem';
                 span.style.lineHeight = '1.4';
                 span.style.display = 'inline-block';
                 span.style.paddingBottom = '6px';
             }
 
-            try { range.surroundContents(span); } 
-            catch(e) { 
-                const frag = range.extractContents(); 
-                span.appendChild(frag); 
-                range.insertNode(span); 
+            // Mover el contenido limpio dentro del nuevo span
+            while (tempDiv.firstChild) {
+                span.appendChild(tempDiv.firstChild);
             }
-            
+            tempDiv.parentNode.replaceChild(span, tempDiv);
+
+            // 5. Volver a seleccionar el texto modificado
             const nr = document.createRange();
             nr.selectNodeContents(span);
             if (sel) { sel.removeAllRanges(); sel.addRange(nr); }
+        } else {
+            document.execCommand('styleWithCSS', false, false);
+            document.execCommand('fontName', false, val);
         }
     } 
     // Formatos Básicos

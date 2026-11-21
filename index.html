@@ -951,7 +951,7 @@ body.focus-mode #focus-frame {
     opacity: 0 !important;
     pointer-events: none !important; /* Evita que se pulse por accidente si está invisible */
     transform: translate(-50%, 30px) !important; /* Se hunde un poco hacia abajo al desaparecer */
-} 
+}  
 /* =========================================
    BOTONES DE FUENTE Y TAMAÑO SIN FLECHAS
    ========================================= */
@@ -2158,55 +2158,7 @@ setTimeout(() => {
         });
     }
 }, 500);
-// =========================================
-// LÓGICA PARA AUTO-OCULTAR LA BARRA DE FUNCIONES
-// =========================================
-setTimeout(() => {
-    const toolbar = document.querySelector('.notes-format-toolbar');
-    const ta = document.getElementById('notes-main-textarea');
-
-    if (!toolbar || !ta) return;
-
-    // Función para mostrar la barra
-    const showToolbar = () => {
-        toolbar.classList.remove('toolbar-hidden');
-    };
-
-    // Función para ocultar la barra
-    const hideToolbar = () => {
-        // No ocultar si el usuario tiene texto seleccionado (podría querer darle formato)
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ta.contains(sel.anchorNode)) return;
-        toolbar.classList.add('toolbar-hidden');
-    };
-
-    // 1. Mostrar al tocar o enfocar el área de texto
-    ta.addEventListener('focus', showToolbar);
-    ta.addEventListener('pointerdown', showToolbar);
-
-    // 2. Mostrar al seleccionar texto
-    document.addEventListener('selectionchange', () => {
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ta.contains(sel.anchorNode)) {
-            showToolbar();
-        }
-    });
-
-    // 3. Ocultar al tocar fuera del área de texto y de la barra
-    document.addEventListener('pointerdown', (e) => {
-        // Si el toque fue en la barra o en el área de texto, no hacer nada
-        if (e.target.closest('.notes-format-toolbar') || e.target.closest('#notes-main-textarea')) {
-            return;
-        }
-        // Si el toque fue en el botón del reloj o el adorno, no ocultar
-        if (e.target.closest('.notes-time-btn') || e.target.closest('#notes-bottom-ornament')) {
-            return;
-        }
-        hideToolbar();
-    });
-}, 500); // Pequeño retraso para asegurar que los elementos ya cargaron
-    // =========================================
-// =========================================
+ // =========================================
 // LÓGICA PARA MOSTRAR/OCULTAR LA BARRA DE HERRAMIENTAS
 // =========================================
 setTimeout(() => {
@@ -2248,12 +2200,9 @@ setTimeout(() => {
         }
         hideToolbar();
     });
-
-    // Ocultar por defecto al abrir las notas
+// Ocultar por defecto al abrir las notas
     hideToolbar();
-
 }, 500);
-}, 500); // Pequeño retraso para asegurar que todo cargó bien
 </script>
 </body>
 </html>

@@ -1518,42 +1518,6 @@ document.getElementById('notes-main-textarea').addEventListener('pointermove', (
 // =========================================
 // PROTECCIÓN ESTRICTA CONTRA BORRADO DE ENLACES
 // =========================================
-const taEl = document.getElementById('notes-main-textarea');
-
-// 1. Interceptar teclas físicas (Backspace y Delete)
-taEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Backspace' || e.key === 'Delete') {
-        const sel = window.getSelection();
-        if (!sel.rangeCount) return;
-        const range = sel.getRangeAt(0);
-        
-        // Si hay texto seleccionado e incluye un enlace
-        if (!range.collapsed) {
-            const links = taEl.querySelectorAll('.wiki-link');
-            for (let link of links) {
-                if (range.intersectsNode(link)) {
-                    e.preventDefault(); 
-                    return;
-                }
-            }
-        } else {
-            // Si el cursor está justo al lado de un enlace
-            let node = range.startContainer;
-            if (node.nodeType === 3) node = node.parentNode;
-            if (node.closest && node.closest('.wiki-link')) {
-                e.preventDefault(); return;
-            }
-            if (e.key === 'Backspace') {
-                let prev = node.previousSibling;
-                if (prev && prev.nodeType === 1 && prev.classList.contains('wiki-link')) e.preventDefault();
-            } else if (e.key === 'Delete') {
-                let next = node.nextSibling;
-                if (next && next.nodeType === 1 && next.classList.contains('wiki-link')) e.preventDefault();
-            }
-        }
-    }
-});
-
 // =========================================
 // PROTECCIÓN ESTRICTA DE HIPERVÍNCULOS
 // =========================================
@@ -1576,8 +1540,7 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
             // Si el cursor está justo antes o después de un enlace
             let node = range.startContainer;
             
-            // Si el cursor está en un nodo de texto
-            if (node.nodeType === 3) {
+            if (node.nodeType === 3) { // Si es un nodo de texto
                 if (e.inputType === 'deleteContentBackward' && range.startOffset === 0) {
                     let prev = node.previousSibling;
                     if (prev && prev.classList && prev.classList.contains('wiki-link')) {
@@ -1591,8 +1554,7 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
                     }
                 }
             } 
-            // Si el cursor está en el contenedor principal
-            else if (node.nodeType === 1) {
+            else if (node.nodeType === 1) { // Si es un contenedor
                 if (e.inputType === 'deleteContentBackward') {
                     let prev = node.childNodes[range.startOffset - 1];
                     if (prev && prev.classList && prev.classList.contains('wiki-link')) {
@@ -2133,10 +2095,19 @@ isInitialLoad = false;
 console.error("Error init:", e);
 alert("Error al iniciar. Recarga.");
 }
-        ornament.addEventListener('pointerdown', (e) => {
-            // SI EL MODAL ESTÁ BLOQUEADO (CANDADO ACTIVO), NO PERMITIR EL ARRASTRE
-            if (notesPinned) return; 
+// =========================================
+// LÓGICA PARA MOVER EL MODAL CON EL ADORNO INFERIOR
+// =========================================
+setTimeout(() => {
+    const ornament = document.getElementById('notes-bottom-ornament');
+    const modal = document.getElementById('main-modal-card');
+    
+    if (ornament && modal) {
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
 
+         ornament.addEventListener('pointerdown', (e) => {
+            if (notesPinned) return; // Bloquea el arrastre si el candado está activo
             e.preventDefault();
             isDragging = true;
             

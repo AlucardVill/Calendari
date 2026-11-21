@@ -979,6 +979,28 @@ body.focus-mode #focus-frame {
     height: 26px !important;
     bottom: 14px !important; 
 }
+/* =========================================
+   BARRA COMPACTA Y ALINEACIÓN DEL RELOJ
+   ========================================= */
+
+/* Igualamos la altura de la barra y el reloj */
+.notes-format-toolbar {
+    bottom: 16px !important;
+    gap: 2px !important; /* Botones más juntos para ahorrar espacio */
+    padding: 4px 8px !important;
+}
+
+.notes-time-btn {
+    bottom: 16px !important;
+    width: 28px !important;
+    height: 28px !important;
+}
+
+/* Reducir un poco el ancho de los botones para que quepa todo */
+.notes-format-btn {
+    width: 28px !important;
+    height: 28px !important;
+}
 </style>
 </head>
 <body>
@@ -1053,19 +1075,8 @@ body.focus-mode #focus-frame {
     <div id="notes-main-textarea" contenteditable="true" spellcheck="false" style="flex:1 1 auto;height:0;min-height:100px;width:100%;box-sizing:border-box;resize:none;overflow-y:auto;border:1px solid var(--border-input);color:var(--text);border-radius:10px;padding:14px 14px 75px 14px;font-family:inherit;font-size:0.9rem;outline:none;white-space:pre-wrap;" oninput="saveMainNote()"></div>
 
     <div class="notes-format-toolbar" style="margin:0;">
- <select class="notes-font-select" onchange="formatDoc('fontName',this.value)" onmousedown="event.stopPropagation(); saveSelection();" ontouchstart="saveSelection();" style="max-width:75px;">
-    <option value="system-ui, sans-serif">Aa</option>
-    <option value="serif">Serif</option>
-    <option value="monospace">Mono</option>
-    <option value="'Pinyon Script', cursive" style="font-family:'Pinyon Script', cursive; font-size:1.3rem;">Inglesa</option>
-</select>
-
-<select class="notes-font-select" onchange="formatDoc('fontSize',this.value)" onmousedown="event.stopPropagation(); saveSelection();" ontouchstart="saveSelection();" style="max-width:50px; margin-left:-2px;">
-    <option value="">A</option>
-    <option value="1.2rem">A+</option>
-    <option value="1.5rem">A++</option>
-    <option value="2rem">A+++</option>
-</select>
+<button type="button" class="notes-format-btn" id="btn-font-cycle" onmousedown="event.preventDefault()" onclick="cycleFont()" style="font-family:Georgia, serif; font-weight:600; width:32px;">Aa</button>
+<button type="button" class="notes-format-btn" id="btn-size-cycle" onmousedown="event.preventDefault()" onclick="cycleSize()" style="width:32px; font-weight:700;">A</button>
         <button type="button" class="notes-format-btn" style="font-weight:900;font-family:serif;" onmousedown="event.preventDefault()" onclick="formatDoc('bold')">B</button>
         <button type="button" class="notes-format-btn" style="text-decoration:underline;font-weight:600;" onmousedown="event.preventDefault()" onclick="formatDoc('underline')">U</button>
 <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('justifyFull')" title="Justificar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 6H3M21 12H3M21 18H3"/></svg></button>
@@ -2158,30 +2169,19 @@ setTimeout(() => {
         });
     }
 }, 500);
- // =========================================
-// LÓGICA PARA MOSTRAR/OCULTAR LA BARRA DE HERRAMIENTAS
-// =========================================
 setTimeout(() => {
     const toolbar = document.querySelector('.notes-format-toolbar');
     const ta = document.getElementById('notes-main-textarea');
 
     if (!toolbar || !ta) return;
 
-    // Mostrar la barra
-    const showToolbar = () => {
-        toolbar.classList.remove('toolbar-hidden');
-    };
+    const showToolbar = () => toolbar.classList.remove('toolbar-hidden');
+    const hideToolbar = () => toolbar.classList.add('toolbar-hidden');
 
-    // Ocultar la barra
-    const hideToolbar = () => {
-        toolbar.classList.add('toolbar-hidden');
-    };
-
-    // 1. Mostrar al tocar el área de texto
+    // 1. Si tocas el área de texto, aparece
     ta.addEventListener('pointerdown', showToolbar);
-    ta.addEventListener('focus', showToolbar);
 
-    // 2. Mostrar al seleccionar texto
+    // 2. Si seleccionas texto, aparece
     document.addEventListener('selectionchange', () => {
         const sel = window.getSelection();
         if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ta.contains(sel.anchorNode)) {
@@ -2189,9 +2189,11 @@ setTimeout(() => {
         }
     });
 
-    // 3. Ocultar al tocar fuera
+    // 3. LA MAGIA: Si empiezas a escribir, SE OCULTA
+    ta.addEventListener('input', hideToolbar);
+
+    // 4. Si tocas cualquier otro lado (fuera de la barra y del texto), se oculta
     document.addEventListener('pointerdown', (e) => {
-        // Si tocas dentro de la barra, en el texto, en el reloj o en el adorno, NO ocultar
         if (e.target.closest('.notes-format-toolbar') || 
             e.target.closest('#notes-main-textarea') || 
             e.target.closest('.notes-time-btn') || 
@@ -2200,9 +2202,51 @@ setTimeout(() => {
         }
         hideToolbar();
     });
-// Ocultar por defecto al abrir las notas
+
+    // Ocultar por defecto
     hideToolbar();
 }, 500);
+// =========================================
+// BOTONES CÍCLICOS DE FUENTE Y TAMAÑO
+// =========================================
+let currentFontIdx = 0;
+const FONTS = ['system-ui, sans-serif', 'serif', 'monospace', "'Pinyon Script', cursive"];
+let currentSizeIdx = 0;
+const SIZES = ['', '1.2rem', '1.5rem', '2rem'];
+
+function cycleFont() {
+    currentFontIdx = (currentFontIdx + 1) % FONTS.length;
+    const btn = document.getElementById('btn-font-cycle');
+    if (btn) {
+        if (currentFontIdx === 3) {
+            btn.style.fontFamily = "'Pinyon Script', cursive";
+            btn.style.fontSize = '1.2rem';
+            btn.innerText = 'Aa';
+        } else if (currentFontIdx === 1) {
+            btn.style.fontFamily = 'serif';
+            btn.style.fontSize = '1rem';
+            btn.innerText = 'Aa';
+        } else if (currentFontIdx === 2) {
+            btn.style.fontFamily = 'monospace';
+            btn.style.fontSize = '1rem';
+            btn.innerText = 'Aa';
+        } else {
+            btn.style.fontFamily = 'system-ui, sans-serif';
+            btn.style.fontSize = '1rem';
+            btn.innerText = 'Aa';
+        }
+    }
+    formatDoc('fontName', FONTS[currentFontIdx]);
+}
+
+function cycleSize() {
+    currentSizeIdx = (currentSizeIdx + 1) % SIZES.length;
+    const btn = document.getElementById('btn-size-cycle');
+    if (btn) {
+        btn.innerText = currentSizeIdx === 0 ? 'A' : (currentSizeIdx === 1 ? 'A+' : (currentSizeIdx === 2 ? 'A++' : 'A+++'));
+    }
+    formatDoc('fontSize', SIZES[currentSizeIdx]);
+}
 </script>
 </body>
 </html>

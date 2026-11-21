@@ -20,6 +20,7 @@ try {
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap');    
 :root{--bg:#0d1017;--card:rgba(34,39,50,0.42);--card-solid:#161a22;--text:#eef0f5;--border:rgba(255,255,255,0.07);--border-input:rgba(255,255,255,0.12);--track-bg:rgba(255,255,255,0.07);--muted:#7b8294;--subtext:#a4aaba;--item-bg:rgba(255,255,255,0.05);--input-bg:rgba(255,255,255,0.04);--past:rgba(255,255,255,0.025);--today:#fff;--future:#6ee7b7;--saturday:#38bdf8;--sunday:#fb7185;--accent:#34d399;--work:#fbbf24;--day-bar:#c084fc;--year-bar:#60a5fa;--week-bar:#34d399;--bi-bar:#fb7185;--week-box-active:#6ee7b7;--current-week-bg:rgba(52,211,153,0.10);--block-id:#fcd34d;--btn-text:#06251a;--today-text:#0a0d12;--shadow-today:0 0 0 2px var(--bg),0 0 0 3.5px var(--accent),0 6px 18px -4px rgba(52,211,153,0.35);--check-color:#06251a;--card-shadow:0 1px 2px rgba(0,0,0,0.10),0 10px 30px -16px rgba(0,0,0,0.45);--card-shadow-hover:0 2px 6px rgba(0,0,0,0.14),0 18px 44px -18px rgba(0,0,0,0.55);--glass-blur:blur(28px) saturate(160%);--modal-bg-rgb:30,34,44;--modal-bg-alpha:0.42;--modal-border-rgb:255,255,255;--modal-border-alpha:0.10;--modal-overlay-rgb:6,9,14;--modal-overlay-alpha:0.32}
 [data-theme="light"]{--bg:#eef0f6;--card:rgba(255,255,255,0.55);--card-solid:#fff;--text:#14171e;--border:rgba(20,23,30,0.07);--border-input:rgba(20,23,30,0.13);--track-bg:rgba(20,23,30,0.08);--muted:#7b8294;--subtext:#4a5162;--item-bg:rgba(20,23,30,0.045);--input-bg:rgba(255,255,255,0.85);--past:rgba(20,23,30,0.035);--today:#14171e;--future:#0e9f6e;--saturday:#0284c7;--sunday:#e11d48;--accent:#10b981;--work:#f59e0b;--day-bar:#a855f7;--year-bar:#3b82f6;--week-bar:#10b981;--bi-bar:#f43f5e;--week-box-active:#10b981;--current-week-bg:rgba(16,185,129,0.09);--block-id:#b45309;--btn-text:#fff;--today-text:#fff;--shadow-today:0 0 0 2px var(--bg),0 0 0 3.5px var(--accent),0 6px 18px -4px rgba(16,185,129,0.30);--check-color:#fff;--card-shadow:0 1px 2px rgba(16,24,40,0.04),0 10px 26px -16px rgba(16,24,40,0.16);--card-shadow-hover:0 2px 6px rgba(16,24,40,0.06),0 18px 40px -18px rgba(16,24,40,0.22);--modal-bg-rgb:255,255,255;--modal-bg-alpha:0.52;--modal-border-rgb:255,255,255;--modal-border-alpha:0.70;--modal-overlay-rgb:20,25,35;--modal-overlay-alpha:0.15}
 *{-webkit-tap-highlight-color:transparent;box-sizing:border-box}
@@ -972,6 +973,13 @@ body.focus-mode #focus-frame {
     opacity: 0 !important;
     pointer-events: none !important; /* Evita que se pueda tocar mientras está invisible */
     transform: translate(-50%, 20px) !important; /* Se hunde un poco hacia abajo al desaparecer */
+} 
+/* Ajuste para que la fuente Pinyon Script no se corte */
+#notes-main-textarea span[style*="Pinyon Script"] {
+    line-height: 1.5 !important;
+    display: inline-block;
+    padding-top: 4px;
+    padding-bottom: 2px;
 }    
 </style>
 </head>
@@ -1047,7 +1055,19 @@ body.focus-mode #focus-frame {
     <div id="notes-main-textarea" contenteditable="true" spellcheck="false" style="flex:1 1 auto;height:0;min-height:100px;width:100%;box-sizing:border-box;resize:none;overflow-y:auto;border:1px solid var(--border-input);color:var(--text);border-radius:10px;padding:14px 14px 75px 14px;font-family:inherit;font-size:0.9rem;outline:none;white-space:pre-wrap;" oninput="saveMainNote()"></div>
 
     <div class="notes-format-toolbar" style="margin:0;">
-  <select class="notes-font-select" onchange="formatDoc('fontName',this.value)" onmousedown="event.stopPropagation(); saveSelection();" ontouchstart="saveSelection();"><option value="system-ui, sans-serif">Aa</option><option value="serif">Serif</option><option value="monospace">Mono</option></select>  
+ <select class="notes-font-select" onchange="formatDoc('fontName',this.value)" onmousedown="event.stopPropagation(); saveSelection();" ontouchstart="saveSelection();" style="max-width:75px;">
+    <option value="system-ui, sans-serif">Aa</option>
+    <option value="serif">Serif</option>
+    <option value="monospace">Mono</option>
+    <option value="'Pinyon Script', cursive" style="font-family:'Pinyon Script', cursive; font-size:1.3rem;">Inglesa</option>
+</select>
+
+<select class="notes-font-select" onchange="formatDoc('fontSize',this.value)" onmousedown="event.stopPropagation(); saveSelection();" ontouchstart="saveSelection();" style="max-width:50px; margin-left:-2px;">
+    <option value="">A</option>
+    <option value="1.2rem">A+</option>
+    <option value="1.5rem">A++</option>
+    <option value="2rem">A+++</option>
+</select>
         <button type="button" class="notes-format-btn" style="font-weight:900;font-family:serif;" onmousedown="event.preventDefault()" onclick="formatDoc('bold')">B</button>
         <button type="button" class="notes-format-btn" style="text-decoration:underline;font-weight:600;" onmousedown="event.preventDefault()" onclick="formatDoc('underline')">U</button>
 <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('justifyFull')" title="Justificar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 6H3M21 12H3M21 18H3"/></svg></button>
@@ -1615,78 +1635,70 @@ function formatDoc(cmd, val) {
     const ta = document.getElementById('notes-main-textarea'); 
     if (!ta) return; 
     
-if (cmd === 'undo') {
-    if (undoStack.length > 0) {
-        isUndoRedoAction = true;
-        
-        // 1. Guardamos la posición actual del scroll
-        const currentScroll = ta.scrollTop; 
-        
-        const currentHtml = ta.innerHTML;
-        const prevHtml = undoStack.pop();
-        redoStack.push(currentHtml);
-        
-        // 2. Reemplazamos el HTML
-        ta.innerHTML = prevHtml;
-        
-        // 3. Restauramos el scroll esperando a que el navegador termine de dibujar
-        setTimeout(() => {
-            ta.scrollTop = currentScroll;
-        }, 10);
-        
-        lastSavedHtml = prevHtml;
-        saveMainNote();
-        isUndoRedoAction = false;
-    } else {
-        ta.focus();
-        document.execCommand('undo', false, null);
-        lastSavedHtml = ta.innerHTML;
-        saveMainNote();
+    // Lógica de Deshacer
+    if (cmd === 'undo') {
+        if (undoStack.length > 0) {
+            isUndoRedoAction = true;
+            const currentScroll = ta.scrollTop; 
+            const currentHtml = ta.innerHTML;
+            const prevHtml = undoStack.pop();
+            redoStack.push(currentHtml);
+            ta.innerHTML = prevHtml;
+            setTimeout(() => { ta.scrollTop = currentScroll; }, 10);
+            lastSavedHtml = prevHtml;
+            saveMainNote();
+            isUndoRedoAction = false;
+        } else {
+            ta.focus();
+            document.execCommand('undo', false, null);
+            lastSavedHtml = ta.innerHTML;
+            saveMainNote();
+        }
+        saveSelection();
+        updateFormatBtns();
+        return;
     }
-    saveSelection();
-    updateFormatBtns();
-    return;
-}
-restoreSelection(); 
-
-if (cmd === 'fontName') {
+    
+    restoreSelection(); 
+    
+    // Lógica para Fuente y Tamaño (envuelve en <span>)
+    if (cmd === 'fontName' || cmd === 'fontSize') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
         
-        // Si la selección actual se perdió (típico en móvil), forzar la selección guardada
         if ((!range || range.collapsed) && _savedRange && !_savedRange.collapsed) {
             range = _savedRange;
-            if (sel) {
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
+            if (sel) { sel.removeAllRanges(); sel.addRange(range); }
         }
 
-      if (range && !range.collapsed) { saveMainNote();
+        if (range && !range.collapsed) {
             const span = document.createElement('span');
-            span.style.fontFamily = val;
-            try {
-                range.surroundContents(span);
-            } catch(e) {
-                const frag = range.extractContents();
-                span.appendChild(frag);
-                range.insertNode(span);
+            if (cmd === 'fontName') span.style.fontFamily = val;
+            if (cmd === 'fontSize') span.style.fontSize = val || '1rem'; // 1rem es el tamaño normal
+            
+            try { range.surroundContents(span); } 
+            catch(e) { 
+                const frag = range.extractContents(); 
+                span.appendChild(frag); 
+                range.insertNode(span); 
             }
+            
             const nr = document.createRange();
             nr.selectNodeContents(span);
-            if (sel) {
-                sel.removeAllRanges();
-                sel.addRange(nr);
-            }
-        } else {
-            document.execCommand('styleWithCSS', false, false);
-            document.execCommand('fontName', false, val);
+            if (sel) { sel.removeAllRanges(); sel.addRange(nr); }
         }
-    } else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
+    } 
+    // Formatos Básicos
+    else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
         document.execCommand('styleWithCSS', false, false); 
         document.execCommand(cmd, false, null); 
-    } else if (cmd === 'undo') { 
-        document.execCommand('undo', false, null); 
+    } else if (cmd === 'justifyFull') {
+        document.execCommand('styleWithCSS', false, true); 
+        if (document.queryCommandState('justifyFull')) {
+            document.execCommand('justifyLeft', false, null);
+        } else {
+            document.execCommand('justifyFull', false, null);
+        }
     } else { 
         document.execCommand('styleWithCSS', false, true); 
         document.execCommand(cmd, false, val || null); 
@@ -1694,7 +1706,7 @@ if (cmd === 'fontName') {
     
     saveMainNote(); 
     saveSelection(); 
-    updateFormatBtns(); 
+    setTimeout(updateFormatBtns, 10); 
 }
 let highlighterActive = false;
 let highlighterColorIdx = 0;

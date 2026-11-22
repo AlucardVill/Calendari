@@ -1748,8 +1748,7 @@ function restoreSelection() { if (_savedRange) { if (window.getSelection) { cons
             newRange.collapse(true);
             sel.removeAllRanges();
             sel.addRange(newRange);
-        }
-    } 
+        } 
     } else if (cmd === 'justifyFull') {
         document.execCommand('styleWithCSS', false, true); 
         if (document.queryCommandState('justifyFull')) {

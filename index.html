@@ -1702,9 +1702,11 @@ function restoreSelection() { if (_savedRange) { if (window.getSelection) { cons
         return;
     }
     
+       ta.focus({ preventScroll: true });
     restoreSelection(); 
     
     // Lógica para Fuente
+
     if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
@@ -1749,14 +1751,49 @@ function restoreSelection() { if (_savedRange) { if (window.getSelection) { cons
             sel.removeAllRanges();
             sel.addRange(newRange);
         } 
-    } else if (cmd === 'justifyFull') {
-        document.execCommand('styleWithCSS', false, true); 
-        if (document.queryCommandState('justifyFull')) {
+     } else if (cmd === 'justifyFull') {
+        const wasJustified = isSelectionJustified();
+        document.execCommand('styleWithCSS', false, true);
+        if (wasJustified) {
             document.execCommand('justifyLeft', false, null);
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0) {
+                let node = sel.anchorNode;
+                while (node && node !== ta) {
+                    if (node.nodeType === 1 && node.style && node.style.textAlign === 'justify') {
+                        node.style.textAlign = '';
+                    }
+                    node = node.parentNode;
+                }
+            }
         } else {
             document.execCommand('justifyFull', false, null);
+            if (!isSelectionJustified()) {
+                const sel = window.getSelection();
+                if (sel && sel.rangeCount > 0) {
+                    const range = sel.getRangeAt(0);
+                    let block = range.startContainer;
+                    while (block && block !== ta && !['DIV', 'P', 'LI'].includes(block.nodeName)) {
+                        block = block.parentNode;
+                    }
+                    if (block && block !== ta) {
+                        block.style.textAlign = 'justify';
+                    } else if (!range.collapsed) {
+                        const div = document.createElement('div');
+                        div.style.textAlign = 'justify';
+                        const frag = range.extractContents();
+                        div.appendChild(frag);
+                        range.insertNode(div);
+                        const nr = document.createRange();
+                        nr.selectNodeContents(div);
+                        sel.removeAllRanges();
+                        sel.addRange(nr);
+                    }
+                }
+            }
         }
     } else { 
+
         document.execCommand('styleWithCSS', false, true); 
         document.execCommand(cmd, false, val || null); 
     }
@@ -1845,11 +1882,28 @@ function removeHighlighter() {
     saveMainNote();
     saveSelection();
 }
+function isSelectionJustified() {
+    const ta = document.getElementById('notes-main-textarea');
+    if (!ta) return false;
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+        let node = sel.anchorNode;
+        while (node && node !== ta) {
+            if (node.nodeType === 1) {
+                const align = node.style.textAlign || window.getComputedStyle(node).textAlign;
+                if (align === 'justify') return true;
+            }
+            node = node.parentNode;
+        }
+    }
+    try { return document.queryCommandState('justifyFull'); } catch (_) { return false; }
+}
+
 function updateFormatBtns() { 
     try { 
         document.querySelectorAll('.notes-format-btn').forEach(b => { 
             const oc = b.getAttribute('onclick') || ''; 
-            if (oc.includes("'justifyFull'")) b.classList.toggle('cmd-active', document.queryCommandState('justifyFull')); 
+            if (oc.includes("'justifyFull'")) b.classList.toggle('cmd-active', isSelectionJustified()); 
         }); 
     } catch(_) {} 
 }

@@ -1762,50 +1762,50 @@ function formatDoc(cmd, val) {
             sel.addRange(newRange);
         }
     }
-       // Formatos Básicos (Negrita, Subrayado, Cursiva)
+     // Formatos Básicos (Negrita, Subrayado, Cursiva)
     else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
-        // 1. Usar CSS para evitar etiquetas viejas que son difíciles de quitar
+        // 1. Ejecutar el comando (usando CSS para evitar etiquetas viejas)
         document.execCommand('styleWithCSS', false, true); 
+        document.execCommand(cmd, false, null); 
         
-        // 2. Verificar si el formato está activo
-        const isActive = document.queryCommandState(cmd);
-        
-        // 3. Ejecutar el comando forzando el estado
-        document.execCommand(cmd, false, !isActive); 
-        
-        // 4. TRUCO PARA MÓVILES: Si acabamos de APAGAR el formato
-        if (isActive) {
-            const sel = window.getSelection();
-            if (sel && sel.rangeCount > 0 && sel.isCollapsed) {
-                const range = sel.getRangeAt(0);
-                // Insertamos un "ancla" invisible para que el texto nuevo sea normal
-                const span = document.createElement('span');
-                if (cmd === 'bold') span.style.fontWeight = 'normal';
-                if (cmd === 'italic') span.style.fontStyle = 'normal';
-                if (cmd === 'underline') span.style.textDecoration = 'none';
-                span.innerHTML = '&#8203;'; // Espacio invisible
-                
-                range.insertNode(span);
-                
-                // Movemos el cursor justo después del espacio invisible
-                const nr = document.createRange();
-                nr.setStart(span.firstChild, 1);
-                nr.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(nr);
+        // 2. Forzar la limpieza si el cursor está en un párrafo vacío
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && sel.isCollapsed) {
+            let node = sel.anchorNode;
+            let el = node.nodeType === 3 ? node.parentNode : node;
+            
+            // Buscar el contenedor (div o p)
+            while (el && el !== ta && el.tagName !== 'DIV' && el.tagName !== 'P') {
+                el = el.parentNode;
+            }
+
+            // Si el párrafo está vacío, quitamos los estilos directamente
+            if (el && el !== ta && el.textContent.trim() === '') {
+                if (cmd === 'bold') el.style.fontWeight = 'normal';
+                if (cmd === 'italic') el.style.fontStyle = 'normal';
+                if (cmd === 'underline') el.style.textDecoration = 'none';
+            } else {
+                // Si hay texto, insertamos un ancla invisible para que lo nuevo sea normal
+                const isActive = document.queryCommandState(cmd);
+                if (!isActive) {
+                    const range = sel.getRangeAt(0);
+                    const span = document.createElement('span');
+                    if (cmd === 'bold') span.style.fontWeight = 'normal';
+                    if (cmd === 'italic') span.style.fontStyle = 'normal';
+                    if (cmd === 'underline') span.style.textDecoration = 'none';
+                    span.innerHTML = '&#8203;'; // Espacio invisible
+                    
+                    range.insertNode(span);
+                    
+                    const nr = document.createRange();
+                    nr.setStart(span.firstChild, 1);
+                    nr.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(nr);
+                }
             }
         }
-    } else if (cmd === 'justifyFull') {
-        document.execCommand('styleWithCSS', false, true); 
-        if (document.queryCommandState('justifyFull')) {
-            document.execCommand('justifyLeft', false, null);
-        } else {
-            document.execCommand('justifyFull', false, null);
-        }
-    } else { 
-        document.execCommand('styleWithCSS', false, true); 
-        document.execCommand(cmd, false, val || null); 
-    } 
+    } else if (cmd === 'justifyFull') {      
     
     saveMainNote(); 
     saveSelection(); 

@@ -1805,11 +1805,22 @@ function formatDoc(cmd, val) {
                 }
             }
         }
-    } else if (cmd === 'justifyFull') {      
+     } else if (cmd === 'justifyFull') {
+        document.execCommand('styleWithCSS', false, true); 
+        if (document.queryCommandState('justifyFull')) {
+            document.execCommand('justifyLeft', false, null);
+        } else {
+            document.execCommand('justifyFull', false, null);
+        }
+    } else { 
+        document.execCommand('styleWithCSS', false, true); 
+        document.execCommand(cmd, false, val || null); 
+    }
     
     saveMainNote(); 
     saveSelection(); 
     setTimeout(updateFormatBtns, 10); 
+}
 }
 let highlighterActive = false;
 let highlighterColorIdx = 0;

@@ -934,7 +934,7 @@ body.focus-mode #focus-frame {
     pointer-events: none !important; /* Evita que se pueda tocar mientras está invisible */
     transform: translate(-50%, 20px) !important; /* Se hunde un poco hacia abajo al desaparecer */
 } 
-/* Ajuste para que la fuente Pinyon Script no se corte */
+/* Ajuste para que la fuente Pinyon  no se corte */
 #notes-main-textarea span[style*="Pinyon Script"] {
     line-height: 1.5 !important;
     display: inline-block;
@@ -3169,6 +3169,183 @@ if (document.getElementById('hidden-bar-pills')) renderHiddenBarColumns();
   } else {
     start();
   }
+})();
+    <script>
+/* =============================================================
+   PROTECCIÓN TOTAL DE WIKI-LINKS
+   Único borrado permitido: window.deleteWikiLink(el)
+   ============================================================= */
+(function () {
+  const area = document.getElementById('notes-main-textarea');
+  if (!area) {
+    document.addEventListener('DOMContentLoaded', () => location.reload());
+    return;
+  }
+
+  let authorized = false;
+
+  /* ---------- utilidades ---------- */
+  const isWiki = (el) => !!(el && el.nodeType === 1 && el.classList && el.classList.contains('wiki-link'));
+
+  const tagAll = () => {
+    area.querySelectorAll('.wiki-link').forEach(el => {
+      if (!el.dataset.wikiId) {
+        el.dataset.wikiId = 'wl_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      }
+      if (el.getAttribute('contenteditable') !== 'false') el.setAttribute('contenteditable', 'false');
+      if (el.getAttribute('draggable')       !== 'false') el.setAttribute('draggable', 'false');
+    });
+  };
+  tagAll();
+
+  const selTouchesWiki = (direction) => {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return false;
+    const r = sel.getRangeAt(0);
+
+    const inWiki = (node) => {
+      const el = node && node.nodeType === 3 ? node.parentElement : node;
+      return !!(el && el.closest && el.closest('.wiki-link'));
+    };
+    if (inWiki(r.startContainer) || inWiki(r.endContainer)) return true;
+
+    if (!r.collapsed) {
+      try { if (r.cloneContents().querySelector('.wiki-link')) return true; } catch (e) {}
+      return false;
+    }
+
+    const c = r.startContainer, o = r.startOffset;
+    const checkPrev = (direction === undefined || direction === 'back');
+    const checkNext = (direction === undefined || direction === 'forward');
+
+    if (c.nodeType === 3) {
+      if (checkPrev && o === 0 && isWiki(c.previousSibling)) return true;
+      if (checkNext && o === c.textContent.length && isWiki(c.nextSibling)) return true;
+    } else {
+      if (checkPrev && isWiki(c.childNodes[o - 1])) return true;
+      if (checkNext && isWiki(c.childNodes[o]))     return true;
+    }
+    return false;
+  };
+
+  const endsWithWiki = (node) => {
+    if (!node) return false;
+    if (isWiki(node)) return true;
+    if (node.nodeType === 1) {
+      const kids = node.childNodes;
+      for (let i = kids.length - 1; i >= 0; i--) {
+        const k = kids[i];
+        if (k.nodeType === 3 && !k.textContent.trim()) continue;
+        return endsWithWiki(k);
+      }
+    }
+    return false;
+  };
+
+  /* Cursor en posición 0 de un bloque cuyo bloque previo termina en wiki-link
+     → el merge del navegador podría destruirlo. */
+  const wouldMergeDeleteWiki = (range) => {
+    if (!range || !range.collapsed || range.startOffset !== 0) return false;
+    const c = range.startContainer;
+    let block = c.nodeType === 1 ? c : c.parentElement;
+    if (!block || block === area) return false;
+    const cs = getComputedStyle(block);
+    if (!/block|flex|list-item|table/.test(cs.display)) return false;
+    let prev = block.previousElementSibling;
+    while (prev && prev.nodeType === 3 && !prev.textContent.trim()) prev = prev.previousElementSibling;
+    return endsWithWiki(prev);
+  };
+
+  /* ---------- 1) BLOQUEO DE EVENTOS ---------- */
+  area.addEventListener('beforeinput', (e) => {
+    const t = e.inputType;
+    const sel = window.getSelection();
+    const dir = t === 'deleteContentBackward' ? 'back'
+              : t === 'deleteContentForward'  ? 'forward'
+              : undefined;
+
+    if (/^delete/.test(t) || t === 'deleteByCut') {
+      if (selTouchesWiki(dir)) { e.preventDefault(); e.stopImmediatePropagation(); return; }
+      if (dir === 'back' && sel && sel.isCollapsed && wouldMergeDeleteWiki(sel.getRangeAt(0))) {
+        e.preventDefault(); e.stopImmediatePropagation(); return;
+      }
+    }
+    if (/^insert/.test(t)) {
+      if (sel && !sel.isCollapsed && selTouchesWiki()) { e.preventDefault(); e.stopImmediatePropagation(); }
+    }
+  }, true);
+
+  area.addEventListener('keydown', (e) => {
+    if (e.isComposing) return;
+    const sel = window.getSelection();
+
+    if (e.key === 'Backspace') {
+      if (selTouchesWiki('back')) { e.preventDefault(); e.stopImmediatePropagation(); return; }
+      if (sel && sel.isCollapsed && wouldMergeDeleteWiki(sel.getRangeAt(0))) {
+        e.preventDefault(); e.stopImmediatePropagation();
+      }
+    } else if (e.key === 'Delete') {
+      if (selTouchesWiki('forward')) { e.preventDefault(); e.stopImmediatePropagation(); }
+    } else if ((e.ctrlKey || e.metaKey) && (e.key === 'x' || e.key === 'X')) {
+      if (selTouchesWiki()) { e.preventDefault(); e.stopImmediatePropagation(); }
+    }
+  }, true);
+
+  area.addEventListener('cut',  (e) => { if (selTouchesWiki()) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+  area.addEventListener('paste',(e) => {
+    const sel = window.getSelection();
+    if (sel && !sel.isCollapsed && selTouchesWiki()) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
+  area.addEventListener('drop', (e) => { if (selTouchesWiki()) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+
+  /* ---------- 2) RESTAURACIÓN POR SI ACASO ---------- */
+  const observer = new MutationObserver((mutations) => {
+    if (authorized) return;
+
+    const toRestore = [];
+    for (const m of mutations) {
+      if (m.type === 'childList') {
+        for (const n of m.removedNodes) {
+          if (n.nodeType === 1 && !n.isConnected) {
+            if (n.classList?.contains('wiki-link') || n.querySelector?.('.wiki-link')) {
+              toRestore.push({ target: m.target, next: m.nextSibling, node: n });
+            }
+          }
+        }
+      }
+    }
+
+    if (toRestore.length) {
+      authorized = true;
+      try {
+        for (const { target, next, node } of toRestore) {
+          try {
+            if (next && next.parentNode === target) target.insertBefore(node, next);
+            else                                    target.appendChild(node);
+          } catch (e) {
+            try { area.appendChild(node); } catch (_) {}
+          }
+        }
+      } finally {
+        authorized = false;
+      }
+    }
+    tagAll();
+  });
+
+  observer.observe(area, {
+    childList: true, subtree: true,
+    attributes: true, attributeFilter: ['contenteditable', 'draggable']
+  });
+
+  /* ---------- 3) ÚNICA VÍA AUTORIZADA ---------- */
+  window.deleteWikiLink = function (el) {
+    if (!el || !el.classList || !el.classList.contains('wiki-link')) return false;
+    authorized = true;
+    try { el.remove(); } finally { authorized = false; }
+    area.dispatchEvent(new Event('input', { bubbles: true }));
+    return true;
+  };
 })();
 </script>
 </body>

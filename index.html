@@ -1534,6 +1534,7 @@ function insertWikiLink() {
     document.execCommand('insertHTML', false, linkHTML);
     saveMainNote();
 }
+let isAuthorizedLinkDeletion = false;
 
 function openLinkEditModal(link) {
     const targetId = link.dataset.target;
@@ -1545,8 +1546,10 @@ function openLinkEditModal(link) {
     
     if (newName.trim() === '') {
         if (confirm(`¿Eliminar el hipervínculo "${currentName}"?`)) {
+            isAuthorizedLinkDeletion = true;
             link.remove();
             saveMainNote();
+            setTimeout(() => { isAuthorizedLinkDeletion = false; }, 100);
         }
     } else if (newName.trim() !== currentName) {
         link.innerText = newName.trim();
@@ -1557,7 +1560,6 @@ function openLinkEditModal(link) {
         saveMainNote();
     }
 }
-
 // =========================================
 // EVENTOS PARA NAVEGACIÓN Y PULSACIÓN LARGA
 // =========================================
@@ -1671,147 +1673,76 @@ function handleEmptyBulletBackspace(ta) {
     const ta = document.getElementById('notes-main-textarea');
     if (!ta) return;
 
-    const isWikiLink = (node) => {
-        if (!node) return false;
-        const el = node.nodeType === 3 ? node.parentElement : node;
-        return el && el.closest('.wiki-link') !== null;
-    };
+    let lastValidHTML = ta.innerHTML;
+    let isRestoring = false;
 
-    const getPreviousMeaningfulNode = (node, root) => {
-        let curr = node;
-        while (curr && curr !== root) {
-            let prev = curr.previousSibling;
-            while (prev) {
-                // Ignorar nodos de texto completamente vacíos (sin contar &nbsp; si es el único carácter)
-                if (prev.nodeType === 3 && prev.textContent.replace(/[\u200B\r\n]/g, '') === '') {
-                    prev = prev.previousSibling;
-                    continue;
+    // 1. Mantener el comportamiento de salir de viñetas vacías con retroceso
+    ta.addEventListener('beforeinput', function(e) {
+        if (e.inputType === 'deleteContentBackward') {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount && sel.getRangeAt(0).collapsed) {
+                if (typeof handleEmptyBulletBackspace === 'function' && handleEmptyBulletBackspace(this)) {
+                    e.preventDefault();
+                    return;
                 }
-                if (prev.nodeType === 1 && prev.tagName === 'BR') {
-                    prev = prev.previousSibling;
-                    continue;
-                }
-                return prev;
-            }
-            curr = curr.parentNode;
-        }
-        return null;
-    };
-
-    const nodeEndsWithWikiLink = (node) => {
-        if (!node) return false;
-        if (isWikiLink(node)) return true;
-        if (node.nodeType === 1) {
-            let child = node.lastChild;
-            while (child) {
-                if (child.nodeType === 3 && child.textContent.replace(/[\u200B\r\n]/g, '') === '') {
-                    child = child.previousSibling;
-                    continue;
-                }
-                if (child.nodeType === 1 && child.tagName === 'BR') {
-                    child = child.previousSibling;
-                    continue;
-                }
-                return nodeEndsWithWikiLink(child);
             }
         }
-        return false;
-    };
+    }, true);
 
-    const shouldBlockDeletion = (isForward = false) => {
-        const sel = window.getSelection();
-        if (!sel || !sel.rangeCount) return false;
-        const range = sel.getRangeAt(0);
-
-        // 1. Si hay una selección que toca o contiene un enlace
-        if (!range.collapsed) {
-            const links = ta.querySelectorAll('.wiki-link');
-            for (const link of links) {
-                if (range.intersectsNode(link)) return true;
-            }
-            return false;
+    // 2. Vigilante del DOM: Si un enlace desaparece sin autorización, lo restaura al instante
+    const observer = new MutationObserver((mutations) => {
+        if (isRestoring || isAuthorizedLinkDeletion || isUndoRedoAction) {
+            lastValidHTML = ta.innerHTML;
+            return;
         }
 
-        const container = range.startContainer;
-        const offset = range.startOffset;
-
-        // 2. Si el cursor está dentro del enlace
-        if (isWikiLink(container)) return true;
-
-        // 3. Borrado hacia atrás (Backspace)
-        if (!isForward) {
-            // Caso A: El contenedor es un elemento (ej. div o el mismo textarea) y el cursor está justo después de un hijo
-            if (container.nodeType === 1 && offset > 0) {
-                const prevChild = container.childNodes[offset - 1];
-                if (nodeEndsWithWikiLink(prevChild)) return true;
-            }
-
-            // Caso B: El cursor está en un nodo de texto
-            if (container.nodeType === 3) {
-                // Si está en offset 0, miramos el nodo hermano anterior
-                if (offset === 0) {
-                    const prev = getPreviousMeaningfulNode(container, ta);
-                    if (nodeEndsWithWikiLink(prev)) return true;
-                }
-                // Si está en offset 1 y el único carácter antes es un espacio invisible/normal pegado al enlace
-                if (offset === 1 && /^[\s\u00A0\u200B]$/.test(container.textContent[0])) {
-                    const prev = getPreviousMeaningfulNode(container, ta);
-                    if (nodeEndsWithWikiLink(prev)) {
-                        // Permitimos borrar el espacio, pero si ya no hay texto después, evitamos que el navegador absorba el enlace
-                        return false;
-                    }
-                }
-            }
-
-            // Caso C: El cursor está al inicio de un bloque (div/p/li) y el bloque anterior termina en un enlace
-            if (offset === 0) {
-                const prev = getPreviousMeaningfulNode(container, ta);
-                if (nodeEndsWithWikiLink(prev)) return true;
-            }
-        } 
-        // 4. Borrado hacia adelante (Delete / Supr)
-        else {
-            if (container.nodeType === 1 && offset < container.childNodes.length) {
-                const nextChild = container.childNodes[offset];
-                if (isWikiLink(nextChild) || (nextChild.querySelector && nextChild.querySelector('.wiki-link'))) return true;
-            }
-            if (container.nodeType === 3 && offset === container.length) {
-                let curr = container;
-                while (curr && curr !== ta) {
-                    if (curr.nextSibling) {
-                        if (isWikiLink(curr.nextSibling)) return true;
+        let linkWasRemoved = false;
+        for (const m of mutations) {
+            if (m.type === 'childList' && m.removedNodes.length > 0) {
+                for (const node of m.removedNodes) {
+                    if (node.nodeType === 1 && (node.classList.contains('wiki-link') || node.querySelector('.wiki-link'))) {
+                        linkWasRemoved = true;
                         break;
                     }
-                    curr = curr.parentNode;
                 }
             }
+            if (linkWasRemoved) break;
         }
 
-        return false;
-    };
+        if (linkWasRemoved) {
+            isRestoring = true;
+            const scrollPos = ta.scrollTop;
+            ta.innerHTML = lastValidHTML;
+            ta.scrollTop = scrollPos;
 
-    // Capa 1: Bloqueo en beforeinput (cubre teclados móviles y de escritorio)
-    ta.addEventListener('beforeinput', function(e) {
-        if (!e.inputType) return;
-        if (e.inputType.includes('delete') || e.inputType === 'historyUndo') {
-            const isForward = e.inputType === 'deleteContentForward' || e.inputType === 'deleteWordForward';
-            if (e.inputType !== 'historyUndo' && shouldBlockDeletion(isForward)) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
+            // Colocar el cursor justo después del último enlace para que puedas seguir escribiendo
+            const links = ta.querySelectorAll('.wiki-link');
+            if (links.length > 0) {
+                const lastLink = links[links.length - 1];
+                const range = document.createRange();
+                const sel = window.getSelection();
+                range.setStartAfter(lastLink);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
             }
-        }
-    }, true);
 
-    // Capa 2: Bloqueo en keydown (respaldo para navegadores que ignoran beforeinput en spans no editables)
-    ta.addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace' || e.key === 'Delete') {
-            const isForward = e.key === 'Delete';
-            if (shouldBlockDeletion(isForward)) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-            }
+            setTimeout(() => { isRestoring = false; }, 10);
+        } else {
+            lastValidHTML = ta.innerHTML;
         }
-    }, true);
+    });
+
+    observer.observe(ta, { childList: true, subtree: true });
+
+    // Actualizar la copia segura cuando cambias de nota o proyecto
+    const originalSave = window.saveMainNote;
+    if (typeof originalSave === 'function') {
+        window.saveMainNote = function() {
+            if (!isRestoring) lastValidHTML = ta.innerHTML;
+            return originalSave.apply(this, arguments);
+        };
+    }
 })();
 function loadNoteForPicker() { const d = document.getElementById('notes-date-picker').value; const ta = document.getElementById('notes-main-textarea'); ta.innerHTML = notesData[d] || ''; if (d) localStorage.setItem('wkNotesLastDate', d); const s = document.getElementById('notes-index-select'); if (s && !s.disabled) s.value = d; undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML; }
 let pendingTypingFont = null;

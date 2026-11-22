@@ -1575,23 +1575,17 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
     if (!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
 
-    const isLinkNode = (n) => {
+    const isLink = (n) => {
         if (!n) return false;
-        if (n.nodeType === 1) {
-            return n.classList.contains('wiki-link') || n.querySelector('.wiki-link') !== null;
-        }
-        if (n.nodeType === 3) {
-            return n.parentElement && n.parentElement.closest('.wiki-link') !== null;
-        }
+        if (n.nodeType === 1) return n.classList.contains('wiki-link') || n.querySelector('.wiki-link') !== null;
+        if (n.nodeType === 3) return n.parentElement && n.parentElement.closest('.wiki-link') !== null;
         return false;
     };
 
     if (!range.collapsed) {
         const links = this.querySelectorAll('.wiki-link');
         for (let link of links) {
-            if (range.intersectsNode(link)) {
-                e.preventDefault(); return;
-            }
+            if (range.intersectsNode(link)) { e.preventDefault(); return; }
         }
         return;
     }
@@ -1599,39 +1593,34 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
     let node = range.startContainer;
     let offset = range.startOffset;
 
-    if (isLinkNode(node)) { e.preventDefault(); return; }
-
-    // NUEVO: Si el enlace es el primer hijo del contenedor y el cursor está al inicio
-    const firstChild = this.firstChild;
-    if (e.inputType === 'deleteContentBackward' && offset === 0 && firstChild && isLinkNode(firstChild)) {
-        if (node === this || (node.nodeType === 1 && node.parentNode === this && node === firstChild)) {
-            e.preventDefault(); return;
-        }
-    }
+    if (isLink(node)) { e.preventDefault(); return; }
 
     if (e.inputType === 'deleteContentBackward') {
         if (offset === 0) {
             let block = node.nodeType === 3 ? node.parentNode : node;
-            let prevBlock = block.previousElementSibling;
-            if (prevBlock && (isLinkNode(prevBlock) || isLinkNode(prevBlock.lastElementChild) || isLinkNode(prevBlock.lastChild))) {
-                e.preventDefault(); return;
+            
+            // Revisa si el hermano anterior es un enlace
+            let prev = block.previousElementSibling || block.previousSibling;
+            if (isLink(prev)) { e.preventDefault(); return; }
+            
+            // Si el anterior es un salto de línea (<br>), revisa el anterior a ese
+            if (prev && (prev.tagName === 'BR' || prev.innerHTML === '<br>')) {
+                let prevPrev = prev.previousElementSibling || prev.previousSibling;
+                if (isLink(prevPrev)) { e.preventDefault(); return; }
             }
-            if (node.nodeType === 1 && isLinkNode(node.previousSibling)) {
+
+            // BLOQUEO TOTAL: Si el primer elemento del área de texto es un enlace
+            if (this.firstChild && isLink(this.firstChild)) {
                 e.preventDefault(); return;
             }
         }
-    } 
+    }
 
     if (e.inputType === 'deleteContentForward') {
+        let block = node.nodeType === 3 ? node.parentNode : node;
         if ((node.nodeType === 3 && offset === node.length) || (node.nodeType === 1 && offset === node.childNodes.length)) {
-            let block = node.nodeType === 3 ? node.parentNode : node;
-            let nextBlock = block.nextElementSibling;
-            if (nextBlock && (isLinkNode(nextBlock) || isLinkNode(nextBlock.firstElementChild) || isLinkNode(nextBlock.firstChild))) {
-                e.preventDefault(); return;
-            }
-            if (node.nodeType === 1 && isLinkNode(node.nextSibling)) {
-                e.preventDefault(); return;
-            }
+            let next = block.nextElementSibling || block.nextSibling;
+            if (isLink(next)) { e.preventDefault(); return; }
         }
     }
 });
@@ -1705,7 +1694,7 @@ function formatDoc(cmd, val) {
     
     restoreSelection(); 
     
-    // Lógica para Fuente (Usa execCommand para no bajar de renglón)
+       // Lógica para Fuente (Corregida para evitar saltos y limpiar tamaños)
     if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
@@ -1716,29 +1705,29 @@ function formatDoc(cmd, val) {
         }
 
         if (range && !range.collapsed) {
-            // 1. Aplicar la fuente nativamente (esto evita el salto de línea)
+            // 1. Aplicar la fuente nativamente
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('fontName', false, val);
 
-            // 2. Escanear los textos para ajustar o limpiar el tamaño
-            ta.querySelectorAll('span').forEach(span => {
-                const ff = span.style.fontFamily || '';
-                if (ff.includes('Pinyon')) {
-                    // Si es Pinyon, aplicar tamaño grande
-                    span.style.fontSize = '2rem';
-                    span.style.lineHeight = '1.4';
-                    span.style.display = 'inline-block';
-                    span.style.paddingBottom = '6px';
+            // 2. Escanear TODOS los elementos del texto (span y font) para limpiar tamaños
+            ta.querySelectorAll('span, font').forEach(el => {
+                const ff = el.style.fontFamily || el.getAttribute('face') || '';
+                if (ff.toLowerCase().includes('pinyon')) {
+                    // Si es Pinyon, tamaño grande
+                    el.style.fontSize = '2rem';
+                    el.style.lineHeight = '1.4';
+                    el.style.display = 'inline-block';
+                    el.style.paddingBottom = '6px';
                 } else {
-                    // Si es otra fuente, limpiar los estilos para que vuelva a la normalidad
-                    span.style.fontSize = '';
-                    span.style.lineHeight = '';
-                    span.style.display = '';
-                    span.style.paddingBottom = '';
+                    // Si es cualquier otra, limpiar TODO para que vuelva a la normalidad
+                    el.style.fontSize = '';
+                    el.style.lineHeight = '';
+                    el.style.display = '';
+                    el.style.paddingBottom = '';
                 }
             });
         }
-    } 
+    }
     // Formatos Básicos
     else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
         document.execCommand('styleWithCSS', false, false); 

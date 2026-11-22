@@ -1762,10 +1762,39 @@ function formatDoc(cmd, val) {
             sel.addRange(newRange);
         }
     }
-    // Formatos Básicos
+       // Formatos Básicos (Negrita, Subrayado, Cursiva)
     else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
-        document.execCommand('styleWithCSS', false, false); 
-        document.execCommand(cmd, false, null); 
+        // 1. Usar CSS para evitar etiquetas viejas que son difíciles de quitar
+        document.execCommand('styleWithCSS', false, true); 
+        
+        // 2. Verificar si el formato está activo
+        const isActive = document.queryCommandState(cmd);
+        
+        // 3. Ejecutar el comando forzando el estado
+        document.execCommand(cmd, false, !isActive); 
+        
+        // 4. TRUCO PARA MÓVILES: Si acabamos de APAGAR el formato
+        if (isActive) {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0 && sel.isCollapsed) {
+                const range = sel.getRangeAt(0);
+                // Insertamos un "ancla" invisible para que el texto nuevo sea normal
+                const span = document.createElement('span');
+                if (cmd === 'bold') span.style.fontWeight = 'normal';
+                if (cmd === 'italic') span.style.fontStyle = 'normal';
+                if (cmd === 'underline') span.style.textDecoration = 'none';
+                span.innerHTML = '&#8203;'; // Espacio invisible
+                
+                range.insertNode(span);
+                
+                // Movemos el cursor justo después del espacio invisible
+                const nr = document.createRange();
+                nr.setStart(span.firstChild, 1);
+                nr.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(nr);
+            }
+        }
     } else if (cmd === 'justifyFull') {
         document.execCommand('styleWithCSS', false, true); 
         if (document.queryCommandState('justifyFull')) {

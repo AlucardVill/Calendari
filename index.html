@@ -1705,8 +1705,7 @@ function formatDoc(cmd, val) {
     
     restoreSelection(); 
     
-    // Lógica para Fuente y Tamaño (envuelve en <span>)
-       // Lógica para Fuente (envuelve en <span> y limpia estilos viejos)
+    // Lógica para Fuente (Usa execCommand para no bajar de renglón)
     if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
@@ -1717,49 +1716,27 @@ function formatDoc(cmd, val) {
         }
 
         if (range && !range.collapsed) {
-            // 1. Clonar el contenido seleccionado
-            const frag = range.cloneContents();
-            const tempDiv = document.createElement('div');
-            tempDiv.appendChild(frag);
-
-            // 2. Limpiar CUALQUIER tamaño o fuente anterior de los hijos
-            tempDiv.querySelectorAll('span').forEach(s => {
-                s.style.fontSize = '';
-                s.style.lineHeight = '';
-                s.style.display = '';
-                s.style.paddingBottom = '';
-                s.style.fontFamily = ''; 
-            });
-
-            // 3. Reemplazar el contenido original con la versión limpia
-            range.deleteContents();
-            range.insertNode(tempDiv);
-
-            // 4. Envolver todo en un nuevo span con la nueva fuente
-            const span = document.createElement('span');
-            span.style.fontFamily = val;
-            
-            // Tamaño por defecto para Pinyon Script
-            if (val.includes('Pinyon Script')) {
-                span.style.fontSize = '2rem';
-                span.style.lineHeight = '1.4';
-                span.style.display = 'inline-block';
-                span.style.paddingBottom = '6px';
-            }
-
-            // Mover el contenido limpio dentro del nuevo span
-            while (tempDiv.firstChild) {
-                span.appendChild(tempDiv.firstChild);
-            }
-            tempDiv.parentNode.replaceChild(span, tempDiv);
-
-            // 5. Volver a seleccionar el texto modificado
-            const nr = document.createRange();
-            nr.selectNodeContents(span);
-            if (sel) { sel.removeAllRanges(); sel.addRange(nr); }
-        } else {
-            document.execCommand('styleWithCSS', false, false);
+            // 1. Aplicar la fuente nativamente (esto evita el salto de línea)
+            document.execCommand('styleWithCSS', false, true);
             document.execCommand('fontName', false, val);
+
+            // 2. Escanear los textos para ajustar o limpiar el tamaño
+            ta.querySelectorAll('span').forEach(span => {
+                const ff = span.style.fontFamily || '';
+                if (ff.includes('Pinyon')) {
+                    // Si es Pinyon, aplicar tamaño grande
+                    span.style.fontSize = '2rem';
+                    span.style.lineHeight = '1.4';
+                    span.style.display = 'inline-block';
+                    span.style.paddingBottom = '6px';
+                } else {
+                    // Si es otra fuente, limpiar los estilos para que vuelva a la normalidad
+                    span.style.fontSize = '';
+                    span.style.lineHeight = '';
+                    span.style.display = '';
+                    span.style.paddingBottom = '';
+                }
+            });
         }
     } 
     // Formatos Básicos

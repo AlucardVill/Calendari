@@ -2940,6 +2940,236 @@ if (document.getElementById('hidden-bar-pills')) renderHiddenBarColumns();
     if (a) init(a);
   });
 })();
-</script> 
+<script>
+/* ============================================================
+   PROTECCIÓN ESTRICTA DE WIKI-LINKS
+   Único método de borrado permitido: window.deleteWikiLink(el)
+   ============================================================ */
+(function () {
+  const originals = new WeakMap(); // link -> innerHTML original
+
+  function init(notesArea) {
+    // ---------- 1) Hacer los links atómicos ----------
+    const makeAtomic = (link) => {
+      if (!link || !link.classList || !link.classList.contains('wiki-link')) return;
+      if (link.getAttribute('contenteditable') !== 'false') {
+        link.setAttribute('contenteditable', 'false');
+      }
+      if (link.getAttribute('draggable') !== 'false') {
+        link.setAttribute('draggable', 'false');
+      }
+      if (!originals.has(link)) originals.set(link, link.innerHTML);
+      if (!link.__wikiDragBound) {
+        link.__wikiDragBound = true;
+        link.addEventListener('dragstart', e => e.preventDefault());
+        link.addEventListener('drop',      e => e.preventDefault());
+      }
+    };
+    const scanAll = () => notesArea.querySelectorAll('.wiki-link').forEach(makeAtomic);
+    scanAll();
+
+    // ---------- 2) Helpers de selección ----------
+    const isWikiNode = (node) => {
+      const el = node && (node.nodeType === 3 ? node.parentElement : node);
+      return !!(el && el.closest && el.closest('.wiki-link'));
+    };
+    const rangeCoversWiki = (range) => {
+      if (!range) return false;
+      try {
+        const frag = range.cloneContents();
+        return !!(frag.querySelector && frag.querySelector('.wiki-link'));
+      } catch (_) { return false; }
+    };
+    const touchingWiki = (range) => {
+      if (!range) return false;
+      if (isWikiNode(range.startContainer) || isWikiNode(range.endContainer)) return true;
+      return rangeCoversWiki(range);
+    };
+    const collapsedAtWikiEdge = (range, dir) => {
+      if (!range || !range.collapsed) return false;
+      const c = range.startContainer, o = range.startOffset;
+      let sib;
+      if (c.nodeType === 3) {
+        if (dir === 'back') { if (o > 0) return false; sib = c.previousSibling; }
+        else                { if (o < c.textContent.length) return false; sib = c.nextSibling; }
+      } else {
+        sib = c.childNodes[dir === 'back' ? o - 1 : o];
+      }
+      while (sib && sib.nodeType === 3 && sib.textContent.trim() === '') {
+        sib = dir === 'back' ? sib.previousSibling : sib.nextSibling;
+      }
+      return !!(sib && sib.nodeType === 1 && sib.classList.contains('wiki-link'));
+    };
+
+    // ---------- 3) beforeinput (vía principal) ----------
+    const DELETION_TYPES = new Set([
+      'deleteContentBackward','deleteContentForward','deleteContent',
+      'deleteByCut','deleteByDrag',
+      'deleteWordBackward','deleteWordForward',
+      'deleteSoftLineBackward','deleteSoftLineForward',
+      'deleteHardLineBackward','deleteHardLineForward',
+      'deleteEntireSoftLine'
+    ]);
+    const INSERTION_REPLACING_TYPES = new Set([
+      'insertText','insertFromPaste','insertFromDrop',
+      'insertCompositionText','insertFromComposition',
+      'insertReplacementText','insertParagraph','insertLineBreak'
+    ]);
+
+    notesArea.addEventListener('beforeinput', (e) => {
+      const sel = window.getSelection();
+      if (!sel || !sel.rangeCount) return;
+      const range = sel.getRangeAt(0);
+      const t = e.inputType;
+
+      if (DELETION_TYPES.has(t)) {
+        const dir = /Backward|deleteContent$/.test(t) ? 'back' : 'forward';
+        if (touchingWiki(range) || collapsedAtWikiEdge(range, dir)) {
+          e.preventDefault(); e.stopImmediatePropagation();
+        }
+        return;
+      }
+      if (INSERTION_REPLACING_TYPES.has(t)) {
+        if (!range.collapsed && rangeCoversWiki(range)) {
+          e.preventDefault(); e.stopImmediatePropagation();
+        }
+      }
+    }, true);
+
+    // ---------- 4) keydown (fallback navegadores viejos) ----------
+    notesArea.addEventListener('keydown', (e) => {
+      if (e.isComposing) return;
+      const k = e.key;
+      const sel = window.getSelection();
+      if (!sel || !sel.rangeCount) return;
+      const range = sel.getRangeAt(0);
+      if (k === 'Backspace' && (touchingWiki(range) || collapsedAtWikiEdge(range, 'back'))) {
+        e.preventDefault(); e.stopImmediatePropagation();
+      } else if (k === 'Delete' && (touchingWiki(range) || collapsedAtWikiEdge(range, 'forward'))) {
+        e.preventDefault(); e.stopImmediatePropagation();
+      } else if ((k === 'x' || k === 'X') && (e.ctrlKey || e.metaKey) && touchingWiki(range)) {
+        e.preventDefault(); e.stopImmediatePropagation();
+      }
+    }, true);
+
+    // ---------- 5) cut / paste / drop ----------
+    notesArea.addEventListener('cut', (e) => {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount && touchingWiki(sel.getRangeAt(0))) {
+        e.preventDefault(); e.stopImmediatePropagation();
+      }
+    }, true);
+
+    notesArea.addEventListener('paste', (e) => {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount) {
+        const r = sel.getRangeAt(0);
+        if (!r.collapsed && rangeCoversWiki(r)) {
+          e.preventDefault(); e.stopImmediatePropagation();
+        }
+      }
+    }, true);
+
+    notesArea.addEventListener('drop', (e) => {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount && touchingWiki(sel.getRangeAt(0))) {
+        e.preventDefault(); e.stopImmediatePropagation();
+      }
+    }, true);
+
+    // ---------- 6) Red de seguridad: MutationObserver ----------
+    const obs = new MutationObserver((mutations) => {
+      if (window.__wikiDeleteAuth) return; // borrado autorizado por deleteWikiLink
+
+      for (const m of mutations) {
+        // a) Nuevos wiki-links (p.ej. pegados) -> hacerlos atómicos
+        if (m.type === 'childList') {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType === 1) {
+              if (n.classList && n.classList.contains('wiki-link')) makeAtomic(n);
+              if (n.querySelectorAll) n.querySelectorAll('.wiki-link').forEach(makeAtomic);
+            }
+          });
+
+          // b) ¿Se eliminó algún wiki-link?
+          let containsWiki = false;
+          m.removedNodes.forEach(n => {
+            if (n.nodeType === 1 && (
+                  (n.classList && n.classList.contains('wiki-link')) ||
+                  (n.querySelector && n.querySelector('.wiki-link'))
+               )) containsWiki = true;
+          });
+
+          if (containsWiki) {
+            const stillConnected = Array.from(m.removedNodes).some(n => n.isConnected);
+            if (stillConnected) { scanAll(); continue; } // es un "move", no un borrado
+
+            // Restaurar el lote en su posición original
+            const target = m.target;
+            const ref = (m.nextSibling && m.nextSibling.parentNode === target) ? m.nextSibling : null;
+            Array.from(m.removedNodes).forEach(node => {
+              try {
+                if (ref) target.insertBefore(node, ref);
+                else     target.appendChild(node);
+              } catch (_) {}
+            });
+            scanAll();
+          }
+        }
+
+        // c) Cambio de texto dentro de un wiki-link -> restaurar
+        else if (m.type === 'characterData') {
+          const link = m.target.parentElement && m.target.parentElement.closest('.wiki-link');
+          if (link && originals.has(link) && link.innerHTML !== originals.get(link)) {
+            link.innerHTML = originals.get(link);
+          }
+        }
+
+        // d) Alguien intentó volverlo editable -> impedirlo
+        else if (m.type === 'attributes' && m.attributeName === 'contenteditable') {
+          const el = m.target;
+          if (el.classList && el.classList.contains('wiki-link') &&
+              el.getAttribute('contenteditable') !== 'false') {
+            el.setAttribute('contenteditable', 'false');
+          }
+        }
+      }
+    });
+
+    obs.observe(notesArea, {
+      childList: true, subtree: true,
+      characterData: true,
+      attributes: true, attributeFilter: ['contenteditable']
+    });
+
+    // ---------- 7) ÚNICO método autorizado de borrado ----------
+    window.deleteWikiLink = function (linkEl) {
+      if (!linkEl || !linkEl.classList || !linkEl.classList.contains('wiki-link')) return false;
+      linkEl.style.transition = 'opacity .15s';
+      linkEl.style.opacity = '0';
+      setTimeout(() => {
+        window.__wikiDeleteAuth = true;
+        try {
+          if (linkEl.parentNode) linkEl.parentNode.removeChild(linkEl);
+        } finally {
+          window.__wikiDeleteAuth = false;
+        }
+        notesArea.dispatchEvent(new Event('input', { bubbles: true }));
+      }, 100);
+      return true;
+    };
+  }
+
+  const start = () => {
+    const area = document.getElementById('notes-main-textarea');
+    if (area) init(area);
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+})();
+</script>
 </body>
 </html>

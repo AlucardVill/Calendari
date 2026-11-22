@@ -934,8 +934,8 @@ body.focus-mode #focus-frame {
     pointer-events: none !important; /* Evita que se pueda tocar mientras está invisible */
     transform: translate(-50%, 20px) !important; /* Se hunde un poco hacia abajo al desaparecer */
 } 
-/* Ajuste para que la fuente Pinyon Script no se corte */
-#notes-main-textarea span[style*="Pinyon Script"] {
+/* Ajuste para que la fuente Pinyon  no se corte */
+#notes-main-textarea span[style*="Pinyon "] {
     line-height: 1.5 !important;
     display: inline-block;
     padding-top: 4px;
@@ -2838,5 +2838,205 @@ buildHiddenColumnsHTML = function(query) {
 };
 if (document.getElementById('hidden-bar-pills')) renderHiddenBarColumns();
 </script>
+  <script>
+(function() {
+    'use strict';
+
+    const NOTES_ID = 'notes-main-textarea';
+
+    function isWikiLink(node) {
+        return node && node.nodeType === 1 &&
+               node.classList && node.classList.contains('wiki-link');
+    }
+
+    // ¿El rango (selección múltiple) intersecta algún enlace?
+    function rangeIntersectsWikiLink(range, root) {
+        const links = root.querySelectorAll('.wiki-link');
+        for (let i = 0; i < links.length; i++) {
+            try {
+                if (range.intersectsNode(links[i])) return true;
+            } catch (err) {}
+        }
+        return false;
+    }
+
+    // ¿El cursor está dentro (o justo en el borde interno) de un enlace?
+    function isCursorInsideWikiLink(range, root) {
+        let node = range.startContainer;
+        while (node && node !== root) {
+            if (isWikiLink(node)) return true;
+            node = node.parentNode;
+        }
+        return false;
+    }
+
+    // Buscar hermano anterior "real" (saltando nodos de texto vacíos)
+    function prevMeaningfulSibling(node) {
+        let sib = node.previousSibling;
+        while (sib) {
+            if (sib.nodeType === 3) {
+                if (sib.textContent.length > 0) return sib;
+                sib = sib.previousSibling;
+            } else if (sib.nodeType === 1) {
+                return sib;
+            } else {
+                sib = sib.previousSibling;
+            }
+        }
+        return null;
+    }
+
+    function nextMeaningfulSibling(node) {
+        let sib = node.nextSibling;
+        while (sib) {
+            if (sib.nodeType === 3) {
+                if (sib.textContent.length > 0) return sib;
+                sib = sib.nextSibling;
+            } else if (sib.nodeType === 1) {
+                return sib;
+            } else {
+                sib = sib.nextSibling;
+            }
+        }
+        return null;
+    }
+
+    // ¿Pulsar Backspace borraría un enlace?
+    function backspaceWouldDeleteLink(range, root) {
+        const { startContainer, startOffset } = range;
+
+        if (isCursorInsideWikiLink(range, root)) return true;
+
+        if (startContainer.nodeType === 3) {
+            if (startOffset > 0) return false; // hay texto previo, se borra texto, no enlace
+            const prev = prevMeaningfulSibling(startContainer);
+            if (prev) return isWikiLink(prev);
+            let parent = startContainer.parentNode;
+            while (parent && parent !== root) {
+                if (isWikiLink(parent)) return true;
+                const pprev = prevMeaningfulSibling(parent);
+                if (pprev) return isWikiLink(pprev);
+                parent = parent.parentNode;
+            }
+            return false;
+        }
+
+        if (startContainer.nodeType === 1) {
+            if (startOffset === 0) {
+                if (isWikiLink(startContainer)) return true;
+                const prev = prevMeaningfulSibling(startContainer);
+                if (prev) return isWikiLink(prev);
+                let parent = startContainer.parentNode;
+                while (parent && parent !== root) {
+                    if (isWikiLink(parent)) return true;
+                    const pprev = prevMeaningfulSibling(parent);
+                    if (pprev) return isWikiLink(pprev);
+                    parent = parent.parentNode;
+                }
+                return false;
+            }
+            const prev = startContainer.childNodes[startOffset - 1];
+            if (prev.nodeType === 3) {
+                if (prev.textContent.length > 0) return false;
+                const real = prevMeaningfulSibling(prev);
+                return real ? isWikiLink(real) : false;
+            }
+            return isWikiLink(prev);
+        }
+        return false;
+    }
+
+    // ¿Pulsar Delete (suprimir) borraría un enlace?
+    function deleteWouldDeleteLink(range, root) {
+        const { startContainer, startOffset } = range;
+
+        if (isCursorInsideWikiLink(range, root)) return true;
+
+        if (startContainer.nodeType === 3) {
+            if (startOffset < startContainer.textContent.length) return false;
+            const next = nextMeaningfulSibling(startContainer);
+            if (next) return isWikiLink(next);
+            let parent = startContainer.parentNode;
+            while (parent && parent !== root) {
+                if (isWikiLink(parent)) return true;
+                const nnext = nextMeaningfulSibling(parent);
+                if (nnext) return isWikiLink(nnext);
+                parent = parent.parentNode;
+            }
+            return false;
+        }
+
+        if (startContainer.nodeType === 1) {
+            if (startOffset >= startContainer.childNodes.length) {
+                if (isWikiLink(startContainer)) return true;
+                const next = nextMeaningfulSibling(startContainer);
+                if (next) return isWikiLink(next);
+                let parent = startContainer.parentNode;
+                while (parent && parent !== root) {
+                    if (isWikiLink(parent)) return true;
+                    const nnext = nextMeaningfulSibling(parent);
+                    if (nnext) return isWikiLink(nnext);
+                    parent = parent.parentNode;
+                }
+                return false;
+            }
+            const next = startContainer.childNodes[startOffset];
+            if (next.nodeType === 3) {
+                if (next.textContent.length > 0) return false;
+                const real = nextMeaningfulSibling(next);
+                return real ? isWikiLink(real) : false;
+            }
+            return isWikiLink(next);
+        }
+        return false;
+    }
+
+    function shouldBlock(direction) {
+        const notesEl = document.getElementById(NOTES_ID);
+        if (!notesEl) return false;
+
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return false;
+        const range = sel.getRangeAt(0);
+
+        if (!notesEl.contains(range.commonAncestorContainer) &&
+            range.commonAncestorContainer !== notesEl) return false;
+
+        // Selección múltiple que incluye un enlace
+        if (!range.collapsed) {
+            return rangeIntersectsWikiLink(range, notesEl);
+        }
+
+        return direction === 'backward'
+            ? backspaceWouldDeleteLink(range, notesEl)
+            : deleteWouldDeleteLink(range, notesEl);
+    }
+
+    function kill(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    // Captura en fase de captura: se ejecuta antes que el contenteditable
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace') {
+            if (shouldBlock('backward')) kill(e);
+        } else if (e.key === 'Delete') {
+            if (shouldBlock('forward')) kill(e);
+        }
+    }, true);
+
+    // Compatibilidad con teclados móviles / virtuales
+    document.addEventListener('beforeinput', function(e) {
+        const t = e.inputType;
+        if (t === 'deleteContentBackward' || t === 'deleteContent') {
+            if (shouldBlock('backward')) kill(e);
+        } else if (t === 'deleteContentForward') {
+            if (shouldBlock('forward')) kill(e);
+        }
+    }, true);
+})();
+</script>  
  </body>
 </html>

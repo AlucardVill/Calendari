@@ -2838,5 +2838,108 @@ buildHiddenColumnsHTML = function(query) {
 };
 if (document.getElementById('hidden-bar-pills')) renderHiddenBarColumns();
 </script>
- </body>
+<script>
+/* =========================================================
+   PROTECCIÓN DE WIKI-LINKS
+   - Backspace/Delete/Cut NO pueden tocarlos.
+   - La única forma de borrar es window.deleteWikiLink(el).
+   ========================================================= */
+(function () {
+  function init(notesArea) {
+    // 1) Hacer atómicos los links existentes y futuros
+    const makeAtomic = () => {
+      notesArea.querySelectorAll('.wiki-link').forEach(link => {
+        if (link.getAttribute('contenteditable') !== 'false') {
+          link.setAttribute('contenteditable', 'false');
+          link.setAttribute('data-wiki-protected', 'true');
+        }
+      });
+    };
+    new MutationObserver(makeAtomic).observe(notesArea, { childList: true, subtree: true });
+    makeAtomic();
+
+    // 2) Utilidades
+    const isInsideWiki = (node) => {
+      const el = node && (node.nodeType === 3 ? node.parentElement : node);
+      return !!(el && el.closest && el.closest('.wiki-link'));
+    };
+    const rangeHasWiki = (range) => {
+      if (!range || range.collapsed) return false;
+      try {
+        const frag = range.cloneContents();
+        return !!(frag.querySelector && frag.querySelector('.wiki-link'));
+      } catch (e) { return false; }
+    };
+    const adjacentWiki = (range, dir) => {
+      const c = range.startContainer, o = range.startOffset;
+      let sib;
+      if (c.nodeType === 3) {
+        if (dir === 'back') { if (o > 0) return null; sib = c.previousSibling; }
+        else { if (o < c.textContent.length) return null; sib = c.nextSibling; }
+      } else {
+        sib = c.childNodes[dir === 'back' ? o - 1 : o];
+      }
+      while (sib && sib.nodeType === 3 && sib.textContent.trim() === '') {
+        sib = dir === 'back' ? sib.previousSibling : sib.nextSibling;
+      }
+      return (sib && sib.nodeType === 1 && sib.classList.contains('wiki-link')) ? sib : null;
+    };
+    const shouldBlock = (range, dir) => {
+      if (isInsideWiki(range.startContainer)) return true;
+      if (isInsideWiki(range.endContainer)) return true;
+      if (rangeHasWiki(range)) return true;
+      if (range.collapsed) {
+        if (dir === 'back' && adjacentWiki(range, 'back')) return true;
+        if (dir === 'forward' && adjacentWiki(range, 'forward')) return true;
+      }
+      return false;
+    };
+
+    // 3) Interceptar borrado moderno
+    notesArea.addEventListener('beforeinput', (e) => {
+      const t = e.inputType;
+      if (t === 'deleteContentBackward' || t === 'deleteContentForward') {
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return;
+        const dir = t === 'deleteContentBackward' ? 'back' : 'forward';
+        if (shouldBlock(sel.getRangeAt(0), dir)) e.preventDefault();
+      } else if (t === 'deleteContent' || t === 'deleteByCut' || t === 'deleteByDrag') {
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return;
+        if (shouldBlock(sel.getRangeAt(0), 'forward')) e.preventDefault();
+      }
+    });
+
+    // 4) Fallback para navegadores viejos
+    notesArea.addEventListener('keydown', (e) => {
+      if (e.isComposing) return;
+      if (e.key !== 'Backspace' && e.key !== 'Delete') return;
+      const sel = window.getSelection();
+      if (!sel.rangeCount) return;
+      const dir = e.key === 'Backspace' ? 'back' : 'forward';
+      if (shouldBlock(sel.getRangeAt(0), dir)) e.preventDefault();
+    });
+
+    // 5) ÚNICA forma oficial de borrar un wiki-link
+    window.deleteWikiLink = function (linkEl) {
+      if (!linkEl || !linkEl.classList || !linkEl.classList.contains('wiki-link')) return false;
+      linkEl.style.transition = 'opacity .15s';
+      linkEl.style.opacity = '0';
+      setTimeout(() => {
+        linkEl.remove();
+        notesArea.dispatchEvent(new Event('input', { bubbles: true }));
+      }, 100);
+      return true;
+    };
+  }
+
+  const area = document.getElementById('notes-main-textarea');
+  if (area) init(area);
+  else document.addEventListener('DOMContentLoaded', () => {
+    const a = document.getElementById('notes-main-textarea');
+    if (a) init(a);
+  });
+})();
+</script> 
+</body>
 </html>

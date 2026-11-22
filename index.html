@@ -1562,6 +1562,64 @@ document.getElementById('notes-main-textarea').addEventListener('pointermove', (
         lastPressedLink = null;
     }
 });
+function unwrapListItem(li, ta) {
+    const ul = li.parentElement;
+    if (!ul || ul.nodeName !== 'UL') return;
+    const div = document.createElement('div');
+    while (li.firstChild) div.appendChild(li.firstChild);
+    if (!div.innerHTML.trim()) div.innerHTML = '<br>';
+
+    const prevLi = li.previousElementSibling;
+    const nextLi = li.nextElementSibling;
+
+    if (!prevLi && !nextLi) {
+        ul.parentNode.replaceChild(div, ul);
+    } else if (!nextLi) {
+        li.remove();
+        ul.parentNode.insertBefore(div, ul.nextSibling);
+    } else if (!prevLi) {
+        li.remove();
+        ul.parentNode.insertBefore(div, ul);
+    } else {
+        const afterUl = document.createElement('ul');
+        let curr = nextLi;
+        while (curr) {
+            const next = curr.nextElementSibling;
+            afterUl.appendChild(curr);
+            curr = next;
+        }
+        li.remove();
+        ul.parentNode.insertBefore(div, ul.nextSibling);
+        ul.parentNode.insertBefore(afterUl, div.nextSibling);
+    }
+
+    const sel = window.getSelection();
+    if (sel) {
+        const r = document.createRange();
+        r.setStart(div, 0);
+        r.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(r);
+    }
+}
+
+function handleEmptyBulletBackspace(ta) {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || !sel.isCollapsed) return false;
+    const node = sel.anchorNode;
+    const el = node.nodeType === 3 ? node.parentNode : node;
+    const li = el ? el.closest('li') : null;
+    if (!li || !ta.contains(li)) return false;
+
+    const cleanText = li.textContent.replace(/\u200B/g, '').trim();
+    if (cleanText === '' && !li.querySelector('.wiki-link, img, hr')) {
+        unwrapListItem(li, ta);
+        saveMainNote();
+        updateFormatBtns();
+        return true;
+    }
+    return false;
+}
 
 // =========================================
 // PROTECCIÓN ABSOLUTA CONTRA BORRADO DE ENLACES
@@ -1573,11 +1631,37 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
     if (!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
 
-    // Función para saber si un elemento es un enlace o lo contiene
-    const hasLink = (el) => {
+    if (e.inputType === 'deleteContentBackward' && range.collapsed) {
+        if (handleEmptyBulletBackspace(this)) {
+            e.preventDefault();
+            return;
+        }
+    }
+
+    const isDirectLink = (el) => {
         if (!el) return false;
-        if (el.nodeType === 1) return el.classList.contains('wiki-link') || el.querySelector('.wiki-link') !== null;
+        if (el.nodeType === 1) return el.classList.contains('wiki-link');
         if (el.nodeType === 3) return el.parentElement && el.parentElement.closest('.wiki-link') !== null;
+        return false;
+    };
+
+    const endsWithLink = (el) => {
+        if (!el) return false;
+        if (isDirectLink(el)) return true;
+        if (el.nodeType === 1) {
+            let last = el.lastChild;
+            while (last) {
+                if (last.nodeType === 3 && last.textContent.replace(/\u200B/g, '').trim() === '') {
+                    last = last.previousSibling;
+                    continue;
+                }
+                if (last.nodeType === 1 && (last.tagName === 'BR' || last.innerHTML === '<br>')) {
+                    last = last.previousSibling;
+                    continue;
+                }
+                return endsWithLink(last);
+            }
+        }
         return false;
     };
 
@@ -1594,20 +1678,23 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
     let offset = range.startOffset;
 
     // 2. Si el cursor está DENTRO de un enlace
-    if (hasLink(node)) { e.preventDefault(); return; }
+    if (isDirectLink(node)) { e.preventDefault(); return; }
 
-    // 3. Retroceso (Backspace)
+       // 3. Retroceso (Backspace)
     if (e.inputType === 'deleteContentBackward') {
+        if (node.nodeType === 1 && offset > 0) {
+            const prevChild = node.childNodes[offset - 1];
+            if (endsWithLink(prevChild)) { e.preventDefault(); return; }
+        }
         if (offset === 0) {
+
             let current = node.nodeType === 3 ? node.parentNode : node;
             
-            // Subimos por el árbol buscando el enlace anterior, ignorando saltos de línea
             while (current && current !== this) {
                 let prev = current.previousSibling;
                 while (prev) {
-                    if (hasLink(prev)) { e.preventDefault(); return; }
+                    if (endsWithLink(prev)) { e.preventDefault(); return; }
                     
-                    // Ignorar <br> y espacios vacíos
                     if (prev.nodeType === 3 && prev.textContent.trim() === '') {
                         prev = prev.previousSibling; continue;
                     }
@@ -1619,8 +1706,7 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
                 current = current.parentNode;
             }
             
-            // Escudo final: si el primer elemento de todo el cuadro es un enlace
-            if (this.firstChild && hasLink(this.firstChild)) {
+            if (this.firstChild && isDirectLink(this.firstChild)) {
                 e.preventDefault(); return;
             }
         }
@@ -1630,7 +1716,7 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
         let current = node.nodeType === 3 ? node.parentNode : node;
         if ((node.nodeType === 3 && offset === node.length) || (node.nodeType === 1 && offset === node.childNodes.length)) {
             let next = current.nextSibling;
-            if (next && hasLink(next)) { e.preventDefault(); return; }
+            if (next && isDirectLink(next)) { e.preventDefault(); return; }
         }
     }
 });
@@ -1792,11 +1878,23 @@ function restoreSelection() { if (_savedRange) { if (window.getSelection) { cons
                 }
             }
         }
+      } else if (cmd === 'insertUnorderedList') {
+        const wasInList = isSelectionInList();
+        document.execCommand('insertUnorderedList', false, null);
+        if (wasInList && isSelectionInList()) {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0) {
+                const node = sel.anchorNode;
+                const el = node.nodeType === 3 ? node.parentNode : node;
+                const li = el ? el.closest('li') : null;
+                if (li && ta.contains(li)) unwrapListItem(li, ta);
+            }
+        }
     } else { 
-
         document.execCommand('styleWithCSS', false, true); 
         document.execCommand(cmd, false, val || null); 
     }
+
     
     saveMainNote(); 
     saveSelection(); 
@@ -1899,11 +1997,26 @@ function isSelectionJustified() {
     try { return document.queryCommandState('justifyFull'); } catch (_) { return false; }
 }
 
+function isSelectionInList() {
+    const ta = document.getElementById('notes-main-textarea');
+    if (!ta) return false;
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+        let node = sel.anchorNode;
+        while (node && node !== ta) {
+            if (node.nodeType === 1 && (node.nodeName === 'UL' || node.nodeName === 'LI')) return true;
+            node = node.parentNode;
+        }
+    }
+    try { return document.queryCommandState('insertUnorderedList'); } catch (_) { return false; }
+}
+
 function updateFormatBtns() { 
     try { 
         document.querySelectorAll('.notes-format-btn').forEach(b => { 
             const oc = b.getAttribute('onclick') || ''; 
             if (oc.includes("'justifyFull'")) b.classList.toggle('cmd-active', isSelectionJustified()); 
+            if (oc.includes("'insertUnorderedList'")) b.classList.toggle('cmd-active', isSelectionInList()); 
         }); 
     } catch(_) {} 
 }
@@ -2349,6 +2462,11 @@ function cycleFont() {
 document.getElementById('notes-main-textarea').addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && ['b', 'u'].includes(e.key.toLowerCase())) {
         e.preventDefault();
+    }
+    if (e.key === 'Backspace' || e.keyCode === 8) {
+        if (handleEmptyBulletBackspace(e.currentTarget)) {
+            e.preventDefault();
+        }
     }
 });
 </script>

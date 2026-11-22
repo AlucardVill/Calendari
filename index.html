@@ -1534,7 +1534,6 @@ function insertWikiLink() {
     document.execCommand('insertHTML', false, linkHTML);
     saveMainNote();
 }
-let isAuthorizedLinkDeletion = false;
 
 function openLinkEditModal(link) {
     const targetId = link.dataset.target;
@@ -1545,13 +1544,13 @@ function openLinkEditModal(link) {
     if (newName === null) return; // Cancelado
     
     if (newName.trim() === '') {
+        // Eliminar enlace
         if (confirm(`¿Eliminar el hipervínculo "${currentName}"?`)) {
-            isAuthorizedLinkDeletion = true;
             link.remove();
             saveMainNote();
-            setTimeout(() => { isAuthorizedLinkDeletion = false; }, 100);
         }
     } else if (newName.trim() !== currentName) {
+        // Editar nombre
         link.innerText = newName.trim();
         if (notesData.projects[targetId]) {
             notesData.projects[targetId].name = newName.trim();
@@ -1560,6 +1559,7 @@ function openLinkEditModal(link) {
         saveMainNote();
     }
 }
+
 // =========================================
 // EVENTOS PARA NAVEGACIÓN Y PULSACIÓN LARGA
 // =========================================
@@ -1669,81 +1669,102 @@ function handleEmptyBulletBackspace(ta) {
 // =========================================
 // PROTECCIÓN ABSOLUTA CONTRA BORRADO DE ENLACES
 // =========================================
-(function() {
-    const ta = document.getElementById('notes-main-textarea');
-    if (!ta) return;
+document.getElementById('notes-main-textarea').addEventListener('beforeinput', function(e) {
+    if (!e.inputType || !e.inputType.includes('delete')) return;
+    
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
 
-    let lastValidHTML = ta.innerHTML;
-    let isRestoring = false;
-
-    // 1. Mantener el comportamiento de salir de viñetas vacías con retroceso
-    ta.addEventListener('beforeinput', function(e) {
-        if (e.inputType === 'deleteContentBackward') {
-            const sel = window.getSelection();
-            if (sel && sel.rangeCount && sel.getRangeAt(0).collapsed) {
-                if (typeof handleEmptyBulletBackspace === 'function' && handleEmptyBulletBackspace(this)) {
-                    e.preventDefault();
-                    return;
-                }
-            }
-        }
-    }, true);
-
-    // 2. Vigilante del DOM: Si un enlace desaparece sin autorización, lo restaura al instante
-    const observer = new MutationObserver((mutations) => {
-        if (isRestoring || isAuthorizedLinkDeletion || isUndoRedoAction) {
-            lastValidHTML = ta.innerHTML;
+    if (e.inputType === 'deleteContentBackward' && range.collapsed) {
+        if (handleEmptyBulletBackspace(this)) {
+            e.preventDefault();
             return;
         }
-
-        let linkWasRemoved = false;
-        for (const m of mutations) {
-            if (m.type === 'childList' && m.removedNodes.length > 0) {
-                for (const node of m.removedNodes) {
-                    if (node.nodeType === 1 && (node.classList.contains('wiki-link') || node.querySelector('.wiki-link'))) {
-                        linkWasRemoved = true;
-                        break;
-                    }
-                }
-            }
-            if (linkWasRemoved) break;
-        }
-
-        if (linkWasRemoved) {
-            isRestoring = true;
-            const scrollPos = ta.scrollTop;
-            ta.innerHTML = lastValidHTML;
-            ta.scrollTop = scrollPos;
-
-            // Colocar el cursor justo después del último enlace para que puedas seguir escribiendo
-            const links = ta.querySelectorAll('.wiki-link');
-            if (links.length > 0) {
-                const lastLink = links[links.length - 1];
-                const range = document.createRange();
-                const sel = window.getSelection();
-                range.setStartAfter(lastLink);
-                range.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
-
-            setTimeout(() => { isRestoring = false; }, 10);
-        } else {
-            lastValidHTML = ta.innerHTML;
-        }
-    });
-
-    observer.observe(ta, { childList: true, subtree: true });
-
-    // Actualizar la copia segura cuando cambias de nota o proyecto
-    const originalSave = window.saveMainNote;
-    if (typeof originalSave === 'function') {
-        window.saveMainNote = function() {
-            if (!isRestoring) lastValidHTML = ta.innerHTML;
-            return originalSave.apply(this, arguments);
-        };
     }
-})();
+
+    const isDirectLink = (el) => {
+        if (!el) return false;
+        if (el.nodeType === 1) return el.classList.contains('wiki-link');
+        if (el.nodeType === 3) return el.parentElement && el.parentElement.closest('.wiki-link') !== null;
+        return false;
+    };
+
+    const endsWithLink = (el) => {
+        if (!el) return false;
+        if (isDirectLink(el)) return true;
+        if (el.nodeType === 1) {
+            let last = el.lastChild;
+            while (last) {
+                if (last.nodeType === 3 && last.textContent.replace(/\u200B/g, '').trim() === '') {
+                    last = last.previousSibling;
+                    continue;
+                }
+                if (last.nodeType === 1 && (last.tagName === 'BR' || last.innerHTML === '<br>')) {
+                    last = last.previousSibling;
+                    continue;
+                }
+                return endsWithLink(last);
+            }
+        }
+        return false;
+    };
+
+    // 1. Si hay texto seleccionado, bloquear si toca un enlace
+    if (!range.collapsed) {
+        const links = this.querySelectorAll('.wiki-link');
+        for (let link of links) {
+            if (range.intersectsNode(link)) { e.preventDefault(); return; }
+        }
+        return;
+    }
+
+    let node = range.startContainer;
+    let offset = range.startOffset;
+
+    // 2. Si el cursor está DENTRO de un enlace
+    if (isDirectLink(node)) { e.preventDefault(); return; }
+
+       // 3. Retroceso (Backspace)
+    if (e.inputType === 'deleteContentBackward') {
+        if (node.nodeType === 1 && offset > 0) {
+            const prevChild = node.childNodes[offset - 1];
+            if (endsWithLink(prevChild)) { e.preventDefault(); return; }
+        }
+        if (offset === 0) {
+
+            let current = node.nodeType === 3 ? node.parentNode : node;
+            
+            while (current && current !== this) {
+                let prev = current.previousSibling;
+                while (prev) {
+                    if (endsWithLink(prev)) { e.preventDefault(); return; }
+                    
+                    if (prev.nodeType === 3 && prev.textContent.trim() === '') {
+                        prev = prev.previousSibling; continue;
+                    }
+                    if (prev.nodeType === 1 && (prev.tagName === 'BR' || prev.innerHTML === '<br>')) {
+                        prev = prev.previousSibling; continue;
+                    }
+                    break; 
+                }
+                current = current.parentNode;
+            }
+            
+            if (this.firstChild && isDirectLink(this.firstChild)) {
+                e.preventDefault(); return;
+            }
+        }
+    } 
+    // 4. Suprimir (Delete)
+    else if (e.inputType === 'deleteContentForward') {
+        let current = node.nodeType === 3 ? node.parentNode : node;
+        if ((node.nodeType === 3 && offset === node.length) || (node.nodeType === 1 && offset === node.childNodes.length)) {
+            let next = current.nextSibling;
+            if (next && isDirectLink(next)) { e.preventDefault(); return; }
+        }
+    }
+});
 function loadNoteForPicker() { const d = document.getElementById('notes-date-picker').value; const ta = document.getElementById('notes-main-textarea'); ta.innerHTML = notesData[d] || ''; if (d) localStorage.setItem('wkNotesLastDate', d); const s = document.getElementById('notes-index-select'); if (s && !s.disabled) s.value = d; undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML; }
 let pendingTypingFont = null;
 
@@ -2819,3 +2840,4 @@ if (document.getElementById('hidden-bar-pills')) renderHiddenBarColumns();
 </script>
  </body>
 </html>
+

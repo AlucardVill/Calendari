@@ -1555,18 +1555,6 @@ function openLinkEditModal(link) {
             scheduleNotesSave();
         }
         saveMainNote();
-    }
-}
-    } else if (newName.trim() !== currentName) {
-        // Editar nombre
-        link.innerText = newName.trim();
-        if (notesData.projects[targetId]) {
-            notesData.projects[targetId].name = newName.trim();
-            scheduleNotesSave();
-        }
-        saveMainNote();
-    }
-}
 
 // =========================================
 // EVENTOS PARA NAVEGACIÓN Y PULSACIÓN LARGA

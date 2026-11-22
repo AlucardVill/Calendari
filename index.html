@@ -934,7 +934,7 @@ body.focus-mode #focus-frame {
     pointer-events: none !important; /* Evita que se pueda tocar mientras está invisible */
     transform: translate(-50%, 20px) !important; /* Se hunde un poco hacia abajo al desaparecer */
 } 
-/* Ajuste para que la fuente Pinyon  no se corte */
+/* Ajuste para que la fuente Pinyon Script no se corte */
 #notes-main-textarea span[style*="Pinyon Script"] {
     line-height: 1.5 !important;
     display: inline-block;
@@ -2837,7 +2837,7 @@ buildHiddenColumnsHTML = function(query) {
     return `<div class="hidden-cols-scroll">${cols.map(col => `<div class="hidden-col">${col.join('')}</div>`).join('')}</div>`;
 };
 if (document.getElementById('hidden-bar-pills')) renderHiddenBarColumns();
-<script>
+  <script>
 /* =============================================================
    WIKI-LINKS: PROTECCIÓN TOTAL (bloqueo + restauración)
    Única vía autorizada de borrado: window.deleteWikiLink(el)
@@ -3106,6 +3106,8 @@ if (document.getElementById('hidden-bar-pills')) renderHiddenBarColumns();
     authorized
   });
 })();
-</script>
-</body>
+</script>  
+ </body>
 </html>
+
+Los vinculos no estan bien protegidos contra el borrado ses estan borrando con la tecla retroceso, quiero que la unica de forma borrada sea la especificada el codigo nada mas.

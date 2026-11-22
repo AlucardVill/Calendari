@@ -1097,9 +1097,7 @@ body.focus-mode #focus-frame {
 
     <div class="notes-format-toolbar" style="margin:0;">
 <button type="button" class="notes-format-btn" id="btn-font-cycle" onmousedown="event.preventDefault()" onclick="cycleFont()" style="font-family:Georgia, serif; font-weight:600; width:32px;">Aa</button>
-        <button type="button" class="notes-format-btn" style="font-weight:900;font-family:serif;" onmousedown="event.preventDefault()" onclick="formatDoc('bold')">B</button>
-        <button type="button" class="notes-format-btn" style="text-decoration:underline;font-weight:600;" onmousedown="event.preventDefault()" onclick="formatDoc('underline')">U</button>
-<button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('justifyFull')" title="Justificar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 6H3M21 12H3M21 18H3"/></svg></button>
+     <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('justifyFull')" title="Justificar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 6H3M21 12H3M21 18H3"/></svg></button>
         <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="insertDivider()" title="Divisor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h16"/></svg></button>
         <button type="button" class="notes-format-btn" onmousedown="event.preventDefault()" onclick="formatDoc('undo')" title="Deshacer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg></button>
         <button type="button" class="notes-format-btn" id="btn-text-color" onmousedown="handleTextColorDown(event)" onmouseup="handleTextColorUp(event)" ontouchstart="event.preventDefault(); handleTextColorDown(event)" ontouchend="event.preventDefault(); handleTextColorUp(event)"title="Color de texto" style="font-family: serif; font-weight: 900; position: relative;">A</button>
@@ -1676,79 +1674,6 @@ let isUndoRedoAction = false;
 let lastSavedHtml = '';
 function saveSelection() { if (window.getSelection) { const s = window.getSelection(); if (s.getRangeAt && s.rangeCount) _savedRange = s.getRangeAt(0); } else if (document.selection && document.selection.createRange) _savedRange = document.selection.createRange(); }
 function restoreSelection() { if (_savedRange) { if (window.getSelection) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(_savedRange); } else if (document.selection && _savedRange.select) _savedRange.select(); } }
-// Función para revisar si el texto tiene el formato puesto (sin preguntarle al navegador)
-function isFormatActive(cmd) {
-    const ta = document.getElementById('notes-main-textarea');
-    const sel = window.getSelection();
-    if (!sel || !sel.rangeCount) return false;
-    
-    let nodes = [];
-    if (!sel.isCollapsed) {
-        const range = sel.getRangeAt(0);
-        const div = document.createElement('div');
-        div.appendChild(range.cloneContents());
-        nodes = Array.from(div.querySelectorAll('*'));
-        nodes.push(div);
-    } else {
-        let node = sel.anchorNode;
-        if (node.nodeType === 3) node = node.parentNode;
-        nodes = [node];
-    }
-
-    for (let n of nodes) {
-        if (!n || n === ta) continue;
-        const style = window.getComputedStyle(n);
-        if (cmd === 'bold' && (style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 700)) return true;
-        if (cmd === 'italic' && style.fontStyle === 'italic') return true;
-        if (cmd === 'underline' && style.textDecoration.includes('underline')) return true;
-        if (n.tagName === 'B' && cmd === 'bold') return true;
-        if (n.tagName === 'I' && cmd === 'italic') return true;
-        if (n.tagName === 'U' && cmd === 'underline') return true;
-    }
-    return false;
-}
-
-// Función que aplica el formato manualmente (evita bugs de execCommand)
-function applyCustomFormat(cmd) {
-    const ta = document.getElementById('notes-main-textarea');
-    ta.focus();
-    restoreSelection();
-    
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    
-    const isActive = isFormatActive(cmd);
-    
-    const span = document.createElement('span');
-    if (cmd === 'bold') span.style.fontWeight = isActive ? 'normal' : 'bold';
-    if (cmd === 'italic') span.style.fontStyle = isActive ? 'normal' : 'italic';
-    if (cmd === 'underline') span.style.textDecoration = isActive ? 'none' : 'underline';
-    
-    if (!range.collapsed) {
-        try {
-            const frag = range.extractContents();
-            span.appendChild(frag);
-            range.insertNode(span);
-        } catch (e) {
-            range.surroundContents(span);
-        }
-        const nr = document.createRange();
-        nr.selectNodeContents(span);
-        sel.removeAllRanges();
-        sel.addRange(nr);
-    } else {
-        span.innerHTML = '&#8203;';
-        range.insertNode(span);
-        const nr = document.createRange();
-        nr.setStart(span.firstChild, 1);
-        nr.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(nr);
-    }
-    saveMainNote();
-    updateFormatBtns();
-}
     function formatDoc(cmd, val) { 
     const ta = document.getElementById('notes-main-textarea'); 
     if (!ta) return; 
@@ -1825,39 +1750,6 @@ function applyCustomFormat(cmd) {
             sel.addRange(newRange);
         }
     } 
-        // Formatos Básicos usando nuestra lógica manual
-    else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
-        applyCustomFormat(cmd);
-        return; // Salimos de la función para no duplicar código
-     
-        
-        // 3. Si acabamos de APAGAR el formato, limpiamos la zona
-        if (isActive) {
-            const sel = window.getSelection();
-            if (sel && sel.rangeCount > 0 && sel.isCollapsed) {
-                let node = sel.anchorNode;
-                let el = node.nodeType === 3 ? node.parentNode : node;
-                
-                // Buscar el párrafo/contenedor
-                while (el && el !== ta && el.tagName !== 'DIV' && el.tagName !== 'P') {
-                    el = el.parentNode;
-                }
-
-                // Limpiar el párrafo contenedor
-                if (el && el !== ta) {
-                    if (cmd === 'bold') el.style.fontWeight = 'normal';
-                    if (cmd === 'italic') el.style.fontStyle = 'normal';
-                    if (cmd === 'underline') el.style.textDecoration = 'none';
-                    
-                    // Limpiar cualquier span interno (incluidos los vacíos)
-                    el.querySelectorAll('span').forEach(s => {
-                        if (cmd === 'bold') s.style.fontWeight = 'normal';
-                        if (cmd === 'italic') s.style.fontStyle = 'normal';
-                        if (cmd === 'underline') s.style.textDecoration = 'none';
-                    });
-                }
-            }
-        }
     } else if (cmd === 'justifyFull') {
         document.execCommand('styleWithCSS', false, true); 
         if (document.queryCommandState('justifyFull')) {
@@ -1958,9 +1850,6 @@ function updateFormatBtns() {
     try { 
         document.querySelectorAll('.notes-format-btn').forEach(b => { 
             const oc = b.getAttribute('onclick') || ''; 
-            if (oc.includes("'bold'")) b.classList.toggle('cmd-active', isFormatActive('bold')); 
-            if (oc.includes("'underline'")) b.classList.toggle('cmd-active', isFormatActive('underline')); 
-            if (oc.includes("'italic'")) b.classList.toggle('cmd-active', isFormatActive('italic')); 
             if (oc.includes("'justifyFull'")) b.classList.toggle('cmd-active', document.queryCommandState('justifyFull')); 
         }); 
     } catch(_) {} 
@@ -2401,8 +2290,14 @@ function cycleFont() {
             btn.innerText = 'Aa';
         }
     }
-    formatDoc('fontName', FONTS[currentFontIdx]);
+     formatDoc('fontName', FONTS[currentFontIdx]);
 }
+
+document.getElementById('notes-main-textarea').addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && ['b', 'u'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+    }
+});
 </script>
-</body>
+ </body>
 </html>

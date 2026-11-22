@@ -1042,6 +1042,18 @@ body.focus-mode #focus-frame {
 .hidden-timer-pill .pill-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .hidden-timer-pill .pill-time{flex-shrink:0}
 .hidden-bar-pill-empty{display:block!important;font-size:0.68rem;color:var(--muted);font-style:italic;padding:2px 4px}
+.timer-widget, .box-timer-card, .hidden-timer-pill {
+    border: none !important;
+}
+.timers-container, .hidden-cols-scroll, .hidden-bar-dots {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+.timers-container::-webkit-scrollbar, .hidden-cols-scroll::-webkit-scrollbar, .hidden-bar-dots::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
 </style>
 </head>
 <body>

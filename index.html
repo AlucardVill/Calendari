@@ -404,6 +404,9 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 .focus-pins-bar .hidden-dot{width:10px;height:10px}
 body.has-minimized .focus-pins-bar{bottom:calc(max(20px,calc(env(safe-area-inset-bottom) + 10px)) + 56px)}
 #notes-main-textarea{flex:1 1 auto!important;height:0!important;min-height:100px!important;overflow-y:auto!important;resize:none!important;padding:14px 14px 75px 14px!important;white-space:pre-wrap;outline:none;box-sizing:border-box;font-family:Georgia,'Times New Roman',serif;font-size:1rem;border:1px solid var(--border-input);color:var(--text);border-radius:10px}
+#notes-main-textarea ul{margin:4px 0;padding-left:22px;white-space:normal}
+#notes-main-textarea li{margin:2px 0;padding:0;white-space:pre-wrap}
+#notes-main-textarea li>div,#notes-main-textarea li>p{display:inline;margin:0;padding:0}
 .notes-time-btn{position:absolute;bottom: 16px;right:12px;width:30px;height:30px;border-radius:9px;background:var(--card-solid);border:1px solid var(--border-input);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;opacity:0.65;z-index:20}
 .notes-time-btn svg{width:14px;height:14px;display:block}
 .box-timer-card{border-left-color:var(--box-color,var(--accent))!important;border-left-width:4px!important}
@@ -1962,10 +1965,16 @@ function restoreSelection() { if (_savedRange) { if (window.getSelection) { cons
                 }
             }
         }
-      } else if (cmd === 'insertUnorderedList') {
+        } else if (cmd === 'insertUnorderedList') {
         const wasInList = isSelectionInList();
         document.execCommand('insertUnorderedList', false, null);
+        ta.querySelectorAll('li').forEach(li => {
+            while (li.firstChild && li.firstChild.nodeName === 'BR' && li.childNodes.length > 1) {
+                li.removeChild(li.firstChild);
+            }
+        });
         if (wasInList && isSelectionInList()) {
+
             const sel = window.getSelection();
             if (sel && sel.rangeCount > 0) {
                 const node = sel.anchorNode;

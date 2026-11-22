@@ -1706,7 +1706,7 @@ function formatDoc(cmd, val) {
     
     restoreSelection(); 
     
-    // Lógica para Fuente (Limpieza profunda de tamaños)
+ // Lógica para Fuente (Con anclaje para cuando NO hay texto seleccionado)
     if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
@@ -1716,12 +1716,11 @@ function formatDoc(cmd, val) {
             if (sel) { sel.removeAllRanges(); sel.addRange(range); }
         }
 
+        // CASO 1: Hay texto seleccionado
         if (range && !range.collapsed) {
-            // 1. Aplicar fuente nativa
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('fontName', false, val);
 
-            // 2. Limpiar tamaños de CUALQUIER etiqueta (span o font)
             ta.querySelectorAll('span, font').forEach(el => {
                 const ff = el.style.fontFamily || el.getAttribute('face') || '';
                 if (ff.toLowerCase().includes('pinyon')) {
@@ -1730,13 +1729,37 @@ function formatDoc(cmd, val) {
                     el.style.display = 'inline-block';
                     el.style.paddingBottom = '6px';
                 } else {
-                    // Si no es Pinyon, borrar tamaños para volver a la normalidad
                     el.style.fontSize = '';
                     el.style.lineHeight = '';
                     el.style.display = '';
                     el.style.paddingBottom = '';
                 }
             });
+        } 
+        // CASO 2: No hay texto seleccionado (el cursor está parpadeando)
+        else if (range) {
+            // Insertamos un "ancla" invisible para que el cursor se quede atrapado
+            const span = document.createElement('span');
+            span.style.fontFamily = val;
+            
+            if (val.includes('Pinyon')) {
+                span.style.fontSize = '2rem';
+                span.style.lineHeight = '1.4';
+                span.style.display = 'inline-block';
+                span.style.paddingBottom = '6px';
+            }
+            
+            // El espacio de ancho cero permite que el cursor entre y escriba aquí
+            span.innerHTML = '&#8203;'; 
+            
+            range.insertNode(span);
+            
+            // Movemos el cursor dentro del ancla
+            const newRange = document.createRange();
+            newRange.setStart(span.firstChild, 1);
+            newRange.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(newRange);
         }
     }
     // Formatos Básicos

@@ -1054,6 +1054,18 @@ body.focus-mode #focus-frame {
     width: 0 !important;
     height: 0 !important;
 }
+.hidden-cols-scroll {
+    gap: 6px !important;
+}
+.hidden-cat-title {
+    font-size: 0.48rem !important;
+    padding: 3px 4px 0 !important;
+    line-height: 1.2 !important;
+}
+.hidden-col {
+    width: calc((100vw - 62px) / 4) !important;
+    width: calc((100cqw - 18px) / 4) !important;
+}
 </style>
 </head>
 <body>
@@ -2799,6 +2811,32 @@ document.getElementById('notes-main-textarea').addEventListener('keydown', (e) =
         }
     }
 });
+buildHiddenColumnsHTML = function(query) {
+    const q = (query || '').trim().toLowerCase();
+    const hL = timersList.filter(t => t.id !== 'general' && t.hidden && (!q || (t.name || '').toLowerCase().includes(q)));
+    const bL = timerBoxes.filter(box => !q || (box.name || '').toLowerCase().includes(q));
+    if (hL.length === 0 && bL.length === 0) return '<div class="hidden-bar-pill-empty">No hay</div>';
+    const cols = [[]];
+    const pushItem = (html, minSpace = 1) => {
+        let curr = cols[cols.length - 1];
+        if (curr.length > 0 && curr.length + minSpace > 13) {
+            curr = [];
+            cols.push(curr);
+        }
+        curr.push(html);
+    };
+    hL.forEach(t => {
+        pushItem(`<div class="hidden-timer-pill ${t.tRunning ? 'is-running' : ''}" style="--pill-color:${escapeHtml(t.color)}" onclick="toggleTimerHidden('${escapeHtml(t.id)}')" title="${escapeHtml(t.name)}"><span class="pill-dot"></span><span class="pill-name">${escapeHtml(t.name)}</span><span class="pill-time" id="pill-time-${escapeHtml(t.id)}" style="display:none;"></span></div>`, 1);
+    });
+    if (bL.length > 0) {
+        pushItem('<div class="hidden-cat-title">Cajas</div>', 2);
+        bL.forEach(box => {
+            pushItem(`<div class="hidden-timer-pill box-pill" style="--pill-color:${escapeHtml(box.color)}" onpointerdown="handleBoxPillDown(event,'${escapeHtml(box.id)}')" onpointerup="handleBoxPillUp(event,'${escapeHtml(box.id)}')" onpointercancel="handleBoxPillCancel()" onpointerleave="handleBoxPillCancel()" title="${escapeHtml(box.name)}"><span class="pill-dot"></span><span class="pill-name">${escapeHtml(box.name)}</span></div>`, 1);
+        });
+    }
+    return `<div class="hidden-cols-scroll">${cols.map(col => `<div class="hidden-col">${col.join('')}</div>`).join('')}</div>`;
+};
+if (document.getElementById('hidden-bar-pills')) renderHiddenBarColumns();
 </script>
  </body>
 </html>

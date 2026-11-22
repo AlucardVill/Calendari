@@ -1753,38 +1753,40 @@ function formatDoc(cmd, val) {
         }
     } 
     // Formatos Básicos (Negrita, Subrayado, Cursiva)
+       // Formatos Básicos (Negrita, Subrayado, Cursiva)
     else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
         document.execCommand('styleWithCSS', false, true); 
-        document.execCommand(cmd, false, null); 
         
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0 && sel.isCollapsed) {
-            let node = sel.anchorNode;
-            let el = node.nodeType === 3 ? node.parentNode : node;
-            
-            while (el && el !== ta && el.tagName !== 'DIV' && el.tagName !== 'P') {
-                el = el.parentNode;
-            }
+        // 1. Comprobar el estado actual antes de ejecutar
+        const isActive = document.queryCommandState(cmd);
+        
+        // 2. Forzar el apagado (false) o encendido (true) estricto
+        document.execCommand(cmd, false, !isActive); 
+        
+        // 3. Si acabamos de APAGAR el formato, limpiamos la zona
+        if (isActive) {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0 && sel.isCollapsed) {
+                let node = sel.anchorNode;
+                let el = node.nodeType === 3 ? node.parentNode : node;
+                
+                // Buscar el párrafo/contenedor
+                while (el && el !== ta && el.tagName !== 'DIV' && el.tagName !== 'P') {
+                    el = el.parentNode;
+                }
 
-            if (el && el !== ta && el.textContent.trim() === '') {
-                if (cmd === 'bold') el.style.fontWeight = 'normal';
-                if (cmd === 'italic') el.style.fontStyle = 'normal';
-                if (cmd === 'underline') el.style.textDecoration = 'none';
-            } else {
-                const isActive = document.queryCommandState(cmd);
-                if (!isActive) {
-                    const range = sel.getRangeAt(0);
-                    const span = document.createElement('span');
-                    if (cmd === 'bold') span.style.fontWeight = 'normal';
-                    if (cmd === 'italic') span.style.fontStyle = 'normal';
-                    if (cmd === 'underline') span.style.textDecoration = 'none';
-                    span.innerHTML = '&#8203;'; 
-                    range.insertNode(span);
-                    const nr = document.createRange();
-                    nr.setStart(span.firstChild, 1);
-                    nr.collapse(true);
-                    sel.removeAllRanges();
-                    sel.addRange(nr);
+                // Limpiar el párrafo contenedor
+                if (el && el !== ta) {
+                    if (cmd === 'bold') el.style.fontWeight = 'normal';
+                    if (cmd === 'italic') el.style.fontStyle = 'normal';
+                    if (cmd === 'underline') el.style.textDecoration = 'none';
+                    
+                    // Limpiar cualquier span interno (incluidos los vacíos)
+                    el.querySelectorAll('span').forEach(s => {
+                        if (cmd === 'bold') s.style.fontWeight = 'normal';
+                        if (cmd === 'italic') s.style.fontStyle = 'normal';
+                        if (cmd === 'underline') s.style.textDecoration = 'none';
+                    });
                 }
             }
         }

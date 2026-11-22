@@ -1706,7 +1706,7 @@ function formatDoc(cmd, val) {
     
     restoreSelection(); 
     
- // Lógica para Fuente (Con anclaje para cuando NO hay texto seleccionado)
+    // Lógica para Fuente
     if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
@@ -1716,7 +1716,6 @@ function formatDoc(cmd, val) {
             if (sel) { sel.removeAllRanges(); sel.addRange(range); }
         }
 
-        // CASO 1: Hay texto seleccionado
         if (range && !range.collapsed) {
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('fontName', false, val);
@@ -1735,57 +1734,43 @@ function formatDoc(cmd, val) {
                     el.style.paddingBottom = '';
                 }
             });
-        } 
-        // CASO 2: No hay texto seleccionado (el cursor está parpadeando)
-        else if (range) {
-            // Insertamos un "ancla" invisible para que el cursor se quede atrapado
+        } else if (range) {
             const span = document.createElement('span');
             span.style.fontFamily = val;
-            
             if (val.includes('Pinyon')) {
                 span.style.fontSize = '2rem';
                 span.style.lineHeight = '1.4';
                 span.style.display = 'inline-block';
                 span.style.paddingBottom = '6px';
             }
-            
-            // El espacio de ancho cero permite que el cursor entre y escriba aquí
             span.innerHTML = '&#8203;'; 
-            
             range.insertNode(span);
-            
-            // Movemos el cursor dentro del ancla
             const newRange = document.createRange();
             newRange.setStart(span.firstChild, 1);
             newRange.collapse(true);
             sel.removeAllRanges();
             sel.addRange(newRange);
         }
-    }
-     // Formatos Básicos (Negrita, Subrayado, Cursiva)
+    } 
+    // Formatos Básicos (Negrita, Subrayado, Cursiva)
     else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
-        // 1. Ejecutar el comando (usando CSS para evitar etiquetas viejas)
         document.execCommand('styleWithCSS', false, true); 
         document.execCommand(cmd, false, null); 
         
-        // 2. Forzar la limpieza si el cursor está en un párrafo vacío
         const sel = window.getSelection();
         if (sel && sel.rangeCount > 0 && sel.isCollapsed) {
             let node = sel.anchorNode;
             let el = node.nodeType === 3 ? node.parentNode : node;
             
-            // Buscar el contenedor (div o p)
             while (el && el !== ta && el.tagName !== 'DIV' && el.tagName !== 'P') {
                 el = el.parentNode;
             }
 
-            // Si el párrafo está vacío, quitamos los estilos directamente
             if (el && el !== ta && el.textContent.trim() === '') {
                 if (cmd === 'bold') el.style.fontWeight = 'normal';
                 if (cmd === 'italic') el.style.fontStyle = 'normal';
                 if (cmd === 'underline') el.style.textDecoration = 'none';
             } else {
-                // Si hay texto, insertamos un ancla invisible para que lo nuevo sea normal
                 const isActive = document.queryCommandState(cmd);
                 if (!isActive) {
                     const range = sel.getRangeAt(0);
@@ -1793,10 +1778,8 @@ function formatDoc(cmd, val) {
                     if (cmd === 'bold') span.style.fontWeight = 'normal';
                     if (cmd === 'italic') span.style.fontStyle = 'normal';
                     if (cmd === 'underline') span.style.textDecoration = 'none';
-                    span.innerHTML = '&#8203;'; // Espacio invisible
-                    
+                    span.innerHTML = '&#8203;'; 
                     range.insertNode(span);
-                    
                     const nr = document.createRange();
                     nr.setStart(span.firstChild, 1);
                     nr.collapse(true);
@@ -1805,7 +1788,7 @@ function formatDoc(cmd, val) {
                 }
             }
         }
-     } else if (cmd === 'justifyFull') {
+    } else if (cmd === 'justifyFull') {
         document.execCommand('styleWithCSS', false, true); 
         if (document.queryCommandState('justifyFull')) {
             document.execCommand('justifyLeft', false, null);

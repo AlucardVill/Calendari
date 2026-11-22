@@ -60,7 +60,7 @@ html:has(body.focus-mode)::before{animation:none}
 .focus-modal-section-label{font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:12px 4px 6px}
 .focus-checkbox-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--item-bg);border:1px solid var(--border);border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;user-select:none}
 .focus-checkbox-item .focus-cb-tag{font-size:0.55rem;font-weight:800;color:var(--muted);background:var(--card-solid);padding:1px 5px;border-radius:4px;margin-left:auto}
-.focus-list-scroll{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding-right:2px}
+.focus-list-oll{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding-right:2px}
 .box-section-focus{margin-left:auto;margin-right:4px;background:transparent;border:none;color:var(--muted);width:16px;height:16px;cursor:pointer;border-radius:5px;display:flex;align-items:center;justify-content:center;opacity:0.55;transition:all 0.2s;padding:0}
 .box-section-focus svg{width:10px;height:10px;display:block}
 .box-section-close{margin-left:0}
@@ -124,7 +124,7 @@ html:has(body.focus-mode)::before{animation:none}
 .hidden-bar-search-clear{background:transparent;border:none;color:var(--muted);width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;border-radius:5px}
 .hidden-bar-search-clear svg{width:10px;height:10px;display:block}
 .hidden-bar-search-clear:hover{color:var(--sunday)}
-.hidden-bar-results{display:none;align-items:center;gap:6px;flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:2px 0}
+.hidden-bar-results{display:none;align-items:center;gap:6px;flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;ollbar-width:none;padding:2px 0}
 .hidden-timers-bar.searching .hidden-bar-results{display:flex}
 .hidden-bar-result-item{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:var(--item-bg);border:1px solid var(--border-input);cursor:pointer;white-space:nowrap;flex-shrink:0;font-size:0.58rem;font-weight:600;color:var(--text);max-width:150px;min-height:24px}
 .hidden-bar-result-item .result-dot{width:8px;height:8px;border-radius:50%;background:var(--result-color);flex-shrink:0}
@@ -133,7 +133,7 @@ html:has(body.focus-mode)::before{animation:none}
 .hidden-bar-result-empty,.hidden-bar-pill-empty{display:none;font-size:0.68rem;color:var(--muted);font-style:italic;padding:0 6px;flex-shrink:0}
 .hidden-timers-bar.searching .hidden-bar-dots{display:none}
 .hidden-timers-bar.searching .hidden-bar-search-btn,.hidden-timers-bar.expanded .hidden-bar-search-btn{display:none}
-.hidden-bar-dots{display:flex;align-items:center;gap:8px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.hidden-bar-dots{display:flex;align-items:center;gap:8px;flex:1;min-width:0;overflow-x:auto;ollbar-width:none;padding:2px 0}
 .hidden-dot{width:8px;height:8px;border-radius:50%;background:var(--dot-color);box-shadow:0 0 5px var(--dot-color);cursor:pointer;flex-shrink:0;border:none;padding:0;transition:transform 0.15s}
 .hidden-dot:hover{transform:scale(1.4)}
 .hidden-dot.box-dot{border-radius:3px;border:1.5px solid var(--dot-color);background:transparent}
@@ -623,9 +623,9 @@ body, html {
    FLOR Y LÍNEA EN LAS NOTAS
    ========================================= */
 
-/* 1. Ocultar scroll para que no tape la flor derecha */
-#notes-main-textarea::-webkit-scrollbar { display: none; }
-#notes-main-textarea { scrollbar-width: none; }
+/* 1. Ocultar oll para que no tape la flor derecha */
+#notes-main-textarea::-webkit-ollbar { display: none; }
+#notes-main-textarea { ollbar-width: none; }
 
 /* 2. Líneas y margen del texto */
 #notes-main-textarea {
@@ -783,11 +783,11 @@ body.focus-mode {
     width: 100%;
     overflow-x: auto;
     white-space: nowrap;
-    scrollbar-width: none; /* Oculta scroll en Firefox */
+    ollbar-width: none; /* Oculta oll en Firefox */
     font-size: 0.8rem;
     padding-bottom: 4px;
 }
-#notes-project-nav::-webkit-scrollbar { display: none; }
+#notes-project-nav::-webkit-ollbar { display: none; }
 
 .breadcrumb-link {
     color: var(--muted);
@@ -902,7 +902,7 @@ body.focus-mode #focus-frame {
     mask-position: center;
     
     cursor: grab;
-    touch-action: none; /* Evita que el teléfono haga scroll al arrastrar */
+    touch-action: none; /* Evita que el teléfono haga oll al arrastrar */
     z-index: 100;
 }
 
@@ -1031,7 +1031,7 @@ body.focus-mode #focus-frame {
 .hidden-bar-search-wrap{flex:1!important;flex-basis:auto!important;max-width:none!important}
 .hidden-timers-bar.searching .hidden-bar-dots,.hidden-timers-bar.expanded .hidden-bar-dots{display:none!important}
 .hidden-timers-bar.searching .hidden-bar-pills,.hidden-timers-bar.expanded .hidden-bar-pills{display:block!important;flex:1 1 100%;flex-basis:100%;min-width:0;padding-top:8px;border-top:1px solid var(--border)}
-.hidden-cols-scroll{display:flex;flex-direction:row;align-items:flex-start;gap:10px;width:100%;overflow-x:auto;overflow-y:hidden;container-type:inline-size;padding-bottom:2px}
+.hidden-cols-oll{display:flex;flex-direction:row;align-items:flex-start;gap:10px;width:100%;overflow-x:auto;overflow-y:hidden;container-type:inline-size;padding-bottom:2px}
 .hidden-cat-group{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
 .hidden-cat-title{font-size:0.5rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding-left:2px;user-select:none}
 .hidden-cat-cols{display:flex;flex-direction:row;align-items:flex-start;gap:6px}
@@ -1045,16 +1045,16 @@ body.focus-mode #focus-frame {
 .timer-widget, .box-timer-card, .hidden-timer-pill {
     border: none !important;
 }
-.timers-container, .hidden-cols-scroll, .hidden-bar-dots {
-    scrollbar-width: none !important;
+.timers-container, .hidden-cols-oll, .hidden-bar-dots {
+    ollbar-width: none !important;
     -ms-overflow-style: none !important;
 }
-.timers-container::-webkit-scrollbar, .hidden-cols-scroll::-webkit-scrollbar, .hidden-bar-dots::-webkit-scrollbar {
+.timers-container::-webkit-ollbar, .hidden-cols-oll::-webkit-ollbar, .hidden-bar-dots::-webkit-ollbar {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
 }
-.hidden-cols-scroll {
+.hidden-cols-oll {
     gap: 6px !important;
 }
 .hidden-cat-title {
@@ -1114,7 +1114,7 @@ body.focus-mode #focus-frame {
 <div id="modal-content-goal" style="display:none;text-align:center;"><h3 style="color:var(--accent);margin-bottom:12px;">¡Tiempo Finalizado!</h3><p id="goal-modal-title" style="font-size:0.88rem;color:var(--subtext);margin-bottom:22px;">¿Objetivo logrado?</p><div style="display:flex;gap:10px;"><button class="btn btn-cancel" onclick="recordGoal(false)" style="background:var(--sunday);color:#fff;">No</button><button class="btn btn-save" onclick="recordGoal(true)">Sí</button></div></div>
 <div id="modal-content-addtimer" style="display:none;"><h3 style="color:var(--accent);margin-bottom:18px;">Nuevo Temporizador</h3><div class="tc-desc" style="margin-bottom:14px;"><input type="text" id="inp-newt-name" placeholder="Nombre" style="padding:11px 13px;font-size:0.9rem;height:42px;"></div><div class="tc-row" style="gap:12px;"><div class="tc-field"><label style="font-size:0.68rem;">Horas</label><input type="number" id="inp-newt-h" placeholder="0" min="0" max="99" style="padding:9px 12px;height:42px;"></div><div class="tc-field"><label style="font-size:0.68rem;">Minutos</label><input type="number" id="inp-newt-m" placeholder="0" min="0" max="999" style="padding:9px 12px;height:42px;"></div></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveNewTimer()">Crear</button></div></div>
 <div id="modal-content-general" style="display:none;"><h3 style="color:var(--accent);margin-bottom:22px;">Configuración</h3><h4 style="color:var(--subtext);margin-bottom:12px;font-size:0.88rem;font-weight:600;">Colores de Interfaz</h4><div class="input-group"><label>Semana Pendiente:</label><select id="theme-week-color" onchange="changeThemeColors()"><option value="green">Verde</option><option value="blue">Azul</option><option value="orange">Naranja</option></select></div><div class="input-group"><label>Contornos:</label><select id="theme-border-color" onchange="changeThemeColors()"><option value="default">Por Defecto</option><option value="green">Verde</option><option value="blue">Azul</option><option value="orange">Naranja</option></select></div><h4 style="color:var(--subtext);margin:20px 0 12px;font-size:0.88rem;font-weight:600;">Transparencia de Modales</h4><div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:0.88rem;color:var(--subtext);margin-bottom:8px;"><span>Fondo</span><span id="lbl-modal-alpha" style="color:var(--text);font-weight:700;">—</span></div><input type="range" id="inp-modal-alpha" min="0" max="100" value="42" oninput="onModalAlphaChange()"></div><div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:0.88rem;color:var(--subtext);margin-bottom:8px;"><span>Marco / Borde</span><span id="lbl-modal-border-alpha" style="color:var(--text);font-weight:700;">—</span></div><input type="range" id="inp-modal-border-alpha" min="0" max="100" value="10" oninput="onModalBorderAlphaChange()"></div><button class="btn btn-cancel" style="font-size:0.72rem;padding:7px 12px;width:100%;" onclick="resetModalTransparency()">Restablecer transparencias</button><button class="btn btn-cancel" style="font-size:0.72rem;padding:7px 12px;width:100%;margin-top:6px;" onclick="resetModalPositions()">Restablecer posición</button><h4 style="color:var(--subtext);margin:20px 0 12px;font-size:0.88rem;font-weight:600;">Rendimiento</h4><label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--item-bg);border:1px solid var(--border-input);border-radius:12px;cursor:pointer;margin-bottom:14px;"><div style="display:flex;flex-direction:column;gap:3px;min-width:0;"><span style="font-size:0.85rem;font-weight:700;color:var(--text);">Modo ahorro de batería</span><span style="font-size:0.66rem;color:var(--muted);font-weight:500;">Desactiva animaciones.</span></div><input type="checkbox" id="inp-battery-saver" onchange="toggleBatterySaver(this.checked)" style="width:22px;height:22px;min-width:22px;accent-color:var(--accent);"></label><div style="display:flex;flex-direction:column;gap:12px;margin-top:28px;"><button class="btn btn-cancel" onclick="toggleTheme()">Alternar Tema</button><button class="btn btn-save" onclick="syncExport()" style="background:var(--accent);color:#000;">Guardar Copia</button><label class="btn btn-cancel" style="text-align:center;cursor:pointer;display:flex;justify-content:center;align-items:center;">Cargar Copia<input type="file" id="import-file-input" accept=".json" onchange="syncImport(event)" style="display:none;"></label></div><div class="modal-actions" style="margin-top:28px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div></div>
-<div id="modal-content-taskcreate" style="display:none;"><div class="modal-header-flex"><h3 id="tc-main-title">Nueva Acción</h3><button class="toggle-mode-btn" id="btn-toggle-tc" onclick="toggleTcMode()">Crear Entorno</button></div><div class="tc-desc"><input type="text" id="inp-tc-title" placeholder="Descripción..."></div><div class="tc-row"><div class="tc-field" style="grid-column:span 2;"><label>Color</label><input type="color" id="inp-tc-color" value="#3b82f6" style="width:100%;"></div></div><div id="tc-tarea-fields"><div class="tc-row"><div class="tc-field"><label>Mes</label><select id="inp-tc-month" onchange="updateWeekDropdown()"></select></div><div class="tc-field"><label>Semana</label><select id="inp-tc-week"></select></div></div><div class="tc-field" style="margin-bottom:6px;"><label>Día (Opcional)</label><select id="inp-tc-day"><option value="">—</option><option value="0">Lunes</option><option value="1">Martes</option><option value="2">Miércoles</option><option value="3">Jueves</option><option value="4">Viernes</option><option value="5">Sábado</option><option value="6">Domingo</option></select></div></div><div id="tc-entorno-fields" style="display:none;"><div class="tc-field" style="margin-bottom:6px;"><label>Meses</label><div class="checkbox-group" id="chk-months"></div></div><div class="tc-field" style="margin-bottom:6px;"><label>Semanas</label><div class="checkbox-group" id="chk-weeks"><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">W0</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="1">W1</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="2">W2</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="3">W3</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="4">W4</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="5">W5</div></div></div><div class="tc-field" style="margin-bottom:6px;"><label>Días</label><div class="checkbox-group" id="chk-days"><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">L</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="1">M</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="2">M</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="3">J</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="4">V</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="5">S</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="6">D</div></div></div></div><div class="tc-row"><div class="tc-field"><label>Hora Inicio</label><input type="time" id="inp-tc-hour"></div><div class="tc-field"><label>Hora Fin</label><input type="time" id="inp-tc-hourEnd"></div></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button><button class="btn btn-save" id="btn-save-tc" onclick="saveTcRecord()">Guardar</button></div></div>
+<div id="modal-content-taskcreate" style="display:none;"><div class="modal-header-flex"><h3 id="tc-main-title">Nueva Acción</h3><button class="toggle-mode-btn" id="btn-toggle-tc" onclick="toggleTcMode()">Crear Entorno</button></div><div class="tc-desc"><input type="text" id="inp-tc-title" placeholder="Deipción..."></div><div class="tc-row"><div class="tc-field" style="grid-column:span 2;"><label>Color</label><input type="color" id="inp-tc-color" value="#3b82f6" style="width:100%;"></div></div><div id="tc-tarea-fields"><div class="tc-row"><div class="tc-field"><label>Mes</label><select id="inp-tc-month" onchange="updateWeekDropdown()"></select></div><div class="tc-field"><label>Semana</label><select id="inp-tc-week"></select></div></div><div class="tc-field" style="margin-bottom:6px;"><label>Día (Opcional)</label><select id="inp-tc-day"><option value="">—</option><option value="0">Lunes</option><option value="1">Martes</option><option value="2">Miércoles</option><option value="3">Jueves</option><option value="4">Viernes</option><option value="5">Sábado</option><option value="6">Domingo</option></select></div></div><div id="tc-entorno-fields" style="display:none;"><div class="tc-field" style="margin-bottom:6px;"><label>Meses</label><div class="checkbox-group" id="chk-months"></div></div><div class="tc-field" style="margin-bottom:6px;"><label>Semanas</label><div class="checkbox-group" id="chk-weeks"><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">W0</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="1">W1</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="2">W2</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="3">W3</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="4">W4</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="5">W5</div></div></div><div class="tc-field" style="margin-bottom:6px;"><label>Días</label><div class="checkbox-group" id="chk-days"><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="0">L</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="1">M</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="2">M</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="3">J</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="4">V</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="5">S</div><div class="chk-btn" onclick="this.classList.toggle('active')" data-val="6">D</div></div></div></div><div class="tc-row"><div class="tc-field"><label>Hora Inicio</label><input type="time" id="inp-tc-hour"></div><div class="tc-field"><label>Hora Fin</label><input type="time" id="inp-tc-hourEnd"></div></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button><button class="btn btn-save" id="btn-save-tc" onclick="saveTcRecord()">Guardar</button></div></div>
 <div id="modal-content-metrics" style="display:none;"><h3 id="ms-title" style="color:var(--accent);">Cumplimiento</h3><div id="ms-body"></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div></div>
 <div id="modal-content-daystats" style="display:none;"><h3 id="ds-title" style="color:var(--accent);margin-bottom:18px;">Día</h3><div id="ds-tasks-list"></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div></div>
 <div id="modal-content-block" style="display:none;"><h3>Bloque Años</h3><div class="input-group"><label>Año inicio:</label><input type="number" id="inp-block-start" min="2000" max="2100"></div><div class="input-group"><label>Duración:</label><select id="inp-block-years"><option value="2">2 Años</option><option value="3">3 Años</option><option value="4">4 Años</option><option value="5">5 Años</option></select></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveBlockSettings()">Guardar</button></div></div>
@@ -1159,14 +1159,14 @@ body.focus-mode #focus-frame {
 <div id="modal-content-timermenu" style="display:none;"><h3 style="color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:8px;"><span id="tm-name-display" style="display:flex;align-items:center;gap:8px;"></span></h3><div style="font-size:0.62rem;color:var(--subtext);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:8px;">Añadir a caja</div><div id="tm-box-list" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;padding-right:2px;"></div><div class="modal-actions" style="margin-top:14px;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button></div></div>
 <div id="modal-content-newbox" style="display:none;"><h3 style="color:var(--accent);margin-bottom:18px;">Nueva Caja</h3><div class="tc-desc" style="margin-bottom:12px;"><input type="text" id="inp-newbox-name" placeholder="Nombre"></div><div class="tc-row"><div class="tc-field" style="grid-column:span 2;"><label>Color</label><input type="color" id="inp-newbox-color" value="#3b82f6"></div></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="saveNewBox()">Crear</button></div></div>
 <div id="modal-content-boxcontents" style="display:none;"><h3 id="bc-title" style="color:var(--accent);margin-bottom:14px;">Caja</h3><div id="bc-timer-list" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;margin-bottom:14px;"></div><div class="modal-actions" style="flex-wrap:wrap;"><button class="btn btn-cancel" onclick="closeModal()">Cerrar</button><button class="btn btn-delete" id="bc-delete-box-btn" onclick="deleteBoxFromContents()" style="flex:0 0 auto;padding:12px 18px;">Eliminar Caja</button></div></div>
-<div id="modal-content-focus" style="display:none;"><h3 style="color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:16px;height:16px;"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>Concentración</h3><div style="font-size:0.6rem;color:var(--subtext);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:6px;">Selección rápida</div><div id="focus-quick-options" style="display:flex;flex-direction:column;gap:6px;"></div><div class="focus-modal-section-label">Manual</div><div class="focus-list-scroll" id="focus-manual-list"></div><div class="modal-actions" style="margin-top:14px;"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="applyManualFocus()">Aplicar</button></div></div>
+<div id="modal-content-focus" style="display:none;"><h3 style="color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:16px;height:16px;"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>Concentración</h3><div style="font-size:0.6rem;color:var(--subtext);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:6px;">Selección rápida</div><div id="focus-quick-options" style="display:flex;flex-direction:column;gap:6px;"></div><div class="focus-modal-section-label">Manual</div><div class="focus-list-oll" id="focus-manual-list"></div><div class="modal-actions" style="margin-top:14px;"><button class="btn btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn btn-save" onclick="applyManualFocus()">Aplicar</button></div></div>
 </div>
 </div>
 <div id="minimized-bar"></div>
-<script>
+<ipt>
 if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log('SW:', err)); }); }
-</script>
-<script>
+</ipt>
+<ipt>
 function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function safeJSONParse(str, fallback) { try { if (!str) return fallback; const p = JSON.parse(str); return (p === null || p === undefined) ? fallback : p; } catch(e) { return fallback; } }
 let _storageQuotaWarned = false;
@@ -1192,8 +1192,8 @@ let extraTimersFolded = localStorage.getItem('wkExtraTimersFolded') === 'true';
 let hiddenBarExpanded = localStorage.getItem('wkHiddenBarExpanded') === 'true';
 let hiddenSearchOpen = false, hiddenSearchQuery = '';
 function toggleHiddenBar() { hiddenBarExpanded = !hiddenBarExpanded; safeSetItem('wkHiddenBarExpanded', hiddenBarExpanded); hiddenSearchOpen = false; hiddenSearchQuery = ''; renderTimersUI(); }
-function openHiddenSearch() { hiddenSearchOpen = true; const bar = document.getElementById('hidden-timers-bar'); if (!bar) return; bar.classList.add('searching'); const input = document.getElementById('hidden-search-input'); if (input) { input.value = hiddenSearchQuery; applyHiddenSearchFilter(); setTimeout(() => { try { input.focus({ preventScroll: true }); } catch(e) { input.focus(); } }, 30); } }
-function closeHiddenSearch() { const input = document.getElementById('hidden-search-input'); if (hiddenSearchQuery.length > 0) { hiddenSearchQuery = ''; if (input) input.value = ''; applyHiddenSearchFilter(); if (input && hiddenSearchOpen) { try { input.focus({ preventScroll: true }); } catch(e) { input.focus(); } } return; } if (!hiddenBarExpanded) { hiddenSearchOpen = false; const bar = document.getElementById('hidden-timers-bar'); if (bar) bar.classList.remove('searching'); if (input) input.blur(); } }
+function openHiddenSearch() { hiddenSearchOpen = true; const bar = document.getElementById('hidden-timers-bar'); if (!bar) return; bar.classList.add('searching'); const input = document.getElementById('hidden-search-input'); if (input) { input.value = hiddenSearchQuery; applyHiddenSearchFilter(); setTimeout(() => { try { input.focus({ preventoll: true }); } catch(e) { input.focus(); } }, 30); } }
+function closeHiddenSearch() { const input = document.getElementById('hidden-search-input'); if (hiddenSearchQuery.length > 0) { hiddenSearchQuery = ''; if (input) input.value = ''; applyHiddenSearchFilter(); if (input && hiddenSearchOpen) { try { input.focus({ preventoll: true }); } catch(e) { input.focus(); } } return; } if (!hiddenBarExpanded) { hiddenSearchOpen = false; const bar = document.getElementById('hidden-timers-bar'); if (bar) bar.classList.remove('searching'); if (input) input.blur(); } }
 function onHiddenSearchInput(value) { hiddenSearchQuery = value; applyHiddenSearchFilter(); }
 function applyHiddenSearchFilter() { const bar = document.getElementById('hidden-timers-bar'); if (!bar) return; const q = (hiddenSearchQuery || '').trim().toLowerCase(); let anyRes = false; bar.querySelectorAll('.hidden-bar-result-item').forEach(el => { const m = !q || (el.dataset.name || '').includes(q); el.style.display = m ? '' : 'none'; if (m) anyRes = true; }); const emptyRes = bar.querySelector('.hidden-bar-result-empty'); if (emptyRes) emptyRes.style.display = (q && !anyRes) ? 'block' : 'none'; let anyPill = false; bar.querySelectorAll('.hidden-timer-pill').forEach(el => { const m = !q || (el.dataset.name || '').includes(q); el.style.display = m ? '' : 'none'; if (m) anyPill = true; }); const emptyPill = bar.querySelector('.hidden-bar-pill-empty'); if (emptyPill) emptyPill.style.display = (q && !anyPill) ? 'block' : 'none'; }
 let timerStats = safeJSONParse(localStorage.getItem('wkTimerStats'), []);
@@ -1225,7 +1225,7 @@ function openTimerMenu(timerId) { const t = timersList.find(x => x.id === timerI
 function renderTimerMenuBoxList() { const listEl = document.getElementById('tm-box-list'); const t = timersList.find(x => x.id === currentTimerForMenu); if (!listEl || !t) return; let h = ''; if (timerBoxes.length === 0) h += `<div style="color:var(--muted);font-size:0.74rem;padding:10px 0;text-align:center;font-style:italic;">Aún no hay cajas</div>`; else timerBoxes.forEach(box => { const inBox = box.timers.some(bt => bt.originId === t.id); h += `<button class="box-select-item ${inBox ? 'in-box' : ''}" onclick="toggleTimerInBox('${escapeHtml(box.id)}')"><span class="timer-color-dot" style="background:${escapeHtml(box.color)};margin:0;flex-shrink:0;"></span><span style="flex:1;">${escapeHtml(box.name)}</span><span style="font-size:0.68rem;color:${inBox ? 'var(--accent)' : 'var(--muted)'};font-weight:800;">${inBox ? 'En caja' : 'Añadir'}</span></button>`; }); h += `<button class="box-select-item new-box" onclick="openNewBoxModal()"><span style="font-size:1rem;">+</span><span>Nueva caja</span></button>`; listEl.innerHTML = h; }
 function toggleTimerInBox(boxId) { const box = timerBoxes.find(b => b.id === boxId); const orig = timersList.find(x => x.id === currentTimerForMenu); if (!box || !orig) return; const ex = box.timers.findIndex(bt => bt.originId === orig.id); if (ex !== -1) box.timers.splice(ex, 1); else { const hC = orig.setMs && orig.setMs > 0; box.timers.push({ id: 'bt_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), originId: orig.id, name: orig.name, color: orig.color, tMode: hC ? 'down' : 'up', tRunning: false, tRef: 0, tAcc: hC ? orig.setMs : 0, tCompleted: false, setMs: orig.setMs || 0, inputH: orig.inputH || '', inputM: orig.inputM || '', scope: 'box', boxId: boxId }); } saveBoxes(); renderTimerMenuBoxList(); renderTimersUI(); }
 function openNewBoxModal() { editingNewBoxContext = currentTimerForMenu; document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none'); document.getElementById('modal-content-newbox').style.display = 'block'; switchPanelState('modal-content-newbox'); document.getElementById('inp-newbox-name').value = ''; document.getElementById('inp-newbox-color').value = '#3b82f6'; openModal(); setTimeout(() => { try { document.getElementById('inp-newbox-name').focus(); } catch(_) {} }, 100); }
-function saveNewBox() { const name = document.getElementById('inp-newbox-name').value.trim(); if (!name) { alert('Escribe nombre.'); return; } const color = document.getElementById('inp-newbox-color').value || '#3b82f6'; const nb = { id: 'box_' + Date.now(), name, color, timers: [] }; if (editingNewBoxContext) { const orig = timersList.find(x => x.id === editingNewBoxContext); if (orig) { const hC = orig.setMs && orig.setMs > 0; nb.timers.push({ id: 'bt_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), originId: orig.id, name: orig.name, color: orig.color, tMode: hC ? 'down' : 'up', tRunning: false, tRef: 0, tAcc: hC ? orig.setMs : 0, tCompleted: false, setMs: orig.setMs || 0, inputH: orig.inputH || '', inputM: orig.inputM || '', scope: 'box', boxId: nb.id }); } } timerBoxes.push(nb); saveBoxes(); renderTimersUI(); closeModal(); }
+function saveNewBox() { const name = document.getElementById('inp-newbox-name').value.trim(); if (!name) { alert('Eibe nombre.'); return; } const color = document.getElementById('inp-newbox-color').value || '#3b82f6'; const nb = { id: 'box_' + Date.now(), name, color, timers: [] }; if (editingNewBoxContext) { const orig = timersList.find(x => x.id === editingNewBoxContext); if (orig) { const hC = orig.setMs && orig.setMs > 0; nb.timers.push({ id: 'bt_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), originId: orig.id, name: orig.name, color: orig.color, tMode: hC ? 'down' : 'up', tRunning: false, tRef: 0, tAcc: hC ? orig.setMs : 0, tCompleted: false, setMs: orig.setMs || 0, inputH: orig.inputH || '', inputM: orig.inputM || '', scope: 'box', boxId: nb.id }); } } timerBoxes.push(nb); saveBoxes(); renderTimersUI(); closeModal(); }
 let boxPillTimer = null, boxPillFlag = false, boxPillStart = { x: 0, y: 0 };
 function handleBoxPillDown(e, boxId) { if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return; boxPillFlag = false; boxPillStart = { x: e.clientX, y: e.clientY }; if (boxPillTimer) clearTimeout(boxPillTimer); boxPillTimer = setTimeout(() => { boxPillFlag = true; openBoxContentsModal(boxId); }, 500); }
 function handleBoxPillUp(e, boxId) { if (boxPillTimer) { clearTimeout(boxPillTimer); boxPillTimer = null; } if (boxPillFlag) { boxPillFlag = false; return; } if (Math.hypot(e.clientX - boxPillStart.x, e.clientY - boxPillStart.y) < 12) toggleOpenBox(boxId); }
@@ -1296,7 +1296,7 @@ function applyFocusMode() {
         } 
     } 
 }
-function enterFocus(type, options) { options = options || {}; focusMode.active = true; focusMode.type = type; if (type === 'box') { focusMode.boxId = options.boxId; const b = timerBoxes.find(x => x.id === options.boxId); focusMode.label = b ? b.name : 'Caja'; if (!openedBoxIds.has(options.boxId)) openedBoxIds.add(options.boxId); } else if (type === 'manual') { focusMode.timerIds = options.timerIds || []; focusMode.label = options.label || 'Personalizado'; } else if (type === 'all') focusMode.label = 'Todos los visibles'; saveFocusPinned(); saveFocusMode(); saveBoxes(); renderTimersUI(); applyFocusMode(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function enterFocus(type, options) { options = options || {}; focusMode.active = true; focusMode.type = type; if (type === 'box') { focusMode.boxId = options.boxId; const b = timerBoxes.find(x => x.id === options.boxId); focusMode.label = b ? b.name : 'Caja'; if (!openedBoxIds.has(options.boxId)) openedBoxIds.add(options.boxId); } else if (type === 'manual') { focusMode.timerIds = options.timerIds || []; focusMode.label = options.label || 'Personalizado'; } else if (type === 'all') focusMode.label = 'Todos los visibles'; saveFocusPinned(); saveFocusMode(); saveBoxes(); renderTimersUI(); applyFocusMode(); window.ollTo({ top: 0, behavior: 'smooth' }); }
 function exitFocusMode() { focusMode.active = false; focusMode.type = null; focusMode.boxId = null; focusMode.timerIds = []; focusMode.label = ''; saveFocusPinned(); saveFocusMode();  document.body.classList.remove('focus-mode'); const bar = document.getElementById('focus-bar'); if (bar) bar.style.display = 'none'; const pB = document.getElementById('focus-pins-bar'); if (pB) { pB.classList.remove('active'); pB.innerHTML = ''; } renderTimersUI(); }
 function openFocusModal() { document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none'); document.getElementById('modal-content-focus').style.display = 'block'; switchPanelState('modal-content-focus'); renderFocusModalContent(); openModal(); }
 function renderFocusModalContent() { const qE = document.getElementById('focus-quick-options'); const mE = document.getElementById('focus-manual-list'); let q = ''; const vC = timersList.filter(t => t.id === 'general' || !t.hidden).length; q += `<button class="focus-option primary" onclick="enterFocus('all');closeModal();"><span class="focus-option-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></svg></span><span>Todos los visibles</span><span class="focus-option-count">${vC}</span></button>`; timerBoxes.forEach(box => { if (box.timers.length === 0) return; q += `<button class="focus-option" onclick="enterFocus('box',{boxId:'${escapeHtml(box.id)}'});closeModal();"><span class="focus-option-dot" style="background:${escapeHtml(box.color)};color:${escapeHtml(box.color)};"></span><span>${escapeHtml(box.name)}</span><span class="focus-option-count">${box.timers.length}</span></button>`; }); if (timerBoxes.filter(b => b.timers.length > 0).length === 0) q += `<div style="color:var(--muted);font-size:0.72rem;padding:6px 4px;font-style:italic;">Sin cajas</div>`; qE.innerHTML = q; const cS = focusMode.type === 'manual' ? focusMode.timerIds : []; let m = ''; const all = []; timersList.forEach(t => { if (t.id === 'general' || !t.hidden) all.push({ ...t, scope: 'main' }); }); timerBoxes.forEach(box => { box.timers.forEach(bt => { all.push({ ...bt, scope: 'box', boxName: box.name, boxColor: box.color }); }); }); if (all.length === 0) m = `<div style="color:var(--muted);font-size:0.74rem;padding:14px 0;text-align:center;font-style:italic;">Sin timers</div>`; else m = all.map(t => { const c = cS.includes(t.id); const tag = t.scope === 'box' ? `<span class="focus-cb-tag" style="color:${escapeHtml(t.boxColor || '#3b82f6')};">${escapeHtml(t.boxName || 'Box')}</span>` : `<span class="focus-cb-tag">Principal</span>`; return `<label class="focus-checkbox-item"><input type="checkbox" class="custom-check focus-manual-cb" data-timer-id="${escapeHtml(t.id)}" ${c ? 'checked' : ''}><span class="timer-color-dot" style="background:${escapeHtml(t.color)};margin:0;flex-shrink:0;"></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(t.name)}</span>${tag}</label>`; }).join(''); mE.innerHTML = m; }
@@ -1479,7 +1479,7 @@ function renderBreadcrumbs() {
     nav.innerHTML = breadcrumbHtml;
     
     // Desplazar la ruta hacia la derecha si es muy larga
-    nav.scrollLeft = nav.scrollWidth;
+    nav.ollLeft = nav.ollWidth;
 }
 
 function navigateToBreadcrumb(targetId) {
@@ -1877,12 +1877,12 @@ function restoreSelection() { if (_savedRange) { if (window.getSelection) { cons
     if (cmd === 'undo') {
         if (undoStack.length > 0) {
             isUndoRedoAction = true;
-            const currentScroll = ta.scrollTop; 
+            const currentoll = ta.ollTop; 
             const currentHtml = ta.innerHTML;
             const prevHtml = undoStack.pop();
             redoStack.push(currentHtml);
             ta.innerHTML = prevHtml;
-            setTimeout(() => { ta.scrollTop = currentScroll; }, 10);
+            setTimeout(() => { ta.ollTop = currentoll; }, 10);
             lastSavedHtml = prevHtml;
             saveMainNote();
             isUndoRedoAction = false;
@@ -1897,7 +1897,7 @@ function restoreSelection() { if (_savedRange) { if (window.getSelection) { cons
         return;
     }
     
-        ta.focus({ preventScroll: true });
+        ta.focus({ preventoll: true });
     restoreSelection(); 
     
     // Lógica para Fuente
@@ -2178,8 +2178,8 @@ function handleEntornoPressUp(e) { if (entornoPressTimer) { clearTimeout(entorno
 function handleEntornoPressCancel(e) { if (entornoPressTimer) { clearTimeout(entornoPressTimer); entornoPressTimer = null; } entornoPressState = null; }
 function openEntornoEditModal(id) { const e = entornosData.find(x => x.id === id); if (!e) return; editingEntornoId = id; tcMode = 'tarea'; toggleTcMode(); document.getElementById('inp-tc-title').value = e.text; document.getElementById('inp-tc-hour').value = e.hour || ''; document.getElementById('inp-tc-hourEnd').value = e.hourEnd || ''; document.getElementById('inp-tc-color').value = e.color || '#3b82f6'; const q = e.q; const mS = document.getElementById('inp-tc-month'); let mH = ''; for (let i = 0; i < 3; i++) { const mI = q * 3 + i; mH += `<option value="${mI}">${escapeHtml(meses[mI])}</option>`; } mS.innerHTML = mH; updateWeekDropdown(); const cM = document.getElementById('chk-months'); cM.innerHTML = ''; for (let i = 0; i < 3; i++) { const mI = q * 3 + i; const a = e.months.includes(i) ? 'active' : ''; cM.innerHTML += `<div class="chk-btn ${a}" onclick="this.classList.toggle('active')" data-val="${i}">${escapeHtml(meses[mI].slice(0,3))}</div>`; } document.querySelectorAll('#chk-weeks .chk-btn').forEach(b => { b.classList.toggle('active', e.weeks.includes(parseInt(b.dataset.val))); }); document.querySelectorAll('#chk-days .chk-btn').forEach(b => { b.classList.toggle('active', e.days.includes(parseInt(b.dataset.val))); }); document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none'); document.getElementById('modal-content-taskcreate').style.display = 'block'; switchPanelState('modal-content-taskcreate'); openModal(); }
 function saveTcRecord() { if (tcMode === 'tarea') saveNewManagedTask(); else saveNewEntorno(); }
-function saveNewManagedTask() { const title = document.getElementById('inp-tc-title').value.trim(); const mI = parseInt(document.getElementById('inp-tc-month').value); const lW = parseInt(document.getElementById('inp-tc-week').value); const dV = document.getElementById('inp-tc-day').value; const hr = document.getElementById('inp-tc-hour').value; const hE = document.getElementById('inp-tc-hourEnd').value; const cl = document.getElementById('inp-tc-color').value; if (!title) { alert("Escribe descripción"); return; } const wN = mI * 10 + lW; const tK = `${selectedYear}-${wN}`; if (!tasksData[tK]) tasksData[tK] = []; tasksData[tK].push({ id: Date.now(), text: title, done: false, day: dV === '' ? null : parseInt(dV), hour: hr || null, hourEnd: hE || null, color: cl }); safeSetItem('wkTasks', JSON.stringify(tasksData)); renderActiveWindow(); renderDayTaskMarks(); if (hE) { globalLastHourEnd = hE; safeSetItem('wkLastHourEnd', globalLastHourEnd); document.getElementById('inp-tc-hour').value = hE; } else { globalLastHourEnd = ''; safeSetItem('wkLastHourEnd', ''); document.getElementById('inp-tc-hour').value = ''; } document.getElementById('inp-tc-hourEnd').value = ''; document.getElementById('inp-tc-title').value = ''; document.getElementById('inp-tc-title').focus(); const b = document.getElementById('btn-save-tc'); b.innerText = 'Guardado'; setTimeout(() => { updateTcUI(); b.innerText = 'Guardar'; }, 1000); }
-function saveNewEntorno() { const title = document.getElementById('inp-tc-title').value.trim(); const hr = document.getElementById('inp-tc-hour').value; const hE = document.getElementById('inp-tc-hourEnd').value; const cl = document.getElementById('inp-tc-color').value; if (!title) { alert("Escribe descripción"); return; } const sM = Array.from(document.getElementById('chk-months').querySelectorAll('.active')).map(e => parseInt(e.dataset.val)); const sW = Array.from(document.getElementById('chk-weeks').querySelectorAll('.active')).map(e => parseInt(e.dataset.val)); const sD = Array.from(document.getElementById('chk-days').querySelectorAll('.active')).map(e => parseInt(e.dataset.val)); if (sM.length === 0 || sW.length === 0 || sD.length === 0) { alert("Selecciona al menos un mes, semana y día."); return; } if (editingEntornoId !== null) { const e = entornosData.find(x => x.id === editingEntornoId); if (e) { e.text = title; e.color = cl; e.hour = hr || null; e.hourEnd = hE || null; e.months = sM; e.weeks = sW; e.days = sD; } editingEntornoId = null; } else entornosData.push({ id: Date.now(), text: title, color: cl, hour: hr || null, hourEnd: hE || null, year: selectedYear, q: selectedQuarter, months: sM, weeks: sW, days: sD }); safeSetItem('wkEntornos', JSON.stringify(entornosData)); renderActiveWindow(); renderDayTaskMarks(); if (hE) { globalLastHourEnd = hE; safeSetItem('wkLastHourEnd', globalLastHourEnd); document.getElementById('inp-tc-hour').value = hE; } else { globalLastHourEnd = ''; safeSetItem('wkLastHourEnd', ''); document.getElementById('inp-tc-hour').value = ''; } document.getElementById('inp-tc-hourEnd').value = ''; document.getElementById('inp-tc-title').value = ''; document.getElementById('inp-tc-title').focus(); const b = document.getElementById('btn-save-tc'); b.innerText = 'Guardado'; setTimeout(() => { updateTcUI(); b.innerText = 'Guardar'; }, 1000); }
+function saveNewManagedTask() { const title = document.getElementById('inp-tc-title').value.trim(); const mI = parseInt(document.getElementById('inp-tc-month').value); const lW = parseInt(document.getElementById('inp-tc-week').value); const dV = document.getElementById('inp-tc-day').value; const hr = document.getElementById('inp-tc-hour').value; const hE = document.getElementById('inp-tc-hourEnd').value; const cl = document.getElementById('inp-tc-color').value; if (!title) { alert("Eibe deipción"); return; } const wN = mI * 10 + lW; const tK = `${selectedYear}-${wN}`; if (!tasksData[tK]) tasksData[tK] = []; tasksData[tK].push({ id: Date.now(), text: title, done: false, day: dV === '' ? null : parseInt(dV), hour: hr || null, hourEnd: hE || null, color: cl }); safeSetItem('wkTasks', JSON.stringify(tasksData)); renderActiveWindow(); renderDayTaskMarks(); if (hE) { globalLastHourEnd = hE; safeSetItem('wkLastHourEnd', globalLastHourEnd); document.getElementById('inp-tc-hour').value = hE; } else { globalLastHourEnd = ''; safeSetItem('wkLastHourEnd', ''); document.getElementById('inp-tc-hour').value = ''; } document.getElementById('inp-tc-hourEnd').value = ''; document.getElementById('inp-tc-title').value = ''; document.getElementById('inp-tc-title').focus(); const b = document.getElementById('btn-save-tc'); b.innerText = 'Guardado'; setTimeout(() => { updateTcUI(); b.innerText = 'Guardar'; }, 1000); }
+function saveNewEntorno() { const title = document.getElementById('inp-tc-title').value.trim(); const hr = document.getElementById('inp-tc-hour').value; const hE = document.getElementById('inp-tc-hourEnd').value; const cl = document.getElementById('inp-tc-color').value; if (!title) { alert("Eibe deipción"); return; } const sM = Array.from(document.getElementById('chk-months').querySelectorAll('.active')).map(e => parseInt(e.dataset.val)); const sW = Array.from(document.getElementById('chk-weeks').querySelectorAll('.active')).map(e => parseInt(e.dataset.val)); const sD = Array.from(document.getElementById('chk-days').querySelectorAll('.active')).map(e => parseInt(e.dataset.val)); if (sM.length === 0 || sW.length === 0 || sD.length === 0) { alert("Selecciona al menos un mes, semana y día."); return; } if (editingEntornoId !== null) { const e = entornosData.find(x => x.id === editingEntornoId); if (e) { e.text = title; e.color = cl; e.hour = hr || null; e.hourEnd = hE || null; e.months = sM; e.weeks = sW; e.days = sD; } editingEntornoId = null; } else entornosData.push({ id: Date.now(), text: title, color: cl, hour: hr || null, hourEnd: hE || null, year: selectedYear, q: selectedQuarter, months: sM, weeks: sW, days: sD }); safeSetItem('wkEntornos', JSON.stringify(entornosData)); renderActiveWindow(); renderDayTaskMarks(); if (hE) { globalLastHourEnd = hE; safeSetItem('wkLastHourEnd', globalLastHourEnd); document.getElementById('inp-tc-hour').value = hE; } else { globalLastHourEnd = ''; safeSetItem('wkLastHourEnd', ''); document.getElementById('inp-tc-hour').value = ''; } document.getElementById('inp-tc-hourEnd').value = ''; document.getElementById('inp-tc-title').value = ''; document.getElementById('inp-tc-title').focus(); const b = document.getElementById('btn-save-tc'); b.innerText = 'Guardado'; setTimeout(() => { updateTcUI(); b.innerText = 'Guardar'; }, 1000); }
 function toggleManagedTask(week, taskId) { const tK = `${selectedYear}-${week}`; const t = (tasksData[tK] || []).find(x => x.id === taskId); if (t) t.done = !t.done; safeSetItem('wkTasks', JSON.stringify(tasksData)); renderActiveWindow(); renderDayTaskMarks(); }
 function deleteManagedTask(week, taskId) { const tK = `${selectedYear}-${week}`; tasksData[tK] = (tasksData[tK] || []).filter(x => x.id !== taskId); safeSetItem('wkTasks', JSON.stringify(tasksData)); renderActiveWindow(); renderDayTaskMarks(); }
 function removeEntornoDay(entornoId, monthIdx, weekVal, dayIdx) { let e = entornosData.find(x => x.id === entornoId); if (!e) return; e.days = e.days.filter(d => d !== dayIdx); if (e.days.length === 0) entornosData = entornosData.filter(x => x.id !== entornoId); safeSetItem('wkEntornos', JSON.stringify(entornosData)); renderActiveWindow(); renderDayTaskMarks(); }
@@ -2237,7 +2237,7 @@ function openMarkerModal(barId, markerObj) { activeMarker = { barId, obj: marker
 function saveMarkerSettings() { if (!activeMarker) return; activeMarker.obj.color = document.getElementById('inp-marker-color').value; saveMarkers(); renderMarkers(activeMarker.barId); closeModal(); }
 function deleteActiveMarker() { if (!activeMarker) return; markersData[activeMarker.barId] = markersData[activeMarker.barId].filter(m => m.id !== activeMarker.obj.id); saveMarkers(); renderMarkers(activeMarker.barId); closeModal(); }
 let lastDayMarksSig = '';
-function renderDayTaskMarks() { const c = document.getElementById('bar-day'); if (!c) return; const n = new Date(); const y = n.getFullYear(); const mI = n.getMonth(); const dN = n.getDate(); const wI = getWeekForDay(y, mI, dN); let s = `${y}-${mI}-${dN}|`; let items = []; if (wI) { const lM = mI % 3, lW = wI.localW; const tE = entornosData.filter(e => e.year === y && e.q === Math.floor(mI/3) && e.months.includes(lM) && e.weeks.includes(lW) && e.days.includes(wI.dayIdx)).map(e => ({ ...e, isEntorno: true })); const wN = mI * 10 + wI.localW; const wT = tasksData[`${y}-${wN}`] || []; const tT = wT.filter(t => getTaskDay(t) === wI.dayIdx && t.hour && t.color); items = [...tE, ...tT]; s += items.map(t => `${t.id}:${t.hour}:${t.hourEnd || ''}:${t.color}:${t.done || false}`).join('|'); } if (s === lastDayMarksSig) return; lastDayMarksSig = s; c.querySelectorAll('.day-task-mark').forEach(e => e.remove()); items.forEach(t => { if (!t.hour) return; const [hS, mS] = t.hour.split(':'); const h = parseInt(hS); const m = parseInt(mS) || 0; const sP = ((h * 60 + m) / (24 * 60)) * 100; let eP; if (t.hourEnd) { const [ehS, emS] = t.hourEnd.split(':'); const eh = parseInt(ehS); const em = parseInt(emS) || 0; eP = ((eh * 60 + em) / (24 * 60)) * 100; if (eP <= sP) eP = sP + (100 / 24); } else eP = Math.min(100, sP + (100 / 24)); const mk = document.createElement('div'); mk.className = 'day-task-mark'; mk.style.left = sP + '%'; mk.style.width = (eP - sP) + '%'; mk.style.background = t.color; if (t.isEntorno) { mk.style.opacity = '0.35'; mk.style.mixBlendMode = 'screen'; } else mk.style.opacity = t.done ? '0.9' : '0.6'; c.appendChild(mk); }); }
+function renderDayTaskMarks() { const c = document.getElementById('bar-day'); if (!c) return; const n = new Date(); const y = n.getFullYear(); const mI = n.getMonth(); const dN = n.getDate(); const wI = getWeekForDay(y, mI, dN); let s = `${y}-${mI}-${dN}|`; let items = []; if (wI) { const lM = mI % 3, lW = wI.localW; const tE = entornosData.filter(e => e.year === y && e.q === Math.floor(mI/3) && e.months.includes(lM) && e.weeks.includes(lW) && e.days.includes(wI.dayIdx)).map(e => ({ ...e, isEntorno: true })); const wN = mI * 10 + wI.localW; const wT = tasksData[`${y}-${wN}`] || []; const tT = wT.filter(t => getTaskDay(t) === wI.dayIdx && t.hour && t.color); items = [...tE, ...tT]; s += items.map(t => `${t.id}:${t.hour}:${t.hourEnd || ''}:${t.color}:${t.done || false}`).join('|'); } if (s === lastDayMarksSig) return; lastDayMarksSig = s; c.querySelectorAll('.day-task-mark').forEach(e => e.remove()); items.forEach(t => { if (!t.hour) return; const [hS, mS] = t.hour.split(':'); const h = parseInt(hS); const m = parseInt(mS) || 0; const sP = ((h * 60 + m) / (24 * 60)) * 100; let eP; if (t.hourEnd) { const [ehS, emS] = t.hourEnd.split(':'); const eh = parseInt(ehS); const em = parseInt(emS) || 0; eP = ((eh * 60 + em) / (24 * 60)) * 100; if (eP <= sP) eP = sP + (100 / 24); } else eP = Math.min(100, sP + (100 / 24)); const mk = document.createElement('div'); mk.className = 'day-task-mark'; mk.style.left = sP + '%'; mk.style.width = (eP - sP) + '%'; mk.style.background = t.color; if (t.isEntorno) { mk.style.opacity = '0.35'; mk.style.mixBlendMode = 'een'; } else mk.style.opacity = t.done ? '0.9' : '0.6'; c.appendChild(mk); }); }
 function renderNowMarker() { const c = document.getElementById('bar-day'); if (!c) return; let nm = c.querySelector('.now-marker'); if (!nm) { nm = document.createElement('div'); nm.className = 'now-marker'; c.appendChild(nm); } const n = new Date(); const h = n.getHours() + n.getMinutes() / 60 + n.getSeconds() / 3600; nm.style.left = ((h / 24) * 100).toFixed(4) + '%'; }
 function update() { const n = new Date(); const y = n.getFullYear(); const h = n.getHours() + n.getMinutes() / 60 + n.getSeconds() / 3600; const hh = n.getHours(), mm = n.getMinutes(); const ap = hh >= 12 ? 'PM' : 'AM', dH = hh % 12 || 12; const oD = document.getElementById('overlay-date'); const oT = document.getElementById('overlay-time'); if (oD) oD.innerText = `${n.getDate()} de ${meses[n.getMonth()]}, ${y}`; if (oT) oT.innerText = `${dH}:${String(mm).padStart(2, '0')} ${ap}`; const sB = blockConfig.startYear; const eB = sB + blockConfig.years; const bT = new Date(eB, 0, 1) - new Date(sB, 0, 1); const bE = n - new Date(sB, 0, 1); let bP = (bE / bT * 100); if (bP < 0) bP = 0; else if (bP > 100) bP = 100; const bf = document.getElementById('block-fill'); if (bf) bf.style.width = bP.toFixed(4) + '%'; const bp = document.getElementById('block-pct'); if (bp) bp.innerText = bP.toFixed(2) + '%'; const yP = ((n - new Date(y, 0, 1)) / (new Date(y + 1, 0, 1) - new Date(y, 0, 1)) * 100); const yf = document.getElementById('year-fill'); if (yf) yf.style.width = yP.toFixed(4) + '%'; const yp = document.getElementById('year-pct'); if (yp) yp.innerText = yP.toFixed(2) + '%'; let dW = n.getDay(), ad = dW === 0 ? 6 : dW - 1, sW = new Date(n); sW.setDate(n.getDate() - ad); sW.setHours(0, 0, 0, 0); const wP = ((n - sW) / (7 * 24 * 60 * 60 * 1000)) * 100; const wf = document.getElementById('week-fill'); if (wf) wf.style.width = wP.toFixed(4) + '%'; const wp = document.getElementById('week-pct'); if (wp) wp.innerText = wP.toFixed(2) + '%'; let woP = 0, woT = "Libre"; if (h >= workConfig.start && h < workConfig.end) { woP = ((h - workConfig.start) / (workConfig.end - workConfig.start)) * 100; woT = new Date((workConfig.end - h) * 3600 * 1000).toISOString().substr(11, 8); } else if (h >= workConfig.end) { woP = 100; woT = "Finalizado"; } const wof = document.getElementById('work-fill'); if (wof) wof.style.width = woP.toFixed(4) + '%'; const wot = document.getElementById('work-timer'); if (wot) wot.innerText = woT; const wop = document.getElementById('work-pct'); if (wop) wop.innerText = woP.toFixed(2) + '%'; const dP = (h / 24) * 100; const df = document.getElementById('day-fill'); if (df) df.style.width = dP.toFixed(4) + '%'; const dp = document.getElementById('day-pct'); if (dp) dp.innerText = dP.toFixed(2) + '%'; const eD = new Date(y, n.getMonth(), n.getDate(), 23, 59, 59, 999); const mD = eD - n; const hD = Math.floor(mD / 3600000); const mD2 = Math.floor((mD % 3600000) / 60000); const sD = Math.floor((mD % 60000) / 1000); const dtS = `-${String(hD).padStart(2, '0')}:${String(mD2).padStart(2, '0')}:${String(sD).padStart(2, '0')}`; const dtE = document.getElementById('day-timer'); if (dtE) dtE.innerText = dtS; updateTimersDisplayValues(); if (!focusMode.active) { renderDayTaskMarks(); renderNowMarker(); } quarterWindows.forEach((w) => { updateQuarterBarInto(w.bodyEl, w); }); }
 let updateIntervalId = null;
@@ -2246,7 +2246,7 @@ function stopUpdateLoop() { if (updateIntervalId) { clearInterval(updateInterval
 document.addEventListener('visibilitychange', () => { if (document.hidden) { stopUpdateLoop(); if (goalOverlayInterval) { clearInterval(goalOverlayInterval); goalOverlayInterval = null; } flushNotesSave(); } else { startUpdateLoop(); if (activeTimerForGoal && !goalOverlayInterval) { renderGoalOverlayStats(); goalOverlayInterval = setInterval(renderGoalOverlayStats, 500); } } });
 window.addEventListener('pagehide', flushNotesSave);
 window.addEventListener('beforeunload', flushNotesSave);
-async function syncExport() { flushNotesSave(); let b = { tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, day: dayConfig, markers: markersData, collapsed: collapsedMonths, trackedYears: trackedYears, timerStats: timerStats, timersList: timersList, notes: JSON.parse(JSON.stringify(notesData)), timerBoxes: timerBoxes, openedBoxes: Array.from(openedBoxIds), focusMode: focusMode }; const tN = Object.keys(b.notes).filter(k => { const v = b.notes[k]; return k !== 'general' && typeof v === 'string' && v.trim(); }).length; const jS = JSON.stringify(b, null, 2); if ('showSaveFilePicker' in window) { try { const fh = await window.showSaveFilePicker({ suggestedName: `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`, types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] }); const w = await fh.createWritable(); await w.write(jS); await w.close(); alert(`Guardado.\n\n${tN} notas exportadas.`); } catch (err) { if (err.name !== 'AbortError') { alert("Error."); } } } else { const bl = new Blob([jS], { type: "application/json" }); const u = URL.createObjectURL(bl); const a = document.createElement("a"); a.href = u; a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); alert(`Guardado.\n\n${tN} notas exportadas.`); } }
+async function syncExport() { flushNotesSave(); let b = { tasks: tasksData, entornos: entornosData, work: workConfig, block: blockConfig, day: dayConfig, markers: markersData, collapsed: collapsedMonths, trackedYears: trackedYears, timerStats: timerStats, timersList: timersList, notes: JSON.parse(JSON.stringify(notesData)), timerBoxes: timerBoxes, openedBoxes: Array.from(openedBoxIds), focusMode: focusMode }; const tN = Object.keys(b.notes).filter(k => { const v = b.notes[k]; return k !== 'general' && typeof v === 'string' && v.trim(); }).length; const jS = JSON.stringify(b, null, 2); if ('showSaveFilePicker' in window) { try { const fh = await window.showSaveFilePicker({ suggestedName: `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`, types: [{ deiption: 'JSON', accept: { 'application/json': ['.json'] } }] }); const w = await fh.createWritable(); await w.write(jS); await w.close(); alert(`Guardado.\n\n${tN} notas exportadas.`); } catch (err) { if (err.name !== 'AbortError') { alert("Error."); } } } else { const bl = new Blob([jS], { type: "application/json" }); const u = URL.createObjectURL(bl); const a = document.createElement("a"); a.href = u; a.download = `Tiempo_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); alert(`Guardado.\n\n${tN} notas exportadas.`); } }
 function syncImport(event) { const file = event.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = function(e) { try { const d = JSON.parse(e.target.result); if (!d.tasks || !d.timersList) { alert("Inválido."); return; } if (confirm("¿Reemplazar TODOS los datos?")) { const nPF = d.notes ? Object.keys(d.notes).filter(k => k !== 'general' && typeof d.notes[k] === 'string' && d.notes[k].trim()).length : 0; if (d.tasks) safeSetItem('wkTasks', JSON.stringify(d.tasks)); if (d.entornos) safeSetItem('wkEntornos', JSON.stringify(d.entornos)); if (d.work) safeSetItem('wkWorkCfg', JSON.stringify(d.work)); if (d.block) safeSetItem('wkBlockCfg', JSON.stringify(d.block)); if (d.day) safeSetItem('wkDayCfg', JSON.stringify(d.day)); if (d.markers) safeSetItem('wkMarkers', JSON.stringify(d.markers)); if (d.collapsed) safeSetItem('wkCollapsedMonths', JSON.stringify(d.collapsed)); if (d.trackedYears) safeSetItem('wkYears', JSON.stringify(d.trackedYears)); if (d.timerStats) safeSetItem('wkTimerStats', JSON.stringify(d.timerStats)); if (d.timersList) safeSetItem('wkTimersList', JSON.stringify(d.timersList)); let nOK = true; if (d.notes && typeof d.notes === 'object') { nOK = safeSetItem('wkNotes', JSON.stringify(d.notes)); if (nOK) { notesData = JSON.parse(JSON.stringify(d.notes)); if (notesSaveTimer) { clearTimeout(notesSaveTimer); notesSaveTimer = null; } } } if (d.timerBoxes) safeSetItem('wkTimerBoxes', JSON.stringify(d.timerBoxes)); if (d.openedBoxes) safeSetItem('wkOpenedBoxes', JSON.stringify(d.openedBoxes)); if (d.focusMode) safeSetItem('wkFocusMode', JSON.stringify(d.focusMode)); alert(nOK ? `Restaurado.\n\n${nPF} notas importadas.` : 'Error notas.'); try { window.location.reload(); } catch(e1) { try { window.location.replace(window.location.href); } catch(e2) {} } } } catch (err) { alert("Error al leer."); } event.target.value = ''; }; r.readAsText(file); }
 function formatClock(ms) { if (!ms || ms < 0) return '00:00'; const ts = Math.floor(ms / 1000); const h = Math.floor(ts / 3600); const m = Math.floor((ts % 3600) / 60); const s = ts % 60; return h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
 function openHistoryModal() { document.querySelectorAll('#main-modal-card > div[id^="modal-content-"]').forEach(el => el.style.display = 'none'); document.getElementById('modal-content-history').style.display = 'flex'; switchPanelState('modal-content-history'); document.getElementById('main-modal-card').classList.add('wide'); renderHistoryModal(); openModal(); }
@@ -2446,7 +2446,7 @@ function buildHiddenColumnsHTML(query) {
         for (let i = 0; i < arr.length; i += size) res.push(arr.slice(i, i + size));
         return res;
     };
-    let out = '<div class="hidden-cols-scroll">';
+    let out = '<div class="hidden-cols-oll">';
     if (hL.length > 0) {
         const cols = chunk(hL, 13).map(col =>
             `<div class="hidden-col">${col.map(t =>
@@ -2489,7 +2489,7 @@ openHiddenSearch = function() {
     const input = document.getElementById('hidden-search-input');
     if (input) {
         setTimeout(() => {
-            try { input.focus({ preventScroll: true }); } catch(e) { input.focus(); }
+            try { input.focus({ preventoll: true }); } catch(e) { input.focus(); }
         }, 30);
     }
 };
@@ -2501,7 +2501,7 @@ closeHiddenSearch = function() {
         if (input) input.value = '';
         renderHiddenBarColumns();
         if (input) {
-            try { input.focus({ preventScroll: true }); } catch(e) { input.focus(); }
+            try { input.focus({ preventoll: true }); } catch(e) { input.focus(); }
         }
         return;
     }
@@ -2838,205 +2838,79 @@ buildHiddenColumnsHTML = function(query) {
 };
 if (document.getElementById('hidden-bar-pills')) renderHiddenBarColumns();
 </script>
-  <script>
+<script>
 (function() {
     'use strict';
-
     const NOTES_ID = 'notes-main-textarea';
+    const DEL_TYPES = ['deleteContentBackward','deleteContentForward','deleteContent','deleteWordBackward','deleteWordForward'];
 
-    function isWikiLink(node) {
-        return node && node.nodeType === 1 &&
-               node.classList && node.classList.contains('wiki-link');
+    let snap = null;
+
+    function getEl(){ return document.getElementById(NOTES_ID); }
+    function countLinks(html){
+        const d = document.createElement('div');
+        d.innerHTML = html;
+        return d.querySelectorAll('.wiki-link').length;
     }
 
-    // ¿El rango (selección múltiple) intersecta algún enlace?
-    function rangeIntersectsWikiLink(range, root) {
-        const links = root.querySelectorAll('.wiki-link');
-        for (let i = 0; i < links.length; i++) {
-            try {
-                if (range.intersectsNode(links[i])) return true;
-            } catch (err) {}
-        }
-        return false;
-    }
-
-    // ¿El cursor está dentro (o justo en el borde interno) de un enlace?
-    function isCursorInsideWikiLink(range, root) {
-        let node = range.startContainer;
-        while (node && node !== root) {
-            if (isWikiLink(node)) return true;
-            node = node.parentNode;
-        }
-        return false;
-    }
-
-    // Buscar hermano anterior "real" (saltando nodos de texto vacíos)
-    function prevMeaningfulSibling(node) {
-        let sib = node.previousSibling;
-        while (sib) {
-            if (sib.nodeType === 3) {
-                if (sib.textContent.length > 0) return sib;
-                sib = sib.previousSibling;
-            } else if (sib.nodeType === 1) {
-                return sib;
-            } else {
-                sib = sib.previousSibling;
-            }
-        }
-        return null;
-    }
-
-    function nextMeaningfulSibling(node) {
-        let sib = node.nextSibling;
-        while (sib) {
-            if (sib.nodeType === 3) {
-                if (sib.textContent.length > 0) return sib;
-                sib = sib.nextSibling;
-            } else if (sib.nodeType === 1) {
-                return sib;
-            } else {
-                sib = sib.nextSibling;
-            }
-        }
-        return null;
-    }
-
-    // ¿Pulsar Backspace borraría un enlace?
-    function backspaceWouldDeleteLink(range, root) {
-        const { startContainer, startOffset } = range;
-
-        if (isCursorInsideWikiLink(range, root)) return true;
-
-        if (startContainer.nodeType === 3) {
-            if (startOffset > 0) return false; // hay texto previo, se borra texto, no enlace
-            const prev = prevMeaningfulSibling(startContainer);
-            if (prev) return isWikiLink(prev);
-            let parent = startContainer.parentNode;
-            while (parent && parent !== root) {
-                if (isWikiLink(parent)) return true;
-                const pprev = prevMeaningfulSibling(parent);
-                if (pprev) return isWikiLink(pprev);
-                parent = parent.parentNode;
-            }
-            return false;
-        }
-
-        if (startContainer.nodeType === 1) {
-            if (startOffset === 0) {
-                if (isWikiLink(startContainer)) return true;
-                const prev = prevMeaningfulSibling(startContainer);
-                if (prev) return isWikiLink(prev);
-                let parent = startContainer.parentNode;
-                while (parent && parent !== root) {
-                    if (isWikiLink(parent)) return true;
-                    const pprev = prevMeaningfulSibling(parent);
-                    if (pprev) return isWikiLink(pprev);
-                    parent = parent.parentNode;
-                }
-                return false;
-            }
-            const prev = startContainer.childNodes[startOffset - 1];
-            if (prev.nodeType === 3) {
-                if (prev.textContent.length > 0) return false;
-                const real = prevMeaningfulSibling(prev);
-                return real ? isWikiLink(real) : false;
-            }
-            return isWikiLink(prev);
-        }
-        return false;
-    }
-
-    // ¿Pulsar Delete (suprimir) borraría un enlace?
-    function deleteWouldDeleteLink(range, root) {
-        const { startContainer, startOffset } = range;
-
-        if (isCursorInsideWikiLink(range, root)) return true;
-
-        if (startContainer.nodeType === 3) {
-            if (startOffset < startContainer.textContent.length) return false;
-            const next = nextMeaningfulSibling(startContainer);
-            if (next) return isWikiLink(next);
-            let parent = startContainer.parentNode;
-            while (parent && parent !== root) {
-                if (isWikiLink(parent)) return true;
-                const nnext = nextMeaningfulSibling(parent);
-                if (nnext) return isWikiLink(nnext);
-                parent = parent.parentNode;
-            }
-            return false;
-        }
-
-        if (startContainer.nodeType === 1) {
-            if (startOffset >= startContainer.childNodes.length) {
-                if (isWikiLink(startContainer)) return true;
-                const next = nextMeaningfulSibling(startContainer);
-                if (next) return isWikiLink(next);
-                let parent = startContainer.parentNode;
-                while (parent && parent !== root) {
-                    if (isWikiLink(parent)) return true;
-                    const nnext = nextMeaningfulSibling(parent);
-                    if (nnext) return isWikiLink(nnext);
-                    parent = parent.parentNode;
-                }
-                return false;
-            }
-            const next = startContainer.childNodes[startOffset];
-            if (next.nodeType === 3) {
-                if (next.textContent.length > 0) return false;
-                const real = nextMeaningfulSibling(next);
-                return real ? isWikiLink(real) : false;
-            }
-            return isWikiLink(next);
-        }
-        return false;
-    }
-
-    function shouldBlock(direction) {
-        const notesEl = document.getElementById(NOTES_ID);
-        if (!notesEl) return false;
-
+    function takeSnap(){
+        const el = getEl(); if(!el) return;
         const sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return false;
-        const range = sel.getRangeAt(0);
-
-        if (!notesEl.contains(range.commonAncestorContainer) &&
-            range.commonAncestorContainer !== notesEl) return false;
-
-        // Selección múltiple que incluye un enlace
-        if (!range.collapsed) {
-            return rangeIntersectsWikiLink(range, notesEl);
-        }
-
-        return direction === 'backward'
-            ? backspaceWouldDeleteLink(range, notesEl)
-            : deleteWouldDeleteLink(range, notesEl);
+        if(!sel || !sel.rangeCount) return;
+        const r = sel.getRangeAt(0);
+        if(!el.contains(r.startContainer) && r.startContainer !== el) return;
+        snap = {
+            html: el.innerHTML,
+            sNode: r.startContainer, sOff: r.startOffset,
+            eNode: r.endContainer,   eOff: r.endOffset,
+            st: el.scrollTop, sl: el.scrollLeft
+        };
     }
 
-    function kill(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    function restore(){
+        const el = getEl(); if(!el || !snap) return;
+        el.innerHTML = snap.html;
+        el.scrollTop = snap.st; el.scrollLeft = snap.sl;
+        try {
+            const sel = window.getSelection(); sel.removeAllRanges();
+            const r = document.createRange();
+            if (snap.sNode && snap.sNode.isConnected) {
+                r.setStart(snap.sNode, snap.sOff);
+                if (snap.eNode && snap.eNode.isConnected) r.setEnd(snap.eNode, snap.eOff);
+                else r.collapse(true);
+            } else {
+                r.selectNodeContents(el); r.collapse(false);
+            }
+            sel.addRange(r);
+        } catch(e) {}
     }
 
-    // Captura en fase de captura: se ejecuta antes que el contenteditable
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace') {
-            if (shouldBlock('backward')) kill(e);
-        } else if (e.key === 'Delete') {
-            if (shouldBlock('forward')) kill(e);
-        }
+    // 1) Foto antes del borrado
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'Backspace' || e.key === 'Delete') takeSnap();
     }, true);
 
-    // Compatibilidad con teclados móviles / virtuales
-    document.addEventListener('beforeinput', function(e) {
-        const t = e.inputType;
-        if (t === 'deleteContentBackward' || t === 'deleteContent') {
-            if (shouldBlock('backward')) kill(e);
-        } else if (t === 'deleteContentForward') {
-            if (shouldBlock('forward')) kill(e);
+    // 1b) Teclados móviles que no emiten keydown
+    document.addEventListener('beforeinput', function(e){
+        if (DEL_TYPES.indexOf(e.inputType || '') !== -1 && !snap) takeSnap();
+    }, true);
+
+    // 2) Verificar y restaurar si se perdió algún enlace
+    document.addEventListener('input', function(e){
+        if (!snap) return;
+        if (DEL_TYPES.indexOf(e.inputType || '') === -1) { snap = null; return; }
+        const el = getEl(); if (!el) { snap = null; return; }
+        if (el.querySelectorAll('.wiki-link').length < countLinks(snap.html)) restore();
+        snap = null;
+    }, true);
+
+    // 3) Limpiar snapshot huérfano (por si input no dispara)
+    document.addEventListener('keyup', function(e){
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            setTimeout(function(){ snap = null; }, 100);
         }
     }, true);
 })();
-</script>  
+</script> 
  </body>
 </html>

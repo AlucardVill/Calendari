@@ -1025,6 +1025,23 @@ body.focus-mode #focus-frame {
     left: 0;
     top: -2px;
 }
+.hidden-timers-bar.expanded,.hidden-timers-bar.searching{flex-wrap:wrap;padding:10px 12px;row-gap:8px}
+.hidden-timers-bar.expanded .hidden-bar-toggle .chev-right,.hidden-timers-bar.searching .hidden-bar-toggle .chev-right{display:none}
+.hidden-timers-bar.expanded .hidden-bar-toggle .chev-down,.hidden-timers-bar.searching .hidden-bar-toggle .chev-down{display:block}
+.hidden-bar-search-wrap{flex:1!important;flex-basis:auto!important;max-width:none!important}
+.hidden-timers-bar.searching .hidden-bar-dots,.hidden-timers-bar.expanded .hidden-bar-dots{display:none!important}
+.hidden-timers-bar.searching .hidden-bar-pills,.hidden-timers-bar.expanded .hidden-bar-pills{display:block!important;flex:1 1 100%;flex-basis:100%;min-width:0;padding-top:8px;border-top:1px solid var(--border)}
+.hidden-cols-scroll{display:flex;flex-direction:row;align-items:flex-start;gap:10px;width:100%;overflow-x:auto;overflow-y:hidden;container-type:inline-size;padding-bottom:2px}
+.hidden-cat-group{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.hidden-cat-title{font-size:0.5rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding-left:2px;user-select:none}
+.hidden-cat-cols{display:flex;flex-direction:row;align-items:flex-start;gap:6px}
+.hidden-col{display:flex;flex-direction:column;gap:5px;width:calc((100vw - 66px) / 4);width:calc((100cqw - 22px) / 4);flex-shrink:0;min-width:0}
+.hidden-timer-pill{width:100%;min-width:0;box-sizing:border-box;gap:5px;padding:4px 7px}
+.hidden-timer-pill .pill-dot{width:7px;height:7px}
+.hidden-timer-pill.box-pill .pill-dot{border-radius:2px}
+.hidden-timer-pill .pill-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.hidden-timer-pill .pill-time{flex-shrink:0}
+.hidden-bar-pill-empty{display:block!important;font-size:0.68rem;color:var(--muted);font-style:italic;padding:2px 4px}
 </style>
 </head>
 <body>
@@ -2394,7 +2411,214 @@ function removeTextColor() {
     document.execCommand('foreColor', false, document.documentElement.getAttribute('data-theme') === 'light' ? '#14171e' : '#eef0f5');
     saveMainNote();
     saveSelection();
-}    
+}  
+function buildHiddenColumnsHTML(query) {
+    const q = (query || '').trim().toLowerCase();
+    const hL = timersList.filter(t => t.id !== 'general' && t.hidden && (!q || (t.name || '').toLowerCase().includes(q)));
+    const bL = timerBoxes.filter(box => !q || (box.name || '').toLowerCase().includes(q));
+    if (hL.length === 0 && bL.length === 0) return '<div class="hidden-bar-pill-empty">No hay</div>';
+    const chunk = (arr, size) => {
+        const res = [];
+        for (let i = 0; i < arr.length; i += size) res.push(arr.slice(i, i + size));
+        return res;
+    };
+    let out = '<div class="hidden-cols-scroll">';
+    if (hL.length > 0) {
+        const cols = chunk(hL, 13).map(col =>
+            `<div class="hidden-col">${col.map(t =>
+                `<div class="hidden-timer-pill ${t.tRunning ? 'is-running' : ''}" style="--pill-color:${escapeHtml(t.color)}" onclick="toggleTimerHidden('${escapeHtml(t.id)}')" title="${escapeHtml(t.name)}"><span class="pill-dot"></span><span class="pill-name">${escapeHtml(t.name)}</span><span class="pill-time" id="pill-time-${escapeHtml(t.id)}" style="display:none;"></span></div>`
+            ).join('')}</div>`
+        ).join('');
+        out += `<div class="hidden-cat-group"><div class="hidden-cat-title">Timers</div><div class="hidden-cat-cols">${cols}</div></div>`;
+    }
+    if (bL.length > 0) {
+        const cols = chunk(bL, 13).map(col =>
+            `<div class="hidden-col">${col.map(box =>
+                `<div class="hidden-timer-pill box-pill" style="--pill-color:${escapeHtml(box.color)}" onpointerdown="handleBoxPillDown(event,'${escapeHtml(box.id)}')" onpointerup="handleBoxPillUp(event,'${escapeHtml(box.id)}')" onpointercancel="handleBoxPillCancel()" onpointerleave="handleBoxPillCancel()" title="${escapeHtml(box.name)}"><span class="pill-dot"></span><span class="pill-name">${escapeHtml(box.name)}</span></div>`
+            ).join('')}</div>`
+        ).join('');
+        out += `<div class="hidden-cat-group"><div class="hidden-cat-title">Cajas</div><div class="hidden-cat-cols">${cols}</div></div>`;
+    }
+    out += '</div>';
+    return out;
+}
+
+function renderHiddenBarColumns() {
+    const pillsEl = document.getElementById('hidden-bar-pills');
+    if (!pillsEl) return;
+    pillsEl.innerHTML = buildHiddenColumnsHTML(hiddenSearchQuery);
+    updateTimersDisplayValues();
+}
+
+toggleHiddenBar = function() {
+    const isOpen = hiddenBarExpanded || hiddenSearchOpen;
+    hiddenBarExpanded = !isOpen;
+    hiddenSearchOpen = false;
+    hiddenSearchQuery = '';
+    safeSetItem('wkHiddenBarExpanded', hiddenBarExpanded);
+    renderTimersUI();
+};
+
+openHiddenSearch = function() {
+    hiddenSearchOpen = true;
+    renderTimersUI();
+    const input = document.getElementById('hidden-search-input');
+    if (input) {
+        setTimeout(() => {
+            try { input.focus({ preventScroll: true }); } catch(e) { input.focus(); }
+        }, 30);
+    }
+};
+
+closeHiddenSearch = function() {
+    const input = document.getElementById('hidden-search-input');
+    if (hiddenSearchQuery.length > 0) {
+        hiddenSearchQuery = '';
+        if (input) input.value = '';
+        renderHiddenBarColumns();
+        if (input) {
+            try { input.focus({ preventScroll: true }); } catch(e) { input.focus(); }
+        }
+        return;
+    }
+    hiddenSearchOpen = false;
+    hiddenBarExpanded = false;
+    safeSetItem('wkHiddenBarExpanded', false);
+    renderTimersUI();
+};
+
+onHiddenSearchInput = function(value) {
+    hiddenSearchQuery = value;
+    renderHiddenBarColumns();
+};
+
+function openBoxInFocus(boxId) {
+    const box = timerBoxes.find(b => b.id === boxId);
+    if (!box) return;
+    if (box.timers.length === 0) {
+        openBoxContentsModal(boxId);
+        return;
+    }
+    enterFocus('box', { boxId });
+}
+
+handleBoxPillUp = function(e, boxId) {
+    if (boxPillTimer) { clearTimeout(boxPillTimer); boxPillTimer = null; }
+    if (boxPillFlag) { boxPillFlag = false; return; }
+    if (Math.hypot(e.clientX - boxPillStart.x, e.clientY - boxPillStart.y) < 12) openBoxInFocus(boxId);
+};
+
+isTimerInFocus = function(id) {
+    if (!focusMode.active) return true;
+    if (focusMode.type === 'all') return timersList.some(t => t.id === id);
+    if (focusMode.type === 'box') {
+        const b = timerBoxes.find(x => x.id === focusMode.boxId);
+        return b ? b.timers.some(bt => bt.id === id) : false;
+    }
+    if (focusMode.type === 'manual') return focusMode.timerIds.includes(id);
+    return true;
+};
+
+applyFocusMode = function() {
+    document.body.classList.toggle('focus-mode', focusMode.active);
+    const bar = document.getElementById('focus-bar');
+    if (!focusMode.active) {
+        if (bar) bar.style.display = 'none';
+        return;
+    }
+    if (bar) bar.style.display = isInitialLoad ? '' : 'none';
+    const tE = document.getElementById('focus-bar-title');
+    const cE = document.getElementById('focus-bar-count');
+    let c = 0;
+    if (focusMode.type === 'all') {
+        c = timersList.filter(t => t.id === 'general' || !t.hidden).length;
+    } else if (focusMode.type === 'box') {
+        const b = timerBoxes.find(x => x.id === focusMode.boxId);
+        c = b ? b.timers.length : 0;
+    } else if (focusMode.type === 'manual') {
+        c = focusMode.timerIds.length;
+    }
+    if (tE) tE.textContent = focusMode.label || 'Concentración';
+    if (cE) cE.textContent = c + (c === 1 ? ' timer' : ' timers');
+    const pE = document.getElementById('focus-bar-pins');
+    if (pE) {
+        if (focusPinned.length > 0) {
+            pE.style.display = 'inline-flex';
+            pE.innerHTML = `${focusPinned.length} fijado${focusPinned.length > 1 ? 's' : ''} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" style="width:9px;height:9px;"><path d="M6 6l12 12M18 6l-12 12"/></svg>`;
+        } else {
+            pE.style.display = 'none';
+            pE.innerHTML = '';
+        }
+    }
+};
+
+renderTimersUI = function() {
+    const container = document.getElementById('timers-container');
+    const headerBar = document.getElementById('timers-header-bar');
+    const pinsBar = document.getElementById('focus-pins-bar');
+    if (!container || !headerBar) return;
+    if (pinsBar) { pinsBar.classList.remove('active'); pinsBar.innerHTML = ''; }
+    if (focusMode.active && focusPinned.length > 0) {
+        headerBar.style.display = 'none';
+        container.classList.remove('collapsed');
+        renderPinnedLayout(container);
+        applyFocusMode();
+        return;
+    }
+    const vE = timersList.filter(t => t.id !== 'general' && !t.hidden).length;
+    const hL = timersList.filter(t => t.id !== 'general' && t.hidden);
+    if (vE + hL.length > 0 && !focusMode.active) {
+        headerBar.style.display = 'flex';
+        document.getElementById('timers-count-label').innerText = hL.length ? `Adicionales (${vE}) · ${hL.length} oculto${hL.length > 1 ? 's' : ''}` : `Adicionales (${vE})`;
+        document.getElementById('timers-toggle-txt').innerText = extraTimersFolded ? 'Mostrar' : 'Ocultar';
+        document.getElementById('timers-toggle-icon').innerText = extraTimersFolded ? '▼' : '▲';
+        container.classList.toggle('collapsed', extraTimersFolded);
+    } else {
+        headerBar.style.display = 'none';
+        container.classList.remove('collapsed');
+    }
+    let html = '';
+    const gI = timersList.findIndex(t => t.id === 'general');
+    if (gI !== -1 && isTimerInFocus('general')) html += renderTimerCard(timersList[gI], gI);
+    const tHI = hL.length + timerBoxes.length;
+    if (tHI > 0 && !focusMode.active) {
+        const dots = hL.map(t => `<button class="hidden-dot ${t.tRunning ? 'is-running' : ''}" style="--dot-color:${escapeHtml(t.color)}" onclick="toggleTimerHidden('${escapeHtml(t.id)}')" title="${escapeHtml(t.name)}"></button>`).join('') +
+            timerBoxes.map(box => `<button class="hidden-dot box-dot" style="--dot-color:${escapeHtml(box.color)}" onpointerdown="handleBoxPillDown(event,'${escapeHtml(box.id)}')" onpointerup="handleBoxPillUp(event,'${escapeHtml(box.id)}')" onpointercancel="handleBoxPillCancel()" onpointerleave="handleBoxPillCancel()" title="${escapeHtml(box.name)}"></button>`).join('');
+        const sq = escapeHtml(hiddenSearchQuery);
+        const colsHtml = buildHiddenColumnsHTML(hiddenSearchQuery);
+        html += `<div class="hidden-timers-bar active ${hiddenBarExpanded ? 'expanded' : ''} ${hiddenSearchOpen ? 'searching' : ''}" id="hidden-timers-bar"><button class="hidden-bar-toggle" onclick="toggleHiddenBar()"><svg class="chev-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 6l6 6-6 6"/></svg><svg class="chev-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg></button><button class="hidden-bar-search-btn" onclick="openHiddenSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button><div class="hidden-bar-search-wrap"><input type="text" class="hidden-bar-search-input" id="hidden-search-input" placeholder="Buscar..." value="${sq}" autocomplete="off" oninput="onHiddenSearchInput(this.value)" onkeydown="if(event.key==='Escape'){closeHiddenSearch();}"><button class="hidden-bar-search-clear" onclick="closeHiddenSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 6l12 12M18 6l-12 12"/></svg></button></div><div class="hidden-bar-dots">${dots}</div><div class="hidden-bar-pills" id="hidden-bar-pills">${colsHtml}</div></div>`;
+    }
+    timersList.forEach((t, index) => {
+        if (t.id === 'general' || t.hidden) return;
+        if (!isTimerInFocus(t.id)) return;
+        html += renderTimerCard(t, index);
+    });
+    if (focusMode.active) {
+        const boxesToShow = focusMode.type === 'box'
+            ? timerBoxes.filter(b => b.id === focusMode.boxId)
+            : (focusMode.type === 'manual' ? timerBoxes : []);
+        boxesToShow.forEach(box => {
+            if (!box || box.timers.length === 0) return;
+            const vT = box.timers.filter(bt => isTimerInFocus(bt.id));
+            if (vT.length === 0) return;
+            html += `<div class="box-section">`;
+            vT.forEach(bt => { html += renderBoxTimerCard(bt, box.id, box); });
+            html += `</div>`;
+        });
+    }
+    container.innerHTML = html;
+    updateTimersDisplayValues();
+    applyFocusMode();
+};
+
+const _origUpdateTimersDisplayValues = updateTimersDisplayValues;
+updateTimersDisplayValues = function() {
+    _origUpdateTimersDisplayValues();
+    document.querySelectorAll('#hidden-bar-pills .pill-time').forEach(el => {
+        const txt = (el.innerText || '').trim();
+        el.style.display = (txt && txt !== '00:00') ? '' : 'none';
+    });
+};
 try {
 applyBatterySaver();
 applyModalAlphaSettings();

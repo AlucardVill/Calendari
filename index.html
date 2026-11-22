@@ -1721,11 +1721,75 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
     }
 });
 function loadNoteForPicker() { const d = document.getElementById('notes-date-picker').value; const ta = document.getElementById('notes-main-textarea'); ta.innerHTML = notesData[d] || ''; if (d) localStorage.setItem('wkNotesLastDate', d); const s = document.getElementById('notes-index-select'); if (s && !s.disabled) s.value = d; undoStack = []; redoStack = []; lastSavedHtml = ta.innerHTML; }
+let pendingTypingFont = null;
+
+function applyFontStyleToSpan(el, val) {
+    el.style.fontFamily = val;
+    if (val && val.toLowerCase().includes('pinyon')) {
+        el.style.fontSize = '2rem';
+        el.style.lineHeight = '1.4';
+        el.style.display = 'inline-block';
+        el.style.paddingBottom = '6px';
+    } else {
+        el.style.fontSize = '';
+        el.style.lineHeight = '';
+        el.style.display = '';
+        el.style.paddingBottom = '';
+    }
+}
+
+function enforcePendingTypingFont(ta) {
+    if (!pendingTypingFont || !ta) return;
+    ta.querySelectorAll('font[face]').forEach(f => {
+        const span = document.createElement('span');
+        applyFontStyleToSpan(span, f.getAttribute('face') || pendingTypingFont);
+        while (f.firstChild) span.appendChild(f.firstChild);
+        f.parentNode.replaceChild(span, f);
+    });
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || !sel.isCollapsed) return;
+    const node = sel.anchorNode;
+    const offset = sel.anchorOffset;
+    if (!node || node.nodeType !== 3 || !ta.contains(node)) return;
+    if (node.textContent.replace(/\u200B/g, '').length === 0) return;
+
+    let hasTargetFont = false;
+    let p = node.parentNode;
+    while (p && p !== ta) {
+        if (p.nodeType === 1 && p.style && p.style.fontFamily) {
+            hasTargetFont = true;
+            break;
+        }
+        p = p.parentNode;
+    }
+    if (!hasTargetFont) {
+        const block = node.parentNode;
+        if (block) {
+            block.querySelectorAll('span').forEach(s => {
+                if (s.style.fontFamily && s.textContent.replace(/\u200B/g, '') === '' && !s.querySelector('.wiki-link, img, hr')) {
+                    s.remove();
+                }
+            });
+        }
+        const span = document.createElement('span');
+        applyFontStyleToSpan(span, pendingTypingFont);
+        node.parentNode.replaceChild(span, node);
+        span.appendChild(node);
+        const nr = document.createRange();
+        nr.setStart(node, Math.min(offset, node.length));
+        nr.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(nr);
+    }
+}
+
 function saveMainNote() { 
     const m = document.getElementById('notes-mode').value; 
     const ta = document.getElementById('notes-main-textarea'); 
+    if (!isUndoRedoAction) enforcePendingTypingFont(ta);
     
     if (!isUndoRedoAction) {
+
         const currentHtml = ta.innerHTML;
         if (currentHtml !== lastSavedHtml) {
             undoStack.push(lastSavedHtml);
@@ -1788,56 +1852,75 @@ function restoreSelection() { if (_savedRange) { if (window.getSelection) { cons
         return;
     }
     
-       ta.focus({ preventScroll: true });
+        ta.focus({ preventScroll: true });
     restoreSelection(); 
     
     // Lógica para Fuente
-
     if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
         
-        if ((!range || range.collapsed) && _savedRange && !_savedRange.collapsed) {
+        if ((!range || range.collapsed) && _savedRange && !_savedRange.collapsed && ta.contains(_savedRange.commonAncestorContainer)) {
             range = _savedRange;
             if (sel) { sel.removeAllRanges(); sel.addRange(range); }
         }
 
-        if (range && !range.collapsed) {
+        if (!range || !ta.contains(range.commonAncestorContainer)) {
+            range = document.createRange();
+            range.selectNodeContents(ta);
+            range.collapse(false);
+            if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+        }
+
+        if (!range.collapsed) {
+            pendingTypingFont = null;
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('fontName', false, val);
 
             ta.querySelectorAll('span, font').forEach(el => {
                 const ff = el.style.fontFamily || el.getAttribute('face') || '';
-                if (ff.toLowerCase().includes('pinyon')) {
-                    el.style.fontSize = '2rem';
-                    el.style.lineHeight = '1.4';
-                    el.style.display = 'inline-block';
-                    el.style.paddingBottom = '6px';
-                } else {
-                    el.style.fontSize = '';
-                    el.style.lineHeight = '';
-                    el.style.display = '';
-                    el.style.paddingBottom = '';
-                }
+                if (!ff) return;
+                if (el.tagName === 'FONT') el.removeAttribute('face');
+                applyFontStyleToSpan(el, ff);
             });
-        } else if (range) {
-            const span = document.createElement('span');
-            span.style.fontFamily = val;
-            if (val.includes('Pinyon')) {
-                span.style.fontSize = '2rem';
-                span.style.lineHeight = '1.4';
-                span.style.display = 'inline-block';
-                span.style.paddingBottom = '6px';
+        } else {
+            pendingTypingFont = val;
+            let activeFontSpan = null;
+            let n = range.startContainer;
+            while (n && n !== ta) {
+                if (n.nodeType === 1 && n.tagName === 'SPAN' && n.style.fontFamily) {
+                    activeFontSpan = n;
+                    break;
+                }
+                n = n.parentNode;
             }
-            span.innerHTML = '&#8203;'; 
-            range.insertNode(span);
-            const newRange = document.createRange();
-            newRange.setStart(span.firstChild, 1);
-            newRange.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(newRange);
-        } 
-     } else if (cmd === 'justifyFull') {
+
+            if (activeFontSpan && activeFontSpan.textContent.replace(/\u200B/g, '') === '' && !activeFontSpan.querySelector('.wiki-link, img, hr')) {
+                applyFontStyleToSpan(activeFontSpan, val);
+                if (!activeFontSpan.firstChild) activeFontSpan.appendChild(document.createTextNode('\u200B'));
+                const newRange = document.createRange();
+                newRange.setStart(activeFontSpan.firstChild, activeFontSpan.firstChild.length);
+                newRange.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+            } else {
+                if (activeFontSpan) {
+                    range.setStartAfter(activeFontSpan);
+                    range.collapse(true);
+                }
+                const span = document.createElement('span');
+                applyFontStyleToSpan(span, val);
+                span.appendChild(document.createTextNode('\u200B'));
+                range.insertNode(span);
+                const newRange = document.createRange();
+                newRange.setStart(span.firstChild, 1);
+                newRange.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+            }
+        }
+    } else if (cmd === 'justifyFull') {
+
         const wasJustified = isSelectionJustified();
         document.execCommand('styleWithCSS', false, true);
         if (wasJustified) {
@@ -2321,6 +2404,7 @@ restoreMinimizedFromStorage();
 startUpdateLoop();
 const taEl = document.getElementById('notes-main-textarea');
 if (taEl) {
+taEl.addEventListener('pointerdown', () => { pendingTypingFont = null; });
 taEl.addEventListener('mouseup', () => { saveSelection(); updateFormatBtns(); });
 taEl.addEventListener('keyup', () => { saveSelection(); updateFormatBtns(); });
 taEl.addEventListener('touchend', () => { saveSelection(); updateFormatBtns(); });

@@ -1676,7 +1676,80 @@ let isUndoRedoAction = false;
 let lastSavedHtml = '';
 function saveSelection() { if (window.getSelection) { const s = window.getSelection(); if (s.getRangeAt && s.rangeCount) _savedRange = s.getRangeAt(0); } else if (document.selection && document.selection.createRange) _savedRange = document.selection.createRange(); }
 function restoreSelection() { if (_savedRange) { if (window.getSelection) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(_savedRange); } else if (document.selection && _savedRange.select) _savedRange.select(); } }
-function formatDoc(cmd, val) { 
+// Función para revisar si el texto tiene el formato puesto (sin preguntarle al navegador)
+function isFormatActive(cmd) {
+    const ta = document.getElementById('notes-main-textarea');
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return false;
+    
+    let nodes = [];
+    if (!sel.isCollapsed) {
+        const range = sel.getRangeAt(0);
+        const div = document.createElement('div');
+        div.appendChild(range.cloneContents());
+        nodes = Array.from(div.querySelectorAll('*'));
+        nodes.push(div);
+    } else {
+        let node = sel.anchorNode;
+        if (node.nodeType === 3) node = node.parentNode;
+        nodes = [node];
+    }
+
+    for (let n of nodes) {
+        if (!n || n === ta) continue;
+        const style = window.getComputedStyle(n);
+        if (cmd === 'bold' && (style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 700)) return true;
+        if (cmd === 'italic' && style.fontStyle === 'italic') return true;
+        if (cmd === 'underline' && style.textDecoration.includes('underline')) return true;
+        if (n.tagName === 'B' && cmd === 'bold') return true;
+        if (n.tagName === 'I' && cmd === 'italic') return true;
+        if (n.tagName === 'U' && cmd === 'underline') return true;
+    }
+    return false;
+}
+
+// Función que aplica el formato manualmente (evita bugs de execCommand)
+function applyCustomFormat(cmd) {
+    const ta = document.getElementById('notes-main-textarea');
+    ta.focus();
+    restoreSelection();
+    
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    
+    const isActive = isFormatActive(cmd);
+    
+    const span = document.createElement('span');
+    if (cmd === 'bold') span.style.fontWeight = isActive ? 'normal' : 'bold';
+    if (cmd === 'italic') span.style.fontStyle = isActive ? 'normal' : 'italic';
+    if (cmd === 'underline') span.style.textDecoration = isActive ? 'none' : 'underline';
+    
+    if (!range.collapsed) {
+        try {
+            const frag = range.extractContents();
+            span.appendChild(frag);
+            range.insertNode(span);
+        } catch (e) {
+            range.surroundContents(span);
+        }
+        const nr = document.createRange();
+        nr.selectNodeContents(span);
+        sel.removeAllRanges();
+        sel.addRange(nr);
+    } else {
+        span.innerHTML = '&#8203;';
+        range.insertNode(span);
+        const nr = document.createRange();
+        nr.setStart(span.firstChild, 1);
+        nr.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(nr);
+    }
+    saveMainNote();
+    updateFormatBtns();
+}
+    function formatDoc(cmd, val) { 
     const ta = document.getElementById('notes-main-textarea'); 
     if (!ta) return; 
     
@@ -1752,16 +1825,11 @@ function formatDoc(cmd, val) {
             sel.addRange(newRange);
         }
     } 
-    // Formatos Básicos (Negrita, Subrayado, Cursiva)
-       // Formatos Básicos (Negrita, Subrayado, Cursiva)
+        // Formatos Básicos usando nuestra lógica manual
     else if (cmd === 'bold' || cmd === 'underline' || cmd === 'italic') { 
-        document.execCommand('styleWithCSS', false, true); 
-        
-        // 1. Comprobar el estado actual antes de ejecutar
-        const isActive = document.queryCommandState(cmd);
-        
-        // 2. Forzar el apagado (false) o encendido (true) estricto
-        document.execCommand(cmd, false, !isActive); 
+        applyCustomFormat(cmd);
+        return; // Salimos de la función para no duplicar código
+     
         
         // 3. Si acabamos de APAGAR el formato, limpiamos la zona
         if (isActive) {
@@ -1886,7 +1954,17 @@ function removeHighlighter() {
     saveMainNote();
     saveSelection();
 }
-function updateFormatBtns() { try { document.querySelectorAll('.notes-format-btn').forEach(b => { const oc = b.getAttribute('onclick') || ''; if (oc.includes("'bold'")) b.classList.toggle('cmd-active', document.queryCommandState('bold')); if (oc.includes("'underline'")) b.classList.toggle('cmd-active', document.queryCommandState('underline')); if (oc.includes("'justifyFull'")) b.classList.toggle('cmd-active', document.queryCommandState('justifyFull')); }); } catch(_) {} }
+function updateFormatBtns() { 
+    try { 
+        document.querySelectorAll('.notes-format-btn').forEach(b => { 
+            const oc = b.getAttribute('onclick') || ''; 
+            if (oc.includes("'bold'")) b.classList.toggle('cmd-active', isFormatActive('bold')); 
+            if (oc.includes("'underline'")) b.classList.toggle('cmd-active', isFormatActive('underline')); 
+            if (oc.includes("'italic'")) b.classList.toggle('cmd-active', isFormatActive('italic')); 
+            if (oc.includes("'justifyFull'")) b.classList.toggle('cmd-active', document.queryCommandState('justifyFull')); 
+        }); 
+    } catch(_) {} 
+}
 function insertDivider() { const ta = document.getElementById('notes-main-textarea'); if (!ta) return; ta.focus(); restoreSelection(); document.execCommand('insertHTML', false, '<hr><p><br></p>'); saveMainNote(); saveSelection(); }
 function insertCurrentTimeInNotes() { const ta = document.getElementById('notes-main-textarea'); if (!ta) return; const n = new Date(); const hh = String(n.getHours()).padStart(2, '0'); const mm = String(n.getMinutes()).padStart(2, '0'); const ts = `[${hh}:${mm}] `; ta.focus(); restoreSelection(); if (window.getSelection) { const s = window.getSelection(); if (s.getRangeAt && s.rangeCount) { const r = s.getRangeAt(0); r.deleteContents(); const tn = document.createTextNode(ts); r.insertNode(tn); r.setStartAfter(tn); r.setEndAfter(tn); s.removeAllRanges(); s.addRange(r); } } else if (document.selection && document.selection.createRange) document.selection.createRange().text = ts; saveMainNote(); }
 function saveDualNotes() { const ta = document.getElementById('dual-notes-text'); const d = ta.dataset.date; if (d) { notesData[d] = ta.value; scheduleNotesSave(); renderActiveWindow(); } }

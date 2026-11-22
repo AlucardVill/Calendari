@@ -1575,13 +1575,15 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
     if (!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
 
-    const isLink = (n) => {
-        if (!n) return false;
-        if (n.nodeType === 1) return n.classList.contains('wiki-link') || n.querySelector('.wiki-link') !== null;
-        if (n.nodeType === 3) return n.parentElement && n.parentElement.closest('.wiki-link') !== null;
+    // Función para saber si un elemento es un enlace o lo contiene
+    const hasLink = (el) => {
+        if (!el) return false;
+        if (el.nodeType === 1) return el.classList.contains('wiki-link') || el.querySelector('.wiki-link') !== null;
+        if (el.nodeType === 3) return el.parentElement && el.parentElement.closest('.wiki-link') !== null;
         return false;
     };
 
+    // 1. Si hay texto seleccionado, bloquear si toca un enlace
     if (!range.collapsed) {
         const links = this.querySelectorAll('.wiki-link');
         for (let link of links) {
@@ -1593,34 +1595,44 @@ document.getElementById('notes-main-textarea').addEventListener('beforeinput', f
     let node = range.startContainer;
     let offset = range.startOffset;
 
-    if (isLink(node)) { e.preventDefault(); return; }
+    // 2. Si el cursor está DENTRO de un enlace
+    if (hasLink(node)) { e.preventDefault(); return; }
 
+    // 3. Retroceso (Backspace)
     if (e.inputType === 'deleteContentBackward') {
         if (offset === 0) {
-            let block = node.nodeType === 3 ? node.parentNode : node;
+            let current = node.nodeType === 3 ? node.parentNode : node;
             
-            // Revisa si el hermano anterior es un enlace
-            let prev = block.previousElementSibling || block.previousSibling;
-            if (isLink(prev)) { e.preventDefault(); return; }
-            
-            // Si el anterior es un salto de línea (<br>), revisa el anterior a ese
-            if (prev && (prev.tagName === 'BR' || prev.innerHTML === '<br>')) {
-                let prevPrev = prev.previousElementSibling || prev.previousSibling;
-                if (isLink(prevPrev)) { e.preventDefault(); return; }
+            // Subimos por el árbol buscando el enlace anterior, ignorando saltos de línea
+            while (current && current !== this) {
+                let prev = current.previousSibling;
+                while (prev) {
+                    if (hasLink(prev)) { e.preventDefault(); return; }
+                    
+                    // Ignorar <br> y espacios vacíos
+                    if (prev.nodeType === 3 && prev.textContent.trim() === '') {
+                        prev = prev.previousSibling; continue;
+                    }
+                    if (prev.nodeType === 1 && (prev.tagName === 'BR' || prev.innerHTML === '<br>')) {
+                        prev = prev.previousSibling; continue;
+                    }
+                    break; 
+                }
+                current = current.parentNode;
             }
-
-            // BLOQUEO TOTAL: Si el primer elemento del área de texto es un enlace
-            if (this.firstChild && isLink(this.firstChild)) {
+            
+            // Escudo final: si el primer elemento de todo el cuadro es un enlace
+            if (this.firstChild && hasLink(this.firstChild)) {
                 e.preventDefault(); return;
             }
         }
-    }
-
-    if (e.inputType === 'deleteContentForward') {
-        let block = node.nodeType === 3 ? node.parentNode : node;
+    } 
+    // 4. Suprimir (Delete)
+    else if (e.inputType === 'deleteContentForward') {
+        let current = node.nodeType === 3 ? node.parentNode : node;
         if ((node.nodeType === 3 && offset === node.length) || (node.nodeType === 1 && offset === node.childNodes.length)) {
-            let next = block.nextElementSibling || block.nextSibling;
-            if (isLink(next)) { e.preventDefault(); return; }
+            let next = current.nextSibling;
+            if (next && hasLink(next)) { e.preventDefault(); return; }
         }
     }
 });
@@ -1694,7 +1706,7 @@ function formatDoc(cmd, val) {
     
     restoreSelection(); 
     
-       // Lógica para Fuente (Corregida para evitar saltos y limpiar tamaños)
+    // Lógica para Fuente (Limpieza profunda de tamaños)
     if (cmd === 'fontName') {
         const sel = window.getSelection();
         let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
@@ -1705,21 +1717,20 @@ function formatDoc(cmd, val) {
         }
 
         if (range && !range.collapsed) {
-            // 1. Aplicar la fuente nativamente
+            // 1. Aplicar fuente nativa
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('fontName', false, val);
 
-            // 2. Escanear TODOS los elementos del texto (span y font) para limpiar tamaños
+            // 2. Limpiar tamaños de CUALQUIER etiqueta (span o font)
             ta.querySelectorAll('span, font').forEach(el => {
                 const ff = el.style.fontFamily || el.getAttribute('face') || '';
                 if (ff.toLowerCase().includes('pinyon')) {
-                    // Si es Pinyon, tamaño grande
                     el.style.fontSize = '2rem';
                     el.style.lineHeight = '1.4';
                     el.style.display = 'inline-block';
                     el.style.paddingBottom = '6px';
                 } else {
-                    // Si es cualquier otra, limpiar TODO para que vuelva a la normalidad
+                    // Si no es Pinyon, borrar tamaños para volver a la normalidad
                     el.style.fontSize = '';
                     el.style.lineHeight = '';
                     el.style.display = '';
